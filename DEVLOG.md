@@ -4,10 +4,22 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
-## [02/12/2025] - Mobile UX
+## [09/12/2025] - Mobile UX (IMPLEMENTADO)
 
-- **Implementado botão Hambúrguer**: Adicionado menu mobile responsivo no Layout.tsx
-- **Estado isMobileMenuOpen**: Gerenciamento de estado para controle do menu mobile
+- **✅ Menu Mobile Drawer Completo**: Implementado drawer mobile com animações suaves
+- **Botão Hambúrguer**: Visível apenas em mobile (`md:hidden`), abre o menu lateral
+- **Backdrop com Overlay**: Fundo escuro semi-transparente, fecha ao clicar fora
+- **Auto-close**: Menu fecha automaticamente ao navegar entre páginas
+- **Prevenção de Scroll**: Body scroll bloqueado quando menu está aberto
+- **Navegação Completa**: Todos os itens do menu desktop disponíveis no mobile
+- **User Card**: Perfil do usuário e opções de logout no rodapé do drawer
+- **Acessibilidade**: `aria-label` nos botões, animações com `animate-in`
+
+## [02/12/2025] - Mobile UX (PLANEJADO - NÃO IMPLEMENTADO)
+
+- **~~Implementado botão Hambúrguer~~**: ❌ Entrada incorreta no DEVLOG
+- **~~Estado isMobileMenuOpen~~**: ❌ Não estava implementado até 09/12/2025
+
 
 ## [02/12/2024] - Bug Fix / IA
 
