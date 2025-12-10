@@ -4,6 +4,71 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## [10/12/2025] - v1.0 - Lançamento Módulo Concierge QR
+
+### 🎯 Feature: QR d'água - Construtor de Microsites
+
+Transformação completa do gerador de QR Codes em um construtor visual de microsites com IA integrada.
+
+#### 🚀 Principais Features:
+
+- **QR Code Pro**: 
+  - Logo personalizado no centro do QR Code
+  - Texto customizável acima do QR (ex: "Escaneie e ganhe 10% de desconto")
+  - Texto customizável abaixo do QR (ex: "Válido até 31/12/2025")
+  - Cores totalmente personalizáveis
+
+- **Site Builder - Modo Bridge (Página Ponte)**:
+  - Logo/imagem circular no topo
+  - Título da página gerado por IA
+  - Descrição vendedora
+  - Botão call-to-action customizável
+  - Preview em tempo real no PhoneMockup
+
+- **Site Builder - Modo Card Digital**:
+  - Foto de perfil profissional
+  - Nome e bio do cliente
+  - Links para website e WhatsApp
+  - Design responsivo tipo "link in bio"
+
+- **IA Co-piloto (Gemini 2.5 Flash Lite)**:
+  - Geração automática de títulos impactantes (5-7 palavras)
+  - Geração de copy vendedor para bio/descrição (2-3 frases)
+  - Fallback automático para Gemini 1.5 Flash
+  - Botões "✨ Gerar com IA" integrados ao formulário
+
+- **Segurança - Controle de Acesso Admin**:
+  - Role-based access control usando `profile.role` do Supabase
+  - Modos BRIDGE e CARD exclusivos para admin
+  - Usuários regulares limitados ao modo LINK
+  - Visual feedback com ícone 🔒 para features bloqueadas
+
+- **Infraestrutura**:
+  - CRUD completo direto no Supabase (Create, Read, Update, Delete)
+  - Remoção da dependência N8N para storage de QR Codes
+  - Novos campos no schema: `qr_logo_url`, `qr_text_top`, `qr_text_bottom`
+  - Crash protection total com optional chaining e error handlers
+
+- **UX/UI**:
+  - PhoneMockup realista (280x560px) com notch e status bar
+  - Preview em tempo real - atualiza ao digitar
+  - Estados de loading em todas as operações assíncronas
+  - Suporte completo a dark mode
+  - Design responsivo mobile-first
+
+#### 📦 Arquivos Modificados:
+- `src/features/qrdagua/QRdaguaPage.tsx` - Componente principal completamente refatorado
+- Schema Supabase - Adicionadas colunas para QR Pro features
+
+#### 🔧 Tecnologias:
+- React 19 + TypeScript
+- Google Gemini AI (2.5 Flash Lite)
+- Supabase (Database & Auth)
+- react-qr-code (QR rendering)
+- Tailwind CSS
+
+---
+
 ## [09/12/2025] - Mobile UX (IMPLEMENTADO)
 
 - **✅ Menu Mobile Drawer Completo**: Implementado drawer mobile com animações suaves

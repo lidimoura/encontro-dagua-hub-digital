@@ -24,33 +24,33 @@
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #cdc7c5;
     border-radius: 4px;
   }
 
   .dark .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #4a4140;
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #aca3a0;
   }
 
   .dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #5a4f4d;
   }
 
-  /* Dot Pattern Background */
+  /* Dot Pattern Background - Amazônia Theme */
   .bg-dots {
-    background-image: radial-gradient(#334155 1px, transparent 1px);
+    background-image: radial-gradient(#4a4140 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
   .dark .bg-dots {
-    background-image: radial-gradient(#1e293b 1px, transparent 1px);
+    background-image: radial-gradient(#3d3635 1px, transparent 1px);
   }
 
-  /* Glassmorphism Utilities */
+  /* Glassmorphism Utilities - Amazônia Theme */
   .glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
@@ -58,9 +58,9 @@
   }
 
   .dark .glass {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(26, 17, 16, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(197, 160, 101, 0.1);
   }
 }

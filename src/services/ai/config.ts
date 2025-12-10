@@ -12,7 +12,7 @@ export const getModel = (provider: AIProvider, apiKey: string, modelId: string) 
     switch (provider) {
         case 'google':
             const google = createGoogleGenerativeAI({ apiKey });
-            return google(modelId || 'gemini-1.5-flash');
+            return google(modelId || 'gemini-2.5-flash');
 
         case 'openai':
             const openai = createOpenAI({ apiKey });

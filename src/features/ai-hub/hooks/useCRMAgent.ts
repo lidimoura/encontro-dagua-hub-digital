@@ -62,10 +62,10 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
       limit?: number;
     }) => {
       let filtered = [...deals];
-      
+
       if (query) {
         const q = query.toLowerCase();
-        filtered = filtered.filter(d => 
+        filtered = filtered.filter(d =>
           d.title.toLowerCase().includes(q) ||
           d.companyName?.toLowerCase().includes(q)
         );
@@ -180,8 +180,8 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
         wonDeals: wonDeals.length,
         wonValue: wonDeals.reduce((sum, d) => sum + d.value, 0),
         lostDeals: lostDeals.length,
-        winRate: deals.length > 0 
-          ? Math.round((wonDeals.length / (wonDeals.length + lostDeals.length || 1)) * 100) 
+        winRate: deals.length > 0
+          ? Math.round((wonDeals.length / (wonDeals.length + lostDeals.length || 1)) * 100)
           : 0,
       };
     },
@@ -299,7 +299,7 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
       let companyId = '';
 
       if (contactName) {
-        const found = contacts.find(c => 
+        const found = contacts.find(c =>
           c.name.toLowerCase().includes(contactName.toLowerCase())
         );
         if (found) {
@@ -367,7 +367,7 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
       }
 
       const dealActivities = activities.filter(a => a.dealId === dealId);
-      const lastActivity = dealActivities.sort((a, b) => 
+      const lastActivity = dealActivities.sort((a, b) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
       )[0];
 
@@ -549,14 +549,26 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
 
       const result = streamText({
         model,
-        system: `Você é o assistente inteligente do FlowCRM. Você tem acesso completo ao CRM e pode:
+        system: `Você é o Flow AI, o co-piloto operacional do 'Encontro D'Água Hub'.
 
+SUA IDENTIDADE:
+Você é técnico, proativo e direto. Você ajuda a operar a máquina, não apenas conversar.
+
+SEUS PODERES ATUAIS:
+- Gestão completa do CRM (Deals, Contatos, Atividades)
 - Buscar e analisar deals, contatos e atividades
 - Criar novas atividades, deals e tarefas
 - Mover deals entre estágios do pipeline
 - Analisar riscos e sugerir próximas ações
 
-REGRAS:
+NOVOS PRODUTOS DO ECOSSISTEMA:
+1. QR d'água: Gerador de Links, Páginas Ponte e Cartões Digitais (Rota: /qrdagua)
+2. Estúdio IA: Criação de sites via imagem (Rota: /estudio)
+
+REGRA DE OURO:
+Se o usuário pedir para criar um site ou QR code, oriente-o a usar a rota específica (/qrdagua ou /estudio) ou use suas ferramentas se disponíveis.
+
+REGRAS OPERACIONAIS:
 1. Sempre use as ferramentas disponíveis para buscar dados reais antes de responder
 2. Seja conciso e direto nas respostas
 3. Quando criar algo, confirme o que foi criado
@@ -573,14 +585,14 @@ Você é proativo - se perceber oportunidades ou riscos, mencione-os.`,
 
       // Streaming da resposta
       let fullText = '';
-      
+
       for await (const chunk of result.textStream) {
         fullText += chunk;
         // Atualiza a mensagem em tempo real
         setMessages(prev => {
           const existing = prev.find(m => m.id === 'streaming');
           if (existing) {
-            return prev.map(m => 
+            return prev.map(m =>
               m.id === 'streaming' ? { ...m, content: fullText } : m
             );
           }
@@ -593,10 +605,10 @@ Você é proativo - se perceber oportunidades ou riscos, mencione-os.`,
       }
 
       // Finaliza a mensagem
-      setMessages(prev => 
-        prev.map(m => 
-          m.id === 'streaming' 
-            ? { ...m, id: crypto.randomUUID() } 
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === 'streaming'
+            ? { ...m, id: crypto.randomUUID() }
             : m
         )
       );
