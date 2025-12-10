@@ -38,6 +38,9 @@ const DecisionQueuePage = lazy(() =>
 const ProfilePage = lazy(() =>
   import('@/features/profile/ProfilePage').then(m => ({ default: m.ProfilePage }))
 );
+const QRdaguaPage = lazy(() =>
+  import('@/features/qrdagua/QRdaguaPage').then(m => ({ default: m.QRdaguaPage }))
+);
 
 // Layout wrapper for protected routes
 const ProtectedLayout: React.FC = () => (
@@ -77,6 +80,7 @@ const App: React.FC = () => {
                       <Route path="profile" element={<ProfilePage />} />
                       <Route path="ai" element={<AIHubPage />} />
                       <Route path="decisions" element={<DecisionQueuePage />} />
+                      <Route path="qrdagua" element={<QRdaguaPage />} />
                     </Route>
 
                     {/* Catch-all redirect */}

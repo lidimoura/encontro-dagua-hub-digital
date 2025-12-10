@@ -19,6 +19,7 @@ import {
   User,
   Menu,
   X,
+  QrCode,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
@@ -67,6 +68,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   // Gera iniciais do email
   const userInitials = profile?.email?.substring(0, 2).toUpperCase() || 'U';
@@ -102,13 +104,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Drawer */}
           <aside className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-50 md:hidden shadow-2xl animate-in slide-in-from-left duration-300 ease-out flex flex-col">
             {/* Header do Drawer */}
-            <div className="h-16 px-5 flex items-center justify-between border-b border-slate-200 dark:border-white/5">
+            <div className="h-16 px-5 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/20">
-                  N
+                <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
+                  A
                 </div>
-                <span className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-white">
-                  NossoCRM
+                <span className="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
+                  Amazônia Tech
                 </span>
               </div>
               <button
@@ -149,6 +151,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 label="Contatos"
                 active={location.pathname === '/contacts'}
                 prefetch="contacts"
+              />
+              <NavItem
+                to="/qrdagua"
+                icon={QrCode}
+                label="QR d'água"
+                active={location.pathname === '/qrdagua'}
               />
               <NavItem
                 to="/reports"
@@ -241,18 +249,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </>
       )}
 
-      <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
+      <div className="flex flex-1 h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
         {/* Sidebar */}
         <aside className="hidden md:flex w-64 flex-col z-20 glass border-r border-slate-200 dark:border-white/5">
-          <div className="h-16 px-5 flex items-center border-b border-slate-100 dark:border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/20">
-                N
+          <div className="h-16 px-5 flex items-center border-b border-solimoes-400/20 dark:border-solimoes-400/10">
+            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
+                E
               </div>
-              <span className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-white">
-                NossoCRM
+              <span className="text-lg font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
+                Encontro D'Água Hub
               </span>
-            </div>
+            </Link>
           </div>
 
           <nav className="flex-1 p-4 space-y-2">
@@ -283,6 +291,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label="Contatos"
               active={location.pathname === '/contacts'}
               prefetch="contacts"
+            />
+            <NavItem
+              to="/qrdagua"
+              icon={QrCode}
+              label="QR d'água"
+              active={location.pathname === '/qrdagua'}
             />
             <NavItem
               to="/reports"
@@ -382,54 +396,140 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 ease-in-out">
             {/* Ambient background glow */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-              <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[100px]"></div>
-                  }`}
-              title="Assistente Nosso"
-              >
-              <Sparkles size={20} />
-            </button>
-            <button className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-dark-card"></span>
-            </button>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95"
-            >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-        </div>
-      </header>
-
-      {/* Page Content */}
-      <div className="flex-1 overflow-auto p-6 relative z-10 scroll-smooth">{children}</div>
-    </main>
-
-        {/* Right Sidebar (AI Assistant) */ }
-  <div
-    className={`border-l border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 transition-all duration-300 ease-in-out overflow-hidden flex flex-col ${isGlobalAIOpen ? 'w-96 opacity-100' : 'w-0 opacity-0'}`}
-  >
-    <div className="w-96 h-full">
-      {isGlobalAIOpen && (
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+              <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px]"></div>
+              <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px]"></div>
             </div>
-          }
-        >
-          <AIAssistant
-            isOpen={true}
-            onClose={() => setIsGlobalAIOpen(false)}
-            variant="sidebar"
-            activeBoard={activeBoard}
-          />
-        </Suspense>
-      )}
+
+            {/* Header */}
+            <header className="h-16 px-6 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10 glass relative z-20">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden p-2 text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50 rounded-lg transition-colors"
+                aria-label="Abrir menu"
+              >
+                <Menu size={24} />
+              </button>
+
+              <div className="flex-1" />
+
+              {/* Right Actions */}
+              <div className="flex items-center gap-2">
+                {/* AI Assistant Button - Desktop: opens sidebar, Mobile: opens fullscreen modal */}
+                <button
+                  onClick={() => setIsGlobalAIOpen(!isGlobalAIOpen)}
+                  className={`p-2 rounded-full transition-all ${isGlobalAIOpen
+                    ? 'bg-acai-900 text-solimoes-400 shadow-lg shadow-acai-900/30'
+                    : 'text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50'
+                    }`}
+                  title="Assistente IA"
+                >
+                  <Sparkles size={20} />
+                </button>
+                {/* Notification Bell */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative transition-colors"
+                  >
+                    <Bell size={20} />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-dark-card animate-pulse"></span>
+                  </button>
+
+                  {/* Notification Popover */}
+                  {isNotificationOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsNotificationOpen(false)}
+                      />
+                      <div className="absolute right-0 top-full mt-2 w-80 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-top-2 fade-in duration-150">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                          <h3 className="font-semibold text-slate-900 dark:text-white">Notificações</h3>
+                        </div>
+                        <div className="p-4">
+                          <div className="flex gap-3">
+                            <div className="flex-shrink-0">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-acai-900 to-acai-700 flex items-center justify-center">
+                                <QrCode className="w-5 h-5 text-solimoes-400" />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
+                                Sistema atualizado
+                              </p>
+                              <p className="text-sm text-slate-600 dark:text-slate-400">
+                                Módulo QR d'água ativo
+                              </p>
+                              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
+                                Agora você pode criar e gerenciar QR Codes personalizados!
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95"
+                >
+                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+              </div>
+            </header>
+
+            {/* Page Content */}
+            <div className="flex-1 overflow-auto p-6 relative z-10 scroll-smooth">{children}</div>
+          </main>
+
+          {/* Right Sidebar (AI Assistant) - Desktop Only */}
+          <div
+            className={`hidden md:flex border-l border-solimoes-400/20 dark:border-solimoes-400/10 bg-white dark:bg-rionegro-900 transition-all duration-300 ease-in-out overflow-hidden flex-col ${isGlobalAIOpen ? 'w-96 opacity-100' : 'w-0 opacity-0'}`}
+          >
+            <div className="w-96 h-full">
+              {isGlobalAIOpen && (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-acai-900" />
+                    </div>
+                  }
+                >
+                  <AIAssistant
+                    isOpen={true}
+                    onClose={() => setIsGlobalAIOpen(false)}
+                    variant="sidebar"
+                    activeBoard={activeBoard}
+                  />
+                </Suspense>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile AI Modal - Fullscreen */}
+          {isGlobalAIOpen && (
+            <div className="md:hidden fixed inset-0 z-50 bg-rionegro-950">
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-acai-900" />
+                  </div>
+                }
+              >
+                <AIAssistant
+                  isOpen={true}
+                  onClose={() => setIsGlobalAIOpen(false)}
+                  variant="modal"
+                  activeBoard={activeBoard}
+                />
+              </Suspense>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  </div>
-      </div >
-    </div >
   );
 };
 
