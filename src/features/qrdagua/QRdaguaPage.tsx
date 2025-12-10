@@ -286,7 +286,6 @@ export const QRdaguaPage: React.FC = () => {
             try {
                 model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
             } catch {
-                console.log('Fallback to gemini-1.5-flash');
                 model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
             }
 
@@ -327,7 +326,6 @@ export const QRdaguaPage: React.FC = () => {
             try {
                 model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
             } catch {
-                console.log('Fallback to gemini-1.5-flash');
                 model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
             }
 
