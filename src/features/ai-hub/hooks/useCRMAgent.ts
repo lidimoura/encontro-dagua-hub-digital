@@ -565,6 +565,63 @@ NOVOS PRODUTOS DO ECOSSISTEMA:
 1. QR d'água: Gerador de Links, Páginas Ponte e Cartões Digitais (Rota: /qrdagua)
 2. Estúdio IA: Criação de sites via imagem (Rota: /estudio)
 
+MÓDULO QR D'ÁGUA - DOCUMENTAÇÃO COMPLETA:
+
+VISÃO GERAL:
+O QR d'água é um Construtor de Sites/Concierge que permite criar 3 tipos de projetos:
+1. LINK - QR Code simples que redireciona para URL
+2. BRIDGE - Página Ponte com título, descrição, imagem e botão CTA
+3. CARD - Cartão Digital de visita com perfil, links e WhatsApp
+
+PERMISSÕES:
+- LINK: Disponível para todos os usuários
+- BRIDGE e CARD: Exclusivo para Admins (role='admin')
+
+FUNCIONALIDADES:
+
+1. QR Code LINK:
+   - URL de destino obrigatória
+   - Cor personalizável (hex)
+   - Slug único para identificação
+   - QR Code Pro (opcional):
+     * Logo no centro do QR
+     * Texto acima do QR
+     * Texto abaixo do QR
+
+2. Página BRIDGE (Admin):
+   - Título da página (pode ser gerado por IA)
+   - Descrição/Bio (pode ser gerada por IA)
+   - Imagem de capa (URL)
+   - Botão CTA com texto customizável
+   - WhatsApp integrado
+   - Preview em tempo real no formato mobile
+
+3. Cartão Digital CARD (Admin):
+   - Foto de perfil
+   - Nome e bio profissional
+   - Link para website
+   - Botão de WhatsApp direto
+   - Design responsivo tipo vCard
+
+GERAÇÃO DE CONTEÚDO IA:
+- Usa Gemini 2.5 Flash Lite (fallback: 1.5 Flash)
+- Gera títulos impactantes (5-7 palavras)
+- Gera bios vendedoras (2-3 frases)
+- Botões "✨ Gerar" disponíveis na interface
+
+PREÇOS (INFORMAR AO USUÁRIO):
+- LINK: Gratuito para todos
+- BRIDGE: R$ 49/mês (requer Admin)
+- CARD: R$ 79/mês (requer Admin)
+- QR Pro (logo + textos): +R$ 19/mês
+
+COMO ORIENTAR O USUÁRIO:
+1. Se pedir QR simples → "Acesse /qrdagua e escolha tipo LINK"
+2. Se pedir página de vendas → "Acesse /qrdagua e escolha BRIDGE (requer permissão Admin)"
+3. Se pedir cartão digital → "Acesse /qrdagua e escolha CARD (requer permissão Admin)"
+4. Se não for Admin e pedir BRIDGE/CARD → "Solicite ao administrador para criar BRIDGE/CARD ou para elevar suas permissões"
+5. Se perguntar sobre preços → Informe a tabela acima
+
 REGRA DE OURO:
 Se o usuário pedir para criar um site ou QR code, oriente-o a usar a rota específica (/qrdagua ou /estudio) ou use suas ferramentas se disponíveis.
 
@@ -577,6 +634,7 @@ REGRAS OPERACIONAIS:
 6. Datas em formato brasileiro (dd/mm/aaaa)
 
 Você é proativo - se perceber oportunidades ou riscos, mencione-os.`,
+
         messages: coreMessages,
         tools,
         stopWhen: stepCountIs(5), // Permite multi-step automático

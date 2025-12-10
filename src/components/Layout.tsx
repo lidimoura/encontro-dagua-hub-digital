@@ -20,6 +20,8 @@ import {
   Menu,
   X,
   QrCode,
+  Wand2,
+  RefreshCcw,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
@@ -64,7 +66,8 @@ const NavItem = ({
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { isGlobalAIOpen, setIsGlobalAIOpen, activeBoard } = useCRM();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, refreshProfile } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -157,6 +160,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 icon={QrCode}
                 label="QR d'água"
                 active={location.pathname === '/qrdagua'}
+              />
+              <NavItem
+                to="/prompt-lab"
+                icon={Wand2}
+                label="Prompt Lab"
+                active={location.pathname === '/prompt-lab'}
               />
               <NavItem
                 to="/reports"
@@ -299,6 +308,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               active={location.pathname === '/qrdagua'}
             />
             <NavItem
+              to="/prompt-lab"
+              icon={Wand2}
+              label="Prompt Lab"
+              active={location.pathname === '/prompt-lab'}
+            />
+            <NavItem
               to="/reports"
               icon={BarChart3}
               label="Relatórios"
@@ -415,6 +430,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               {/* Right Actions */}
               <div className="flex items-center gap-2">
+                {/* Refresh Profile Button */}
+                <button
+                  onClick={async () => {
+                    setIsRefreshing(true);
+                    try {
+                      await refreshProfile();
+                    } finally {
+                      setIsRefreshing(false);
+                    }
+                  }}
+                  disabled={isRefreshing}
+                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all disabled:opacity-50"
+                  title="Atualizar permissões"
+                >
+                  <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+                </button>
                 {/* AI Assistant Button - Desktop: opens sidebar, Mobile: opens fullscreen modal */}
                 <button
                   onClick={() => setIsGlobalAIOpen(!isGlobalAIOpen)}

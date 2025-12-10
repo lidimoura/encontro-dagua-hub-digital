@@ -41,6 +41,10 @@ const ProfilePage = lazy(() =>
 const QRdaguaPage = lazy(() =>
   import('@/features/qrdagua/QRdaguaPage').then(m => ({ default: m.QRdaguaPage }))
 );
+const PromptLabPage = lazy(() =>
+  import('@/features/prompt-lab/PromptLabPage').then(m => ({ default: m.default }))
+);
+
 
 // Layout wrapper for protected routes
 const ProtectedLayout: React.FC = () => (
@@ -81,6 +85,7 @@ const App: React.FC = () => {
                       <Route path="ai" element={<AIHubPage />} />
                       <Route path="decisions" element={<DecisionQueuePage />} />
                       <Route path="qrdagua" element={<QRdaguaPage />} />
+                      <Route path="prompt-lab" element={<PromptLabPage />} />
                     </Route>
 
                     {/* Catch-all redirect */}
