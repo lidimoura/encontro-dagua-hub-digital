@@ -447,10 +447,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
                           <h3 className="font-semibold text-slate-900 dark:text-white">Notificações</h3>
                         </div>
-                        <div className="p-4">
-                          <div className="flex gap-3">
+                        <div className="p-2">
+                          <Link
+                            to="/qrdagua"
+                            onClick={() => setIsNotificationOpen(false)}
+                            className="flex gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group"
+                          >
                             <div className="flex-shrink-0">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-acai-900 to-acai-700 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-acai-900 to-acai-700 flex items-center justify-center group-hover:scale-105 transition-transform">
                                 <QrCode className="w-5 h-5 text-solimoes-400" />
                               </div>
                             </div>
@@ -465,7 +469,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 Agora você pode criar e gerenciar QR Codes personalizados!
                               </p>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       </div>
                     </>
