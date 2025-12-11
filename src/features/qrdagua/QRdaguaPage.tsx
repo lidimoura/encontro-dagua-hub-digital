@@ -686,7 +686,6 @@ export const QRdaguaPage: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all font-mono"
                                     placeholder="restaurante-amazonia"
-                                    pattern="[a-z0-9-]+"
                                     title="Apenas letras minúsculas, números e hífens"
                                     required
                                 />
@@ -869,13 +868,17 @@ export const QRdaguaPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Phone Preview - 1 column, sticky */}
+                {/* Preview - 1 column */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white dark:bg-rionegro-900 rounded-2xl shadow-xl border border-solimoes-400/20 dark:border-solimoes-400/10 p-6 lg:sticky lg:top-6">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 text-center">
-                            Preview no Celular
+                    <div className="sticky top-6">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            📱 Preview
                         </h3>
-                        <PhoneMockup formData={formData} />
+                        <div className="flex justify-center items-start overflow-hidden">
+                            <div className="transform scale-75 origin-top">
+                                <PhoneMockup formData={formData} />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
