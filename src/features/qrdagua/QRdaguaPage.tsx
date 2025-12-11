@@ -25,6 +25,9 @@ interface QRFormData {
     qrLogoUrl?: string;
     qrTextTop?: string;
     qrTextBottom?: string;
+    // Portfolio/Gallery fields
+    inPortfolio?: boolean;
+    inGallery?: boolean;
 }
 
 interface QRProject {
@@ -39,6 +42,8 @@ interface QRProject {
     button_text?: string;
     image_url?: string;
     whatsapp?: string;
+    in_portfolio?: boolean;
+    in_gallery?: boolean;
     created_at: string;
 }
 
@@ -360,6 +365,8 @@ export const QRdaguaPage: React.FC = () => {
             buttonText: project.button_text,
             imageUrl: project.image_url,
             whatsapp: project.whatsapp,
+            inPortfolio: project.in_portfolio || false,
+            inGallery: project.in_gallery || false,
         });
         setEditingId(project.id);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -395,6 +402,8 @@ export const QRdaguaPage: React.FC = () => {
             qrLogoUrl: '',
             qrTextTop: '',
             qrTextBottom: '',
+            inPortfolio: false,
+            inGallery: false,
         });
         setEditingId(null);
     };
@@ -423,6 +432,8 @@ export const QRdaguaPage: React.FC = () => {
                 qr_logo_url: formData.qrLogoUrl || null,
                 qr_text_top: formData.qrTextTop || null,
                 qr_text_bottom: formData.qrTextBottom || null,
+                in_portfolio: formData.inPortfolio || false,
+                in_gallery: formData.inGallery || false,
             };
 
             if (editingId) {
@@ -742,6 +753,50 @@ export const QRdaguaPage: React.FC = () => {
                                     className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all resize-none"
                                     placeholder="Descrição do negócio (opcional)"
                                 />
+                            </div>
+
+                            {/* Portfolio/Gallery Checkboxes */}
+                            <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-500/20 rounded-lg">
+                                <h3 className="text-sm font-semibold text-green-900 dark:text-green-400 flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                    </svg>
+                                    Vitrine Pública
+                                </h3>
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.inPortfolio || false}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, inPortfolio: e.target.checked }))}
+                                            className="w-4 h-4 text-green-600 bg-white dark:bg-rionegro-950 border-green-300 dark:border-green-700 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                                                📁 Exibir no Portfólio
+                                            </span>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                                Projeto aparecerá na landing page oficial
+                                            </p>
+                                        </div>
+                                    </label>
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.inGallery || false}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, inGallery: e.target.checked }))}
+                                            className="w-4 h-4 text-green-600 bg-white dark:bg-rionegro-950 border-green-300 dark:border-green-700 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                                                🖼️ Exibir na Galeria
+                                            </span>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                                Projeto aparecerá na galeria de exemplos
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
 
                             {/* Enhanced QR Code Fields (LINK type only) */}
