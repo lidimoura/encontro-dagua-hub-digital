@@ -3,7 +3,7 @@ import { QrCode, Sparkles, Save, Link as LinkIcon, Palette, FileText, Edit2, Tra
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { QRCodeSVG } from 'react-qr-code';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase/client';
 
 type ProjectType = 'LINK' | 'BRIDGE' | 'CARD';
