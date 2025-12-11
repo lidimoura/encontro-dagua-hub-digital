@@ -4,7 +4,101 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
-## 🎖️ MARCO: [10/12/2025] - v1.1 - Business OS & Concierge
+## 🛡️ MARCO: [11/12/2025] - v1.2 - Security Hardening & Bug Bash
+
+### 🔐 Database Security - Multi-tenant RLS
+
+**Problema Crítico Resolvido:** Infinite recursion em RLS policies causava crash ao editar perfis.
+
+#### Implementação Híbrida (Tenant Isolation + Super Admin)
+
+**Funções SECURITY DEFINER (Bypass RLS):**
+- `get_user_company_id()` - Retorna company_id sem triggerar RLS
+- `is_user_admin()` - Checa role='admin' sem recursão
+- `is_super_admin()` - Checa email OU coluna `is_super_admin`
+
+**Policies Criadas (8 total):**
+1. `tenant_isolation_select` - Users veem apenas sua company
+2. `super_admin_view_all` - Super admin vê todas companies
+3. `users_update_own` - Users editam só próprio perfil (protege role/company_id)
+4. `admin_update_company` - Admins editam apenas sua company
+5. `super_admin_update_all` - Super admin edita qualquer perfil
+6. `admin_insert_company` - Admins criam apenas em sua company
+7. `super_admin_insert_all` - Super admin cria em qualquer company
+8. `super_admin_delete_all` - Apenas super admin deleta
+
+**Limpeza de Policies:**
+- Script "Nuclear V3" com PL/pgSQL dinâmico
+- Removidas 15+ policies conflitantes (PT-BR, Read access, tenant_isolation antigas)
+- Estado final: Exatamente 8 policies ativas
+
+**Nova Coluna:**
+- `profiles.is_super_admin` (boolean, default false)
+- Permite adicionar super admins via painel (futuro)
+
+#### Arquivos SQL Criados:
+- `rls_nuclear_v3.sql` - Limpeza dinâmica de policies
+- `fix_company_id.sql` - Correção de UUID undefined
+- `rls_multitenant_fix.sql` - Implementação completa
+
+---
+
+### 🐛 Bug Bash - Correções Críticas
+
+#### 1. Crash "Tela Preta" no QR Code
+**Sintoma:** App crashava ao digitar URL no campo de destino  
+**Causa:** Import incorreto da biblioteca QR Code  
+**Fix:** Trocado `react-qr-code` para `qrcode.react`  
+**Arquivo:** `src/features/qrdagua/QRdaguaPage.tsx` (linha 6)
+
+#### 2. Erro "invalid input syntax for type uuid: undefined"
+**Sintoma:** Falha ao criar contatos ou editar perfil  
+**Causa:** Usuário sem `company_id` válido no banco  
+**Fix:** Script SQL para vincular usuário a company  
+**Impacto:** Bloqueava operações CRUD em todo o sistema
+
+#### 3. Menu Prompt Lab "Desaparecido"
+**Sintoma:** Item não aparecia no menu lateral  
+**Causa:** Cache do browser (código estava correto)  
+**Fix:** Hard refresh (`Ctrl+Shift+R`)  
+**Confirmado:** Menu presente em mobile (linha 164) e desktop (linha 310)
+
+---
+
+### 📊 Métricas da Sprint de Segurança
+
+| Métrica | Valor |
+|---------|-------|
+| Policies antigas removidas | 15+ |
+| Policies novas criadas | 8 |
+| Funções SECURITY DEFINER | 3 |
+| Bugs críticos corrigidos | 3 |
+| Scripts SQL gerados | 5 |
+| Tentativas de limpeza RLS | 3 (V1, V2, V3) |
+
+---
+
+### 🎯 Status Pós-Correção
+
+**✅ ESTÁVEL EM PRODUÇÃO (Vercel)**
+
+- **RLS:** Sem recursão infinita, tenant isolation funcional
+- **Super Admin:** Acesso global implementado
+- **QR Code:** Sem crashes em validação de URL
+- **Data Integrity:** Todos os usuários com company_id válido
+- **Build:** Dependência `qrcode.react` adicionada ao package.json
+
+---
+
+### 🔮 Próximos Passos
+
+1. **Dogfooding:** Criar 3 projetos QR d'água (Amazô, Yara, CRM Hub)
+2. **Landing Page:** Construir portfólio público com projetos marcados
+3. **Analytics:** Rastrear uso de Prompt Lab e QR d'água
+4. **Super Admin Panel:** Interface para gerenciar super admins
+
+---
+
 
 ### 🏆 Transformação Estratégica
 
