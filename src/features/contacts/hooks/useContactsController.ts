@@ -25,7 +25,7 @@ export const useContactsController = () => {
 
   // Enable realtime sync
   useRealtimeSync('contacts');
-  useRealtimeSync('crm_companies');
+  useRealtimeSync('companies');
 
   const { addToast, showToast } = useToast();
   const [searchParams] = useSearchParams();

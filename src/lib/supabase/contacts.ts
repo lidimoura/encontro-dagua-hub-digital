@@ -68,7 +68,7 @@ const transformCompany = (db: DbCompany): Company => ({
 // Transform App -> DB
 const transformContactToDb = (contact: Partial<Contact>): Partial<DbContact> => {
   const db: Partial<DbContact> = {};
-  
+
   if (contact.name !== undefined) db.name = contact.name;
   if (contact.email !== undefined) db.email = contact.email || null;
   if (contact.phone !== undefined) db.phone = contact.phone || null;
@@ -83,7 +83,7 @@ const transformContactToDb = (contact: Partial<Contact>): Partial<DbContact> => 
   if (contact.lastInteraction !== undefined) db.last_interaction = contact.lastInteraction || null;
   if (contact.lastPurchaseDate !== undefined) db.last_purchase_date = contact.lastPurchaseDate || null;
   if (contact.totalValue !== undefined) db.total_value = contact.totalValue;
-  
+
   return db;
 };
 
@@ -151,7 +151,7 @@ export const companiesService = {
   async getAll(): Promise<{ data: Company[] | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
-        .from('crm_companies')
+        .from('companies')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -165,7 +165,7 @@ export const companiesService = {
   async create(company: Omit<Company, 'id' | 'createdAt'>, tenantId: string): Promise<{ data: Company | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
-        .from('crm_companies')
+        .from('companies')
         .insert({
           name: company.name,
           industry: company.industry || null,
@@ -191,7 +191,7 @@ export const companiesService = {
       dbUpdates.updated_at = new Date().toISOString();
 
       const { error } = await supabase
-        .from('crm_companies')
+        .from('companies')
         .update(dbUpdates)
         .eq('id', id);
 
@@ -204,7 +204,7 @@ export const companiesService = {
   async delete(id: string): Promise<{ error: Error | null }> {
     try {
       const { error } = await supabase
-        .from('crm_companies')
+        .from('companies')
         .delete()
         .eq('id', id);
 
