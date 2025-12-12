@@ -416,6 +416,13 @@ export const QRdaguaPage: React.FC = () => {
             return;
         }
 
+        // Get current user ID
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            showToast('Você precisa estar logado para criar projetos', 'error');
+            return;
+        }
+
         setIsSaving(true);
         try {
             const payload = {
@@ -434,6 +441,7 @@ export const QRdaguaPage: React.FC = () => {
                 qr_text_bottom: formData.qrTextBottom || null,
                 in_portfolio: formData.inPortfolio || false,
                 in_gallery: formData.inGallery || false,
+                owner_id: user.id, // FIX: Add user ID to prevent null constraint violation
             };
 
             if (editingId) {
