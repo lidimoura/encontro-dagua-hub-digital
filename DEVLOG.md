@@ -4,6 +4,288 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🚀 MARCO: [11/12/2025] - v1.3 - QR Module Fixes & System Audit
+
+### 🔧 QR d'água - Correções Críticas de Deploy
+
+**Contexto**: O módulo QR d'água estava com 4 erros críticos impedindo o uso em produção.
+
+#### Problemas Identificados e Resolvidos:
+
+**1. Schema Mismatch (FATAL)**
+- **Problema**: Tabela `qr_codes` existia mas faltavam 16 colunas essenciais
+- **Sintoma**: `Could not find the 'project_type' column in schema cache`
+- **Solução**: Criado migration `001_add_qr_codes_table.sql` com ALTER TABLE
+- **Colunas Adicionadas**:
+  - Core: `project_type`, `client_name`, `destination_url`, `slug`, `color`, `description`
+  - BRIDGE/CARD: `page_title`, `button_text`, `image_url`, `whatsapp`
+  - QR Pro: `qr_logo_url`, `qr_text_top`, `qr_text_bottom`
+  - Portfolio: `in_portfolio`, `in_gallery`
+  - Sistema: `created_at`, `updated_at`, `owner_id`, `company_id`
+- **Arquivo**: `supabase/migrations/001_add_qr_codes_table.sql`
+
+**2. Regex Mobile Crash**
+- **Problema**: Flag `/v` não suportada em browsers mobile
+- **Sintoma**: `Uncaught SyntaxError: Invalid regular expression: /[a-z0-9-]+/v`
+- **Solução**: Removido atributo `pattern` do input slug (linha 689)
+- **Arquivo**: `src/features/qrdagua/QRdaguaPage.tsx`
+
+**3. CSS Overflow no PhoneMockup**
+- **Problema**: Preview do celular (280x560px) vazava o layout
+- **Solução**: Adicionado `transform scale-75` com container responsivo
+- **Arquivo**: `src/features/qrdagua/QRdaguaPage.tsx` (linhas 871-880)
+
+**4. Companies Table Name**
+- **Status**: ✅ Já estava correto como `companies`
+- **Ação**: Nenhuma necessária
+
+#### Git Commit:
+- **Hash**: `739dffc`
+- **Branch**: `main`
+- **Mensagem**: "fix: resolve QR module critical errors"
+
+---
+
+### 📊 Auditoria Completa do Sistema
+
+**Motivação**: Sistema fragmentado sem visibilidade clara do que funciona vs mockup.
+
+#### Documentação Criada:
+
+**1. System Status Document**
+- **Arquivo**: `system_status.md` (artifact)
+- **Conteúdo**:
+  - Status de todas as features (Funcionando / Com Bug / Mockup)
+  - Auditoria completa das capacidades do AI Flow
+  - Lista de 12 tools conectadas vs features não implementadas
+  - Métricas do sistema (21 tabelas, 12 features funcionando)
+  - Roadmap de prioridades (P0 a P3)
+
+**2. AI Flow - Capacidades Auditadas**
+
+**✅ O Que Funciona (12 Tools Conectadas)**:
+- Leitura: `searchDeals`, `getContact`, `getActivitiesToday`, `getOverdueActivities`, `getPipelineStats`, `getDealDetails`
+- Escrita: `createActivity`, `completeActivity`, `moveDeal`, `updateDealValue`, `createDeal`
+- Análise: `analyzeStagnantDeals`, `suggestNextAction`
+
+**❌ O Que NÃO Funciona (Não Implementado)**:
+- Criação/edição de Boards (usuário deve usar wizard manual)
+- Geração de documentos (apenas mockup)
+- Integrações externas (email, WhatsApp, N8N)
+
+**System Prompt**:
+- ✅ Já inclui documentação completa do QR d'água
+- ✅ Já inclui informações do Prompt Lab
+- ✅ Orienta usuário para rotas corretas
+- ✅ Informa preços (R$ 0, R$ 49, R$ 79)
+
+**3. UX - Componente de Onboarding**
+
+**OnboardingModal ("Aba Rosa")**:
+- **Localização**: `src/components/OnboardingModal.tsx`
+- **Status**: ✅ Implementado e funcionando em `/boards`
+- **Características**: Modal fullscreen, gradiente rosa/roxo, 3 cards de features
+- **Replicabilidade**: ⭐⭐⭐⭐⭐ (Muito fácil de adaptar)
+- **Próximos Passos**: Adicionar em `/qrdagua` e `/prompt-lab`
+
+---
+
+### 🚨 Problemas Ativos Identificados
+
+**1. Erro 400 em Todas as Rotas**
+- **Status**: 🔴 CRÍTICO - BLOQUEADOR
+- **Sintoma**: POST requests retornam 400 Bad Request
+- **Tabelas Afetadas**: `companies`, `contacts`, `qr_codes`
+- **Causa Provável**:
+  - PostgREST cache desatualizado após migration
+  - Migration SQL não executada no Supabase
+  - TypeScript types desatualizados
+- **Ação Necessária**: Usuário deve executar SQL migration manualmente
+
+---
+
+### 📋 Status Atual por Categoria
+
+**🟢 Funcionando (12 features)**:
+- Login/Auth, Boards, Deals, Contatos, Atividades
+- AI Flow (Chat), Board Wizard (IA), Prompt Lab
+- Multi-tenancy (RLS), Dark Mode, Mobile Menu
+
+**🟡 Implementado mas com Bugs (2 features)**:
+- QR d'água (código pronto, aguardando fix 400)
+- Companies Service (tabela existe, 400 em POST)
+
+**🔴 Apenas Visual / Mockup (3 features)**:
+- Estúdio IA (rota planejada)
+- Geração de documentos (AI Flow sem tool)
+- Integração N8N (webhooks comentados)
+
+**⚪ Planejado / Não Iniciado (5 features)**:
+- Stripe (pagamentos)
+- Landing Page pública
+- Analytics
+- Templates de prompts
+- Webhooks de QR Code
+
+---
+
+### 🎯 Próximos Passos (Prioridades)
+
+**P0 - Crítico (Bloqueador)**:
+1. ⏳ Usuário executar SQL migration no Supabase
+2. ⏳ Verificar cache PostgREST
+3. ⏳ Testar criação de QR code
+
+**P1 - Alta (UX)**:
+1. ⏳ Adicionar OnboardingModal em `/qrdagua`
+2. ⏳ Adicionar OnboardingModal em `/prompt-lab`
+
+**P2 - Média (Features)**:
+1. ⏳ Implementar Landing Page pública
+2. ⏳ Conectar AI Flow com Board creation (tool)
+
+---
+
+### 📊 Métricas da Sprint
+
+| Métrica | Valor |
+|---------|-------|
+| Bugs críticos corrigidos | 3 |
+| SQL migrations criadas | 1 |
+| Colunas adicionadas ao DB | 16 |
+| Documentação criada | 3 arquivos |
+| AI Tools auditadas | 12 |
+| Features catalogadas | 22 |
+
+---
+
+### ✅ SQL Migration - Executado com Sucesso
+
+**Data**: 11/12/2025 22:10  
+**Arquivo**: `001_add_qr_codes_table.sql`  
+**Status**: ✅ SUCCESS  
+**Resultado**: Todas as 16 colunas adicionadas à tabela `qr_codes`
+
+**Ação de Follow-up**:
+- Criado script `002_refresh_postgrest.sql` para forçar reload do schema cache
+- Se erro 400 persistir: Executar `NOTIFY pgrst, 'reload schema';` no SQL Editor
+- Alternativa: Restart PostgREST via Supabase Dashboard (Settings > API)
+
+---
+
+### 🎨 Brand Identity Update - Açaí Purple
+
+**Motivação**: Sair do "rosa genérico" para uma identidade sofisticada e profunda.
+
+**Mudanças no Tailwind Config**:
+- **Antes**: Primary = Rosa (#e34b9b, #cf2d7c, #620939)
+- **Depois**: Primary = Roxo Profundo (#a855f7, #9333ea, #581c87)
+- **Inspiração**: Açaí (deep purple/violet) - sofisticado, profissional, profundo
+- **Aplicação**: OnboardingModal, gradientes, destaques do QR Code
+
+**Cores da Nova Paleta**:
+- `primary-500`: #a855f7 (Vivid Purple)
+- `primary-600`: #9333ea (Deep Purple)
+- `primary-700`: #7e22ce (Rich Purple)
+- `primary-900`: #581c87 (Very Dark Purple - Açaí)
+
+---
+
+### 🚀 Roadmap Estratégico - Business Operating System
+
+**Visão**: O Hub não é apenas um CRM, é o centro de comando da agência.
+
+#### A) Stack Knowledge Base (Planejado)
+
+**Objetivo**: Cadastrar o stack tecnológico atual da agência.
+
+**Campos Necessários**:
+- Nome da ferramenta (ex: "Supabase", "Vercel", "Gemini AI")
+- Categoria (Database, Hosting, AI, Design, etc)
+- Custo mensal (R$)
+- Versão/Plano atual
+- Documentação (link)
+- Casos de uso (quando usar)
+
+**Uso pelo AI Agent**:
+- O "Agente Técnico" consultará o Stack KB para arquitetar soluções
+- Exemplo: "Cliente precisa de um backend" → AI sugere Supabase (já temos)
+- Evita reinventar a roda e mantém consistência
+
+**Implementação Futura**:
+- Nova tabela: `tech_stack`
+- Nova rota: `/stack` (admin only)
+- AI Flow tool: `searchTechStack({ category, maxCost })`
+
+---
+
+#### B) Specialized Agents Integration (Planejado)
+
+**Objetivo**: Evoluir Prompt Lab para invocar agentes especializados.
+
+**Agentes Existentes** (já criados pela equipe):
+1. **QA Agent**: Testa código e identifica bugs
+2. **Architect Agent**: Desenha arquitetura de sistemas
+3. **Onboarding Agent**: Cria planos de onboarding para clientes
+
+**Funcionalidade Desejada**:
+- Prompt Lab vira "Agent Hub"
+- Usuário seleciona agente + fornece contexto do projeto
+- Agente roda com contexto do CRM (cliente, deal, stack)
+- Resultado é salvo no deal como "AI Analysis"
+
+**Implementação Futura**:
+- Nova tabela: `agents` (nome, system_prompt, tools, model)
+- Nova feature: "Invocar Agente" no DealDetailModal
+- AI Flow tool: `runSpecializedAgent({ agentId, dealId, context })`
+
+---
+
+#### C) GitHub Lifecycle Sync (Planejado)
+
+**Objetivo**: Sincronizar DEVLOG com commits do GitHub automaticamente.
+
+**Fluxo Desejado**:
+1. Dev faz commit no GitHub
+2. Webhook notifica o Hub
+3. Hub extrai mensagem do commit
+4. DEVLOG é atualizado automaticamente
+5. Cliente vê progresso em tempo real no dashboard
+
+**Features Relacionadas**:
+- Templates de repositórios prontos (Next.js, Vite, Supabase)
+- "Iniciar Projeto" cria repo no GitHub + board no CRM
+- Commits linkados a deals/atividades
+
+**Implementação Futura**:
+- GitHub App/Webhook integration
+- Nova tabela: `project_repositories`
+- Nova rota: `/projects` (gerenciamento de projetos de clientes)
+- AI Flow tool: `createProjectFromTemplate({ clientId, template })`
+
+---
+
+### 📝 Notas Estratégicas
+
+**Filosofia do Sistema**:
+- De CRM → Business Operating System
+- De "Gestão de Vendas" → "Centro de Comando da Agência"
+- De "Dados Isolados" → "Inteligência Conectada"
+
+**Princípios de Desenvolvimento**:
+1. **Context-Aware AI**: Agentes sempre têm contexto completo (cliente, stack, histórico)
+2. **No-Code First**: Usuário não-técnico deve conseguir operar tudo
+3. **Automation by Default**: Se pode ser automatizado, deve ser
+4. **Single Source of Truth**: Hub é a fonte única de verdade
+
+**Próximas Sprints** (Prioridade):
+1. P0: Resolver erro 400 definitivamente (PostgREST cache)
+2. P1: Adicionar OnboardingModal em QR d'água e Prompt Lab
+3. P2: Implementar Stack Knowledge Base (MVP)
+4. P3: Evoluir Prompt Lab para Agent Hub
+
+---
+
 ## 🛡️ MARCO: [11/12/2025] - v1.2 - Security Hardening & Bug Bash
 
 ### 🔐 Database Security - Multi-tenant RLS

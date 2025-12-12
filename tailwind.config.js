@@ -64,19 +64,19 @@ export default {
                     900: '#620939', // Main Purple
                     950: '#3d0522',
                 },
-                // Keep primary as alias to acai for compatibility
+                // Keep primary as deep purple (Açaí brand identity)
                 primary: {
-                    50: '#fdf4f8',
-                    100: '#fbe8f3',
-                    200: '#f9d1e8',
-                    300: '#f5aad4',
-                    400: '#ee76b8',
-                    500: '#e34b9b',
-                    600: '#cf2d7c',
-                    700: '#b21f63',
-                    800: '#931d52',
-                    900: '#620939',
-                    950: '#3d0522',
+                    50: '#faf5ff',   // Lightest lavender
+                    100: '#f3e8ff',  // Soft lavender
+                    200: '#e9d5ff',  // Light purple
+                    300: '#d8b4fe',  // Medium light purple
+                    400: '#c084fc',  // Bright purple
+                    500: '#a855f7',  // Vivid purple
+                    600: '#9333ea',  // Deep purple
+                    700: '#7e22ce',  // Rich purple
+                    800: '#6b21a8',  // Dark purple
+                    900: '#581c87',  // Very dark purple (Açaí)
+                    950: '#3b0764',  // Deepest purple
                 },
                 dark: {
                     bg: '#1A1110', // Rio Negro - Profundo
