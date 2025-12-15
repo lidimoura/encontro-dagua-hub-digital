@@ -18,7 +18,7 @@ import AudioPlayer from '@/components/ui/AudioPlayer';
 interface AIAssistantProps {
   isOpen: boolean;
   onClose: () => void;
-  variant?: 'overlay' | 'sidebar';
+  variant?: 'overlay' | 'sidebar' | 'modal' | 'floating';
   activeBoard?: Board | null;
 }
 
@@ -342,7 +342,9 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   const baseClasses =
     variant === 'overlay'
       ? 'fixed inset-y-0 right-0 w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-white/10 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300'
-      : 'w-full h-full flex flex-col';
+      : variant === 'floating' || variant === 'modal'
+        ? 'w-full h-full flex flex-col'
+        : 'w-full h-full flex flex-col';
 
   return (
     <div className={baseClasses} onPaste={handlePaste}>
@@ -388,12 +390,14 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             )}
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="p-2 -mr-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-white/5"
-        >
-          <X size={18} />
-        </button>
+        {variant !== 'floating' && (
+          <button
+            onClick={onClose}
+            className="p-2 -mr-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-white/5"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       {/* Messages */}
@@ -404,13 +408,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
           >
             <div
-              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                msg.role === 'user'
-                  ? (mode === 'board'
-                      ? 'bg-purple-600 shadow-purple-600/10'
-                      : 'bg-blue-600 shadow-blue-600/10') + ' text-white rounded-br-sm'
-                  : 'bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-white/5 rounded-bl-sm backdrop-blur-sm'
-              } whitespace-pre-wrap`}
+              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user'
+                ? (mode === 'board'
+                  ? 'bg-purple-600 shadow-purple-600/10'
+                  : 'bg-blue-600 shadow-blue-600/10') + ' text-white rounded-br-sm'
+                : 'bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-white/5 rounded-bl-sm backdrop-blur-sm'
+                } whitespace-pre-wrap`}
             >
               {/* Attachments Display */}
               {msg.attachments && msg.attachments.length > 0 && (
@@ -527,11 +530,10 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
           {/* Audio Recording Button */}
           <button
             onClick={isRecording ? stopRecording : startRecording}
-            className={`p-2 transition-colors rounded-full ${
-              isRecording
-                ? 'text-red-500 bg-red-100 dark:bg-red-900/20 animate-pulse'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
-            }`}
+            className={`p-2 transition-colors rounded-full ${isRecording
+              ? 'text-red-500 bg-red-100 dark:bg-red-900/20 animate-pulse'
+              : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
+              }`}
             title={isRecording ? 'Parar gravação' : 'Gravar áudio'}
           >
             {isRecording ? <StopCircle size={18} /> : <Mic size={18} />}

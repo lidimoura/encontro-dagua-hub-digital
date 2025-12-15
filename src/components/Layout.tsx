@@ -27,6 +27,7 @@ import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { prefetchRoute, RouteName } from '@/lib/prefetch';
+import { FloatingAIWidget } from './FloatingAIWidget';
 
 // Lazy load AI Assistant (heavy component with Gemini SDK)
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -65,7 +66,6 @@ const NavItem = ({
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
-  const { isGlobalAIOpen, setIsGlobalAIOpen, activeBoard } = useCRM();
   const { profile, signOut, refreshProfile } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const location = useLocation();
@@ -410,10 +410,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Middle Content (Header + Page) */}
           <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 ease-in-out">
             {/* Ambient background glow */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-              <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px]"></div>
-              <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px]"></div>
-            </div>
+            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px]"></div>
+            <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px]"></div>
 
             {/* Header */}
             <header className="h-16 px-6 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10 glass relative z-20">
@@ -445,17 +443,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   title="Atualizar permissões"
                 >
                   <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                </button>
-                {/* AI Assistant Button - Desktop: opens sidebar, Mobile: opens fullscreen modal */}
-                <button
-                  onClick={() => setIsGlobalAIOpen(!isGlobalAIOpen)}
-                  className={`p-2 rounded-full transition-all ${isGlobalAIOpen
-                    ? 'bg-acai-900 text-solimoes-400 shadow-lg shadow-acai-900/30'
-                    : 'text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50'
-                    }`}
-                  title="Assistente IA"
-                >
-                  <Sparkles size={20} />
                 </button>
                 {/* Notification Bell */}
                 <div className="relative">
@@ -518,54 +505,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Page Content */}
             <div className="flex-1 overflow-auto p-6 relative z-10 scroll-smooth">{children}</div>
           </main>
-
-          {/* Right Sidebar (AI Assistant) - Desktop Only */}
-          <div
-            className={`hidden md:flex border-l border-solimoes-400/20 dark:border-solimoes-400/10 bg-white dark:bg-rionegro-900 transition-all duration-300 ease-in-out overflow-hidden flex-col ${isGlobalAIOpen ? 'w-96 opacity-100' : 'w-0 opacity-0'}`}
-          >
-            <div className="w-96 h-full">
-              {isGlobalAIOpen && (
-                <Suspense
-                  fallback={
-                    <div className="flex items-center justify-center h-full">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-acai-900" />
-                    </div>
-                  }
-                >
-                  <AIAssistant
-                    isOpen={true}
-                    onClose={() => setIsGlobalAIOpen(false)}
-                    variant="sidebar"
-                    activeBoard={activeBoard}
-                  />
-                </Suspense>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile AI Modal - Fullscreen */}
-          {isGlobalAIOpen && (
-            <div className="md:hidden fixed inset-0 z-50 bg-rionegro-950">
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-acai-900" />
-                  </div>
-                }
-              >
-                <AIAssistant
-                  isOpen={true}
-                  onClose={() => setIsGlobalAIOpen(false)}
-                  variant="modal"
-                  activeBoard={activeBoard}
-                />
-              </Suspense>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Floating AI Widget - Omnipresent */}
+      <FloatingAIWidget isAuthenticated={!!profile} />
     </div>
   );
 };
+
 
 export default Layout;
