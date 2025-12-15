@@ -540,6 +540,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
           </button>
 
           <input
+            id="chat-input"
+            name="message"
             type="text"
             className="flex-1 bg-transparent border-0 px-2 py-2 text-sm text-slate-900 dark:text-white focus:ring-0 outline-none placeholder:text-slate-400"
             placeholder={

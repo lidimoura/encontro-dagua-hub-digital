@@ -367,8 +367,12 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
                   </div>
                   {board.agentPersona && (
                     <button
-                      onClick={() => setIsGlobalAIOpen(true)}
+                      onClick={() => {
+                        // Open the FloatingAIWidget with board context
+                        setIsGlobalAIOpen(true);
+                      }}
                       className="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 px-2 py-0.5 rounded flex items-center gap-1 transition-colors"
+                      title="Conversar com o agente"
                     >
                       <MessageSquare size={12} /> Falar
                     </button>

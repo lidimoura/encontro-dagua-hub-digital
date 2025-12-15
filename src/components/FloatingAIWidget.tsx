@@ -71,8 +71,8 @@ export const FloatingAIWidget: React.FC<FloatingAIWidgetProps> = ({ isAuthentica
                     {/* Glow effect */}
                     <div className="absolute inset-0 bg-primary-900 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity animate-pulse"></div>
 
-                    {/* Button */}
-                    <div className="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary-900 to-acai-900 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 ring-4 ring-primary-900/20">
+                    {/* Button - Glass/Transparent */}
+                    <div className="relative w-14 h-14 md:w-16 md:h-16 bg-acai-900/80 backdrop-blur-md rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 ring-4 ring-primary-900/20 border border-white/10">
                         <Sparkles className="w-7 h-7 md:w-8 md:h-8" />
                     </div>
 
@@ -93,14 +93,18 @@ export const FloatingAIWidget: React.FC<FloatingAIWidgetProps> = ({ isAuthentica
                         onClick={() => setIsOpen(false)}
                     />
 
-                    {/* Chat Container */}
+                    {/* Chat Container - Fixed positioning */}
                     <div
-                        className={`fixed z-50 animate-in slide-in-from-bottom-4 fade-in duration-300 ${
-                            // Desktop: bottom-right corner, Mobile: fullscreen
-                            'bottom-0 right-0 md:bottom-6 md:right-6 w-full h-full md:w-[400px] md:h-[600px] md:max-h-[calc(100vh-48px)]'
-                            }`}
+                        className="fixed z-50 animate-in slide-in-from-bottom-4 fade-in duration-300"
+                        style={{
+                            bottom: '24px',
+                            right: '24px',
+                            width: window.innerWidth < 768 ? '100vw' : '400px',
+                            height: window.innerWidth < 768 ? '100vh' : '600px',
+                            maxHeight: window.innerWidth < 768 ? '100vh' : 'calc(100vh - 48px)',
+                        }}
                     >
-                        <div className="h-full bg-white dark:bg-slate-900 md:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div className="h-full bg-neutral-900 md:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-700">
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-900 to-acai-900">
                                 <div className="flex items-center gap-3">
