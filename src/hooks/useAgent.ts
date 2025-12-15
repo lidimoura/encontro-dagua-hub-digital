@@ -264,8 +264,9 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
           }
         }
 
-        console.log('Calling streamText with:', {
+        console.log('🚀 [useAgent] Calling streamText with:', {
           model: aiModel,
+          provider: aiProvider,
           system: systemPrompt ? 'present' : 'none',
           historyLength: history.length,
         });
@@ -278,19 +279,42 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
           tools: tools as Parameters<typeof streamText>[0]['tools'],
         });
 
+        console.log('✅ [useAgent] streamText result received, starting to iterate...');
+
         // Create a placeholder for the assistant's response
         const assistantMsgId = crypto.randomUUID();
         let fullResponse = '';
+        let chunkCount = 0;
 
         setMessages(prev => [...prev, { id: assistantMsgId, role: 'assistant', content: '' }]);
 
+        console.log('📝 [useAgent] Placeholder message created with ID:', assistantMsgId);
+
         // Iterate over the stream
         for await (const textPart of result.textStream) {
+          chunkCount++;
+          console.log(`📦 [useAgent] Chunk #${chunkCount}:`, {
+            textPart,
+            length: textPart?.length || 0,
+            type: typeof textPart,
+          });
+
           fullResponse += textPart;
+
+          console.log(`📊 [useAgent] Full response so far (${fullResponse.length} chars):`,
+            fullResponse.substring(0, 100) + (fullResponse.length > 100 ? '...' : '')
+          );
+
           setMessages(prev =>
             prev.map(m => (m.id === assistantMsgId ? { ...m, content: fullResponse } : m))
           );
         }
+
+        console.log('🏁 [useAgent] Stream complete!', {
+          totalChunks: chunkCount,
+          finalLength: fullResponse.length,
+          finalContent: fullResponse.substring(0, 200),
+        });
 
         if (onFinish) {
           onFinish({ id: assistantMsgId, role: 'assistant', content: fullResponse });
