@@ -465,9 +465,23 @@ export const QRdaguaPage: React.FC = () => {
 
             resetForm();
             fetchProjects();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao salvar:', error);
-            showToast('Erro ao salvar projeto. Tente novamente.', 'error');
+
+            // Handle specific error cases
+            if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
+                // Duplicate slug error
+                showToast('Este link (slug) já está em uso. Tente outro nome.', 'error');
+            } else if (error?.code === '23502') {
+                // Not null constraint
+                showToast('Erro: Campo obrigatório faltando. Verifique os dados.', 'error');
+            } else if (error?.message) {
+                // Show specific error message from database
+                showToast(`Erro: ${error.message}`, 'error');
+            } else {
+                // Generic error
+                showToast('Erro ao salvar projeto. Tente novamente.', 'error');
+            }
         } finally {
             setIsSaving(false);
         }

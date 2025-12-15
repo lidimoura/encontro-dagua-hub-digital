@@ -113,7 +113,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   A
                 </div>
                 <span className="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                  Amazônia Tech
+                  Encontro D'água Hub
                 </span>
               </div>
               <button
