@@ -47,6 +47,9 @@ const PromptLabPage = lazy(() =>
 const AdminUsersPage = lazy(() =>
   import('@/features/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage }))
 );
+const BridgePage = lazy(() =>
+  import('@/pages/BridgePage').then(m => ({ default: m.BridgePage }))
+);
 
 
 // Layout wrapper for protected routes
@@ -72,6 +75,7 @@ const App: React.FC = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/join" element={<JoinPage />} />
                     <Route path="/setup" element={<SetupWizard />} />
+                    <Route path="/v/:slug" element={<BridgePage />} />
 
                     {/* Protected routes with Layout */}
                     <Route element={<ProtectedLayout />}>
