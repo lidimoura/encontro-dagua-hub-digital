@@ -4,6 +4,113 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🚀 MARCO: [15/12/2025] - v1.4 - System Stabilization & AI Widget
+
+### 🔧 Critical Fixes - Layout Duplication Removed
+
+**Contexto**: Sistema travou devido a duplicação completa de código no Layout.tsx durante sessão anterior.
+
+#### Problema Resolvido:
+- **Arquivo**: `src/components/Layout.tsx`
+- **Sintoma**: Código duplicado causando erros de compilação
+- **Antes**: 1.059 linhas (componente Layout declarado 2x)
+- **Depois**: 518 linhas (código limpo)
+- **Componentes Duplicados Removidos**:
+  - Interface `LayoutProps` (declarada 2x)
+  - Componente `NavItem` (declarado 2x)
+  - Componente `Layout` completo (declarado 2x)
+
+#### Git Commit:
+- **Hash**: `7c786e5`
+- **Branch**: `main`
+- **Mensagem**: "fix: remove Layout.tsx duplication and implement Açaí-themed FloatingAIWidget"
+
+---
+
+### ✨ Feature: Floating AI Widget (Açaí Theme)
+
+**Objetivo**: Transformar o AI Assistant em widget flutuante omnipresente com identidade visual Açaí.
+
+#### Implementação:
+- **Arquivo**: `src/components/FloatingAIWidget.tsx`
+- **Status**: ✅ Já existia, atualizado com branding Açaí
+
+#### Características:
+1. **Cor Açaí (Roxo Profundo/Sério)**:
+   - Botão FAB: `bg-gradient-to-br from-primary-900 to-acai-900`
+   - Glow effect: `bg-primary-900` com blur e pulse animation
+   - Header do chat: `bg-gradient-to-r from-primary-900 to-acai-900`
+   - Cores hex: `#581c87` (primary-900) e `#620939` (acai-900)
+
+2. **Auto-hide no Scroll (Mobile-Friendly)**:
+   - Esconde ao rolar para baixo (após 100px)
+   - Reaparece ao rolar para cima
+   - Transição suave: `translate-y` + `opacity`
+   - `pointer-events-none` quando escondido
+
+3. **Context-Aware Chat**:
+   - Detecta página atual automaticamente
+   - Contextos: Boards, Contatos, QR d'água, Prompt Lab, Dashboard, etc.
+   - Exibe contexto no header do chat
+   - Integrado com `AIAssistant` component
+
+4. **Responsividade**:
+   - Desktop: Floating panel (400x600px) no canto inferior direito
+   - Mobile: Fullscreen overlay
+   - Backdrop com blur effect
+   - Botão FAB: 56x56px (mobile) / 64x64px (desktop)
+
+#### UX:
+- Ícone: `Sparkles` (✨)
+- Tooltip: "AI Flow"
+- Animações: `animate-pulse`, `hover:scale-110`
+- Z-index: 40 (FAB) / 50 (overlay)
+
+---
+
+### 🏗️ Config: Agent Integration (Placeholder)
+
+**Nota**: Configuração inicial para futura integração de agentes especializados.
+
+#### Agentes Planejados:
+- **Precificação**: Cálculo de orçamentos baseado em escopo
+- **Jurídico**: Análise de contratos e termos legais
+- **Amazo (Hub Manager)**: Gerente do Hub com acesso SuperAdmin (ver system_architecture.md)
+
+#### Status:
+- ⏳ Placeholders criados em `src/services/n8n/n8nService.ts`
+- ⏳ Funções: `calculatePricing()`, `consultLegalAgent()`
+- ⏳ Aguardando definição de workflows N8N
+
+---
+
+### 📊 Métricas da Sprint
+
+| Métrica | Valor |
+|---------|-------|
+| Arquivos modificados | 2 |
+| Linhas removidas (Layout.tsx) | ~541 |
+| Bugs críticos corrigidos | 1 |
+| Features atualizadas | 1 |
+| Commits realizados | 1 |
+
+---
+
+### 🎯 Status Atual
+
+**✅ SISTEMA ESTÁVEL E PRONTO PARA CLIENTE REAL**
+
+- **Compilação**: ✅ Sem erros
+- **Dev Server**: ✅ Rodando (porta 5173)
+- **Layout**: ✅ Código limpo (518 linhas)
+- **FloatingAIWidget**: ✅ Açaí branding implementado
+- **Boards/Kanban**: ✅ Funcional
+- **Contatos/Deals**: ✅ Funcional
+- **QR d'água**: ✅ Funcional
+
+---
+
+
 ## 🚀 MARCO: [11/12/2025] - v1.3 - QR Module Fixes & System Audit
 
 ### 🔧 QR d'água - Correções Críticas de Deploy
