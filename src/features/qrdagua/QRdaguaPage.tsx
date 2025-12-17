@@ -91,42 +91,61 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                             <div className="flex flex-col items-center justify-center h-full">
                                 {/* Text Above QR */}
                                 {qrTextTop && (
-                                    <p className="mb-3 text-sm font-semibold text-slate-900 dark:text-white text-center">
+                                    <p className="mb-4 text-sm font-semibold text-slate-900 dark:text-white text-center px-2">
                                         {qrTextTop}
                                     </p>
                                 )}
 
-                                {/* QR Code with Logo */}
-                                <div className="relative">
-                                    <QRCodeSVG
-                                        value={safeUrl}
-                                        size={180}
-                                        level="H"
-                                        fgColor={safeColor}
-                                    />
-                                    {qrLogoUrl && (
-                                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-lg p-1 shadow-lg">
-                                            <img
-                                                src={qrLogoUrl}
-                                                alt="Logo"
-                                                className="w-full h-full object-contain"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = 'none';
-                                                }}
+                                {/* Premium QR Code Container with Glassmorphism */}
+                                <div className="relative group">
+                                    {/* Gradient Background Glow */}
+                                    <div className="absolute -inset-4 bg-gradient-to-br from-acai-900/30 via-acai-700/20 to-solimoes-400/30 rounded-3xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
+
+                                    {/* Glassmorphism Container */}
+                                    <div className="relative bg-white/90 dark:bg-rionegro-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-acai-900/30">
+                                        {/* Decorative Corner Accents */}
+                                        <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-acai-900/40 rounded-tl-lg"></div>
+                                        <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-acai-900/40 rounded-tr-lg"></div>
+                                        <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-acai-900/40 rounded-bl-lg"></div>
+                                        <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-acai-900/40 rounded-br-lg"></div>
+
+                                        {/* QR Code with Subtle Pulse Animation */}
+                                        <div className="relative animate-pulse-subtle">
+                                            <QRCodeSVG
+                                                value={safeUrl}
+                                                size={180}
+                                                level="H"
+                                                fgColor={safeColor}
+                                                bgColor="transparent"
                                             />
+
+                                            {/* Logo Overlay with Enhanced Styling */}
+                                            {qrLogoUrl && (
+                                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white dark:bg-white rounded-xl p-2 shadow-xl ring-2 ring-acai-900/20">
+                                                    <img
+                                                        src={qrLogoUrl}
+                                                        alt="Logo"
+                                                        className="w-full h-full object-contain"
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
 
                                 {/* Text Below QR */}
                                 {qrTextBottom && (
-                                    <p className="mt-3 text-xs text-slate-600 dark:text-slate-400 text-center">
+                                    <p className="mt-4 text-xs text-slate-600 dark:text-slate-400 text-center px-2">
                                         {qrTextBottom}
                                     </p>
                                 )}
 
                                 {!qrTextBottom && (
-                                    <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
+                                    <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center flex items-center gap-1">
+                                        <span className="inline-block w-1.5 h-1.5 bg-solimoes-400 rounded-full animate-pulse"></span>
                                         Escaneie para acessar
                                     </p>
                                 )}
