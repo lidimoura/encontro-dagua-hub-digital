@@ -1,6 +1,17 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
+/**
+ * Props for the ConfirmModal component
+ * @property {boolean} isOpen - Controls the visibility of the modal
+ * @property {() => void} onClose - Callback function when the modal is closed
+ * @property {() => void} onConfirm - Callback function when the user confirms the action
+ * @property {string} title - The title text displayed in the modal
+ * @property {string} message - The message text displayed in the modal
+ * @property {string} [confirmText='Confirmar'] - Optional text for the confirm button
+ * @property {string} [cancelText='Cancelar'] - Optional text for the cancel button
+ * @property {'danger' | 'primary'} [variant='danger'] - Visual variant of the modal (affects colors)
+ */
 interface ConfirmModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -12,6 +23,26 @@ interface ConfirmModalProps {
     variant?: 'danger' | 'primary';
 }
 
+/**
+ * ConfirmModal - A reusable confirmation dialog component
+ * 
+ * Displays a modal dialog with a title, message, and action buttons.
+ * Used for confirming destructive or important actions before proceeding.
+ * Supports two visual variants: 'danger' (red) for destructive actions and 'primary' (brand color) for regular confirmations.
+ * 
+ * @param {ConfirmModalProps} props - Component props
+ * @returns {JSX.Element | null} The rendered modal or null if not open
+ * 
+ * @example
+ * <ConfirmModal
+ *   isOpen={showModal}
+ *   onClose={() => setShowModal(false)}
+ *   onConfirm={handleDelete}
+ *   title="Excluir Item"
+ *   message="Tem certeza que deseja excluir este item?"
+ *   variant="danger"
+ * />
+ */
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
     isOpen,
     onClose,
@@ -29,8 +60,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
                 <div className="p-6 text-center">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${variant === 'danger'
-                            ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
-                            : 'bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                        ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                        : 'bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
                         }`}>
                         <AlertTriangle size={24} />
                     </div>
@@ -56,8 +87,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                                 onClose();
                             }}
                             className={`px-4 py-2 rounded-lg text-sm font-bold text-white shadow-lg transition-all ${variant === 'danger'
-                                    ? 'bg-red-600 hover:bg-red-500 shadow-red-600/20'
-                                    : 'bg-primary-600 hover:bg-primary-500 shadow-primary-600/20'
+                                ? 'bg-red-600 hover:bg-red-500 shadow-red-600/20'
+                                : 'bg-primary-600 hover:bg-primary-500 shadow-primary-600/20'
                                 }`}
                         >
                             {confirmText}

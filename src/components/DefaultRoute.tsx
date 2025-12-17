@@ -2,6 +2,19 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { usePersistedState } from '@/hooks/usePersistedState';
 
+/**
+ * DefaultRoute - Handles the default route navigation for the application
+ * 
+ * This component redirects users to their preferred default route (stored in localStorage).
+ * If no default route is set, it defaults to '/dashboard'.
+ * Also handles special cases for Inbox view modes (list/focus).
+ * 
+ * @returns {JSX.Element} A Navigate component that redirects to the appropriate route
+ * 
+ * @example
+ * // In router configuration:
+ * <Route path="/" element={<DefaultRoute />} />
+ */
 export const DefaultRoute: React.FC = () => {
     // Default to /dashboard if not set
     const [defaultRoute] = usePersistedState<string>('crm_default_route', '/dashboard');

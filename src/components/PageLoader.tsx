@@ -1,5 +1,18 @@
 import React from 'react';
 
+/**
+ * PageLoader - A loading spinner component for page-level loading states
+ * 
+ * Displays a centered, animated spinner with "Carregando..." text.
+ * Used during route transitions, data fetching, or authentication checks.
+ * 
+ * @returns {JSX.Element} A centered loading spinner with text
+ * 
+ * @example
+ * if (loading) {
+ *   return <PageLoader />;
+ * }
+ */
 export const PageLoader: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-[60vh]">

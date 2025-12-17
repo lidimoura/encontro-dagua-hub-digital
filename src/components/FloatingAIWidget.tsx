@@ -5,10 +5,28 @@ import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import AIAssistant from './AIAssistant';
 
+/**
+ * Props for the FloatingAIWidget component
+ * @property {boolean} isAuthenticated - Whether the user is currently authenticated
+ */
 interface FloatingAIWidgetProps {
     isAuthenticated: boolean;
 }
 
+/**
+ * FloatingAIWidget - Omnipresent AI assistant floating action button (FAB)
+ * 
+ * Provides a floating AI assistant button that appears in the bottom-right corner of the screen.
+ * Features auto-hide on scroll down and reappear on scroll up for better UX.
+ * When clicked, opens an overlay chat panel with the AI assistant.
+ * Automatically provides page context to the AI based on the current route.
+ * 
+ * @param {FloatingAIWidgetProps} props - Component props
+ * @returns {JSX.Element} The floating AI widget with FAB and overlay chat
+ * 
+ * @example
+ * <FloatingAIWidget isAuthenticated={!!user} />
+ */
 export const FloatingAIWidget: React.FC<FloatingAIWidgetProps> = ({ isAuthenticated }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);

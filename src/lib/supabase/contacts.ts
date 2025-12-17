@@ -1,10 +1,17 @@
 import { supabase } from './client';
 import { Contact, Company } from '@/types';
 
-// ============================================
-// CONTACTS SERVICE
-// ============================================
+/**
+ * Contacts Service
+ * 
+ * Provides CRUD operations for contacts and companies in the CRM.
+ * Handles data transformation between database schema (snake_case) and application types (camelCase).
+ * All operations are scoped to the authenticated user's company via RLS policies.
+ */
 
+/**
+ * Database representation of a contact (snake_case fields)
+ */
 export interface DbContact {
   id: string;
   name: string;
@@ -27,6 +34,9 @@ export interface DbContact {
   owner_id: string | null;
 }
 
+/**
+ * Database representation of a company (snake_case fields)
+ */
 export interface DbCompany {
   id: string;
   name: string;
@@ -37,7 +47,13 @@ export interface DbCompany {
   owner_id: string | null;
 }
 
-// Transform DB -> App
+/**
+ * Transforms a database contact record to application Contact type
+ * Converts snake_case fields to camelCase and handles null values
+ * 
+ * @param {DbContact} db - Database contact record
+ * @returns {Contact} Application contact object
+ */
 const transformContact = (db: DbContact): Contact => ({
   id: db.id,
   name: db.name,
@@ -57,6 +73,12 @@ const transformContact = (db: DbContact): Contact => ({
   createdAt: db.created_at,
 });
 
+/**
+ * Transforms a database company record to application Company type
+ * 
+ * @param {DbCompany} db - Database company record
+ * @returns {Company} Application company object
+ */
 const transformCompany = (db: DbCompany): Company => ({
   id: db.id,
   name: db.name,
@@ -65,7 +87,13 @@ const transformCompany = (db: DbCompany): Company => ({
   createdAt: db.created_at,
 });
 
-// Transform App -> DB
+/**
+ * Transforms an application Contact object to database format
+ * Converts camelCase fields to snake_case and handles empty strings as null
+ * 
+ * @param {Partial<Contact>} contact - Partial contact object with updates
+ * @returns {Partial<DbContact>} Database-compatible contact object
+ */
 const transformContactToDb = (contact: Partial<Contact>): Partial<DbContact> => {
   const db: Partial<DbContact> = {};
 
@@ -87,7 +115,18 @@ const transformContactToDb = (contact: Partial<Contact>): Partial<DbContact> => 
   return db;
 };
 
+/**
+ * Contacts Service
+ * 
+ * Provides CRUD operations for contacts with automatic data transformation.
+ * All operations respect Row Level Security (RLS) policies.
+ */
 export const contactsService = {
+  /**
+   * Retrieves all contacts for the authenticated user's company
+   * 
+   * @returns {Promise<{data: Contact[] | null, error: Error | null}>} Array of contacts or error
+   */
   async getAll(): Promise<{ data: Contact[] | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
@@ -102,6 +141,13 @@ export const contactsService = {
     }
   },
 
+  /**
+   * Creates a new contact
+   * 
+   * @param {Omit<Contact, 'id' | 'createdAt'>} contact - Contact data (without id and createdAt)
+   * @param {string} companyId - Company ID to associate the contact with
+   * @returns {Promise<{data: Contact | null, error: Error | null}>} Created contact or error
+   */
   async create(contact: Omit<Contact, 'id' | 'createdAt'>, companyId: string): Promise<{ data: Contact | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
@@ -117,6 +163,13 @@ export const contactsService = {
     }
   },
 
+  /**
+   * Updates an existing contact
+   * 
+   * @param {string} id - Contact ID to update
+   * @param {Partial<Contact>} updates - Partial contact data to update
+   * @returns {Promise<{error: Error | null}>} Error if update failed, null otherwise
+   */
   async update(id: string, updates: Partial<Contact>): Promise<{ error: Error | null }> {
     try {
       const dbUpdates = transformContactToDb(updates);
@@ -133,6 +186,12 @@ export const contactsService = {
     }
   },
 
+  /**
+   * Deletes a contact
+   * 
+   * @param {string} id - Contact ID to delete
+   * @returns {Promise<{error: Error | null}>} Error if deletion failed, null otherwise
+   */
   async delete(id: string): Promise<{ error: Error | null }> {
     try {
       const { error } = await supabase
@@ -147,7 +206,17 @@ export const contactsService = {
   },
 };
 
+/**
+ * Companies Service
+ * 
+ * Provides CRUD operations for companies with automatic data transformation.
+ */
 export const companiesService = {
+  /**
+   * Retrieves all companies for the authenticated user's company
+   * 
+   * @returns {Promise<{data: Company[] | null, error: Error | null}>} Array of companies or error
+   */
   async getAll(): Promise<{ data: Company[] | null; error: Error | null }> {
     try {
       const { data, error } = await supabase

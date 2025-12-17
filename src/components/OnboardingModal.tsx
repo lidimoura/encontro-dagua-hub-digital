@@ -1,12 +1,34 @@
 import React from 'react';
 import { Sparkles, ArrowRight, X } from 'lucide-react';
 
+/**
+ * Props for the OnboardingModal component
+ * @property {boolean} isOpen - Controls the visibility of the onboarding modal
+ * @property {() => void} onStart - Callback function when user clicks "Start" to begin onboarding
+ * @property {() => void} onSkip - Callback function when user skips the onboarding process
+ */
 interface OnboardingModalProps {
     isOpen: boolean;
     onStart: () => void;
     onSkip: () => void;
 }
 
+/**
+ * OnboardingModal - First-time user onboarding experience
+ * 
+ * Displays a welcoming modal for new users, encouraging them to create their first board.
+ * Features a gradient design with key benefits and two CTAs: start onboarding or explore independently.
+ * 
+ * @param {OnboardingModalProps} props - Component props
+ * @returns {JSX.Element | null} The rendered onboarding modal or null if not open
+ * 
+ * @example
+ * <OnboardingModal
+ *   isOpen={isFirstVisit}
+ *   onStart={handleStartOnboarding}
+ *   onSkip={handleSkipOnboarding}
+ * />
+ */
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     isOpen,
     onStart,
