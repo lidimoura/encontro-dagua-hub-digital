@@ -61,18 +61,18 @@ export const BridgePage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="min-h-screen bg-[#0f0f12] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
 
     if (notFound || !data) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-[#0f0f12] flex items-center justify-center p-4">
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">404</h1>
-                    <p className="text-slate-600 dark:text-slate-400">Link não encontrado</p>
+                    <h1 className="text-4xl font-bold text-white mb-4">404</h1>
+                    <p className="text-slate-400">Link não encontrado</p>
                 </div>
             </div>
         );
@@ -80,51 +80,75 @@ export const BridgePage: React.FC = () => {
 
     // BRIDGE or CARD page rendering
     return (
-        <div
-            className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center p-4"
-            style={{ backgroundColor: data.color ? `${data.color}10` : undefined }}
-        >
-            <div className="max-w-2xl w-full">
-                <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="min-h-screen bg-[#0f0f12] flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background Gradient Orbs */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-fuchsia-600/5 rounded-full blur-3xl"></div>
+            </div>
+
+            <div className="max-w-2xl w-full relative z-10">
+                {/* Glassmorphism Container - Dark Mode */}
+                <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
                     {/* Header Image */}
                     {data.image_url && (
-                        <div className="w-full h-64 bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                        <div className="w-full h-64 bg-gradient-to-br from-purple-900/20 to-violet-900/20 overflow-hidden relative">
                             <img
                                 src={data.image_url}
                                 alt={data.client_name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover opacity-80"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f12]/80 to-transparent"></div>
                         </div>
                     )}
 
                     {/* Content */}
                     <div className="p-8 md:p-12">
-                        {/* QR Code with custom styling */}
+                        {/* QR Code with Premium Dark Glassmorphism */}
                         {data.qr_logo_url && (
                             <div className="flex justify-center mb-8">
                                 <div className="text-center">
                                     {data.qr_text_top && (
-                                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                                        <p className="text-sm text-slate-300 font-medium mb-4">
                                             {data.qr_text_top}
                                         </p>
                                     )}
-                                    <div className="bg-white p-4 rounded-2xl shadow-lg inline-block">
-                                        <QRCodeSVG
-                                            value={`${window.location.origin}/#/v/${data.slug}`}
-                                            size={200}
-                                            level="H"
-                                            includeMargin
-                                            fgColor={data.color || '#000000'}
-                                            imageSettings={data.qr_logo_url ? {
-                                                src: data.qr_logo_url,
-                                                height: 40,
-                                                width: 40,
-                                                excavate: true,
-                                            } : undefined}
-                                        />
+
+                                    {/* Dark Glassmorphism QR Container */}
+                                    <div className="relative group inline-block">
+                                        {/* Purple Glow Effect */}
+                                        <div className="absolute -inset-6 bg-gradient-to-br from-purple-500/20 via-violet-500/20 to-fuchsia-500/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
+
+                                        {/* Dark Glass QR Container */}
+                                        <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10">
+                                            {/* Decorative Corners - Purple Accent */}
+                                            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-purple-400/60 rounded-tl-lg"></div>
+                                            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-purple-400/60 rounded-tr-lg"></div>
+                                            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-purple-400/60 rounded-bl-lg"></div>
+                                            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-purple-400/60 rounded-br-lg"></div>
+
+                                            {/* QR Code - White on Transparent */}
+                                            <div className="bg-white/95 p-4 rounded-xl">
+                                                <QRCodeSVG
+                                                    value={`${window.location.origin}/#/v/${data.slug}`}
+                                                    size={200}
+                                                    level="H"
+                                                    fgColor={data.color || '#7c3aed'}
+                                                    bgColor="transparent"
+                                                    imageSettings={data.qr_logo_url ? {
+                                                        src: data.qr_logo_url,
+                                                        height: 40,
+                                                        width: 40,
+                                                        excavate: true,
+                                                    } : undefined}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
+
                                     {data.qr_text_bottom && (
-                                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                                        <p className="text-xs text-slate-400 mt-4">
                                             {data.qr_text_bottom}
                                         </p>
                                     )}
@@ -132,52 +156,57 @@ export const BridgePage: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Title */}
-                        <h1
-                            className="text-3xl md:text-4xl font-bold text-center mb-4"
-                            style={{ color: data.color || '#1f2937' }}
-                        >
+                        {/* Title with Gradient */}
+                        <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-300 via-white to-purple-300 bg-clip-text text-transparent">
                             {data.page_title || data.client_name}
                         </h1>
 
                         {/* Description */}
                         {data.description && (
-                            <p className="text-lg text-slate-600 dark:text-slate-300 text-center mb-8 leading-relaxed">
+                            <p className="text-lg text-slate-300 text-center mb-10 leading-relaxed">
                                 {data.description}
                             </p>
                         )}
 
-                        {/* CTA Button */}
+                        {/* CTA Buttons - Wide, Premium, Dark Mode */}
                         <div className="flex flex-col gap-4">
                             <a
                                 href={data.destination_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-                                style={{ backgroundColor: data.color || '#9333ea' }}
+                                className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                style={{
+                                    background: `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`,
+                                    boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`
+                                }}
                             >
-                                <ExternalLink size={20} />
-                                {data.button_text || 'Acessar'}
+                                {/* Shine Effect on Hover */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                                <ExternalLink size={22} className="relative z-10" />
+                                <span className="relative z-10 text-lg">{data.button_text || 'Acessar'}</span>
                             </a>
 
-                            {/* WhatsApp Button */}
+                            {/* WhatsApp Button - Premium Dark Style */}
                             {data.whatsapp && (
                                 <a
                                     href={`https://wa.me/${data.whatsapp.replace(/\D/g, '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-3 px-8 py-4 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                    className="group relative flex items-center justify-center gap-3 px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold text-white shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                    style={{ boxShadow: '0 10px 40px rgba(34, 197, 94, 0.3)' }}
                                 >
-                                    <Phone size={20} />
-                                    Falar no WhatsApp
+                                    {/* Shine Effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                                    <Phone size={22} className="relative z-10" />
+                                    <span className="relative z-10 text-lg">Falar no WhatsApp</span>
                                 </a>
                             )}
                         </div>
 
-                        {/* Footer */}
-                        <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-700 text-center">
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Powered by <span className="font-semibold text-primary-600">Encontro D'água Hub</span>
+                        {/* Footer - Dark Mode */}
+                        <div className="mt-12 pt-6 border-t border-white/5 text-center">
+                            <p className="text-sm text-slate-500">
+                                Powered by <span className="font-semibold text-purple-400">Encontro D'água Hub</span>
                             </p>
                         </div>
                     </div>
