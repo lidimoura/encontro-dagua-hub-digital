@@ -7,7 +7,7 @@
  * - Automatic cache invalidation
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../index';
+import { queryKeys } from '../queryKeys';
 import { boardsService } from '@/lib/supabase';
 import type { Board, BoardStage } from '@/types';
 

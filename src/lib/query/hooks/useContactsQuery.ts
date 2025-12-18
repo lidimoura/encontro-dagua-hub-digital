@@ -7,7 +7,7 @@
  * - Automatic cache invalidation
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../index';
+import { queryKeys } from '../queryKeys';
 import { contactsService, companiesService } from '@/lib/supabase';
 import type { Contact, ContactStage, Company } from '@/types';
 
@@ -124,8 +124,14 @@ export const useCreateContact = () => {
 
   return useMutation({
     mutationFn: async (contact: Omit<Contact, 'id' | 'createdAt'>) => {
-      // company_id will be auto-set by trigger
-      const { data, error } = await contactsService.create(contact, '');
+      // Sanitize: Convert empty strings to null for UUID fields to prevent 22P02 error
+      const sanitizedContact = {
+        ...contact,
+        companyId: contact.companyId || undefined, // Empty string → undefined → null in transform
+      };
+
+      // company_id will be auto-set by trigger if not provided
+      const { data, error } = await contactsService.create(sanitizedContact, '');
       if (error) throw error;
       return data!;
     },
@@ -145,7 +151,19 @@ export const useCreateContact = () => {
       ]);
       return { previousContacts };
     },
-    onError: (_error, _newContact, context) => {
+    onError: (error, _newContact, context) => {
+      // DEBUG: Log detailed Supabase error for RLS diagnosis
+      console.error('❌ ERRO CRÍTICO SUPABASE - Criação de Contato:', {
+        message: error.message,
+        // @ts-ignore - Supabase error details
+        details: error.details,
+        // @ts-ignore - Supabase error hints
+        hint: error.hint,
+        // @ts-ignore - Supabase error code
+        code: error.code,
+        fullError: error,
+      });
+
       if (context?.previousContacts) {
         queryClient.setQueryData(queryKeys.contacts.lists(), context.previousContacts);
       }
@@ -261,7 +279,14 @@ export const useCreateCompany = () => {
 
   return useMutation({
     mutationFn: async (company: Omit<Company, 'id' | 'createdAt'>) => {
-      const { data, error } = await companiesService.create(company, '');
+      // Sanitize: Convert empty strings to null for optional fields
+      const sanitizedCompany = {
+        ...company,
+        industry: company.industry || undefined,
+        website: company.website || undefined,
+      };
+
+      const { data, error } = await companiesService.create(sanitizedCompany, '');
       if (error) throw error;
       return data!;
     },

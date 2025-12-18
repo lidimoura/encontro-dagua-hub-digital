@@ -8,7 +8,7 @@
  * - Ready for Realtime integration
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../index';
+import { queryKeys } from '../queryKeys';
 import { dealsService, contactsService, companiesService } from '@/lib/supabase';
 import type { Deal, DealView, DealStatus, DealItem } from '@/types';
 
@@ -191,12 +191,18 @@ export const useCreateDeal = () => {
 
   return useMutation({
     mutationFn: async (deal: CreateDealInput) => {
-      // company_id will be auto-set by trigger on server
-      const fullDeal = {
+      // Sanitize: Convert empty strings to null for UUID fields to prevent 22P02 error
+      const sanitizedDeal = {
         ...deal,
+        contactId: deal.contactId || undefined,
+        companyId: deal.companyId || undefined,
+        boardId: deal.boardId || undefined,
+        stageId: deal.stageId || undefined,
         updatedAt: new Date().toISOString(),
       };
-      const { data, error } = await dealsService.create(fullDeal, '');
+
+      // company_id will be auto-set by trigger on server
+      const { data, error } = await dealsService.create(sanitizedDeal, '');
       if (error) throw error;
       return data!;
     },
@@ -307,11 +313,11 @@ export const useUpdateDealStatus = () => {
         old.map(deal =>
           deal.id === id
             ? {
-                ...deal,
-                status,
-                lastStageChangeDate: new Date().toISOString(),
-                ...(lossReason && { lossReason }),
-              }
+              ...deal,
+              status,
+              lastStageChangeDate: new Date().toISOString(),
+              ...(lossReason && { lossReason }),
+            }
             : deal
         )
       );

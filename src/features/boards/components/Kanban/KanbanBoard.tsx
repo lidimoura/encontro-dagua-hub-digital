@@ -103,9 +103,25 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               className={`flex-1 p-2 overflow-y-auto space-y-2 bg-slate-100/50 dark:bg-black/20 scrollbar-thin min-h-[100px]`}
             >
               {stageDeals.length === 0 && !draggingId && (
-                <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-600 text-sm py-8">
-                  Sem negócios
-                </div>
+                <button
+                  onClick={() => {
+                    // Open create deal modal (we'll need to pass this function down)
+                    const event = new CustomEvent('openCreateDealModal', {
+                      detail: { stageId: stage.id }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                  className="w-full py-8 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group cursor-pointer"
+                >
+                  <div className="text-center">
+                    <div className="w-10 h-10 mx-auto mb-2 bg-slate-200 dark:bg-slate-700 group-hover:bg-primary-500 rounded-full flex items-center justify-center transition-colors">
+                      <span className="text-2xl text-slate-400 group-hover:text-white transition-colors">+</span>
+                    </div>
+                    <span className="text-sm text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400 font-medium transition-colors">
+                      Adicionar Negócio
+                    </span>
+                  </div>
+                </button>
               )}
               {isOver && stageDeals.length === 0 && (
                 <div className="h-full flex items-center justify-center text-green-500 dark:text-green-400 text-sm py-8 font-bold animate-pulse pointer-events-none">
