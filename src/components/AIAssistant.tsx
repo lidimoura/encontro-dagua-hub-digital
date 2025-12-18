@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   X,
   Send,
@@ -13,6 +13,7 @@ import {
 import { useCRM } from '../context/CRMContext';
 import { Board } from '@/types';
 import { useAgent, Message, Attachment } from '@/hooks/useAgent';
+import { useCRMAgent } from '@/features/ai-hub/hooks/useCRMAgent';
 import AudioPlayer from '@/components/ui/AudioPlayer';
 
 interface AIAssistantProps {
@@ -103,10 +104,28 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   // Initialize AI Agent Hook with Persistence ID
   const persistenceId = mode === 'board' && activeBoard ? `board_${activeBoard.id}` : 'global_chat';
 
-  const { messages, input, setInput, append, isLoading, setMessages } = useAgent({
-    system: systemPrompt,
-    id: persistenceId,
-  });
+  // Use CRM Agent with tools instead of generic useAgent
+  const { messages: crmMessages, isLoading, sendMessage } = useCRMAgent({ id: persistenceId });
+
+  // Create compatibility layer to match useAgent interface
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // Sync CRM messages to local state
+  useEffect(() => {
+    const convertedMessages: Message[] = crmMessages.map(msg => ({
+      id: msg.id,
+      role: msg.role,
+      content: msg.content,
+    }));
+    setMessages(convertedMessages);
+  }, [crmMessages]);
+
+  // Compatibility wrapper for append function
+  const append = useCallback(async (content: string, attachments: Attachment[] = []) => {
+    await sendMessage(content);
+    setInput('');
+  }, [sendMessage]);
 
   // Handle Mode Switching & Welcome Messages
   useEffect(() => {

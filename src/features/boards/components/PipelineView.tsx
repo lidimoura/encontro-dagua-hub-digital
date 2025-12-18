@@ -101,6 +101,16 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
     handleUpdateBoard({ ...activeBoard, stages: newStages });
   };
 
+  // Listen for quick-add deal event from empty columns
+  React.useEffect(() => {
+    const handleOpenCreateDeal = () => {
+      setIsCreateModalOpen(true);
+    };
+
+    window.addEventListener('openCreateDealModal', handleOpenCreateDeal);
+    return () => window.removeEventListener('openCreateDealModal', handleOpenCreateDeal);
+  }, [setIsCreateModalOpen]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>

@@ -28,6 +28,7 @@ interface QRFormData {
     // Portfolio/Gallery fields
     inPortfolio?: boolean;
     inGallery?: boolean;
+    directRedirect?: boolean; // PRO feature: Skip BridgePage
 }
 
 interface QRProject {
@@ -44,6 +45,7 @@ interface QRProject {
     whatsapp?: string;
     in_portfolio?: boolean;
     in_gallery?: boolean;
+    direct_redirect?: boolean; // PRO feature
     created_at: string;
 }
 
@@ -112,7 +114,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                         {/* QR Code with Subtle Pulse Animation */}
                                         <div className="relative animate-pulse-subtle">
                                             <QRCodeSVG
-                                                value={safeUrl}
+                                                value={`${window.location.origin}/#/v/${formData.slug || 'preview'}`}
                                                 size={180}
                                                 level="H"
                                                 fgColor={safeColor}
@@ -241,6 +243,9 @@ export const QRdaguaPage: React.FC = () => {
 
     // Admin check based on database role
     const isAdmin = profile?.role === 'admin';
+
+    // Plan detection: admin = PRO, vendedor = FREE
+    const isPro = profile?.role === 'admin';
 
     const [formData, setFormData] = useState<QRFormData>({
         projectType: 'LINK',
@@ -386,6 +391,7 @@ export const QRdaguaPage: React.FC = () => {
             whatsapp: project.whatsapp,
             inPortfolio: project.in_portfolio || false,
             inGallery: project.in_gallery || false,
+            directRedirect: project.direct_redirect || false, // PRO feature
         });
         setEditingId(project.id);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -460,6 +466,7 @@ export const QRdaguaPage: React.FC = () => {
                 qr_text_bottom: formData.qrTextBottom || null,
                 in_portfolio: formData.inPortfolio || false,
                 in_gallery: formData.inGallery || false,
+                direct_redirect: formData.directRedirect || false, // PRO feature
                 owner_id: user.id, // FIX: Add user ID to prevent null constraint violation
             };
 
@@ -894,6 +901,57 @@ export const QRdaguaPage: React.FC = () => {
                                 </div>
                             )}
 
+                            {/* Direct Redirect (PRO Only) */}
+                            {isPro && (
+                                <div className="space-y-3 p-4 bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-500/20 rounded-lg">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-semibold text-purple-900 dark:text-purple-400 flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            💎 PRO: Redirecionamento Direto
+                                        </h3>
+                                        {/* Help Tooltip */}
+                                        <div className="group relative">
+                                            <button
+                                                type="button"
+                                                className="p-1 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                                                title="Ajuda"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                            {/* Tooltip */}
+                                            <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-xl z-50 border border-slate-700">
+                                                <p className="font-semibold mb-1">Recurso PRO</p>
+                                                <p className="text-slate-300">
+                                                    Quando ativado, o QR Code redireciona diretamente para o destino final,
+                                                    pulando a Página Ponte e removendo o footer "Powered by".
+                                                </p>
+                                                <div className="absolute top-full right-4 w-2 h-2 bg-slate-900 transform rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.directRedirect || false}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, directRedirect: e.target.checked }))}
+                                            className="w-4 h-4 text-purple-600 bg-white dark:bg-rionegro-950 border-purple-300 dark:border-purple-700 rounded focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                                ⚡ Redirecionar automaticamente
+                                            </span>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                                Pula a Página Ponte e vai direto para o destino (sem mostrar "Powered by")
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
+                            )}
+
                             {/* Submit */}
                             <div className="flex justify-end pt-4">
                                 <button
@@ -986,7 +1044,7 @@ export const QRdaguaPage: React.FC = () => {
                                 <div className="flex items-center justify-center p-4 bg-slate-50 dark:bg-rionegro-950 rounded-lg mb-3">
                                     {project.destination_url && (
                                         <QRCodeSVG
-                                            value={project.destination_url}
+                                            value={`${window.location.origin}/#/v/${project.slug}`}
                                             size={120}
                                             level="H"
                                             fgColor={project.color}

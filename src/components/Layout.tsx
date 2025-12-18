@@ -22,6 +22,7 @@ import {
   QrCode,
   Wand2,
   RefreshCcw,
+  HelpCircle,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
@@ -72,6 +73,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [hasUnreadNotification, setHasUnreadNotification] = useState(true); // Notification badge state
+  const [isHelpOpen, setIsHelpOpen] = useState(false); // Help modal state
 
   // Gera iniciais do email
   const userInitials = profile?.email?.substring(0, 2).toUpperCase() || 'U';
@@ -447,11 +450,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {/* Notification Bell */}
                 <div className="relative">
                   <button
-                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    onClick={() => {
+                      setIsNotificationOpen(!isNotificationOpen);
+                      setHasUnreadNotification(false); // Clear badge on click
+                    }}
                     className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative transition-colors"
                   >
                     <Bell size={20} />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-dark-card animate-pulse"></span>
+                    {hasUnreadNotification && (
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-dark-card animate-pulse"></span>
+                    )}
                   </button>
 
                   {/* Notification Popover */}
@@ -499,8 +507,59 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
+                {/* Help Button */}
+                <button
+                  onClick={() => setIsHelpOpen(true)}
+                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all"
+                  title="Ajuda"
+                >
+                  <HelpCircle size={20} />
+                </button>
               </div>
             </header>
+
+            {/* Help Modal */}
+            {isHelpOpen && (
+              <>
+                <div className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200" onClick={() => setIsHelpOpen(false)} />
+                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in zoom-in-95 fade-in duration-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Como usar o Hub 🚀</h3>
+                    <button
+                      onClick={() => setIsHelpOpen(false)}
+                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <ol className="space-y-3 text-sm text-slate-600 dark:text-slate-300 mb-6">
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">1</span>
+                      <span><strong>Crie um Board</strong> para organizar seus negócios por etapa do funil</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">2</span>
+                      <span><strong>Adicione um Negócio</strong> ao Board com informações do cliente</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">3</span>
+                      <span><strong>Fale com a IA</strong> clicando no botão "Falar" ou no ícone flutuante ✨</span>
+                    </li>
+                  </ol>
+                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-500/20 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-purple-900 dark:text-purple-300">
+                      <strong>💎 Planos FREE vs PRO:</strong> Admins têm recursos PRO como redirecionamento direto de QR Codes. Vendedores usam o plano FREE com "Powered by" nas páginas.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsHelpOpen(false)}
+                    className="w-full py-2 bg-acai-900 text-white rounded-lg font-semibold hover:bg-acai-800 transition-colors"
+                  >
+                    Entendi!
+                  </button>
+                </div>
+              </>
+            )}
 
             {/* Page Content */}
             <div className="flex-1 overflow-auto p-6 relative z-10 scroll-smooth">{children}</div>

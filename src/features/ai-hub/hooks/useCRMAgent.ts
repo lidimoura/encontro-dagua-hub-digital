@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { streamText, tool, CoreMessage, stepCountIs } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
@@ -18,6 +18,7 @@ export interface AgentMessage {
 
 interface UseCRMAgentOptions {
   onToolCall?: (toolName: string, args: Record<string, unknown>) => void;
+  id?: string; // Persistence ID for chat history
 }
 
 export function useCRMAgent(options: UseCRMAgentOptions = {}) {
@@ -33,10 +34,31 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
     aiApiKey,
   } = useCRM();
 
-  const [messages, setMessages] = useState<AgentMessage[]>([]);
+  // Load messages from localStorage if id is provided
+  const [messages, setMessages] = useState<AgentMessage[]>(() => {
+    if (options.id) {
+      const saved = localStorage.getItem(`crm_chat_${options.id}`);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse chat history', e);
+        }
+      }
+    }
+    return [];
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (options.id && messages.length > 0) {
+      localStorage.setItem(`crm_chat_${options.id}`, JSON.stringify(messages));
+    }
+  }, [messages, options.id]);
 
   // Cria o modelo Google com Gemini 2.5 Flash
   const getModel = useCallback(() => {

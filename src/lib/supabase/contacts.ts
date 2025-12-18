@@ -150,9 +150,12 @@ export const contactsService = {
    */
   async create(contact: Omit<Contact, 'id' | 'createdAt'>, companyId: string): Promise<{ data: Contact | null; error: Error | null }> {
     try {
+      // Sanitize: Convert empty string to null for UUID field
+      const sanitizedCompanyId = companyId || null;
+
       const { data, error } = await supabase
         .from('contacts')
-        .insert({ ...transformContactToDb(contact as Contact), company_id: companyId })
+        .insert({ ...transformContactToDb(contact as Contact), company_id: sanitizedCompanyId })
         .select()
         .single();
 
@@ -233,13 +236,16 @@ export const companiesService = {
 
   async create(company: Omit<Company, 'id' | 'createdAt'>, tenantId: string): Promise<{ data: Company | null; error: Error | null }> {
     try {
+      // Sanitize: Convert empty string to null for UUID field
+      const sanitizedTenantId = tenantId || null;
+
       const { data, error } = await supabase
         .from('companies')
         .insert({
           name: company.name,
           industry: company.industry || null,
           website: company.website || null,
-          company_id: tenantId,
+          company_id: sanitizedTenantId,
         })
         .select()
         .single();

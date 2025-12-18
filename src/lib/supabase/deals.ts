@@ -69,7 +69,7 @@ const transformDeal = (db: DbDeal, items: DbDealItem[]): Deal => ({
 // Transform App -> DB
 const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
   const db: Partial<DbDeal> = {};
-  
+
   if (deal.title !== undefined) db.title = deal.title;
   if (deal.value !== undefined) db.value = deal.value;
   if (deal.probability !== undefined) db.probability = deal.probability;
@@ -83,7 +83,7 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
   if (deal.tags !== undefined) db.tags = deal.tags;
   if (deal.lastStageChangeDate !== undefined) db.last_stage_change_date = deal.lastStageChangeDate || null;
   if (deal.customFields !== undefined) db.custom_fields = deal.customFields;
-  
+
   return db;
 };
 
@@ -98,7 +98,7 @@ export const dealsService = {
       if (dealsResult.error) return { data: null, error: dealsResult.error };
       if (itemsResult.error) return { data: null, error: itemsResult.error };
 
-      const deals = (dealsResult.data || []).map(d => 
+      const deals = (dealsResult.data || []).map(d =>
         transformDeal(d as DbDeal, (itemsResult.data || []) as DbDealItem[])
       );
       return { data: deals, error: null };
@@ -125,6 +125,9 @@ export const dealsService = {
 
   async create(deal: Omit<Deal, 'id' | 'createdAt'>, companyId: string): Promise<{ data: Deal | null; error: Error | null }> {
     try {
+      // Sanitize: Convert empty string to null for UUID field
+      const sanitizedCompanyId = companyId || null;
+
       const { data, error } = await supabase
         .from('deals')
         .insert({
@@ -138,7 +141,7 @@ export const dealsService = {
           crm_company_id: deal.companyId || null,
           tags: deal.tags || [],
           custom_fields: deal.customFields || {},
-          company_id: companyId,
+          company_id: sanitizedCompanyId,
         })
         .select()
         .single();
@@ -168,9 +171,9 @@ export const dealsService = {
         .select('*')
         .eq('deal_id', data.id);
 
-      return { 
-        data: transformDeal(data as DbDeal, (items || []) as DbDealItem[]), 
-        error: null 
+      return {
+        data: transformDeal(data as DbDeal, (items || []) as DbDealItem[]),
+        error: null
       };
     } catch (e) {
       return { data: null, error: e as Error };

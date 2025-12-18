@@ -71,6 +71,16 @@ export const FloatingAIWidget: React.FC<FloatingAIWidgetProps> = ({ isAuthentica
 
     const pageContext = getPageContext();
 
+    // Listen for custom event to open widget programmatically
+    useEffect(() => {
+        const handleOpenWidget = (e: Event) => {
+            setIsOpen(true);
+        };
+
+        window.addEventListener('openAIWidget', handleOpenWidget);
+        return () => window.removeEventListener('openAIWidget', handleOpenWidget);
+    }, []);
+
     return (
         <>
             {/* Floating Action Button (FAB) */}

@@ -104,20 +104,8 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
       ...s,
     }));
 
-    // Randomize Agent Name (Names ending in 'ia')
-    const agentNames = [
-      'Sofia',
-      'Valeria',
-      'Julia',
-      'Cecilia',
-      'Livia',
-      'Vitoria',
-      'Alicia',
-      'Olivia',
-      'Claudia',
-      'Silvia',
-    ];
-    const randomName = agentNames[Math.floor(Math.random() * agentNames.length)];
+    // Use template's agent name or fallback to Yara
+    const agentName = template.agentPersona?.name || 'Yara';
 
     onCreate({
       name: template.name,
@@ -127,10 +115,10 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
       stages: boardStages,
       isDefault: false,
       // Strategy Fields
-      agentPersona: {
-        ...template.agentPersona!,
-        name: randomName, // Override with random name
-      },
+      agentPersona: template.agentPersona ? {
+        ...template.agentPersona,
+        name: agentName, // Use template name or Yara fallback
+      } : undefined,
       goal: template.goal,
       entryTrigger: template.entryTrigger,
     });
@@ -418,37 +406,10 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
       linkedLifecycleStage: s.linkedLifecycleStage, // Apply AI automation suggestion
     }));
 
-    // Randomize Agent Name (Names ending in 'ia')
-    const agentNames = [
-      'Sofia',
-      'Valeria',
-      'Julia',
-      'Cecilia',
-      'Livia',
-      'Vitoria',
-      'Alicia',
-      'Olivia',
-      'Claudia',
-      'Silvia',
-    ];
-    const randomName = agentNames[Math.floor(Math.random() * agentNames.length)];
-
-    // Apply strategy and randomize name
+    // Use AI-generated agent name or fallback to Yara
     const finalAgentPersona = finalStrategy.agentPersona
-      ? {
-          ...finalStrategy.agentPersona,
-          name: randomName,
-          // Replace occurrences of the old name in behavior and role
-          behavior: finalStrategy.agentPersona.behavior.replace(
-            new RegExp(finalStrategy.agentPersona.name, 'g'),
-            randomName
-          ),
-          role: finalStrategy.agentPersona.role.replace(
-            new RegExp(finalStrategy.agentPersona.name, 'g'),
-            randomName
-          ),
-        }
-      : undefined;
+      ? finalStrategy.agentPersona // Use AI-generated agent as-is
+      : { name: 'Yara', role: 'Assistente de Vendas', behavior: 'Profissional e proativa' };
 
     onCreate({
       name: boardToCreate.boardName,
@@ -527,11 +488,10 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
                     className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`max-w-[90%] p-3 rounded-xl text-sm whitespace-pre-wrap ${
-                        msg.role === 'user'
+                      className={`max-w-[90%] p-3 rounded-xl text-sm whitespace-pre-wrap ${msg.role === 'user'
                           ? 'bg-primary-600 text-white rounded-br-none'
                           : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-none'
-                      }`}
+                        }`}
                     >
                       {msg.content
                         .split(/(\*\*.*?\*\*)/)
@@ -549,11 +509,10 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
                       <div className="mt-2 flex gap-2">
                         <button
                           onClick={() => handlePreviewToggle(msg.proposalData!)}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors flex items-center gap-1 ${
-                            previewBoard === msg.proposalData
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors flex items-center gap-1 ${previewBoard === msg.proposalData
                               ? 'bg-blue-100 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/50 dark:text-blue-300'
                               : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
-                          }`}
+                            }`}
                         >
                           {previewBoard === msg.proposalData
                             ? '👁️ Esconder Preview'
@@ -617,21 +576,19 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
                 <div className="flex p-1 bg-slate-100 dark:bg-white/5 rounded-xl mb-6">
                   <button
                     onClick={() => setActiveTab('official')}
-                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      activeTab === 'official'
+                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'official'
                         ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                    }`}
+                      }`}
                   >
                     Oficiais
                   </button>
                   <button
                     onClick={() => setActiveTab('community')}
-                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      activeTab === 'community'
+                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'community'
                         ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                    }`}
+                      }`}
                   >
                     Comunidade
                   </button>
@@ -840,10 +797,10 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
                                 )}
                                 {index ===
                                   OFFICIAL_JOURNEYS[selectedPlaybookId].boards.length - 1 && (
-                                  <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wide">
-                                    Fim
-                                  </span>
-                                )}
+                                    <span className="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wide">
+                                      Fim
+                                    </span>
+                                  )}
                               </div>
                             </div>
 

@@ -18,6 +18,8 @@ interface BridgePageData {
     qr_logo_url?: string;
     qr_text_top?: string;
     qr_text_bottom?: string;
+    direct_redirect?: boolean; // PRO feature
+    profiles?: { role: string }; // Owner's role for plan detection
 }
 
 export const BridgePage: React.FC = () => {
@@ -33,7 +35,7 @@ export const BridgePage: React.FC = () => {
             try {
                 const { data: qrData, error } = await supabase
                     .from('qr_codes')
-                    .select('*')
+                    .select('*, profiles!owner_id(role)') // Join to get owner's role
                     .eq('slug', slug)
                     .single();
 
@@ -44,10 +46,19 @@ export const BridgePage: React.FC = () => {
 
                 setData(qrData as BridgePageData);
 
-                // If it's a LINK type, redirect immediately
-                if (qrData.project_type === 'LINK') {
-                    window.location.href = qrData.destination_url;
+                // Plan-based redirect logic
+                const ownerRole = qrData.profiles?.role;
+                const isPro = ownerRole === 'admin';
+
+                // PRO users with direct_redirect enabled: Skip BridgePage
+                if (isPro && qrData.direct_redirect === true) {
+                    window.location.replace(qrData.destination_url);
+                    return;
                 }
+
+                // FREE users OR PRO users without direct_redirect: Show BridgePage
+                // (This includes all project types: LINK, BRIDGE, CARD)
+
             } catch (err) {
                 console.error('Error fetching bridge data:', err);
                 setNotFound(true);
@@ -203,11 +214,13 @@ export const BridgePage: React.FC = () => {
                             )}
                         </div>
 
-                        {/* Footer - Dark Mode */}
+                        {/* Footer - Conditional "Powered by" */}
                         <div className="mt-12 pt-6 border-t border-white/5 text-center">
-                            <p className="text-sm text-slate-500">
-                                Powered by <span className="font-semibold text-purple-400">Encontro D'água Hub</span>
-                            </p>
+                            {data.profiles?.role !== 'admin' && ( // Show only for FREE users
+                                <p className="text-sm text-slate-500">
+                                    Powered by <span className="font-semibold text-purple-400">Encontro D'água Hub</span>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
