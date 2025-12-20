@@ -7,7 +7,6 @@ import { AuthProvider } from '@/context/AuthContext';
 import { QueryProvider } from '@/lib/query';
 import Layout from '@/components/Layout';
 import { PageLoader } from '@/components/PageLoader';
-import { DefaultRoute } from '@/components/DefaultRoute';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
 import JoinPage from '@/pages/JoinPage';
@@ -50,6 +49,10 @@ const AdminUsersPage = lazy(() =>
 const BridgePage = lazy(() =>
   import('@/pages/BridgePage').then(m => ({ default: m.BridgePage }))
 );
+const LandingPage = lazy(() =>
+  import('@/pages/LandingPage').then(m => ({ default: m.default }))
+);
+
 
 
 // Layout wrapper for protected routes
@@ -71,15 +74,16 @@ const App: React.FC = () => {
               <HashRouter>
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
-                    {/* Public routes */}
+                    {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/join" element={<JoinPage />} />
                     <Route path="/setup" element={<SetupWizard />} />
                     <Route path="/v/:slug" element={<BridgePage />} />
 
-                    {/* Protected routes with Layout */}
+
+                    {/* PROTECTED ROUTES - REQUIRE AUTH */}
                     <Route element={<ProtectedLayout />}>
-                      <Route index element={<DefaultRoute />} />
                       <Route path="dashboard" element={<Dashboard />} />
                       <Route path="inbox" element={<InboxPage />} />
                       <Route path="boards" element={<BoardsPage />} />

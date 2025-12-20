@@ -2,6 +2,26 @@
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
+## Sprint: Release V5 (Main) - Turno da Noite
+**Status:** ✅ Concluído
+**Data:** 20/12/2025
+
+### 🚀 Entregas Críticas (Manual Release)
+1. **Landing Page V5 (Açaí Edition):**
+   - Tema visual ajustado para Vinho/Fuchsia e Dourado.
+   - Hero Section cinematográfica com texto no rodapé.
+   - Efeito Parallax CSS puro ("Rio que mexe").
+   - Integração Amazo via Script Nativo (Typebot).
+2. **Ecossistema de Agentes:**
+   - Definição oficial: Amazo (CS/Vendas), Precy (Tech), Jury (Compliance).
+   - Modal de equipe implementado.
+3. **QR D'água:**
+   - Refatoração visual (contraste e bordas).
+   - Validação de links.
+
+### 📝 Observações
+- Commit realizado manualmente devido a instabilidade no Agente de AI.
+- Deploy direto na branch `main`.
 ---
 
 ## 🚀 MARCO: [18/12/2025] - v1.5 - Onboarding Sprint & Critical Fixes

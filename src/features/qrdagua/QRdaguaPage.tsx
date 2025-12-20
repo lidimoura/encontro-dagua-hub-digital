@@ -5,6 +5,10 @@ import { useAuth } from '@/context/AuthContext';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase/client';
+import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
+import { CardLinksEditor } from './components/CardLinksEditor';
+
+
 
 type ProjectType = 'LINK' | 'BRIDGE' | 'CARD';
 
@@ -29,7 +33,16 @@ interface QRFormData {
     inPortfolio?: boolean;
     inGallery?: boolean;
     directRedirect?: boolean; // PRO feature: Skip BridgePage
+    linksArray?: Array<{
+        id: string;
+        type: string;
+        label: string;
+        url: string;
+        icon: string;
+        active: boolean;
+    }>;
 }
+
 
 interface QRProject {
     id: string;
@@ -202,23 +215,46 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                     </p>
                                 </div>
                                 <div className="w-full space-y-2">
-                                    {safeUrl && (
-                                        <a
-                                            href={safeUrl}
-                                            style={{ borderColor: safeColor, color: safeColor }}
-                                            className="block w-full px-4 py-2 border-2 rounded-lg text-center text-sm font-medium"
-                                        >
-                                            🌐 Website
-                                        </a>
-                                    )}
-                                    {whatsapp?.trim() && (
-                                        <a
-                                            href={`https://wa.me/${whatsapp}`}
-                                            style={{ backgroundColor: safeColor }}
-                                            className="block w-full px-4 py-2 text-white rounded-lg text-center text-sm font-medium"
-                                        >
-                                            💬 WhatsApp
-                                        </a>
+                                    {/* Render links_array for CARD type */}
+                                    {projectType === 'CARD' && formData.linksArray && formData.linksArray.length > 0 ? (
+                                        formData.linksArray
+                                            .filter(link => link.active)
+                                            .map((link) => (
+                                                <a
+                                                    key={link.id}
+                                                    href={link.url}
+                                                    style={{
+                                                        backgroundColor: link.type === 'whatsapp' ? '#25D366' : safeColor,
+                                                        borderColor: safeColor
+                                                    }}
+                                                    className="block w-full px-4 py-3 text-white rounded-lg text-center text-sm font-medium shadow-md hover:shadow-lg transition-all"
+                                                >
+                                                    <span className="mr-2">{link.icon}</span>
+                                                    {link.label || 'Link'}
+                                                </a>
+                                            ))
+                                    ) : (
+                                        <>
+                                            {/* Fallback for BRIDGE type or empty CARD */}
+                                            {safeUrl && (
+                                                <a
+                                                    href={safeUrl}
+                                                    style={{ borderColor: safeColor, color: safeColor }}
+                                                    className="block w-full px-4 py-2 border-2 rounded-lg text-center text-sm font-medium"
+                                                >
+                                                    {buttonText || '🌐 Website'}
+                                                </a>
+                                            )}
+                                            {whatsapp?.trim() && (
+                                                <a
+                                                    href={`https://wa.me/${whatsapp}`}
+                                                    style={{ backgroundColor: safeColor }}
+                                                    className="block w-full px-4 py-2 text-white rounded-lg text-center text-sm font-medium"
+                                                >
+                                                    💬 WhatsApp
+                                                </a>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -254,6 +290,7 @@ export const QRdaguaPage: React.FC = () => {
         slug: '',
         color: '#620939',
         description: '',
+        linksArray: [],
     });
     const [isGeneratingBio, setIsGeneratingBio] = useState(false);
     const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
@@ -292,8 +329,16 @@ export const QRdaguaPage: React.FC = () => {
     };
 
     const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prev) => ({ ...prev, color: e.target.value }));
+        const newColor = e.target.value;
+        setFormData((prev) => ({ ...prev, color: newColor }));
     };
+
+    // Calculate contrast ratio for QR code safety
+    const bgColor = '#FFFFFF'; // QR codes typically have white background
+    const contrastRatio = calculateContrastRatio(formData.color, bgColor);
+    const contrastSafe = isContrastSafe(formData.color, bgColor);
+    const contrastInfo = getContrastLevel(contrastRatio);
+
 
     const generateTitle = async () => {
         if (!formData.clientName) {
@@ -467,6 +512,7 @@ export const QRdaguaPage: React.FC = () => {
                 in_portfolio: formData.inPortfolio || false,
                 in_gallery: formData.inGallery || false,
                 direct_redirect: formData.directRedirect || false, // PRO feature
+                links_array: formData.linksArray || [], // Card Digital links
                 owner_id: user.id, // FIX: Add user ID to prevent null constraint violation
             };
 
@@ -696,6 +742,16 @@ export const QRdaguaPage: React.FC = () => {
                                             placeholder="5511999999999"
                                         />
                                     </div>
+
+                                    {/* Card Digital Links Editor - Only for CARD type */}
+                                    {formData.projectType === 'CARD' && (
+                                        <div className="col-span-2 mt-4">
+                                            <CardLinksEditor
+                                                links={formData.linksArray || []}
+                                                onChange={(links) => setFormData(prev => ({ ...prev, linksArray: links }))}
+                                            />
+                                        </div>
+                                    )}
                                 </>
                             )}
 
@@ -773,7 +829,43 @@ export const QRdaguaPage: React.FC = () => {
                                         />
                                     </div>
                                 </div>
+
+                                {/* Contrast Validation Warning */}
+                                {!contrastSafe && (
+                                    <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg">
+                                        <div className="flex items-start gap-2">
+                                            <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <div className="flex-1">
+                                                <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
+                                                    ⚠️ Contraste Insuficiente
+                                                </p>
+                                                <p className="text-xs text-yellow-800 dark:text-yellow-400 mt-1">
+                                                    Razão de contraste: <strong>{contrastRatio.toFixed(2)}:1</strong> (mínimo recomendado: 4.5:1)
+                                                </p>
+                                                <p className="text-xs text-yellow-700 dark:text-yellow-500 mt-1">
+                                                    O QR Code pode ser difícil de escanear em alguns dispositivos.
+                                                    Sugestão: use uma cor mais escura como <strong>{suggestForegroundColor(bgColor)}</strong>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Contrast Success Indicator */}
+                                {contrastSafe && contrastInfo.level === 'aaa' && (
+                                    <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                                        <p className="text-xs text-green-800 dark:text-green-300 flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            ✅ {contrastInfo.description} - Contraste: {contrastRatio.toFixed(2)}:1
+                                        </p>
+                                    </div>
+                                )}
                             </div>
+
 
                             {/* Description */}
                             <div>

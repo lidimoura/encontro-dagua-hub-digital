@@ -111,15 +111,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <aside className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-50 md:hidden shadow-2xl animate-in slide-in-from-left duration-300 ease-out flex flex-col">
             {/* Header do Drawer */}
             <div className="h-16 px-5 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10">
-              <div className="flex items-center gap-3">
+              <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
                   A
                 </div>
                 <span className="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                  Encontro D'água Hub
+                  Encontro D'água - Hub Digital
                 </span>
-              </div>
+              </a>
               <button
+
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Fechar menu"
@@ -265,15 +266,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Sidebar */}
         <aside className="hidden md:flex w-64 flex-col z-20 glass border-r border-slate-200 dark:border-white/5">
           <div className="h-16 px-5 flex items-center border-b border-solimoes-400/20 dark:border-solimoes-400/10">
-            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
                 E
               </div>
               <span className="text-lg font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                Encontro D'Água Hub
+                Encontro D'água - Hub Digital
               </span>
-            </Link>
+            </a>
           </div>
+
 
           <nav className="flex-1 p-4 space-y-2">
             <NavItem

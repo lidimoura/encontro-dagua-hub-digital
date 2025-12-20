@@ -1,294 +1,270 @@
-# 📖 Guia do Usuário - CRM Encontro D'Água
+# Encontro D'água - Hub Digital
+## Guia do Usuário
 
-**Bem-vindo ao seu CRM com Superpoderes de IA!**
-
-Este guia documenta as funcionalidades principais do sistema, incluindo recursos avançados que transformam sua produtividade.
+Bem-vindo ao **Encontro D'água - Hub Digital**, a plataforma que une tecnologia e humanidade para potencializar suas conexões de negócios.
 
 ---
 
 ## 🎯 Visão Geral
 
-O CRM Encontro D'Água é uma plataforma de gestão de relacionamento com clientes potencializada por Inteligência Artificial, projetada para:
-- **Automatizar** tarefas repetitivas
-- **Qualificar** leads automaticamente
-- **Sugerir** próximas ações estratégicas
-- **Organizar** seu fluxo de trabalho com foco total
+O Hub Digital é uma plataforma completa que integra:
+- **CRM Inteligente** com IA integrada
+- **QR d'água** - Gerador de QR Codes e Cartões Digitais
+- **Prompt Lab** - Otimizador de prompts com IA
+- **Gestão de Leads** com estratégia Invite-Only
 
 ---
 
-## ✨ Funcionalidades Principais
+## 📋 Módulos Principais
 
-### 1. 📊 **Boards Inteligentes (Kanban AI)**
+### 1. 🏠 Dashboard
+Visão geral de suas métricas, negócios ativos e atividades recentes.
 
-Gerencie seus negócios em quadros Kanban personalizados, cada um com seu próprio **Agente de IA**.
-
-#### **Como Criar um Board:**
-1. Clique em **"+ Novo Board"** no topo da página
-2. Escolha entre:
-   - **Templates Prontos** (Vendas, Pós-Venda, Recrutamento)
-   - **Geração por IA** (descreva seu processo e a IA cria as etapas)
-   - **Board Customizado** (crie do zero)
-
-#### **Agentes Estratégicos:**
-Cada board possui um agente especializado:
-- **Yara** - Qualificação de Leads (metodologia 10K)
-- **Precy** - Precificação Social (análise de viabilidade)
-- **Jury** - Recrutamento (triagem de candidatos)
-
-**Dica:** Os agentes analisam seus negócios e sugerem ações automaticamente!
+**Funcionalidades:**
+- Resumo de negócios por estágio
+- Atividades recentes
+- Acesso rápido aos módulos
 
 ---
 
-### 2. 🎯 **Inbox & Modo Foco** (TDAH Friendly)
+### 2. 💼 CRM (Gestão de Negócios)
 
-**Problema resolvido:** Sobrecarga de tarefas e falta de foco.
+**Boards Kanban:**
+- Arraste e solte negócios entre colunas
+- Personalize estágios do funil
+- Adicione notas e atualizações
 
-#### **O que é:**
-Uma visualização inteligente que mostra **apenas as 3 tarefas mais importantes** do seu dia, baseadas em:
-- Urgência (prazo)
-- Prioridade (valor do negócio)
-- Contexto (etapa do funil)
-
-#### **Como usar:**
-1. Acesse **"Inbox"** no menu lateral
-2. Ative o **"Modo Foco"** (toggle no topo)
-3. Concentre-se nas 3 tarefas exibidas
-4. Ao concluir, novas tarefas aparecem automaticamente
-
-**Benefício:** Reduz ansiedade e aumenta produtividade em 300% (testado com usuários TDAH).
-
----
-
-### 3. 🤖 **AI Insights: Objection Killer**
-
-**Funcionalidade de Elite:** Negociação assistida por IA.
-
-#### **O que faz:**
-Quando um negócio está travado, a IA analisa:
+**Contatos:**
+- Gerencie clientes e leads
 - Histórico de interações
-- Objeções do cliente
-- Padrão de comportamento
-- Dados do mercado
+- Campos personalizáveis
 
-E sugere **respostas prontas** para superar objeções comuns:
-- "Está muito caro" → Script de valor
-- "Preciso pensar" → Técnica de urgência
-- "Vou comparar" → Diferenciação competitiva
-
-#### **Como acessar:**
-1. Abra um **Deal** (negócio)
-2. Clique em **"AI Insights"** no painel lateral
-3. Veja as sugestões de ação
-4. Copie o script sugerido ou adapte
-
-**Exemplo Real:**
-```
-Cliente: "R$ 500 está fora do meu orçamento"
-IA sugere: "Entendo! Que tal dividirmos em 3x sem juros? 
-Assim você investe R$ 166/mês e já começa a ver resultados."
-```
+**Agentes de IA:**
+- **Yara** - Qualificação de leads (10K Methodology)
+- **Júlia** - Análise de propostas
+- **Vitória** - Suporte em vendas
 
 ---
 
-### 4. 🧠 **AI Board Creator** (Gerador de Jornadas)
+### 3. 🎨 QR d'água - Gerador de QR Codes
 
-**Magia Pura:** Descreva seu processo de vendas e a IA cria o board completo.
+Crie QR Codes profissionais com páginas de destino personalizadas.
 
-#### **Como funciona:**
-1. Clique em **"Criar com IA"** no wizard de boards
-2. Descreva seu processo:
-   ```
-   "Vendo consultoria de IA. Primeiro faço diagnóstico gratuito,
-   depois apresento proposta, negocio valor e fecho contrato."
-   ```
-3. A IA gera:
-   - **Etapas do funil** (ex: Diagnóstico → Proposta → Negociação → Fechamento)
-   - **Automações** (ex: "Enviar proposta após diagnóstico")
-   - **Agente personalizado** (ex: "Consultor de IA")
-   - **Metas** (ex: "Fechar 5 contratos/mês")
+**Tipos de Projeto:**
 
-#### **Refinamento Interativo:**
-Após a geração, você pode conversar com a IA:
-- "Adicione uma etapa de follow-up"
-- "Mude o nome da etapa 2 para 'Apresentação'"
-- "Sugira automações para a etapa de fechamento"
+#### LINK (Redirecionamento Simples)
+- QR Code direto para URL
+- Personalize cores
+- Adicione logo e textos ao QR
 
-**Resultado:** Board profissional em 2 minutos vs. 2 horas manualmente.
+#### BRIDGE (Página Ponte)
+- Página intermediária com branding
+- Título e descrição personalizados
+- Botão de ação customizável
+- Imagem de destaque
+
+#### CARD (Cartão Digital - Mini Linktree)
+- **Múltiplos links** em uma única página
+- Editor visual de links com:
+  - Adicionar/remover links
+  - Reordenar com setas
+  - 7 tipos de link: WhatsApp, Link/Site, Email, Telefone, Instagram, LinkedIn, Personalizado
+  - Ícones emoji personalizáveis
+  - Ativar/desativar links individualmente
+
+**Recursos PRO:**
+- **Direct Redirect** - Pula a página ponte (apenas para admins)
+- QR Code com logo central
+- Textos acima e abaixo do QR
+- Portfolio e Galeria públicos
+
+**Validação de Contraste:**
+- Alerta visual quando contraste é insuficiente (< 4.5:1)
+- Sugestões de cores seguras
+- Conformidade WCAG AA
 
 ---
 
-## 🛠️ Funcionalidades Avançadas
+### 4. ✨ Prompt Lab - Otimizador de Prompts com IA
 
-### 5. 📱 **QR d'água** (Cartões Digitais Interativos)
+Transforme ideias brutas em prompts perfeitos para LLMs.
 
-Crie cartões de visita digitais com QR Code para seus clientes.
+**Funcionalidades:**
 
-#### **Tipos de QR Code:**
-- **LINK** - Redireciona para qualquer URL
-- **BRIDGE** - Página intermediária com botões de ação
-- **CARD** - Cartão digital completo (vCard)
+#### Otimização de Prompts
+1. Selecione a **persona** (Engenheiro, Copywriter, Designer, etc.)
+2. Digite sua ideia bruta
+3. Clique em "✨ Otimizar Prompt"
+4. Receba prompt estruturado e otimizado
 
-#### **Como criar:**
-1. Acesse **"QR d'água"** no menu
-2. Clique em **"+ Novo QR Code"**
-3. Escolha o tipo e preencha os dados
+#### Teste e Feedback
+1. Clique em "🧪 Testar Prompt" após otimizar
+2. Veja a resposta da IA em tempo real
+3. Avalie com 👍 Útil ou 👎 Não Útil
+4. Feedback salvo para melhorias contínuas
+
+#### Biblioteca de Prompts
+- Salve prompts otimizados com título e tags
+- Acesse prompts salvos anteriormente
+- Click para carregar prompt salvo no editor
+- Organize por tags e personas
+
+**Personas Disponíveis:**
+- 👨‍💻 Engenheiro de Software
+- ✍️ Copywriter
+- 🎨 Designer
+- ⚖️ Advogado
+- 📈 Profissional de Marketing
+- 👩‍🏫 Professor
+
+---
+
+### 5. 🔒 Landing Page Invite-Only
+
+**Estratégia de Crescimento:**
+- Acesso por convite ou lista de espera
+- Prompt Lab público como lead magnet
+- Formulário de waitlist captura:
+  - Nome completo
+  - WhatsApp (com DDD)
+  - Quem indicou (opcional - garante 20% desconto futuro)
+
+**Prompt Lab Público:**
+- Teste gratuito do otimizador
+- Resultado exibido em modal
+- CTA para solicitar acesso completo
+
+---
+
+## 🎨 Temas e Personalização
+
+**Temas Disponíveis:**
+- 🌞 Modo Claro
+- 🌙 Modo Escuro (padrão)
+
+**Paleta de Cores:**
+- **Açaí** - Roxo profundo (#620939)
+- **Solimões** - Dourado vibrante (#FFD700)
+- **Rio Negro** - Tons escuros para dark mode
+
+---
+
+## 🔐 Planos e Permissões
+
+### FREE (Vendedor)
+- Acesso ao CRM básico
+- QR Codes com página ponte
+- Marca "Powered by Encontro D'água Hub"
+- Prompt Lab com personas básicas
+
+### PRO (Admin)
+- Direct Redirect (sem página ponte)
+- QR Codes com logo e textos
+- Sem marca "Powered by"
+- Acesso a todas as personas
+- Analytics avançado
+
+---
+
+## 📊 Analytics e Métricas
+
+**QR Scans Tracking:**
+- Rastreamento automático de escaneamentos
+- Dados capturados:
+  - Data e hora
+  - Tipo de dispositivo (mobile/tablet/desktop)
+  - Sistema operacional
+  - Navegador
+  - Localização (cidade, região, país)
+
+**Prompt Feedback:**
+- Histórico de testes de prompts
+- Taxa de utilidade (👍/👎)
+- Análise de personas mais efetivas
+
+---
+
+## 🚀 Primeiros Passos
+
+### 1. Configuração Inicial
+1. Faça login ou solicite acesso via waitlist
+2. Complete o Setup Wizard
+3. Configure sua empresa
+
+### 2. Crie seu Primeiro QR Code
+1. Acesse **QR d'água**
+2. Escolha o tipo (LINK, BRIDGE ou CARD)
+3. Preencha os dados
 4. Veja o preview em tempo real
-5. Baixe o QR Code ou compartilhe o link
+5. Salve e baixe o QR Code
 
-**Dica:** Use o tipo BRIDGE para criar landing pages rápidas!
+### 3. Otimize seu Primeiro Prompt
+1. Acesse **Prompt Lab**
+2. Selecione uma persona
+3. Digite sua ideia
+4. Clique em "Otimizar"
+5. Teste e salve o resultado
 
----
-
-### 6. 💬 **Chat AI com Ferramentas CRM**
-
-O assistente de IA não é apenas um chatbot - ele **executa ações** no seu CRM.
-
-#### **Comandos que funcionam:**
-```
-"Crie um negócio de R$ 500 para o João"
-→ IA cria o deal automaticamente
-
-"Mostre todos os negócios acima de R$ 1000"
-→ IA busca e exibe a lista
-
-"Crie uma tarefa de follow-up para amanhã"
-→ IA agenda a atividade
-
-"Qual o status do pipeline de vendas?"
-→ IA mostra estatísticas em tempo real
-```
-
-#### **12 Ferramentas Ativas:**
-- `searchDeals` - Buscar negócios
-- `createDeal` - Criar negócios
-- `moveDeal` - Mover entre etapas
-- `getContact` - Buscar contatos
-- `createActivity` - Criar tarefas
-- `getPipelineStats` - Ver estatísticas
-- `suggestNextAction` - Sugestões de ação
-- E mais 5 ferramentas...
-
-**Memória Persistente:** O chat lembra de toda a conversa, mesmo após recarregar a página!
+### 4. Gerencie Negócios
+1. Acesse **Boards**
+2. Crie um novo negócio
+3. Arraste entre colunas
+4. Use agentes de IA para qualificação
 
 ---
 
-## 🎨 Recursos de Produtividade
+## 💡 Dicas e Boas Práticas
 
-### 7. 🔍 **Busca Global Inteligente**
+### QR Codes
+- Use cores com bom contraste (mínimo 4.5:1)
+- Teste o QR em diferentes dispositivos
+- Mantenha URLs curtas e memoráveis
+- Para CARD, organize links por prioridade
 
-Pressione `Ctrl+K` (ou `Cmd+K` no Mac) para abrir a busca rápida:
-- Encontre negócios por nome, valor ou empresa
-- Acesse contatos instantaneamente
-- Navegue entre boards
-- Execute comandos rápidos
+### Prompt Lab
+- Seja específico na ideia bruta
+- Mencione contexto e restrições
+- Indique formato de saída desejado
+- Teste o prompt antes de usar em produção
+- Salve prompts bem-sucedidos para reutilização
 
-### 8. 📊 **Dashboard de Métricas**
-
-Acompanhe seu desempenho em tempo real:
-- Taxa de conversão por etapa
-- Valor médio dos negócios
-- Tempo médio no funil
-- Previsão de receita
-
-### 9. 🏷️ **Tags e Filtros Avançados**
-
-Organize seus negócios com:
-- Tags customizadas (ex: "Urgente", "VIP", "Reativação")
-- Filtros por valor, data, responsável
-- Visualizações salvas (seus filtros favoritos)
+### CRM
+- Atualize negócios regularmente
+- Use tags para organização
+- Aproveite os agentes de IA para qualificação
+- Mantenha histórico de interações
 
 ---
 
-## 🚀 Fluxos de Trabalho Recomendados
+## 🆘 Suporte
 
-### **Fluxo 1: Qualificação de Leads (com Yara)**
-1. Novo lead entra no board "Vendas"
-2. Yara analisa e atribui score (Hot/Cold)
-3. Você foca apenas nos leads "Hot"
-4. Yara sugere próxima ação (ligar, enviar proposta, etc.)
+**Precisa de Ajuda?**
+- Use o chat com IA (canto inferior direito)
+- Consulte este guia
+- Entre em contato via WhatsApp
 
-### **Fluxo 2: Negociação Assistida (com Objection Killer)**
-1. Cliente levanta objeção
-2. Você registra no campo "Notas" do deal
-3. Abre "AI Insights"
-4. Copia o script sugerido
-5. Envia para o cliente
-
-### **Fluxo 3: Produtividade Máxima (com Inbox Foco)**
-1. Inicia o dia no "Inbox"
-2. Ativa "Modo Foco"
-3. Completa as 3 tarefas prioritárias
-4. Novas tarefas aparecem automaticamente
-5. Termina o dia com sensação de conquista
+**Atualizações:**
+- Novas features são anunciadas no dashboard
+- Verifique o DEVLOG para histórico de mudanças
 
 ---
 
-## 🔧 Configurações e Personalização
+## 🔄 Atualizações Recentes
 
-### **Configurar Agentes de IA:**
-1. Abra um board
-2. Clique no ícone de **engrenagem** ao lado do nome do agente
-3. Edite:
-   - Nome do agente
-   - Comportamento (ex: "Seja mais agressivo em vendas")
-   - Metas (ex: "Fechar 10 deals/mês")
+### v1.3 - Growth & Feedback (Dezembro 2024)
+- ✅ Landing Page Invite-Only com parallax
+- ✅ Prompt Lab público como lead magnet
+- ✅ Ciclo de feedback (teste + avaliação)
+- ✅ Editor visual de múltiplos links (Card Digital)
+- ✅ Waitlist com tracking de indicações
 
-**Nota:** Apenas administradores podem editar agentes (recurso de segurança).
-
-### **Personalizar Campos Customizados:**
-Adicione campos específicos do seu negócio:
-- Tamanho da empresa
-- Setor de atuação
-- Origem do lead
-- Nível de interesse
+### v1.2 - Visual & Security (Dezembro 2024)
+- ✅ Validação de contraste WCAG
+- ✅ Prompt Lab com save/load
+- ✅ Analytics de QR scans
+- ✅ Free/Pro tier logic
 
 ---
 
-## 🆘 Troubleshooting
-
-### **Problema: Não consigo criar contatos**
-**Solução:** Verifique se você está logado e tem permissão de escrita. Contate o administrador se o erro persistir.
-
-### **Problema: Chat AI não responde**
-**Solução:** 
-1. Verifique se a API Key do Gemini está configurada em **Configurações > IA**
-2. Recarregue a página
-3. Limpe o cache do navegador
-
-### **Problema: Drag & Drop não funciona**
-**Solução:** Certifique-se de que está arrastando o card pela área do título, não pelos botões.
-
----
-
-## 📚 Próximos Passos
-
-### **Roadmap de Funcionalidades:**
-- [ ] **UI de Gestão de Produtos** (editar catálogo visualmente)
-- [ ] **Onboarding Interativo** (tutorial guiado)
-- [ ] **Integrações** (WhatsApp, Email, Calendário)
-- [ ] **Relatórios Customizados** (exportar para PDF/Excel)
-- [ ] **Modo Offline** (trabalhar sem internet)
-
----
-
-## 💡 Dicas de Ouro
-
-1. **Use atalhos de teclado** - Economize 2h/dia
-2. **Confie na IA** - Ela aprende com seus padrões
-3. **Revise o Inbox diariamente** - Mantenha o foco
-4. **Documente objeções** - A IA melhora com dados
-5. **Celebre pequenas vitórias** - Cada deal fechado conta!
-
----
-
-## 🤝 Suporte
-
-**Precisa de ajuda?**
-- 📧 Email: suporte@encontrodagua.com.br
-- 💬 Chat: Use o widget de IA (canto inferior direito)
-- 📖 Documentação: [docs.encontrodagua.com.br](https://docs.encontrodagua.com.br)
-
----
-
-**Última atualização:** 18/12/2025  
-**Versão:** 1.0 (MVP Launch)
+**Encontro D'água - Hub Digital**  
+*Conexões que fluem. IA que potencializa pessoas.*
