@@ -2,6 +2,35 @@
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
+## Sprint: Mobile Polish & Final Setup (V6)
+**Status:** ✅ Concluído
+**Data:** 20/12/2025
+
+### 🎨 Polimento Visual e UX Mobile
+1. **Landing Page V6 (Correções Mobile):**
+   - Fix de Menu/Scroll Mobile: Resolvido comportamento de scroll em dispositivos móveis.
+   - Componente de Carrossel para Equipe: Implementado carrossel visual para apresentação da equipe de agentes.
+   - Responsividade aprimorada em telas pequenas.
+
+2. **Ajustes de Rotas:**
+   - Rota raiz (`/`) agora renderiza a Landing Page como home universal.
+   - Mantidas rotas de `/login` e `/dashboard` funcionais.
+   - Landing Page como ponto de entrada "invite-only" para todos os visitantes.
+
+3. **SEO e Identidade:**
+   - Título da página atualizado: "Encontro D'água .hub"
+   - Meta description adicionada para melhor indexação.
+   - Branding consistente em toda a aplicação.
+   - **Identity Shift:** Adoção do ícone 🌀 e reposicionamento como Ecossistema Bioinspirado.
+   - README.md atualizado com nova visão "Inspirado na natureza, codificado para o mundo."
+   - Preparação para Beta Testing (QA).
+
+### 📝 Observações
+- Preparação para commit final do pacote visual V6.
+- Sistema estável e pronto para deploy.
+
+---
+
 ## Sprint: Release V5 (Main) - Turno da Noite
 **Status:** ✅ Concluído
 **Data:** 20/12/2025
