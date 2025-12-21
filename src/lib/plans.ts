@@ -45,42 +45,41 @@ export const PLANS: Plan[] = [
     },
     {
         id: 'pro_monthly',
-        name: 'Pro Avulso',
-        price: 9.90,
+        name: 'Pro Mensal',
+        price: 3.00,
         currency: 'BRL',
         interval: 'month',
         features: [
-            'QR Codes ilimitados',
-            'Prompt Lab avançado',
-            'Amazo IA integrado',
-            'Analytics completo',
-            'Sem marca "Powered by"',
-            'Suporte prioritário'
+            'Prompt Lab completo',
+            'Templates de especialistas',
+            'Suporte prioritário',
+            'Atualizações contínuas'
         ],
         limits: {
-            qrCodes: 'unlimited',
+            qrCodes: 0,
             promptLab: true,
-            aiAgents: true,
-            analytics: true,
-            customBranding: true
+            aiAgents: false,
+            analytics: false,
+            customBranding: false
         },
         recommended: true
     },
     {
         id: 'pro_yearly',
-        name: 'Pro Anual',
-        price: 97,
+        name: 'Visionário Anual',
+        price: 30,
         currency: 'BRL',
         interval: 'year',
         features: [
-            'Tudo do Pro Avulso',
-            '2 meses grátis (economia de R$ 21,80)',
+            'Tudo do Pro Mensal',
+            'Pague 10, Leve 12 meses',
+            '3 QR Codes Dinâmicos Pro',
+            'Prompt Lab ilimitado',
             'Acesso antecipado a features',
-            'Consultoria estratégica (1h/ano)',
             'Badge de Early Adopter'
         ],
         limits: {
-            qrCodes: 'unlimited',
+            qrCodes: 3,
             promptLab: true,
             aiAgents: true,
             analytics: true,

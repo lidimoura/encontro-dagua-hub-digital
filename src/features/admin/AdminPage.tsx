@@ -21,14 +21,14 @@ export default function AdminPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState<string | null>(null);
 
-    // SECURITY CHECK: Only lidifmfc@gmail.com can access
+    // SECURITY CHECK: Only lidimfc@gmail.com can access
     useEffect(() => {
         if (!user) {
             navigate('/login');
             return;
         }
 
-        if (user.email !== 'lidifmfc@gmail.com') {
+        if (user.email !== 'lidimfc@gmail.com') {
             navigate('/dashboard');
             return;
         }
@@ -187,8 +187,8 @@ export default function AdminPage() {
                                         </span>
                                         <span className="text-xs text-slate-400">•</span>
                                         <span className={`text-xs font-bold ${profile.plan === 'pro'
-                                                ? 'text-green-600'
-                                                : 'text-slate-500'
+                                            ? 'text-green-600'
+                                            : 'text-slate-500'
                                             }`}>
                                             {profile.plan === 'pro' ? 'PRO' : 'FREE'}
                                         </span>
@@ -199,8 +199,8 @@ export default function AdminPage() {
                                     onClick={() => togglePlan(profile.id, profile.plan || 'free')}
                                     disabled={updating === profile.id}
                                     className={`px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 ${profile.plan === 'pro'
-                                            ? 'bg-red-500 hover:bg-red-600 text-white'
-                                            : 'bg-green-500 hover:bg-green-600 text-white'
+                                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                                        : 'bg-green-500 hover:bg-green-600 text-white'
                                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
                                     {updating === profile.id ? (
