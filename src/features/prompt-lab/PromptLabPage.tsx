@@ -14,11 +14,14 @@ interface PersonaOption {
 
 const PERSONAS: PersonaOption[] = [
     { value: 'software-engineer', label: '👨‍💻 Engenheiro de Software', description: 'Código, arquitetura, debugging' },
-    { value: 'copywriter', label: '✍️ Copywriter', description: 'Textos persuasivos, vendas' },
-    { value: 'designer', label: '🎨 Designer', description: 'UI/UX, branding, visual' },
-    { value: 'lawyer', label: '⚖️ Advogado', description: 'Contratos, compliance, legal' },
+    { value: 'product-manager', label: '📊 Product Manager', description: 'Roadmap, features, stakeholders' },
+    { value: 'data-scientist', label: '📈 Cientista de Dados', description: 'Análise, ML, insights' },
+    { value: 'designer', label: '🎨 Designer', description: 'UI/UX, prototipagem, visual' },
     { value: 'marketer', label: '📈 Profissional de Marketing', description: 'Campanhas, estratégia, growth' },
     { value: 'teacher', label: '👩‍🏫 Professor', description: 'Educação, didática, conteúdo' },
+    { value: 'bot-architect', label: '🤖 Arquiteto de Bots', description: 'Estrutura de agentes IA e fluxos (SDR/Closer)' },
+    { value: 'llm-trainer', label: '🧠 Treinador de LLM', description: 'System Prompts para ChatGPT/Claude personalizados' },
+    { value: 'web-architect', label: '🌐 Arquiteto Web', description: 'Escopo e código (HTML/Tailwind) para Landing Pages' },
 ];
 
 export const PromptLabPage: React.FC = () => {

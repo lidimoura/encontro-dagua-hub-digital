@@ -2,6 +2,42 @@
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
+## Sprint: Final Launch Features (V7)
+**Status:** ✅ Concluído
+**Data:** 21/12/2025
+
+### 🚀 Recursos de Lançamento
+
+1. **QR Code - Analytics & Sharing:**
+   - Implementado contador de scans no banco de dados
+   - Adicionados botões de compartilhamento:
+     - Baixar PNG (download em alta qualidade)
+     - Compartilhar Link (copia URL para WhatsApp)
+     - Preview/Tela Cheia (modal para teste)
+   - Migration SQL: `008_add_qr_scans.sql`
+
+2. **Prompt Lab - Novos Especialistas:**
+   - 🤖 **Arquiteto de Bots:** Estrutura de agentes IA e fluxos (SDR/Closer)
+   - 🧠 **Treinador de LLM:** System Prompts para ChatGPT/Claude personalizados
+   - 🌐 **Arquiteto Web:** Escopo e código (HTML/Tailwind) para Landing Pages
+   - Total: 9 especialistas disponíveis
+
+3. **Payment Flow MVP:**
+   - Criado componente `SubscriptionModal.tsx`
+   - Integração com links externos de pagamento
+   - Planos: Pro Mensal (R$3) e Visionário Anual (R$30)
+   - Ativação manual pela administração
+
+4. **Documentação Completa:**
+   - Criado `USERGUIDE.md` com guia completo de uso
+   - Atualizado `README.md` com novos recursos
+   - Documentação de especialistas e fluxo de pagamento
+
+### 📝 Observações
+- Sistema pronto para lançamento oficial
+- Todos os recursos de usabilidade implementados
+- Documentação completa para usuários
+
 ## Sprint: Mobile Polish & Final Setup (V6)
 **Status:** ✅ Concluído
 **Data:** 20/12/2025
