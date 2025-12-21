@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Sparkles, CheckCircle, Copy, ThumbsUp, 
+import {
+  Sparkles, CheckCircle, Copy, ThumbsUp,
   QrCode, Bot, Brain, Menu, X, Heart, ArrowRight, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -48,7 +48,7 @@ export default function LandingPage() {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   // State do Carrossel da Equipe
   const [activeTeamIndex, setActiveTeamIndex] = useState(1); // Começa com a Lidi (índice 1) no meio
   const teamCarouselRef = useRef<HTMLDivElement>(null);
@@ -73,6 +73,13 @@ export default function LandingPage() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizedResult, setOptimizedResult] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [promptTemplate, setPromptTemplate] = useState<'viral' | 'agent' | 'sales'>('viral');
+
+  const templatePlaceholders = {
+    viral: 'Ex: Como divulgar minha loja de açaí no TikTok?',
+    agent: 'Ex: Criar agente de IA para atendimento de clientes',
+    sales: 'Ex: Vender consultoria de marketing digital'
+  };
 
   const handleOptimize = async () => {
     if (!idea.trim()) return;
@@ -118,44 +125,44 @@ export default function LandingPage() {
 
       {/* --- HEADER (MOBILE FIX: Z-INDEX ALTO) --- */}
       <header className="fixed w-full z-[100] top-0 py-4 px-6 bg-gradient-to-b from-black/90 to-transparent backdrop-blur-md border-b border-white/5 transition-all duration-300">
-         <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-               <span className="text-xl font-bold text-white tracking-tight drop-shadow-md hover:text-amber-400 transition">Encontro D'água .hub</span>
-            </div>
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+            <span className="text-xl font-bold text-white tracking-tight drop-shadow-md hover:text-amber-400 transition">Encontro D'água .hub</span>
+          </div>
 
-            {/* Menu Desktop */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#lab" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Prompt Lab</a>
-              <a href="#solucoes" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Soluções</a>
-              <a href="#time" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Time</a>
-              {user ? (
-                <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900/90 hover:bg-fuchsia-800 text-white rounded-full transition font-medium text-sm shadow-lg border border-fuchsia-800 backdrop-blur-md">Meu Painel</button>
-              ) : (
-                <div className="flex gap-4">
-                  <button onClick={() => navigate('/login')} className="text-slate-200 hover:text-white transition text-sm font-medium">Login</button>
-                  <button onClick={() => window.open('https://wa.me/5592999999999', '_blank')} className="px-6 py-2.5 bg-amber-500/90 hover:bg-amber-900 text-slate-900 rounded-full transition font-bold text-sm shadow-lg backdrop-blur-md">Solicitar Convite</button>
-                </div>
-              )}
-            </div>
-            
-            {/* Botão Menu Mobile */}
-            <button className="md:hidden text-white z-[101]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-         </div>
-
-         {/* Menu Mobile Overlay */}
-         {isMenuOpen && (
-           <div className="md:hidden fixed inset-0 top-[70px] bg-[#02040a]/95 backdrop-blur-xl z-[90] flex flex-col items-center pt-12 space-y-8 animate-fade-in">
-              <a href="#lab" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Prompt Lab</a>
-              <a href="#solucoes" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Soluções</a>
-              <a href="#time" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Time</a>
-              <div className="pt-8 flex flex-col gap-4 w-3/4">
-                <button onClick={() => {navigate('/login'); setIsMenuOpen(false)}} className="py-3 border border-white/20 rounded-full text-lg">Login</button>
-                <button className="py-3 bg-amber-500 text-slate-900 font-bold rounded-full text-lg">Solicitar Convite</button>
+          {/* Menu Desktop */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#lab" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Prompt Lab</a>
+            <a href="#solucoes" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Soluções</a>
+            <a href="#time" className="text-slate-300 hover:text-amber-400 transition text-sm font-medium">Time</a>
+            {user ? (
+              <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900/90 hover:bg-fuchsia-800 text-white rounded-full transition font-medium text-sm shadow-lg border border-fuchsia-800 backdrop-blur-md">Meu Painel</button>
+            ) : (
+              <div className="flex gap-4">
+                <button onClick={() => navigate('/login')} className="text-slate-200 hover:text-white transition text-sm font-medium">Login</button>
+                <button onClick={() => window.open('https://wa.me/5592999999999', '_blank')} className="px-6 py-2.5 bg-amber-500/90 hover:bg-amber-900 text-slate-900 rounded-full transition font-bold text-sm shadow-lg backdrop-blur-md">Solicitar Convite</button>
               </div>
-           </div>
-         )}
+            )}
+          </div>
+
+          {/* Botão Menu Mobile */}
+          <button className="md:hidden text-white z-[101]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+
+        {/* Menu Mobile Overlay */}
+        {isMenuOpen && (
+          <div className="md:hidden fixed inset-0 top-[70px] bg-[#02040a]/95 backdrop-blur-xl z-[90] flex flex-col items-center pt-12 space-y-8 animate-fade-in">
+            <a href="#lab" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Prompt Lab</a>
+            <a href="#solucoes" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Soluções</a>
+            <a href="#time" onClick={() => setIsMenuOpen(false)} className="text-2xl text-slate-300 hover:text-amber-400">Time</a>
+            <div className="pt-8 flex flex-col gap-4 w-3/4">
+              <button onClick={() => { navigate('/login'); setIsMenuOpen(false) }} className="py-3 border border-white/20 rounded-full text-lg">Login</button>
+              <button className="py-3 bg-amber-500 text-slate-900 font-bold rounded-full text-lg">Solicitar Convite</button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* --- HERO SECTION (MOBILE FIX: MIN-H-SCREEN, NÃO H-SCREEN FIXO) --- */}
@@ -183,32 +190,65 @@ export default function LandingPage() {
       {/* --- SEÇÃO PROMPT LAB --- */}
       <section id="lab" className="py-20 px-6 bg-[#02040a] relative z-20 border-t border-white/5 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center">
-           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-900/20 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3 h-3" /><span>Prove a Inteligência do Hub</span></div>
-           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">Laboratório de Ideias</h2>
-           <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">Digite um problema ou ideia vaga. Nossa engenharia de prompt devolve uma solução estruturada em segundos.</p>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-900/20 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3 h-3" /><span>Prove a Inteligência do Hub</span></div>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">Laboratório de Ideias</h2>
+          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">Digite um problema ou ideia vaga. Nossa engenharia de prompt devolve uma solução estruturada em segundos.</p>
 
-           <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex flex-col md:flex-row gap-3 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-fuchsia-600 opacity-50 group-hover:opacity-100 transition"></div>
-              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} placeholder="Ex: Como divulgar minha loja de açaí no TikTok?" className="flex-1 bg-transparent border-none px-4 py-3 text-white placeholder:text-slate-600 focus:ring-0 text-lg"/>
-              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-900 hover:bg-fuchsia-800 text-white px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 disabled:opacity-50">{isOptimizing ? '...' : <Sparkles className="w-5 h-5" />}<span>{isOptimizing ? 'Gerando...' : 'Otimizar'}</span></button>
-           </div>
+          {/* Template Selector */}
+          <div className="mb-6 flex justify-center">
+            <div className="inline-flex gap-2 p-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-xl">
+              <button
+                onClick={() => setPromptTemplate('viral')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${promptTemplate === 'viral'
+                    ? 'bg-fuchsia-900 text-white shadow-lg'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                Ideia Viral (Redes Sociais)
+              </button>
+              <button
+                onClick={() => setPromptTemplate('agent')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${promptTemplate === 'agent'
+                    ? 'bg-fuchsia-900 text-white shadow-lg'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                Prompt para Agente de IA
+              </button>
+              <button
+                onClick={() => setPromptTemplate('sales')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${promptTemplate === 'sales'
+                    ? 'bg-fuchsia-900 text-white shadow-lg'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                Mensagem de Venda (CNV)
+              </button>
+            </div>
+          </div>
 
-           {optimizedResult && (
+          <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex flex-col md:flex-row gap-3 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-fuchsia-600 opacity-50 group-hover:opacity-100 transition"></div>
+            <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} placeholder={templatePlaceholders[promptTemplate]} className="flex-1 bg-transparent border-none px-4 py-3 text-white placeholder:text-slate-600 focus:ring-0 text-lg" />
+            <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-900 hover:bg-fuchsia-800 text-white px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 disabled:opacity-50">{isOptimizing ? '...' : <Sparkles className="w-5 h-5" />}<span>{isOptimizing ? 'Gerando...' : 'Otimizar'}</span></button>
+          </div>
+
+          {optimizedResult && (
             <div className="mt-8 bg-[#0f0518] border border-fuchsia-900/30 rounded-xl p-6 md:p-8 text-left animate-fade-in shadow-2xl relative">
-               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h3 className="text-amber-400 font-semibold flex items-center gap-2"><CheckCircle className="w-5 h-5" /> Resultado Gerado</h3>
                 <div className="flex gap-2 self-end md:self-auto">
-                   <button onClick={handleCopyPrompt} className={`p-2 rounded-lg transition flex items-center gap-2 text-sm ${copySuccess ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10 text-slate-400 hover:text-white'}`}>
-                     <Copy className="w-4 h-4" /> {copySuccess ? 'Copiado!' : 'Copiar'}
-                   </button>
-                   <button onClick={handleSaveFeedback} className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-green-400 flex items-center gap-2 text-sm" title="Salvar no Painel">
-                     <ThumbsUp className="w-4 h-4" /> Salvar
-                   </button>
+                  <button onClick={handleCopyPrompt} className={`p-2 rounded-lg transition flex items-center gap-2 text-sm ${copySuccess ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10 text-slate-400 hover:text-white'}`}>
+                    <Copy className="w-4 h-4" /> {copySuccess ? 'Copiado!' : 'Copiar'}
+                  </button>
+                  <button onClick={handleSaveFeedback} className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-green-400 flex items-center gap-2 text-sm" title="Salvar no Painel">
+                    <ThumbsUp className="w-4 h-4" /> Salvar
+                  </button>
                 </div>
               </div>
               <div className="font-mono text-sm text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/30 p-4 rounded-lg overflow-x-auto">{optimizedResult}</div>
             </div>
-           )}
+          )}
         </div>
       </section>
 
@@ -219,7 +259,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Soluções para Problemas Reais</h2>
             <p className="text-slate-400 max-w-xl mx-auto">Nosso ecossistema oferece as ferramentas certas para cada desafio do seu negócio.</p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* CARD QR */}
             <div className="bg-slate-900/40 border border-white/5 p-8 rounded-2xl hover:border-blue-500/30 transition duration-300 flex flex-col h-full hover:-translate-y-1">
@@ -242,7 +282,7 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-6 text-amber-500"><Brain className="w-6 h-6" /></div>
               <h3 className="text-xl font-bold text-white mb-3">Engenharia de Ideias</h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">Travou na criação de conteúdo ou estratégia? Use nossa IA especializada para transformar intenções vagas em planos de ação estruturados.</p>
-              <button onClick={() => document.getElementById('lab')?.scrollIntoView({behavior: 'smooth'})} className="text-amber-500 text-sm font-semibold flex items-center gap-2 mt-auto hover:gap-3 transition-all">Testar o Lab <ArrowRight size={16} /></button>
+              <button onClick={() => document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth' })} className="text-amber-500 text-sm font-semibold flex items-center gap-2 mt-auto hover:gap-3 transition-all">Testar o Lab <ArrowRight size={16} /></button>
             </div>
           </div>
         </div>
@@ -251,26 +291,26 @@ export default function LandingPage() {
       {/* --- SEÇÃO TIME (CARROSSEL DESTAQUE) --- */}
       <section id="time" className="py-24 px-6 bg-[#02040a] relative z-20 border-t border-fuchsia-900/10 scroll-mt-20 overflow-hidden">
         <div className="max-w-6xl mx-auto text-center mb-12">
-           <span className="text-fuchsia-500 font-bold tracking-widest text-sm uppercase">Quem Somos</span>
-           <h2 className="text-3xl md:text-4xl font-bold mt-2 text-white">Inteligência Híbrida em Ação</h2>
+          <span className="text-fuchsia-500 font-bold tracking-widest text-sm uppercase">Quem Somos</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2 text-white">Inteligência Híbrida em Ação</h2>
         </div>
 
         {/* CARROSSEL */}
         <div className="relative max-w-4xl mx-auto flex items-center justify-center h-[400px]" ref={teamCarouselRef}>
-           {/* Botão Anterior */}
-           <button onClick={handlePrevTeam} className="absolute left-0 md:-left-12 z-30 p-2 bg-slate-800/50 hover:bg-fuchsia-900/50 rounded-full text-white transition"><ChevronLeft size={32}/></button>
-           
-           {/* Cards */}
-           <div className="flex items-center justify-center relative w-full h-full perspective-1000">
+          {/* Botão Anterior */}
+          <button onClick={handlePrevTeam} className="absolute left-0 md:-left-12 z-30 p-2 bg-slate-800/50 hover:bg-fuchsia-900/50 rounded-full text-white transition"><ChevronLeft size={32} /></button>
+
+          {/* Cards */}
+          <div className="flex items-center justify-center relative w-full h-full perspective-1000">
             {TEAM_MEMBERS.map((member, index) => {
               // Lógica para determinar a posição relativa ao card ativo
               let position = index - activeTeamIndex;
               if (position < -1) position += TEAM_MEMBERS.length;
               if (position > 1) position -= TEAM_MEMBERS.length;
-              
+
               const isActive = position === 0;
               const isSide = Math.abs(position) === 1;
-              
+
               // Estilos dinâmicos baseados na posição
               let transform = '';
               let opacity = '';
@@ -285,14 +325,14 @@ export default function LandingPage() {
                 opacity = 'opacity-40 blur-[1px]';
                 zIndex = 'z-10';
               } else {
-                 // Esconde os outros cards
-                 transform = 'scale(0) translateX(0)';
-                 opacity = 'opacity-0';
-                 zIndex = 'z-0';
+                // Esconde os outros cards
+                transform = 'scale(0) translateX(0)';
+                opacity = 'opacity-0';
+                zIndex = 'z-0';
               }
 
               return (
-                <div 
+                <div
                   key={member.id}
                   className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[350px] bg-[#0f0518] border border-white/10 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-out flex flex-col items-center text-center ${transform} ${opacity} ${zIndex}`}
                 >
@@ -305,12 +345,12 @@ export default function LandingPage() {
                 </div>
               );
             })}
-           </div>
+          </div>
 
-           {/* Botão Próximo */}
-           <button onClick={handleNextTeam} className="absolute right-0 md:-right-12 z-30 p-2 bg-slate-800/50 hover:bg-fuchsia-900/50 rounded-full text-white transition"><ChevronRight size={32}/></button>
+          {/* Botão Próximo */}
+          <button onClick={handleNextTeam} className="absolute right-0 md:-right-12 z-30 p-2 bg-slate-800/50 hover:bg-fuchsia-900/50 rounded-full text-white transition"><ChevronRight size={32} /></button>
         </div>
-        
+
         {/* Indicadores (Bolinhas) */}
         <div className="flex justify-center gap-2 mt-8">
           {TEAM_MEMBERS.map((_, index) => (

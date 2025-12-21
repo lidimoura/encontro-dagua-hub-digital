@@ -7,6 +7,7 @@ import { StatCard } from './components/StatCard';
 import { ActivityFeedItem } from './components/ActivityFeedItem';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
+import { OnboardingTour } from '@/components/OnboardingTour';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -248,6 +249,9 @@ const DashboardPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Onboarding Tour */}
+      <OnboardingTour />
     </div>
   );
 };
