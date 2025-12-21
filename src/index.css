@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+
+  /* CRITICAL: Force scroll unlock globally */
+  html,
+  body {
+    overflow-x: hidden !important;
+    /* Prevent horizontal scroll */
+    overflow-y: auto !important;
+    /* FORCE vertical scroll to work */
+    min-height: 100vh;
+    height: auto;
+  }
+
   body {
     font-family: 'Inter', sans-serif;
   }
