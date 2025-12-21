@@ -46,6 +46,7 @@ const PromptLabPage = lazy(() =>
 const AdminUsersPage = lazy(() =>
   import('@/features/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage }))
 );
+const AdminPage = lazy(() => import('@/features/admin/AdminPage'));
 const BridgePage = lazy(() =>
   import('@/pages/BridgePage').then(m => ({ default: m.BridgePage }))
 );
@@ -97,6 +98,7 @@ const App: React.FC = () => {
                       <Route path="decisions" element={<DecisionQueuePage />} />
                       <Route path="qrdagua" element={<QRdaguaPage />} />
                       <Route path="prompt-lab" element={<PromptLabPage />} />
+                      <Route path="admin" element={<AdminPage />} />
                       <Route path="admin/users" element={<AdminUsersPage />} />
                     </Route>
 
