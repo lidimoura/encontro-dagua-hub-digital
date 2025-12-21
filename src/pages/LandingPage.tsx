@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Sparkles, CheckCircle, Copy, Play,
-  QrCode, Bot, Brain, Menu, X, ArrowRight, ChevronLeft, ChevronRight, Globe, Users, MessageCircle
+  Sparkles, CheckCircle, Copy, Play, QrCode, Bot, Brain, Menu, X,
+  ArrowRight, ChevronLeft, ChevronRight, Globe, Users, MessageCircle,
+  Linkedin, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 
-// DADOS DO TIME
 const TEAM_MEMBERS = [
   {
     id: 'lidi',
@@ -15,32 +15,12 @@ const TEAM_MEMBERS = [
     type: "human",
     image: "/profile.png",
     color: "border-amber-500 text-amber-400",
+    linkedin: "https://linkedin.com/in/sua-url", // Coloque seu LinkedIn aqui
     pitch: "Minha missão é desenhar soluções tecnológicas que devolvam tempo e liberdade para você empreender."
   },
-  {
-    id: 'amazo',
-    name: "Amazo",
-    role: "Customer Success",
-    type: "ai",
-    color: "border-fuchsia-500 text-fuchsia-400",
-    pitch: "Atendimento 24h. Garanto que nenhum cliente fique sem resposta, guiando cada passo."
-  },
-  {
-    id: 'precy',
-    name: "Precy",
-    role: "Tech Lead",
-    type: "ai",
-    color: "border-blue-500 text-blue-400",
-    pitch: "Estabilidade e segurança. Cuido para que seu QR D'água e links funcionem sempre."
-  },
-  {
-    id: 'jury',
-    name: "Jury",
-    role: "Compliance",
-    type: "ai",
-    color: "border-red-500 text-red-400",
-    pitch: "Ética e responsabilidade. Garanto que a IA respeite a privacidade e valores humanos."
-  }
+  { id: 'amazo', name: "Amazo", role: "CS & Vendas", type: "ai", color: "border-fuchsia-500 text-fuchsia-400", pitch: "Atendimento 24h. Garanto que nenhum cliente fique sem resposta." },
+  { id: 'precy', name: "Precy", role: "Tech Lead", type: "ai", color: "border-blue-500 text-blue-400", pitch: "Estabilidade e segurança. Cuido para que seu QR D'água funcione sempre." },
+  { id: 'jury', name: "Jury", role: "Compliance", type: "ai", color: "border-red-500 text-red-400", pitch: "Ética e responsabilidade. Garanto privacidade e valores humanos." }
 ];
 
 export default function LandingPage() {
@@ -54,6 +34,7 @@ export default function LandingPage() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizedResult, setOptimizedResult] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [testResponse, setTestResponse] = useState<string | null>(null); // Simulação do teste
 
   // Amazo Init
   useEffect(() => {
@@ -64,252 +45,230 @@ export default function LandingPage() {
     return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
   }, []);
 
-  const openAmazoChat = () => document.querySelector('typebot-bubble')?.shadowRoot?.querySelector('.button-container')?.click();
+  // FORCE OPEN CHAT (Tenta várias vezes até conseguir)
+  const openAmazoChat = () => {
+    let attempts = 0;
+    const interval = setInterval(() => {
+      const bubble = document.querySelector('typebot-bubble');
+      const shadow = bubble?.shadowRoot;
+      const button = shadow?.querySelector('.button-container');
+      if (button instanceof HTMLElement) {
+        button.click();
+        clearInterval(interval);
+      }
+      attempts++;
+      if (attempts > 10) clearInterval(interval); // Desiste após 2 segundos
+    }, 200);
+  };
 
   const handleOptimize = async () => {
     if (!idea.trim()) return;
     setIsOptimizing(true);
-    // SIMULAÇÃO DE ALTA QUALIDADE (Sem texto dummy)
+    setTestResponse(null);
     setTimeout(() => {
-      setOptimizedResult(`## 🌀 Prompt Estruturado pelo Hub\n\n**CONTEXTO:**\nVocê é um especialista em comunicação digital e copywriter persuasivo.\n\n**TAREFA:**\n${idea}\n\n**REQUISITOS:**\n- Use gatilhos mentais de curiosidade.\n- Mantenha parágrafos curtos para leitura mobile.\n- Finalize com uma chamada para ação (CTA) clara.\n\n**TOM DE VOZ:**\nEmpático, acessível e profissional.`);
+      setOptimizedResult(`## 🌀 Prompt Estruturado (Hub)\n\n**CONTEXTO:** Especialista em comunicação persuasiva.\n\n**TAREFA:** "${idea}"\n\n**ESTRUTURA:**\n1. Use gatilhos mentais.\n2. Crie 3 opções de copy.\n3. Finalize com CTA.\n\n*Prompt criado pelo Otimizador Gratuito do Hub.*`);
       setIsOptimizing(false);
-    }, 1000);
+    }, 800);
   };
 
-  const handleCopy = () => {
-    if (optimizedResult) { navigator.clipboard.writeText(optimizedResult); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000); }
-  }
-
-  const handleNextTeam = () => setActiveTeamIndex((prev) => (prev === TEAM_MEMBERS.length - 1 ? 0 : prev + 1));
-  const handlePrevTeam = () => setActiveTeamIndex((prev) => (prev === 0 ? TEAM_MEMBERS.length - 1 : prev - 1));
+  const handleTestInPlace = () => {
+    setTestResponse("🤖 IA Responde: 'Olá! Aqui estão suas 3 opções de copy baseadas no prompt...' (Isso é uma simulação. No Hub Pro, você conecta seus próprios Agentes!)");
+  };
 
   return (
-    <div className="w-full min-h-screen bg-[#02040a] text-white font-sans selection:bg-fuchsia-900/50 overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#02040a] text-white font-sans overflow-x-hidden relative">
       <style>{`@keyframes floatRiver { 0% { transform: scale(1.0); } 50% { transform: scale(1.05); } 100% { transform: scale(1.0); } } .river-animation { animation: floatRiver 25s infinite ease-in-out alternate; }`}</style>
 
+      {/* PARALLAX BG */}
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
+        <div className="w-full h-full bg-cover bg-center river-animation" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+
       {/* HEADER */}
-      <header className="fixed w-full z-[9999] top-0 py-4 px-6 bg-black/60 backdrop-blur-md border-b border-white/5 transition-all">
+      <header className="fixed w-full z-[9999] top-0 py-4 px-6 bg-black/60 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-xl font-bold text-white tracking-tight drop-shadow-md">Encontro D'água .hub 🌀</span>
+            <span className="text-xl font-bold text-white tracking-tight">Encontro D'água .hub 🌀</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#manifesto" className="text-slate-200 hover:text-amber-400 text-sm font-medium drop-shadow-sm">Manifesto</a>
-            <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium drop-shadow-sm">Soluções</a>
-            <a href="#time" className="text-slate-200 hover:text-amber-400 text-sm font-medium drop-shadow-sm">Sobre Nós</a>
+            <a href="#lab" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Prompt Lab</a>
+            <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Soluções</a>
             {user ? (
-              <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold shadow-lg hover:bg-fuchsia-800 transition">Acessar Painel</button>
+              <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold">Painel</button>
             ) : (
               <div className="flex gap-4">
-                <button onClick={() => navigate('/login')} className="text-white text-sm font-bold hover:text-amber-400 transition">Login</button>
-                <button onClick={() => navigate('/register')} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 transition shadow-lg">Criar Conta</button>
+                <button onClick={() => navigate('/login')} className="text-white text-sm font-bold">Login</button>
+                <button onClick={() => navigate('/register')} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">Criar Conta Grátis</button>
               </div>
             )}
           </div>
-          <button className="md:hidden text-white p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
         </div>
-        {isMenuOpen && (
-          <div className="md:hidden fixed inset-0 top-[70px] bg-[#02040a] z-[9998] flex flex-col items-center pt-10 space-y-8 h-screen overflow-y-auto">
-            <a href="#manifesto" onClick={() => setIsMenuOpen(false)} className="text-xl text-slate-300">Manifesto</a>
-            <a href="#solucoes" onClick={() => setIsMenuOpen(false)} className="text-xl text-slate-300">Soluções</a>
-            <a href="#time" onClick={() => setIsMenuOpen(false)} className="text-xl text-slate-300">Sobre Nós</a>
-            <button onClick={() => { navigate('/login'); setIsMenuOpen(false) }} className="text-amber-500 font-bold text-lg mt-8">Acessar Hub</button>
-          </div>
-        )}
       </header>
 
-      {/* HERO SECTION - PARALLAX LIMPO */}
-      <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 text-center">
-        {/* Fundo Parallax */}
-        <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
-          {/* Removido o bg-black pesado, agora é mais transparente para ver o rio */}
-          <div className="w-full h-full bg-cover bg-center river-animation" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
-          <div className="absolute inset-0 bg-black/40" /> {/* Overlay leve apenas para contraste do texto */}
-        </div>
+      {/* CONTENT WRAPPER */}
+      <div className="relative z-10 w-full">
 
-        <div className="relative z-10 max-w-5xl mx-auto space-y-8 animate-fade-in-up flex flex-col items-center pt-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-widest text-amber-400 shadow-xl">
-            🚀 Mobile First • AI First • Impacto Real
-          </div>
-
-          <h1 className="text-5xl md:text-8xl font-extrabold tracking-tight text-white leading-tight drop-shadow-2xl">
-            Tecnologia mais <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500 filter drop-shadow-lg">acessível.</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-white font-medium leading-relaxed max-w-3xl mx-auto drop-shadow-xl text-shadow-sm">
-            Um ecossistema digital que oferece as melhores soluções tecnológicas para resolver problemas reais e garantir resultados e prosperidade para todos.
-          </p>
-
-          <div className="pt-10 w-full flex justify-center">
-            <button onClick={() => document.getElementById('manifesto')?.scrollIntoView({ behavior: 'smooth' })} className="animate-bounce flex flex-col items-center gap-2 text-white hover:text-amber-400 transition drop-shadow-md">
-              <span className="text-xs uppercase tracking-widest font-bold">Conheça o Hub</span>
-              <ArrowRight className="w-6 h-6 rotate-90 text-amber-500" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* MANIFESTO / IMPACTO SOCIAL */}
-      <section id="manifesto" className="py-24 px-6 bg-[#02040a] relative z-10 text-center border-t border-white/10">
-        <div className="max-w-5xl mx-auto">
-          <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
-          <p className="text-slate-300 text-lg leading-relaxed mb-10 max-w-3xl mx-auto">
-            Não somos uma agência comum. Nosso compromisso é com o impacto social.
-            Garantimos acessibilidade e preços justos para que ninguém fique de fora da economia digital.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {[
-              "Pessoas Originárias e em Retomada", // ADICIONADO
-              "Mães e Pais Empreendedores",
-              "Negócios Locais & Regionais",
-              "Ribeirinhos & Quilombolas",
-              "PCD & Neurodivergentes",
-              "LGBTQIAPN+",
-              "Pessoas Pretas e Pardas",
-              "ONGs e Projetos Sociais"
-            ].map((tag) => (
-              <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold hover:border-amber-500/50 hover:text-white transition cursor-default shadow-sm">
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA CONSULTORIA SOCIAL */}
-          <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-            <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
-            <p className="text-slate-400 text-sm mb-6">Precisa de uma condição especial? Oferecemos descontos justos e sustentáveis para garantir sua prosperidade.</p>
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá! Gostaria da consultoria social gratuita de 10min sobre o Hub.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-lg">
-                <MessageCircle size={18} /> Consultoria Social Gratuita (10min)
-              </button>
-              <button onClick={openAmazoChat} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition">
-                <Bot size={18} /> Tirar Dúvidas com Amazo
+        {/* HERO */}
+        <section className="min-h-[90vh] flex flex-col justify-center items-center px-6 text-center pt-20">
+          <div className="max-w-5xl mx-auto space-y-8 animate-fade-in-up flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-widest text-amber-400 shadow-xl">
+              🚀 Mobile First • AI First • Impacto Real
+            </div>
+            <h1 className="text-5xl md:text-8xl font-extrabold tracking-tight text-white leading-tight drop-shadow-2xl">
+              Tecnologia mais <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500">acessível.</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-white font-medium max-w-3xl mx-auto drop-shadow-xl">
+              Um ecossistema digital que oferece as melhores soluções tecnológicas para resolver problemas reais e garantir resultados e prosperidade para todos.
+            </p>
+            <div className="pt-10 w-full flex justify-center">
+              <button onClick={() => document.getElementById('manifesto')?.scrollIntoView({ behavior: 'smooth' })} className="animate-bounce flex flex-col items-center gap-2 text-white hover:text-amber-400">
+                <span className="text-xs uppercase tracking-widest font-bold">Conheça o Hub</span>
+                <ArrowRight className="w-6 h-6 rotate-90 text-amber-500" />
               </button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* PROMPT LAB (AGORA FUNCIONAL) */}
-      <section className="py-20 px-6 bg-[#05020a] border-y border-white/5 relative z-10 text-center">
-        <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Teste nossa Engenharia de Ideias</span></div>
-          <h3 className="text-3xl font-bold text-white mb-4">Digite uma intenção e veja a mágica.</h3>
+        {/* MANIFESTO SOCIAL */}
+        <section id="manifesto" className="py-24 px-6 bg-[#02040a] text-center border-t border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.8)]">
+          <div className="max-w-5xl mx-auto">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
 
-          <div className="flex flex-col md:flex-row gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10 shadow-2xl">
-            <input
-              type="text"
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              placeholder="Ex: Preciso de copy para vender açaí no instagram..."
-              className="flex-1 bg-transparent border-none px-4 py-3 text-white placeholder:text-slate-500 focus:ring-0 text-lg"
-            />
-            <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-600 hover:bg-fuchsia-500 px-8 py-3 rounded-xl font-bold text-white transition disabled:opacity-50 min-w-[120px]">
-              {isOptimizing ? 'Criando...' : 'Otimizar'}
-            </button>
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              {["Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "ONGs"].map((tag) => (
+                <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
+              ))}
+            </div>
+
+            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
+              <p className="text-slate-400 text-sm mb-6">Condições especiais para impacto social.</p>
+              <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                <MessageCircle size={18} /> Consultoria Social (WhatsApp)
+              </button>
+            </div>
           </div>
+        </section>
 
-          {/* RESULTADO ESTRUTURADO REAL (SIMULADO) */}
-          {optimizedResult && (
-            <div className="text-left bg-[#0f0518] border border-fuchsia-500/20 p-6 rounded-2xl shadow-xl animate-fade-in relative">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-fuchsia-500 to-amber-500 rounded-l-2xl"></div>
-              <pre className="font-mono text-sm text-slate-300 whitespace-pre-wrap leading-relaxed mb-6 overflow-x-auto">
-                {optimizedResult}
-              </pre>
+        {/* PROMPT LAB (INTERATIVO) */}
+        <section id="lab" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
+          <div className="max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Engenharia de Ideias</span></div>
+            <h3 className="text-3xl font-bold text-white mb-2">Otimizador de Prompts</h3>
+            <p className="text-slate-400 mb-8">Digite sua intenção. A gente estrutura o comando perfeito.</p>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                <button onClick={handleCopy} className="text-slate-300 hover:text-white text-sm font-bold flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition">
-                  {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} {copySuccess ? 'Copiado!' : 'Copiar'}
-                </button>
-                <button onClick={() => navigate('/login')} className="bg-white/10 hover:bg-white/20 text-white text-sm font-bold flex items-center gap-2 px-4 py-2 rounded-lg transition border border-white/10">
-                  <Play size={16} className="text-amber-400" /> Testar no Hub
-                </button>
+            <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
+              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} placeholder="Ex: Criar legenda para foto de produto..." className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
+              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-600 hover:bg-fuchsia-500 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
+                {isOptimizing ? '...' : 'Otimizar'}
+              </button>
+            </div>
+
+            {optimizedResult && (
+              <div className="text-left bg-[#0f0518] border border-fuchsia-500/20 p-6 rounded-2xl shadow-xl animate-fade-in relative">
+                <pre className="font-mono text-sm text-slate-300 whitespace-pre-wrap mb-6 p-4 bg-black/30 rounded-lg">{optimizedResult}</pre>
+
+                {/* BOTÕES DE AÇÃO */}
+                <div className="flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <div className="flex gap-2">
+                    <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-green-400"><ThumbsUp size={18} /></button>
+                    <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-red-400"><ThumbsDown size={18} /></button>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => { navigator.clipboard.writeText(optimizedResult); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000) }} className="text-white bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                      {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} Copiar
+                    </button>
+                    <button onClick={handleTestInPlace} className="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                      <Play size={16} /> Testar Aqui
+                    </button>
+                  </div>
+                </div>
+
+                {/* RESULTADO DO TESTE SIMULADO */}
+                {testResponse && (
+                  <div className="mt-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg text-green-200 text-sm animate-fade-in">
+                    {testResponse}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-8 grid md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
+                <h4 className="text-amber-400 font-bold text-sm mb-1">🔥 Especialista: Agentes de IA</h4>
+                <p className="text-slate-400 text-xs">Cria "cérebros" completos para seus chatbots (Typebot/OpenAI). <span className="text-white underline cursor-pointer" onClick={() => navigate('/login')}>Acessar no Hub Pro</span></p>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
+                <h4 className="text-amber-400 font-bold text-sm mb-1">⚙️ Especialista: Personalizar LLMs</h4>
+                <p className="text-slate-400 text-xs">Instruções para treinar seu ChatGPT/Gemini com sua voz. <span className="text-white underline cursor-pointer" onClick={() => navigate('/login')}>Acessar no Hub Pro</span></p>
               </div>
             </div>
-          )}
-          <p className="text-xs text-slate-500 mt-6">*Cadastre-se para acessar templates avançados de Agentes e Vendas.</p>
-        </div>
-      </section>
 
-      {/* SOLUÇÕES */}
-      <section id="solucoes" className="py-20 px-6 bg-[#02040a] relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Soluções Reais</h2>
-            <p className="text-slate-400">Ferramentas desenhadas para resolver dores reais.</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* PROMPT LAB */}
-            <div className="bg-slate-900/50 border border-white/5 p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-1 transition duration-300 hover:border-amber-500/30">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 mb-4"><Brain /></div>
-              <h3 className="text-lg font-bold text-white mb-2">Prompt Lab</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">Engenharia de ideias. Transforme intenções em prompts estratégicos estruturados.</p>
-            </div>
-
-            {/* QR D'ÁGUA */}
-            <div className="bg-slate-900/50 border border-white/5 p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-1 transition duration-300 hover:border-blue-500/30">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 mb-4"><QrCode /></div>
-              <h3 className="text-lg font-bold text-white mb-2">QR D'água</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">Conexão instantânea. Cartões digitais e links que resolvem problemas reais.</p>
-            </div>
-
-            {/* AMAZO IA (CLICK TO CHAT) */}
-            <div className="bg-slate-900/50 border border-white/5 p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-1 transition duration-300 cursor-pointer hover:border-fuchsia-500/30 group" onClick={openAmazoChat}>
-              <div className="w-12 h-12 bg-fuchsia-500/10 rounded-lg flex items-center justify-center text-fuchsia-400 mb-4 group-hover:scale-110 transition"><Bot /></div>
-              <h3 className="text-lg font-bold text-white mb-2">Amazo IA</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">Atendimento 24/7. Clique para falar com nossa IA agora mesmo.</p>
-            </div>
-
-            {/* CRM NATIVO */}
-            <div className="bg-slate-900/50 border border-white/5 p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-1 transition duration-300 hover:border-green-500/30">
-              <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center text-green-500 mb-4"><Users /></div>
-              <h3 className="text-lg font-bold text-white mb-2">CRM Nativo</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">Gestão simplificada de leads com IA integrada e recursos estratégicos.</p>
+            <div className="mt-6 p-4 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl inline-block">
+              <p className="text-sm font-bold text-fuchsia-300">💡 Quer apenas o Prompt Lab?</p>
+              <button onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Prompt Lab Lifetime por 3 reais', '_blank')} className="text-white hover:text-white underline mt-1 text-xs">Assinar Plano Vitalício (R$ 3,00)</button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* SOBRE NÓS (TEAM) */}
-      <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10 border-t border-white/5">
-        <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">Sobre Nós</h2></div>
-        <div className="relative max-w-lg mx-auto h-[350px] flex items-center justify-center">
-          <button onClick={handlePrevTeam} className="absolute left-0 z-20 p-2 bg-slate-800 rounded-full text-white hover:bg-slate-700 transition"><ChevronLeft /></button>
+        {/* SOLUÇÕES REAIS */}
+        <section id="solucoes" className="py-20 px-6 bg-[#02040a] text-center">
+          <h2 className="text-3xl font-bold text-white mb-12">Nossas Soluções</h2>
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Cards com textos do README */}
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-amber-500/50 transition">
+              <Brain className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <h3 className="font-bold text-white">Prompt Lab</h3>
+              <p className="text-xs text-slate-400 mt-2">Engenharia de ideias. Transforme intenções em estratégias estruturadas.</p>
+            </div>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-blue-500/50 transition">
+              <QrCode className="w-10 h-10 text-blue-400 mx-auto mb-4" />
+              <h3 className="font-bold text-white">QR D'água</h3>
+              <p className="text-xs text-slate-400 mt-2">Conexão instantânea. Cartões digitais e links que resolvem problemas reais.</p>
+            </div>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-fuchsia-500/50 transition cursor-pointer" onClick={openAmazoChat}>
+              <Bot className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
+              <h3 className="font-bold text-white">Amazo IA</h3>
+              <p className="text-xs text-slate-400 mt-2">Atendimento 24/7. Agente de IA para CS e Vendas no WhatsApp.</p>
+            </div>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-green-500/50 transition">
+              <Users className="w-10 h-10 text-green-500 mx-auto mb-4" />
+              <h3 className="font-bold text-white">CRM Nativo</h3>
+              <p className="text-xs text-slate-400 mt-2">Gestão simplificada de leads com IA integrada e recursos estratégicos.</p>
+            </div>
+          </div>
+        </section>
 
-          <div className="text-center p-8 bg-[#0f0518] border border-white/10 rounded-3xl w-full mx-8 shadow-2xl flex flex-col items-center">
-            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden shadow-lg`}>
-              {TEAM_MEMBERS[activeTeamIndex].image ? (
-                <img src={TEAM_MEMBERS[activeTeamIndex].image} alt={TEAM_MEMBERS[activeTeamIndex].name} className="w-full h-full object-cover" />
-              ) : (
-                <span>{TEAM_MEMBERS[activeTeamIndex].type === 'human' ? '👩‍💻' : '🤖'}</span>
+        {/* TEAM */}
+        <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10 border-t border-white/5">
+          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">Sobre Nós</h2></div>
+          <div className="relative max-w-lg mx-auto h-[400px] flex items-center justify-center">
+            <button onClick={() => setActiveTeamIndex((p) => p === 0 ? TEAM_MEMBERS.length - 1 : p - 1)} className="absolute left-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronLeft /></button>
+
+            <div className="text-center p-8 bg-[#0f0518] border border-white/10 rounded-3xl w-full mx-8 shadow-2xl flex flex-col items-center">
+              <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden`}>
+                {TEAM_MEMBERS[activeTeamIndex].image ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" /> : '🤖'}
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-1">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
+              <span className={`text-xs uppercase font-bold tracking-widest mb-4 block ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>{TEAM_MEMBERS[activeTeamIndex].role}</span>
+              <p className="text-slate-300 text-sm italic mb-4">"{TEAM_MEMBERS[activeTeamIndex].pitch}"</p>
+              {TEAM_MEMBERS[activeTeamIndex].linkedin && (
+                <a href={TEAM_MEMBERS[activeTeamIndex].linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white"><Linkedin size={20} /></a>
               )}
             </div>
-            <h3 className="text-2xl font-bold text-white mb-1">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
-            <span className={`text-xs uppercase font-bold tracking-widest mb-4 block ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>{TEAM_MEMBERS[activeTeamIndex].role}</span>
-            <p className="text-slate-300 text-sm italic leading-relaxed">"{TEAM_MEMBERS[activeTeamIndex].pitch}"</p>
+
+            <button onClick={() => setActiveTeamIndex((p) => p === TEAM_MEMBERS.length - 1 ? 0 : p + 1)} className="absolute right-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronRight /></button>
           </div>
+        </section>
 
-          <button onClick={handleNextTeam} className="absolute right-0 z-20 p-2 bg-slate-800 rounded-full text-white hover:bg-slate-700 transition"><ChevronRight /></button>
-        </div>
-        {/* Dots Indicator */}
-        <div className="flex justify-center gap-2 mt-4">
-          {TEAM_MEMBERS.map((_, idx) => (
-            <div key={idx} className={`h-2 rounded-full transition-all ${idx === activeTeamIndex ? 'w-6 bg-fuchsia-500' : 'w-2 bg-slate-700'}`} />
-          ))}
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] relative z-10 border-t border-white/5">
-        <p className="mb-2 text-white font-bold">Encontro D'água .hub 🌀</p>
-        <p>Inspirado na natureza, codificado para o mundo.</p>
-      </footer>
+        {/* FOOTER */}
+        <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] border-t border-white/5">
+          <p className="mb-2 text-white font-bold">Encontro D'água .hub 🌀</p>
+          <p>Inspirado na natureza, codificado para o mundo.</p>
+        </footer>
+      </div>
     </div>
   );
 }
