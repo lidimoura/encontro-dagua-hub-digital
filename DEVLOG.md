@@ -2,6 +2,84 @@
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
+## Sprint: Master Reset & Strategy (V8)
+**Status:** ✅ Concluído
+**Data:** 22/12/2025
+
+### 🚨 Critical Build Fixes
+
+1. **TypeScript Type Safety:**
+   - Verified CoreMessage imports from 'ai' package in `useAgent.ts` and `useCRMAgent.ts`
+   - Confirmed message mapping returns correct type structure `{ role, content }`
+   - Build verified clean with exit code 0 - no TypeScript errors
+
+### 🛡️ Admin Panel 2.0
+
+1. **Enhanced Admin Access:**
+   - Added "Admin" link to navbar (Shield icon)
+   - Conditional rendering: visible only for `lidimfc@gmail.com`
+   - Positioned after Settings in both mobile and desktop navigation
+
+2. **Advanced Search Implementation:**
+   - Multi-field search: email, full_name, phone
+   - Real-time filtering with instant results
+   - Improved UX for user management
+
+3. **User Edit Modal:**
+   - Edit plan_type (free, monthly, annual)
+   - Edit status (active, inactive, suspended)
+   - Edit phone number
+   - Manual feature activation capability
+
+4. **Database Column Fix:**
+   - Corrected column reference from `plan` to `plan_type`
+   - Updated all Supabase queries in AdminPage.tsx
+   - Enhanced stats display with Monthly/Annual/Free breakdown
+
+### 🎨 UX Refinements & Identity
+
+1. **Widget Identity Verification:**
+   - ✅ Landing Page (public): "Amazô IA" (Vendas) - Typebot integration
+   - ✅ Dashboard (internal): "AI Flow" (Suporte Técnico) - FloatingAIWidget
+   - Identity split correctly implemented for different contexts
+
+2. **Onboarding Text:**
+   - Internal widget maintains "AI Flow" branding
+   - Public-facing widget maintains "Amazô" branding
+   - Consistent messaging across all touchpoints
+
+### 💰 Commercial Strategy 2025
+
+1. **Precy Pricing Logic Update:**
+   - **Visual Products** (Cartão Digital/Landing Page):
+     - Low cost model: R$ 49-79/mês
+     - Focus: Quick digital presence
+   - **Intellectual Products** (AI Agents):
+     - Setup: (Hours × R$ 50) + 35% margin
+     - Recurrence: R$ 1,500/month (base)
+     - Focus: Automation and intelligence
+   - **Bundle Strategy**:
+     - "Close the AI Agent and get 1 year of Hub Pro FREE!"
+     - Includes: CRM + QR d'água + Prompt Lab
+   - **Social Pricing**:
+     - Up to 60% discount for priority groups/NGOs
+     - Transparent pricing (full price + social price)
+
+2. **Prompt Lab Specialists:**
+   - ✅ Arquiteto Web: Already configured for HTML/Tailwind templates
+   - ✅ Arquiteto de Bots: Already configured for SDR/Closer flows
+   - Specialists ready for 2025 commercial strategy
+
+### 📝 Observações
+
+- Build completely clean - no TypeScript errors
+- Admin panel fully functional with advanced capabilities
+- Commercial strategy clearly defined and documented
+- Widget identities properly separated for different audiences
+- System ready for 2025 business model
+
+---
+
 ## Sprint: Final Launch Features (V7)
 **Status:** ✅ Concluído
 **Data:** 21/12/2025
