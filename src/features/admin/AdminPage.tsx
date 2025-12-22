@@ -117,6 +117,19 @@ export default function AdminPage() {
                 <p className="text-slate-600 dark:text-slate-400 text-sm">
                     Gerenciamento manual de planos (Mobile First)
                 </p>
+
+                {/* DEBUG INFO - Remove after fixing access issue */}
+                <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg">
+                    <p className="text-sm font-mono text-yellow-900 dark:text-yellow-200">
+                        <strong>🔍 DEBUG:</strong> Logado como: <span className="font-bold">{user?.email || 'N/A'}</span>
+                    </p>
+                    <p className="text-xs font-mono text-yellow-800 dark:text-yellow-300 mt-1">
+                        Admin esperado: <span className="font-bold">lidimfc@gmail.com</span>
+                    </p>
+                    <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-2">
+                        ⚠️ Se você não consegue acessar, verifique se o email está correto ou limpe o cache do navegador.
+                    </p>
+                </div>
             </div>
 
             {/* Search Bar */}
