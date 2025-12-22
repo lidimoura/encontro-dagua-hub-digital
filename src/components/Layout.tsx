@@ -23,6 +23,7 @@ import {
   Wand2,
   RefreshCcw,
   HelpCircle,
+  Shield,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
@@ -185,6 +186,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 active={location.pathname === '/settings'}
                 prefetch="settings"
               />
+              {profile?.email === 'lidimfc@gmail.com' && (
+                <NavItem
+                  to="/admin"
+                  icon={Shield}
+                  label="Admin"
+                  active={location.pathname === '/admin'}
+                />
+              )}
             </nav>
 
             {/* User Card no rodapé do drawer */}
@@ -332,6 +341,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               active={location.pathname === '/settings'}
               prefetch="settings"
             />
+            {profile?.email === 'lidimfc@gmail.com' && (
+              <NavItem
+                to="/admin"
+                icon={Shield}
+                label="Admin"
+                active={location.pathname === '/admin'}
+              />
+            )}
           </nav>
 
           <div className="p-4 border-t border-slate-100 dark:border-white/5">
