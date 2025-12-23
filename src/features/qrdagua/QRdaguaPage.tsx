@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { QrCode, Sparkles, Save, Link as LinkIcon, Palette, FileText, Edit2, Trash2, Smartphone, Globe, CreditCard } from 'lucide-react';
+import { QrCode, Sparkles, Save, Link as LinkIcon, Palette, FileText, Edit2, Trash2, Smartphone, Globe, CreditCard, Copy, ExternalLink, X, Share2 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -298,6 +298,8 @@ export const QRdaguaPage: React.FC = () => {
     const [projects, setProjects] = useState<QRProject[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successUrl, setSuccessUrl] = useState('');
 
     const fetchProjects = async () => {
         setIsLoadingProjects(true);
@@ -535,7 +537,10 @@ export const QRdaguaPage: React.FC = () => {
                 if (error) throw error;
             }
 
-            showToast(editingId ? 'Projeto atualizado com sucesso!' : 'Projeto criado com sucesso!', 'success');
+            // Show success modal with URL and actions
+            const finalUrl = `${window.location.origin}/#/v/${formData.slug}`;
+            setSuccessUrl(finalUrl);
+            setShowSuccessModal(true);
 
             resetForm();
             fetchProjects();
@@ -784,10 +789,10 @@ export const QRdaguaPage: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Slug */}
+                            {/* Slug - Renamed for clarity */}
                             <div>
                                 <label htmlFor="slug" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                    Slug (Identificador único) *
+                                    Endereço do Link (ex: seu-nome) *
                                 </label>
                                 <input
                                     type="text"
@@ -796,12 +801,15 @@ export const QRdaguaPage: React.FC = () => {
                                     value={formData.slug}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all font-mono"
-                                    placeholder="restaurante-amazonia"
+                                    placeholder="seu-nome"
                                     title="Apenas letras minúsculas, números e hífens"
                                     required
                                 />
                                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                    Apenas letras minúsculas, números e hífens
+                                    💡 Seu link será: <span className="font-mono text-acai-900 dark:text-solimoes-400">{window.location.origin}/#/v/{formData.slug || 'seu-nome'}</span>
+                                </p>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                    Use apenas letras minúsculas, números e hífens
                                 </p>
                             </div>
 
@@ -1124,6 +1132,24 @@ export const QRdaguaPage: React.FC = () => {
                                     </div>
                                     <div className="flex gap-2">
                                         <button
+                                            onClick={() => {
+                                                const url = `${window.location.origin}/#/v/${project.slug}`;
+                                                navigator.clipboard.writeText(url);
+                                                showToast('Link copiado!', 'success');
+                                            }}
+                                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                                            title="Copiar Link"
+                                        >
+                                            <Copy size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => window.open(`/#/v/${project.slug}`, '_blank')}
+                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                            title="Visualizar"
+                                        >
+                                            <ExternalLink size={16} />
+                                        </button>
+                                        <button
                                             onClick={() => handleEdit(project)}
                                             className="p-2 text-slate-400 hover:text-acai-900 hover:bg-acai-50 dark:hover:bg-acai-900/20 rounded-lg transition-colors"
                                             title="Editar"
@@ -1169,6 +1195,88 @@ export const QRdaguaPage: React.FC = () => {
                     Escolha o tipo de projeto e veja o preview em tempo real no celular! Use "✨ Gerar Bio" para criar descrições automáticas.
                 </p>
             </div>
+
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <>
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+                        onClick={() => setShowSuccessModal(false)}
+                    />
+
+                    {/* Modal */}
+                    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-rionegro-900 rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4 animate-in zoom-in-95 fade-in duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                                    <QrCode className="w-6 h-6 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        Projeto Criado!
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                        Seu link está pronto para usar
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* URL Display */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Seu Link:
+                            </label>
+                            <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg">
+                                <input
+                                    type="text"
+                                    value={successUrl}
+                                    readOnly
+                                    className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(successUrl);
+                                    showToast('Link copiado!', 'success');
+                                }}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-acai-900 hover:bg-acai-800 text-white rounded-lg font-semibold transition-all"
+                            >
+                                <Copy size={18} />
+                                Copiar Link
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const message = `Confira meu cartão digital: ${successUrl}`;
+                                    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                                }}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all"
+                            >
+                                <Share2 size={18} />
+                                Enviar no WhatsApp
+                            </button>
+                            <button
+                                onClick={() => window.open(successUrl, '_blank')}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-all"
+                            >
+                                <ExternalLink size={18} />
+                                Visualizar
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
