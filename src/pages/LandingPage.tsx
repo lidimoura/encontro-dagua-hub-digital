@@ -125,8 +125,8 @@ export default function LandingPage() {
               onClick={() => setIsMenuOpen(false)}
             />
 
-            {/* Mobile Menu Panel */}
-            <div className="fixed top-0 right-0 h-full w-[280px] bg-[#02040a] border-l border-white/10 md:hidden z-[9999] animate-slide-in-right shadow-2xl">
+            {/* Menu Panel - Unified for all screen sizes */}
+            <div className="fixed top-0 right-0 h-full w-[280px] bg-[#02040a] border-l border-white/10 z-[9999] animate-slide-in-right shadow-2xl">
               <div className="flex flex-col h-full p-6">
                 {/* Close Button */}
                 <button
@@ -240,7 +240,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
 
             <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {["Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "ONGs"].map((tag) => (
+              {["Mães e Pais Atípicos", "Neurodivergentes", "Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "Comunidades", "ONGs"].map((tag) => (
                 <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
               ))}
             </div>
@@ -312,6 +312,52 @@ export default function LandingPage() {
             <div className="mt-6 p-4 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl inline-block">
               <p className="text-sm font-bold text-fuchsia-300">💡 Quer apenas o Prompt Lab?</p>
               <button onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Prompt Lab Lifetime por 3 reais', '_blank')} className="text-white hover:text-white underline mt-1 text-xs">Assinar Plano Vitalício (R$ 3,00)</button>
+            </div>
+          </div>
+        </section>
+
+        {/* VITRINE DA COMUNIDADE (SHOWCASE) */}
+        <section id="showcase" className="py-20 px-6 bg-[#02040a] text-center border-t border-white/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <Sparkles className="w-3 h-3" /> Vitrine da Comunidade
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Exemplos Reais</h2>
+            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
+              Veja como empreendedores estão usando o QR D'água para conectar com seus clientes
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
+                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                  <QrCode className="w-full h-full text-slate-900" />
+                </div>
+                <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
+                <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
+                <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
+              </div>
+
+              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition">
+                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                  <QrCode className="w-full h-full text-slate-900" />
+                </div>
+                <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
+                <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
+                <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
+              </div>
+
+              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition">
+                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                  <QrCode className="w-full h-full text-slate-900" />
+                </div>
+                <h3 className="font-bold text-white mb-1">João Consultor</h3>
+                <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
+                <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
+              </div>
+            </div>
+
+            <div className="mt-8 text-sm text-slate-500">
+              💡 Quer aparecer aqui? Marque "Autorizar Galeria" ao criar seu projeto!
             </div>
           </div>
         </section>

@@ -132,6 +132,12 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                                 level="H"
                                                 fgColor={safeColor}
                                                 bgColor="transparent"
+                                                imageSettings={{
+                                                    src: qrLogoUrl || '',
+                                                    height: 40,
+                                                    width: 40,
+                                                    excavate: true,
+                                                }}
                                             />
 
                                             {/* Logo Overlay with Enhanced Styling */}
@@ -441,6 +447,7 @@ export const QRdaguaPage: React.FC = () => {
             directRedirect: project.direct_redirect || false, // PRO feature
         });
         setEditingId(project.id);
+        // Smooth scroll to top of form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -542,6 +549,9 @@ export const QRdaguaPage: React.FC = () => {
             setSuccessUrl(finalUrl);
             setShowSuccessModal(true);
 
+            // Show appropriate toast message
+            showToast(editingId ? 'Projeto Atualizado com Sucesso!' : 'Projeto Criado!', 'success');
+
             resetForm();
             fetchProjects();
         } catch (error: any) {
@@ -619,7 +629,7 @@ export const QRdaguaPage: React.FC = () => {
                                     >
                                         <LinkIcon className="w-6 h-6 mx-auto mb-2 text-acai-900" />
                                         <p className="text-sm font-medium">Link</p>
-                                        <p className="text-xs text-slate-500 mt-1">QR Code simples</p>
+                                        <p className="text-xs text-slate-500 mt-1">QR Code Direto</p>
                                     </button>
                                     <button
                                         type="button"
@@ -646,9 +656,9 @@ export const QRdaguaPage: React.FC = () => {
                                             } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <CreditCard className="w-6 h-6 mx-auto mb-2 text-acai-900" />
-                                        <p className="text-sm font-medium">Card</p>
+                                        <p className="text-sm font-medium">Cartão Digital</p>
                                         <p className="text-xs text-slate-500 mt-1">
-                                            {isAdmin ? 'Cartão Digital' : '🔒 Admin'}
+                                            {isAdmin ? 'Links Múltiplos' : '🔒 Admin'}
                                         </p>
                                     </button>
                                 </div>
@@ -707,8 +717,11 @@ export const QRdaguaPage: React.FC = () => {
 
                                     <div>
                                         <label htmlFor="buttonText" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                            Texto do Botão
+                                            Botão de Ação Principal
                                         </label>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                                            💡 Ex: "Ver Cardápio", "Ir para Site", "Falar Comigo"
+                                        </p>
                                         <input
                                             type="text"
                                             id="buttonText"
@@ -1058,6 +1071,27 @@ export const QRdaguaPage: React.FC = () => {
                                     </label>
                                 </div>
                             )}
+
+                            {/* Gallery Consent - Available for all users */}
+                            <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-solimoes-50 dark:from-amber-900/10 dark:to-solimoes-900/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+                                <label className="flex items-start gap-3 cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.inGallery || false}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, inGallery: e.target.checked }))}
+                                        className="mt-1 w-4 h-4 text-amber-600 bg-white dark:bg-rionegro-950 border-amber-300 dark:border-amber-700 rounded focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                            🌟 Autorizo exibir este projeto na Galeria de Exemplos do Hub
+                                        </span>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                                            Seu projeto pode inspirar outros empreendedores e trazer visibilidade extra para seu negócio!
+                                            Você pode desativar isso a qualquer momento.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
 
                             {/* Submit */}
                             <div className="flex justify-end pt-4">
