@@ -91,6 +91,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <span className="text-xl font-bold text-white tracking-tight">Encontro D'água .hub 🌀</span>
           </div>
+
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#lab" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Prompt Lab</a>
             <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Soluções</a>
@@ -103,8 +105,109 @@ export default function LandingPage() {
               </div>
             )}
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-white hover:text-amber-400 transition-colors"
+            aria-label="Menu"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm md:hidden z-[9998]"
+              onClick={() => setIsMenuOpen(false)}
+            />
+
+            {/* Mobile Menu Panel */}
+            <div className="fixed top-0 right-0 h-full w-[280px] bg-[#02040a] border-l border-white/10 md:hidden z-[9999] animate-slide-in-right shadow-2xl">
+              <div className="flex flex-col h-full p-6">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="self-end p-2 text-white hover:text-amber-400 transition-colors mb-8"
+                >
+                  <X size={24} />
+                </button>
+
+                {/* Menu Items */}
+                <nav className="flex flex-col gap-6">
+                  <a
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate('/'); }}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    Início
+                  </a>
+                  <a
+                    href="#lab"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    Prompt Lab
+                  </a>
+                  <a
+                    href="#solucoes"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    Soluções
+                  </a>
+
+                  <div className="border-t border-white/10 my-4" />
+
+                  {user ? (
+                    <button
+                      onClick={() => { setIsMenuOpen(false); navigate('/dashboard'); }}
+                      className="w-full px-6 py-3 bg-fuchsia-900 hover:bg-fuchsia-800 rounded-full text-sm font-bold transition-colors"
+                    >
+                      Painel
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => { setIsMenuOpen(false); navigate('/login'); }}
+                        className="w-full px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-full text-sm font-bold transition-colors"
+                      >
+                        Entrar
+                      </button>
+                      <button
+                        onClick={() => { setIsMenuOpen(false); navigate('/register'); }}
+                        className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-sm font-bold transition-colors shadow-lg"
+                      >
+                        Cadastro
+                      </button>
+                    </>
+                  )}
+                </nav>
+              </div>
+            </div>
+          </>
+        )}
       </header>
+
+      {/* Add animation styles */}
+      <style>{`
+        @keyframes slide-in-right {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in-right {
+          animation: slide-in-right 0.3s ease-out;
+        }
+      `}</style>
 
       {/* CONTENT WRAPPER */}
       <div className="relative z-10 w-full">

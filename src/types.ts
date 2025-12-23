@@ -71,10 +71,16 @@ export interface Contact {
 // ITEM 3: Produtos e Serviços
 export interface Product {
   id: string;
+  company_id?: string;
   name: string;
   description?: string;
   price: number;
+  unit?: string; // 'un', 'h', 'mês', etc
+  category?: string; // 'service', 'product', 'subscription'
+  is_active?: boolean; // Default true
   sku?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DealItem {

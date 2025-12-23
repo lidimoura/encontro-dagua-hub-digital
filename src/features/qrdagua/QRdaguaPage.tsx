@@ -481,7 +481,9 @@ export const QRdaguaPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.clientName || !formData.destinationUrl || !formData.slug) {
+        // Validation: destinationUrl only required for LINK and BRIDGE, not CARD
+        const requiresUrl = formData.projectType !== 'CARD';
+        if (!formData.clientName || (requiresUrl && !formData.destinationUrl) || !formData.slug) {
             showToast('Por favor, preencha todos os campos obrigatórios', 'error');
             return;
         }
@@ -755,27 +757,32 @@ export const QRdaguaPage: React.FC = () => {
                                 </>
                             )}
 
-                            {/* URL */}
-                            <div>
-                                <label htmlFor="destinationUrl" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                    URL Destino *
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <LinkIcon className="w-5 h-5 text-slate-400" />
+                            {/* URL - Only for LINK and BRIDGE, not CARD */}
+                            {formData.projectType !== 'CARD' && (
+                                <div>
+                                    <label htmlFor="destinationUrl" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
+                                        URL Destino *
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <LinkIcon className="w-5 h-5 text-slate-400" />
+                                        </div>
+                                        <input
+                                            type="url"
+                                            id="destinationUrl"
+                                            name="destinationUrl"
+                                            value={formData.destinationUrl}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
+                                            placeholder="https://exemplo.com"
+                                            required
+                                        />
                                     </div>
-                                    <input
-                                        type="url"
-                                        id="destinationUrl"
-                                        name="destinationUrl"
-                                        value={formData.destinationUrl}
-                                        onChange={handleInputChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                        placeholder="https://exemplo.com"
-                                        required
-                                    />
+                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                        Para onde o QR Code deve redirecionar
+                                    </p>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Slug */}
                             <div>
