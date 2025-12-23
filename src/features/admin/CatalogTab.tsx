@@ -215,24 +215,39 @@ export default function CatalogTab() {
                     .update(formData)
                     .eq('id', id);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro detalhado ao atualizar:', error.message || error);
+                    throw error;
+                }
 
                 setProducts(prev =>
                     prev.map(p => p.id === id ? { ...p, ...formData } : p)
                 );
             } else {
                 // Create new product
+                // Note: company_id is automatically set by the database trigger
+                // but we log the payload for debugging
+                console.log('Creating product with payload:', formData);
+
                 const { data, error } = await supabase
                     .from('products')
                     .insert([formData])
                     .select()
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro detalhado ao criar produto:', {
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint,
+                        code: error.code
+                    });
+                    throw error;
+                }
 
                 setProducts(prev => [data, ...prev]);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving product:', error);
             throw error;
         }
