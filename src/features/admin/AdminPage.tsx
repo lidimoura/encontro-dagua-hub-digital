@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Search, Shield, Users, CheckCircle, XCircle, Loader2, Edit, X } from 'lucide-react';
+import { Search, Shield, Users, CheckCircle, XCircle, Loader2, Edit, X, Package } from 'lucide-react';
+import CatalogTab from './CatalogTab';
 
 interface Profile {
     id: string;
@@ -144,6 +145,7 @@ export default function AdminPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+    const [activeTab, setActiveTab] = useState<'users' | 'catalog'>('users');
 
     // SECURITY CHECK: Only lidimfc@gmail.com can access
     useEffect(() => {
@@ -229,7 +231,7 @@ export default function AdminPage() {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-dark-bg p-4 md:p-8">
             {/* Header */}
-            <div className="max-w-4xl mx-auto mb-8">
+            <div className="max-w-4xl mx-auto mb-6">
                 <div className="flex items-center gap-3 mb-2">
                     <Shield className="w-8 h-8 text-primary-500" />
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -241,115 +243,153 @@ export default function AdminPage() {
                 </p>
             </div>
 
-            {/* Search Bar */}
+            {/* Tab Navigation */}
             <div className="max-w-4xl mx-auto mb-6">
-                <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        placeholder="Buscar por email, nome ou telefone..."
-                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
+                <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
+                    <button
+                        onClick={() => setActiveTab('users')}
+                        className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'users'
+                            ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'
+                            }`}
+                    >
+                        <Users size={18} />
+                        Usuários
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('catalog')}
+                        className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'catalog'
+                            ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'
+                            }`}
+                    >
+                        <Package size={18} />
+                        Catálogo
+                    </button>
                 </div>
             </div>
 
-            {/* Stats */}
-            <div className="max-w-4xl mx-auto mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2 mb-1">
-                        <Users className="w-4 h-4 text-slate-500" />
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Total</span>
+            {/* Search Bar - Only for Users Tab */}
+            {activeTab === 'users' && (
+                <div className="max-w-4xl mx-auto mb-6">
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            placeholder="Buscar por email, nome ou telefone..."
+                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
                     </div>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {profiles.length}
-                    </p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Monthly</span>
-                    </div>
-                    <p className="text-2xl font-bold text-green-600">
-                        {profiles.filter(p => p.plan_type === 'monthly').length}
-                    </p>
-                </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle className="w-4 h-4 text-purple-500" />
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Annual</span>
-                    </div>
-                    <p className="text-2xl font-bold text-purple-600">
-                        {profiles.filter(p => p.plan_type === 'annual').length}
-                    </p>
-                </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2 mb-1">
-                        <XCircle className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Free</span>
-                    </div>
-                    <p className="text-2xl font-bold text-slate-600">
-                        {profiles.filter(p => !p.plan_type || p.plan_type === 'free').length}
-                    </p>
-                </div>
-            </div>
+            )}
 
-            {/* Users List */}
-            <div className="max-w-4xl mx-auto space-y-3">
-                {filteredProfiles.length === 0 ? (
-                    <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                        Nenhum usuário encontrado.
+            {/* Stats - Only for Users Tab */}
+            {activeTab === 'users' && (
+                <div className="max-w-4xl mx-auto mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Users className="w-4 h-4 text-slate-500" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">Total</span>
+                        </div>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                            {profiles.length}
+                        </p>
                     </div>
-                ) : (
-                    filteredProfiles.map((profile) => (
-                        <div
-                            key={profile.id}
-                            className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary-500 transition"
-                        >
-                            <div className="flex items-center justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-slate-900 dark:text-white truncate">
-                                        {profile.email}
-                                    </p>
-                                    {profile.full_name && (
-                                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
-                                            {profile.full_name}
-                                        </p>
-                                    )}
-                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                                            {profile.role || 'user'}
-                                        </span>
-                                        <span className="text-xs text-slate-400">•</span>
-                                        <span className={`text-xs font-bold ${profile.plan_type === 'annual' ? 'text-purple-600' :
-                                                profile.plan_type === 'monthly' ? 'text-green-600' :
-                                                    'text-slate-500'
-                                            }`}>
-                                            {profile.plan_type === 'annual' ? 'ANNUAL' :
-                                                profile.plan_type === 'monthly' ? 'MONTHLY' : 'FREE'}
-                                        </span>
-                                        {profile.phone && (
-                                            <>
-                                                <span className="text-xs text-slate-400">•</span>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">Monthly</span>
+                        </div>
+                        <p className="text-2xl font-bold text-green-600">
+                            {profiles.filter(p => p.plan_type === 'monthly').length}
+                        </p>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                            <CheckCircle className="w-4 h-4 text-purple-500" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">Annual</span>
+                        </div>
+                        <p className="text-2xl font-bold text-purple-600">
+                            {profiles.filter(p => p.plan_type === 'annual').length}
+                        </p>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 mb-1">
+                            <XCircle className="w-4 h-4 text-slate-400" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">Free</span>
+                        </div>
+                        <p className="text-2xl font-bold text-slate-600">
+                            {profiles.filter(p => !p.plan_type || p.plan_type === 'free').length}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Tab Content */}
+            <div className="max-w-4xl mx-auto">
+                {activeTab === 'users' ? (
+                    /* Users List */
+                    <div className="space-y-3">
+                        {filteredProfiles.length === 0 ? (
+                            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                                Nenhum usuário encontrado.
+                            </div>
+                        ) : (
+                            filteredProfiles.map((profile) => (
+                                <div
+                                    key={profile.id}
+                                    className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary-500 transition"
+                                >
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-slate-900 dark:text-white truncate">
+                                                {profile.email}
+                                            </p>
+                                            {profile.full_name && (
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                                                    {profile.full_name}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                 <span className="text-xs text-slate-500 dark:text-slate-400">
-                                                    {profile.phone}
+                                                    {profile.role || 'user'}
                                                 </span>
-                                            </>
-                                        )}
+                                                <span className="text-xs text-slate-400">•</span>
+                                                <span className={`text-xs font-bold ${profile.plan_type === 'annual' ? 'text-purple-600' :
+                                                    profile.plan_type === 'monthly' ? 'text-green-600' :
+                                                        'text-slate-500'
+                                                    }`}>
+                                                    {profile.plan_type === 'annual' ? 'ANNUAL' :
+                                                        profile.plan_type === 'monthly' ? 'MONTHLY' : 'FREE'}
+                                                </span>
+                                                {profile.phone && (
+                                                    <>
+                                                        <span className="text-xs text-slate-400">•</span>
+                                                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                                                            {profile.phone}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => setEditingProfile(profile)}
+                                            className="px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                            Editar
+                                        </button>
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={() => setEditingProfile(profile)}
-                                    className="px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    Editar
-                                </button>
-                            </div>
-                        </div>
-                    ))
+                            ))
+                        )}
+                    </div>
+                ) : (
+                    /* Catalog Tab */
+                    <CatalogTab />
                 )}
             </div>
 

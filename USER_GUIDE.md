@@ -236,7 +236,131 @@ Transforme ideias brutas em prompts perfeitos para LLMs.
 
 ---
 
-## 🆘 Suporte
+## � Catálogo - Gestão de Produtos e Serviços
+
+Gerencie o catálogo de produtos e serviços da sua loja diretamente no Admin Panel.
+
+**Acesso:** Menu Admin → Aba "Catálogo"
+
+### Criando um Novo Produto
+
+1. Acesse **Admin Panel** (disponível apenas para admin)
+2. Clique na aba **"Catálogo"**
+3. Clique em **"Novo Produto"**
+4. Preencha o formulário:
+   - **Nome:** Nome do produto/serviço (ex: "Consultoria em IA")
+   - **Preço (R$):** Valor em reais (ex: 5000.00)
+   - **Unidade:** Unidade de medida (ex: "un", "h", "mês")
+   - **Categoria:** Selecione entre Serviço, Produto ou Assinatura
+   - **Descrição:** Campo de texto livre para:
+     - Features do produto
+     - Links de pagamento (Asaas, Pix, etc.)
+     - Informações adicionais
+   - **Produto Ativo:** Marque para deixar o produto visível
+5. Clique em **"Salvar"**
+
+### Editando Produtos
+
+1. Na lista de produtos, clique no ícone **✏️ Editar**
+2. Modifique os campos desejados
+3. Clique em **"Salvar"**
+
+### Deletando Produtos
+
+1. Clique no ícone **🗑️ Deletar**
+2. Confirme a exclusão
+
+### Integração com Kanban
+
+**Importante:** Os produtos criados no Catálogo ficam automaticamente disponíveis no Kanban Board para adicionar aos negócios!
+
+**Fluxo:**
+1. Crie produtos no Catálogo
+2. Ao editar um negócio no Kanban, os produtos aparecem na aba "Produtos"
+3. Adicione produtos ao negócio com quantidade
+4. O valor total é calculado automaticamente
+
+💡 **Dica:** Use o campo "Descrição" para colar links de pagamento (Asaas/Pix) e manter tudo organizado em um só lugar!
+
+---
+
+## 🤖 Amazo IA - Assistente 24/7
+
+O Amazo está sempre disponível no canto inferior direito da tela.
+
+**Como usar:**
+1. Clique no ícone roxo flutuante
+2. Digite sua dúvida ou pedido
+3. Amazo responde instantaneamente
+
+**O que Amazo pode fazer:**
+- Tirar dúvidas sobre o Hub
+- Ajudar com prompts
+- Explicar funcionalidades
+- Suporte técnico básico
+
+---
+
+## 💳 Planos e Pagamento
+
+### Planos Disponíveis
+
+#### 🆓 Free (Grátis)
+- CRM básico
+- QR Codes básicos (até 3)
+- Prompt Lab público
+- Suporte via comunidade
+
+#### ⭐ Pro Mensal (R$ 3/mês)
+- Prompt Lab completo
+- Templates de especialistas
+- Suporte prioritário
+- Atualizações contínuas
+
+#### 🚀 Visionário Anual (R$ 30/ano)
+- Tudo do Pro Mensal
+- **Pague 10, Leve 12 meses**
+- 3 QR Codes Dinâmicos Pro
+- Prompt Lab ilimitado
+- Acesso antecipado a features
+- Badge de Early Adopter
+
+### Como Assinar
+
+1. Clique em **"Upgrade to Pro"** ou **"Assinar"**
+2. Escolha seu plano (Mensal ou Anual)
+3. Clique em **"Assinar Agora"**
+4. Complete o pagamento
+5. **Aguarde até 24h** para ativação manual
+
+⚠️ **Importante:** Após o pagamento, sua conta será ativada manualmente pela administração em até 24 horas úteis.
+
+---
+
+## 💡 Dicas e Boas Práticas
+
+### QR Codes
+- Use cores com bom contraste (mínimo 4.5:1)
+- Teste o QR em diferentes dispositivos
+- Mantenha URLs curtas e memoráveis
+- Para CARD, organize links por prioridade
+
+### Prompt Lab
+- Seja específico na ideia bruta
+- Mencione contexto e restrições
+- Indique formato de saída desejado
+- Teste o prompt antes de usar em produção
+- Salve prompts bem-sucedidos para reutilização
+
+### Catálogo de Produtos
+- Use nomes descritivos e claros
+- Mantenha preços atualizados
+- Cole links de pagamento na descrição
+- Desative produtos temporariamente ao invés de deletar
+
+---
+
+## �🆘 Suporte
 
 **Precisa de Ajuda?**
 - Use o chat com IA (canto inferior direito)
@@ -250,6 +374,13 @@ Transforme ideias brutas em prompts perfeitos para LLMs.
 ---
 
 ## 🔄 Atualizações Recentes
+
+### v1.4 - Store Management (Dezembro 2024)
+- ✅ Catálogo de Produtos e Serviços no Admin Panel
+- ✅ CRUD completo para produtos (criar, editar, deletar)
+- ✅ Integração automática com Kanban Board
+- ✅ Campo de descrição para links de pagamento
+- ✅ Interface mobile-first
 
 ### v1.3 - Growth & Feedback (Dezembro 2024)
 - ✅ Landing Page Invite-Only com parallax

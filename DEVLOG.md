@@ -2,6 +2,111 @@
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
+## Sprint: Store Management (Missão 2)
+**Status:** ✅ Concluído
+**Data:** 22/12/2025
+
+### 🏪 Catálogo de Produtos e Serviços
+
+**Objetivo:** Implementar gestão completa de produtos/serviços da loja no Admin Panel com integração ao Kanban Board.
+
+#### Componentes Criados:
+
+**1. CatalogTab.tsx**
+- Interface mobile-first para CRUD de produtos
+- Modal de criação/edição com formulário completo
+- Campos implementados:
+  - Nome do produto/serviço
+  - Preço (R$) com formatação
+  - Unidade (un, h, mês)
+  - Categoria (Serviço/Produto/Assinatura)
+  - Descrição (textarea para links de pagamento e features)
+  - Status ativo/inativo
+- Cards responsivos com ações de editar e deletar
+- Loading states e error handling
+- Integração direta com Supabase
+
+**2. AdminPage.tsx - Tab Navigation**
+- Sistema de abas: "Usuários" e "Catálogo"
+- Renderização condicional de conteúdo
+- Search bar específica para aba de usuários
+- Stats específicas para aba de usuários
+- Smooth tab switching com visual feedback
+
+#### Integração com Kanban Board:
+
+**Fluxo Automático:**
+1. Produtos criados no Catálogo → Disponíveis via `SettingsContext`
+2. `CRMContext` expõe produtos para todos os componentes
+3. `DealDetailModal` lista produtos na aba "Produtos"
+4. Adicionar produtos aos negócios com quantidade
+5. Cálculo automático do valor total
+
+**Nenhuma alteração adicional necessária** - integração já funcionava via arquitetura existente!
+
+#### Database Schema:
+
+**Tabela:** `products` (já existente)
+- Campos utilizados: `id`, `company_id`, `name`, `description`, `price`, `unit`, `category`, `is_active`
+- RLS policies: Isolamento por company_id
+- Triggers: Auto-set company_id e updated_at
+
+#### UX/UI Highlights:
+
+**Mobile-First Design:**
+- Textarea grande (6 rows) para descrição
+- Touch-friendly buttons com spacing adequado
+- Responsive grid que adapta ao tamanho da tela
+- Clear visual hierarchy com ícones
+- Smooth animations para modals
+
+**Dica de Uso:**
+- Campo "Descrição" usado para colar links de pagamento (Asaas/Pix)
+- Mantém tudo organizado em um só lugar
+- Facilita acesso rápido durante negociações
+
+#### Build Verification:
+
+```bash
+npm run build
+```
+
+**Resultado:** ✅ SUCCESS
+- Build time: 6m 49s
+- Bundle size: 234.40 kB (gzip)
+- Exit code: 0
+- Zero TypeScript errors
+
+#### Documentação Atualizada:
+
+**1. USER_GUIDE.md:**
+- Adicionada seção "Catálogo - Gestão de Produtos e Serviços"
+- Instruções completas de uso (criar, editar, deletar)
+- Explicação da integração com Kanban
+- Dicas de uso do campo descrição
+- Merged conteúdo único de USERGUIDE.md (Amazo IA, Planos)
+- Atualizada seção de versões (v1.4)
+
+**2. DEVLOG.md:**
+- Registrado Sprint "Store Management (Missão 2)"
+
+**3. README.md:**
+- Atualizada lista de funcionalidades
+
+**4. Cleanup:**
+- Removido arquivo duplicado `USERGUIDE.md`
+- Mantido apenas `USER_GUIDE.md` (formato padrão)
+
+### 📝 Observações
+
+- Sistema 100% funcional e pronto para deploy
+- Interface otimizada para uso mobile
+- Integração com Kanban Board validada e funcionando
+- Documentação completa para usuários
+- Build passing sem erros
+
+---
+
 ## Sprint: Master Reset & Strategy (V8)
 **Status:** ✅ Concluído
 **Data:** 22/12/2025
