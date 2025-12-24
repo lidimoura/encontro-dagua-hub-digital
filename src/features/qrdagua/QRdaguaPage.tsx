@@ -3,7 +3,7 @@ import { QrCode, Sparkles, Save, Link as LinkIcon, Palette, FileText, Edit2, Tra
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCode } from 'react-qrcode-logo';
 import { supabase } from '@/lib/supabase/client';
 import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
 import { CardLinksEditor } from './components/CardLinksEditor';
@@ -126,33 +126,19 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
 
                                         {/* QR Code with Subtle Pulse Animation */}
                                         <div className="relative animate-pulse-subtle">
-                                            <QRCodeSVG
-                                                value={`${window.location.origin}/#/v/${formData.slug || 'preview'}`}
+                                            <QRCode
+                                                value={`${window.location.origin} /#/v / ${formData.slug || 'preview'} `}
                                                 size={180}
-                                                level="H"
+                                                ecLevel="H"
                                                 fgColor={safeColor}
                                                 bgColor="transparent"
-                                                imageSettings={{
-                                                    src: qrLogoUrl || '',
-                                                    height: 40,
-                                                    width: 40,
-                                                    excavate: true,
-                                                }}
+                                                qrStyle="dots"
+                                                eyeRadius={10}
+                                                logoImage={qrLogoUrl || ''}
+                                                logoWidth={40}
+                                                logoHeight={40}
+                                                removeQrCodeBehindLogo={true}
                                             />
-
-                                            {/* Logo Overlay with Enhanced Styling */}
-                                            {qrLogoUrl && (
-                                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white dark:bg-white rounded-xl p-2 shadow-xl ring-2 ring-acai-900/20">
-                                                    <img
-                                                        src={qrLogoUrl}
-                                                        alt="Logo"
-                                                        className="w-full h-full object-contain"
-                                                        onError={(e) => {
-                                                            e.currentTarget.style.display = 'none';
-                                                        }}
-                                                    />
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -258,12 +244,12 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                                     className="block w-full px-4 py-2 text-white rounded-lg text-center text-sm font-medium"
                                                 >
                                                     💬 WhatsApp
-                                                </a>
+                                                </a >
                                             )}
                                         </>
                                     )}
-                                </div>
-                            </div>
+                                </div >
+                            </div >
                         ) : (
                             <div className="flex flex-col items-center justify-center h-full text-center">
                                 <Smartphone className="w-16 h-16 text-slate-300 dark:text-slate-700 mb-4" />
@@ -272,10 +258,10 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                 </p>
                             </div>
                         )}
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </div >
+                </div >
+            </div >
+        </div >
     );
 };
 

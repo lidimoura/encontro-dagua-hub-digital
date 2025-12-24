@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Search, Shield, Users, CheckCircle, XCircle, Loader2, Edit, X, Package } from 'lucide-react';
 import CatalogTab from './CatalogTab';
+import { InviteGenerator } from './components/InviteGenerator';
 
 interface Profile {
     id: string;
@@ -243,9 +244,14 @@ export default function AdminPage() {
                 </p>
             </div>
 
-            {/* Tab Navigation */}
+            {/* Invite Generator - Always visible for Admin */}
             <div className="max-w-4xl mx-auto mb-6">
-                <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
+                <InviteGenerator onInviteGenerated={fetchProfiles} />
+            </div>
+
+            {/* Tabs Navigation */}
+            <div className="max-w-4xl mx-auto mb-6">
+                <div className="flex gap-4 border-b border-slate-200 dark:border-slate-700">
                     <button
                         onClick={() => setActiveTab('users')}
                         className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'users'

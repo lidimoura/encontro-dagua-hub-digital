@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase/client';
-import { QRCodeSVG } from 'qrcode.react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
+import { QRCode } from 'react-qrcode-logo';
 import { ExternalLink, Phone, Instagram, Copy, Check, Download, Share2, X } from 'lucide-react';
 
 interface BridgePageData {
@@ -61,7 +61,7 @@ export const BridgePage: React.FC = () => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `qr-code-${data?.slug || 'download'}.png`;
+                    a.download = `qr - code - ${data?.slug || 'download'}.png`;
                     a.click();
                     URL.revokeObjectURL(url);
                 }
@@ -72,8 +72,8 @@ export const BridgePage: React.FC = () => {
     };
 
     const handleShareWhatsApp = () => {
-        const url = `${window.location.origin}/#/v/${data?.slug}`;
-        const text = `Confira: ${data?.page_title || data?.client_name}`;
+        const url = `${window.location.origin} /#/v / ${data?.slug} `;
+        const text = `Confira: ${data?.page_title || data?.client_name} `;
         window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
     };
 

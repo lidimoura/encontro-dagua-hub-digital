@@ -358,8 +358,8 @@ export default function LandingPage() {
             </p>
 
             {/* Horizontal Scroll Container */}
-            <div className="relative">
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+            <div className="relative -mx-4 px-4">
+              <div className="flex flex-row gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {!loadingGallery && galleryProjects.length > 0 ? (
                   // Real projects from database
                   galleryProjects.map((project) => (
