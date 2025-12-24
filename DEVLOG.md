@@ -4,6 +4,89 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🎁 24/12/2024 - Sistema de Indicação & Correções UX Críticas
+
+### Sistema de Referral (20% OFF)
+
+**Objetivo:** Implementar sistema completo de indicações com rastreamento e descontos automáticos.
+
+**Database Changes:**
+- **Migration:** `006_add_referral_system.sql`
+- **Colunas Adicionadas:**
+  - `profiles.referred_by` (UUID) - Rastreamento de quem indicou
+  - `profiles.discount_credits` (INTEGER) - Cupons de 20% acumulados
+  - `company_invites.offer_discount` (BOOLEAN) - Flag de desconto no convite
+- **Função RPC:** `increment_discount_credits()` para incremento atômico
+
+**Frontend Components:**
+- **InviteGenerator** (`src/features/admin/components/InviteGenerator.tsx`)
+  - Admin gera convites com ou sem desconto
+  - Email opcional (pré-preenche no cadastro)
+  - Botões: Copiar Link + Enviar WhatsApp
+  - Mensagem WhatsApp pré-preenchida
+  
+- **ReferralCard** (`src/features/profile/components/ReferralCard.tsx`)
+  - Link único: `/#/join?ref=[USER_ID]`
+  - Stats: Indicações feitas + Cupons acumulados
+  - Compartilhamento viral no WhatsApp
+
+**Fluxo de Indicação:**
+1. Usuário compartilha link de referral
+2. Novo usuário se cadastra via `?ref=USER_ID`
+3. Sistema salva `referred_by` no profile
+4. Incrementa `discount_credits` do padrinho
+5. Admin aplica desconto manualmente ao gerar cobrança
+
+### Migração QR Code Library
+
+**Mudança:** `qrcode.react` → `react-qrcode-logo`
+
+**Motivo:** Estética moderna com dots/rounded style
+
+**Implementação:**
+- **Props Configuradas:**
+  - `qrStyle="dots"` - Estilo arredondado (não blocado)
+  - `eyeRadius={10}` - Cantos dos olhos arredondados
+  - `removeQrCodeBehindLogo={true}` - Logo limpo
+  - `logoImage`, `logoWidth`, `logoHeight` - Logo embedding
+
+**Arquivos Atualizados:**
+- `src/features/qrdagua/QRdaguaPage.tsx`
+- `src/pages/BridgePage.tsx`
+- `src/pages/LandingPage.tsx`
+
+### Correções UX Críticas
+
+**1. Menu Hamburguer (Todos os Devices)**
+- **Problema:** Menu desktop expandido, inconsistente com mobile
+- **Solução:**
+  - Removido `md:hidden` do botão hamburguer
+  - Sidebar desktop completamente oculta
+  - Hamburguer é a ÚNICA forma de navegação
+  - UX consistente em mobile e desktop
+
+**2. Galeria - Navegação com Setas (Desktop)**
+- **Problema:** Scroll horizontal ruim com mouse
+- **Solução:**
+  - Botões esquerda/direita adicionados
+  - Visíveis apenas no desktop (`hidden md:flex`)
+  - Scroll suave de 300px por clique
+  - Hover effects com scale animation
+  - Posicionamento absoluto nas bordas
+
+**3. Galeria - Melhorias Gerais**
+- Aumentado limit de 3 para 10 projetos
+- useRef para scroll programático
+- Melhor tratamento de erros no fetch
+
+**Arquivos Modificados:**
+- `src/components/Layout.tsx`
+- `src/pages/LandingPage.tsx`
+
+---
+
+## 📋 CICLO DE VIDA DO CLIENTE (Customer Journey)
+
 ## 📋 CICLO DE VIDA DO CLIENTE (Customer Journey)
 
 **Última Atualização:** 23/12/2025

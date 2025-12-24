@@ -272,8 +272,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
 
       <div className="flex flex-1 h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
-        {/* Sidebar */}
-        <aside className="hidden md:flex w-64 flex-col z-20 glass border-r border-slate-200 dark:border-white/5">
+        {/* Sidebar - Hidden on all devices, use hamburger menu instead */}
+        <aside className="hidden w-64 flex-col z-20 glass border-r border-slate-200 dark:border-white/5">
           <div className="h-16 px-5 flex items-center border-b border-solimoes-400/20 dark:border-solimoes-400/10">
             <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
@@ -437,10 +437,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Header */}
             <header className="h-16 px-6 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10 glass relative z-20">
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button - Now visible on all devices */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50 rounded-lg transition-colors"
+                className="p-2 text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50 rounded-lg transition-colors"
                 aria-label="Abrir menu"
               >
                 <Menu size={24} />

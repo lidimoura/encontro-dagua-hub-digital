@@ -15,6 +15,35 @@ O Hub Digital é uma plataforma completa que integra:
 
 ---
 
+## 🚀 Guia Rápido
+
+### Como Convidar Alguém (Admin)
+
+1. **Acesse o Painel Admin** (`/admin`)
+2. **Localize o Gerador de Convites** (topo da página)
+3. **Preencha o email** (opcional - será pré-preenchido no cadastro)
+4. **Marque "Oferecer 20% de desconto"** se quiser dar desconto na 1ª mensalidade
+5. **Clique em "Gerar Link de Convite"**
+6. **Copie o link** ou **Envie direto no WhatsApp**
+7. **Compartilhe com o novo usuário**
+
+**Link gerado:** `https://[dominio]/#/join?token=[TOKEN]`
+
+### Como Navegar na Galeria
+
+**No Mobile (Touch):**
+- Deslize horizontalmente para ver mais projetos
+- Toque em um card para abrir o projeto em nova aba
+
+**No Desktop (Mouse):**
+- Use as **setas esquerda/direita** nas bordas da galeria
+- Ou arraste horizontalmente com o mouse
+- Clique em um card para abrir o projeto em nova aba
+
+**Dica:** Para aparecer na galeria, marque "Exibir na Galeria" ao criar seu QR Code!
+
+---
+
 ## 📋 Módulos Principais
 
 ### 1. 🏠 Dashboard

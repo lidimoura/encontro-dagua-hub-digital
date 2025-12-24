@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import {
-  Sparkles, CheckCircle, Copy, Play, QrCode, Bot, Brain, Menu, X,
-  ArrowRight, ChevronLeft, ChevronRight, Globe, Users, MessageCircle,
-  Linkedin, ThumbsUp, ThumbsDown
-} from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import {
+  Sparkles, Zap, Users, TrendingUp, QrCode, Menu, X, ChevronLeft, ChevronRight
+} from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 const TEAM_MEMBERS = [
@@ -80,6 +78,7 @@ export default function LandingPage() {
   // Gallery Projects State
   const [galleryProjects, setGalleryProjects] = useState<any[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(true);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   // Fetch real gallery projects
   useEffect(() => {
@@ -89,14 +88,14 @@ export default function LandingPage() {
           .from('qr_codes')
           .select('*')
           .eq('in_gallery', true)
-          .limit(3)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(10); // Show up to 10 projects
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           setGalleryProjects(data);
         }
-      } catch (err) {
-        console.error('Error fetching gallery projects:', err);
+      } catch (error) {
+        console.error('Error fetching gallery:', error);
       } finally {
         setLoadingGallery(false);
       }
@@ -104,6 +103,17 @@ export default function LandingPage() {
 
     fetchGalleryProjects();
   }, []);
+
+  // Gallery scroll functions
+  const scrollGallery = (direction: 'left' | 'right') => {
+    if (galleryRef.current) {
+      const scrollAmount = 300;
+      galleryRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-[#02040a] text-white font-sans overflow-x-hidden relative">
@@ -357,9 +367,27 @@ export default function LandingPage() {
               Veja como empreendedores estão usando o QR D'água para conectar com seus clientes
             </p>
 
-            {/* Horizontal Scroll Container */}
+            {/* Horizontal Scroll Container with Navigation Arrows */}
             <div className="relative -mx-4 px-4">
-              <div className="flex flex-row gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+              {/* Left Arrow - Desktop only */}
+              <button
+                onClick={() => scrollGallery('left')}
+                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center bg-slate-900/80 hover:bg-slate-900 border border-white/10 rounded-full text-white transition-all shadow-xl hover:scale-110"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft size={24} />
+              </button>
+
+              {/* Right Arrow - Desktop only */}
+              <button
+                onClick={() => scrollGallery('right')}
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center bg-slate-900/80 hover:bg-slate-900 border border-white/10 rounded-full text-white transition-all shadow-xl hover:scale-110"
+                aria-label="Scroll right"
+              >
+                <ChevronRight size={24} />
+              </button>
+
+              <div ref={galleryRef} className="flex flex-row gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {!loadingGallery && galleryProjects.length > 0 ? (
                   // Real projects from database
                   galleryProjects.map((project) => (

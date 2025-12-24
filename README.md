@@ -4,18 +4,83 @@
 
 O **Encontro D'água** é um ecossistema digital que se inspira na natureza como maior tecnologia fluida para integrar estratégias humanas com a eficiência da IA.
 
-## 🚀 Soluções do Hub
+## 🔐 Status: Invite-Only
+
+Este projeto é **privado e exclusivo**. O acesso é concedido apenas via convite gerado pela Admin. Não há cadastro público.
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** TailwindCSS + Custom Design System (Açaí/Solimões)
+- **Database:** Supabase (PostgreSQL + Auth + Storage)
+- **AI:** Google Gemini 2.0 Flash
+- **QR Codes:** react-qrcode-logo (dots/rounded style)
+- **State:** React Context API
+- **Routing:** React Router v6 (HashRouter)
+
+## 🚀 Setup Local
+
+```bash
+# 1. Clone o repositório
+git clone [repo-url]
+cd crm-encontro-dagua
+
+# 2. Instale dependências
+npm install
+
+# 3. Configure variáveis de ambiente (.env)
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_key
+VITE_GEMINI_API_KEY=your_gemini_key
+
+# 4. Execute migrations no Supabase
+# Acesse Supabase Dashboard > SQL Editor
+# Execute os arquivos em supabase/migrations/ em ordem
+
+# 5. Rode o projeto
+npm run dev
+
+# 6. Build para produção
+npm run build
+```
+
+## 🎯 Soluções do Hub
+
 - **🧠 Prompt Lab:** Engenharia de ideias. Transforme intenções em prompts estratégicos estruturados.
-- **📱 QR D'água:** Conexão instantânea. QR Codes dinâmicos, cartões digitais e links que resolvem problemas reais e conectam negócios no mundo digital de forma sustentável.
-- **🏪 Catálogo:** Gestão de produtos e serviços. CRUD completo integrado ao CRM para gerenciar seu portfólio e precificação.
-- **🤖 Amazo IA:** Atendimento 24/7. Agente de IA para CS e Vendas no WhatsApp.
-- **💼 CRM Nativo:** Gestão simplificada de leads com IA integrada e recursos estratégicos para garantir a melhor eficiência e qualidade no gerenciamento de clientes.
+- **📱 QR D'água:** Conexão instantânea. QR Codes dinâmicos, cartões digitais e links que resolvem problemas reais.
+- **🏪 Catálogo:** Gestão de produtos e serviços. CRUD completo integrado ao CRM.
+- **🤖 Amazo IA:** Atendimento 24/7. Agente de IA para CS e Vendas.
+- **💼 CRM Nativo:** Gestão simplificada de leads com IA integrada.
+- **🎁 Sistema de Indicação:** Referral com 20% OFF para indicador e indicado.
 
 ## 👩‍💻 Inteligência Híbrida (Equipe)
+
 - **Lidi (Founder):** Estratégia e Visão.
 - **Amazo (IA):** Customer Success.
 - **Precy (IA):** Tech Lead.
-- **Jury (IA):** Compliance e outros que virão.
+- **Jury (IA):** Compliance.
+
+## 📋 Features Principais
+
+### Sistema de Convites
+- Admin gera links únicos com ou sem desconto (20% OFF)
+- Usuários podem compartilhar link de referral
+- Rastreamento automático de indicações
+- Acúmulo de créditos de desconto
+
+### QR D'água
+- 3 tipos: Link Direto, Página Ponte, Cartão Digital
+- QR Codes com estilo dots/arredondado
+- Logo embedding
+- Galeria pública (opt-in)
+- Preview em tempo real
+
+### CRM & Boards
+- Kanban personalizado
+- IA integrada para qualificação
+- Campos customizáveis
+- Automações
 
 ---
+
 *Inspirado na natureza, codificado para o mundo.*
