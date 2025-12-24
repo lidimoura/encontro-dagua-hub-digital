@@ -4,6 +4,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { QRCode } from 'react-qrcode-logo';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase/client';
 import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
 import { CardLinksEditor } from './components/CardLinksEditor';
