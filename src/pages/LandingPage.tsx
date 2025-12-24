@@ -357,56 +357,80 @@ export default function LandingPage() {
               Veja como empreendedores estão usando o QR D'água para conectar com seus clientes
             </p>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {!loadingGallery && galleryProjects.length > 0 ? (
-                // Real projects from database
-                galleryProjects.map((project) => (
-                  <div key={project.id} className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
-                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                      <QRCodeSVG
-                        value={`${window.location.origin}/#/v/${project.slug}`}
-                        size={112}
-                        level="H"
-                        fgColor={project.color || '#000000'}
-                      />
+            {/* Horizontal Scroll Container */}
+            <div className="relative">
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                {!loadingGallery && galleryProjects.length > 0 ? (
+                  // Real projects from database
+                  galleryProjects.map((project) => (
+                    <a
+                      key={project.id}
+                      href={`/#/v/${project.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start cursor-pointer group"
+                    >
+                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <QRCodeSVG
+                          value={`${window.location.origin}/#/v/${project.slug}`}
+                          size={112}
+                          level="H"
+                          fgColor={project.color || '#000000'}
+                        />
+                      </div>
+                      <h3 className="font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">{project.client_name}</h3>
+                      <p className="text-xs text-slate-400 mb-3">{project.project_type || 'Cartão Digital'}</p>
+                      <p className="text-xs text-slate-500 line-clamp-2">{project.description || project.page_title || 'QR Code personalizado'}</p>
+                    </a>
+                  ))
+                ) : (
+                  // Fallback mockups when no real data
+                  <>
+                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start">
+                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                        <QrCode className="w-full h-full text-slate-900" />
+                      </div>
+                      <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
+                      <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
+                      <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
                     </div>
-                    <h3 className="font-bold text-white mb-1">{project.client_name}</h3>
-                    <p className="text-xs text-slate-400 mb-3">{project.project_type || 'Cartão Digital'}</p>
-                    <p className="text-xs text-slate-500 line-clamp-2">{project.description || project.page_title || 'QR Code personalizado'}</p>
-                  </div>
-                ))
-              ) : (
-                // Fallback mockups when no real data
-                <>
-                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
-                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                      <QrCode className="w-full h-full text-slate-900" />
-                    </div>
-                    <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
-                    <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
-                    <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
-                  </div>
 
-                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition">
-                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                      <QrCode className="w-full h-full text-slate-900" />
+                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition snap-start">
+                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                        <QrCode className="w-full h-full text-slate-900" />
+                      </div>
+                      <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
+                      <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
+                      <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
                     </div>
-                    <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
-                    <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
-                    <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
-                  </div>
 
-                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition">
-                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                      <QrCode className="w-full h-full text-slate-900" />
+                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition snap-start">
+                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                        <QrCode className="w-full h-full text-slate-900" />
+                      </div>
+                      <h3 className="font-bold text-white mb-1">João Consultor</h3>
+                      <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
+                      <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
                     </div>
-                    <h3 className="font-bold text-white mb-1">João Consultor</h3>
-                    <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
-                    <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
+
+              {/* Scroll Indicator */}
+              <div className="text-center mt-2">
+                <p className="text-xs text-slate-500">← Deslize para ver mais →</p>
+              </div>
             </div>
+
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+              .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+            `}</style>
 
             <div className="mt-8 text-sm text-slate-500">
               💡 Quer aparecer aqui? Marque "Autorizar Galeria" ao criar seu projeto!

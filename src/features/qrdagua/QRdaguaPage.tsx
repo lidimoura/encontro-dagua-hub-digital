@@ -934,22 +934,6 @@ export const QRdaguaPage: React.FC = () => {
                                     <label className="flex items-center gap-3 cursor-pointer group">
                                         <input
                                             type="checkbox"
-                                            checked={formData.inPortfolio || false}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, inPortfolio: e.target.checked }))}
-                                            className="w-4 h-4 text-green-600 bg-white dark:bg-rionegro-950 border-green-300 dark:border-green-700 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
-                                        />
-                                        <div className="flex-1">
-                                            <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                                                📁 Exibir no Portfólio
-                                            </span>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                                Projeto aparecerá na landing page oficial
-                                            </p>
-                                        </div>
-                                    </label>
-                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                        <input
-                                            type="checkbox"
                                             checked={formData.inGallery || false}
                                             onChange={(e) => setFormData(prev => ({ ...prev, inGallery: e.target.checked }))}
                                             className="w-4 h-4 text-green-600 bg-white dark:bg-rionegro-950 border-green-300 dark:border-green-700 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
