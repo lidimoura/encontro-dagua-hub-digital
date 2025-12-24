@@ -6,6 +6,8 @@ import {
   ArrowRight, ChevronLeft, ChevronRight, Globe, Users, MessageCircle,
   Linkedin, ThumbsUp, ThumbsDown
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { QRCodeSVG } from 'qrcode.react';
 
 const TEAM_MEMBERS = [
   {
@@ -74,6 +76,34 @@ export default function LandingPage() {
   const handleTestInPlace = () => {
     setTestResponse("🤖 IA Responde: 'Olá! Aqui estão suas 3 opções de copy baseadas no prompt...' (Isso é uma simulação. No Hub Pro, você conecta seus próprios Agentes!)");
   };
+
+  // Gallery Projects State
+  const [galleryProjects, setGalleryProjects] = useState<any[]>([]);
+  const [loadingGallery, setLoadingGallery] = useState(true);
+
+  // Fetch real gallery projects
+  useEffect(() => {
+    const fetchGalleryProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('qr_codes')
+          .select('*')
+          .eq('in_gallery', true)
+          .limit(3)
+          .order('created_at', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          setGalleryProjects(data);
+        }
+      } catch (err) {
+        console.error('Error fetching gallery projects:', err);
+      } finally {
+        setLoadingGallery(false);
+      }
+    };
+
+    fetchGalleryProjects();
+  }, []);
 
   return (
     <div className="w-full min-h-screen bg-[#02040a] text-white font-sans overflow-x-hidden relative">
@@ -328,32 +358,54 @@ export default function LandingPage() {
             </p>
 
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
-                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                  <QrCode className="w-full h-full text-slate-900" />
-                </div>
-                <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
-                <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
-                <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
-              </div>
+              {!loadingGallery && galleryProjects.length > 0 ? (
+                // Real projects from database
+                galleryProjects.map((project) => (
+                  <div key={project.id} className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                      <QRCodeSVG
+                        value={`${window.location.origin}/#/v/${project.slug}`}
+                        size={112}
+                        level="H"
+                        fgColor={project.color || '#000000'}
+                      />
+                    </div>
+                    <h3 className="font-bold text-white mb-1">{project.client_name}</h3>
+                    <p className="text-xs text-slate-400 mb-3">{project.project_type || 'Cartão Digital'}</p>
+                    <p className="text-xs text-slate-500 line-clamp-2">{project.description || project.page_title || 'QR Code personalizado'}</p>
+                  </div>
+                ))
+              ) : (
+                // Fallback mockups when no real data
+                <>
+                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                      <QrCode className="w-full h-full text-slate-900" />
+                    </div>
+                    <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
+                    <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
+                    <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
+                  </div>
 
-              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition">
-                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                  <QrCode className="w-full h-full text-slate-900" />
-                </div>
-                <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
-                <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
-                <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
-              </div>
+                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                      <QrCode className="w-full h-full text-slate-900" />
+                    </div>
+                    <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
+                    <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
+                    <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
+                  </div>
 
-              <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition">
-                <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                  <QrCode className="w-full h-full text-slate-900" />
-                </div>
-                <h3 className="font-bold text-white mb-1">João Consultor</h3>
-                <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
-                <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
-              </div>
+                  <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
+                      <QrCode className="w-full h-full text-slate-900" />
+                    </div>
+                    <h3 className="font-bold text-white mb-1">João Consultor</h3>
+                    <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
+                    <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="mt-8 text-sm text-slate-500">
