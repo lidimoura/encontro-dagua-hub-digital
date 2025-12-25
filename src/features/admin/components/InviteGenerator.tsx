@@ -13,9 +13,11 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
     const [offerDiscount, setOfferDiscount] = useState(false);
     const [generating, setGenerating] = useState(false);
     const [generatedLink, setGeneratedLink] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     const generateInvite = async () => {
         setGenerating(true);
+        setShowModal(false); // Reset modal state
         try {
             // Generate unique token
             const token = crypto.randomUUID();
@@ -25,7 +27,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 .from('company_invites')
                 .insert({
                     token,
-                    email: email || null,
+                    email: email.trim() || null, // Safely handle empty email
                     offer_discount: offerDiscount,
                     expires_at: null, // No expiration for now
                 });
@@ -35,6 +37,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
             // Generate invite link
             const inviteLink = `${window.location.origin}/#/join?token=${token}`;
             setGeneratedLink(inviteLink);
+            setShowModal(true); // ALWAYS show modal after successful generation
 
             showToast(
                 offerDiscount
@@ -47,6 +50,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
         } catch (error: any) {
             console.error('Error generating invite:', error);
             showToast('Erro ao gerar convite. Tente novamente.', 'error');
+            setShowModal(false);
         } finally {
             setGenerating(false);
         }
@@ -139,8 +143,8 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                     )}
                 </button>
 
-                {/* Generated Link Display */}
-                {generatedLink && (
+                {/* Generated Link Display - Modal */}
+                {showModal && generatedLink && (
                     <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl animate-in fade-in duration-300">
                         <label className="block text-sm font-medium text-green-900 dark:text-green-300 mb-2">
                             ✅ Link Gerado com Sucesso!

@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase/client';
 import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
 import { CardLinksEditor } from './components/CardLinksEditor';
+import { ImageUpload } from '@/components/ImageUpload';
 
 
 
@@ -720,20 +721,15 @@ export const QRdaguaPage: React.FC = () => {
                                         />
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="imageUrl" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                            URL da Imagem
-                                        </label>
-                                        <input
-                                            type="url"
-                                            id="imageUrl"
-                                            name="imageUrl"
-                                            value={formData.imageUrl || ''}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                            placeholder="https://exemplo.com/logo.png"
-                                        />
-                                    </div>
+
+                                    {/* Image Upload - Supabase Storage */}
+                                    <ImageUpload
+                                        bucket="qr-images"
+                                        currentImageUrl={formData.imageUrl}
+                                        onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                                        label="Imagem da Ponte"
+                                        accept="image/*"
+                                    />
 
                                     <div>
                                         <label htmlFor="whatsapp" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
