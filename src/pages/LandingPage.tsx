@@ -352,7 +352,7 @@ export default function LandingPage() {
 
             <div className="mt-6 p-4 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl inline-block">
               <p className="text-sm font-bold text-fuchsia-300">💡 Quer apenas o Prompt Lab?</p>
-              <button onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Prompt Lab Lifetime por 3 reais', '_blank')} className="text-white hover:text-white underline mt-1 text-xs">Assinar Plano Vitalício (R$ 3,00)</button>
+              <button onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Pro Mensal por R$ 3,00', '_blank')} className="text-white hover:text-white underline mt-1 text-xs">Assinar Pro Mensal (R$ 3,00)</button>
             </div>
           </div>
         </section>
