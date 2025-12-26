@@ -4,6 +4,11 @@
   "installCommand": "npm install",
   "framework": "vite",
   "outputDirectory": "dist",
+  "build": {
+    "env": {
+      "HUSKY": "0"
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
