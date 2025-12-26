@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { QRCode } from 'react-qrcode-logo';
-import { QRCode } from 'qrcode.react';
 import { ExternalLink, Phone, Instagram, Copy, Check, Download, Share2, X } from 'lucide-react';
 
 interface BridgePageData {
@@ -407,7 +406,7 @@ export const BridgePage: React.FC = () => {
                                         logoHeight={50}
                                         logoPadding={5}
                                         logoPaddingStyle="circle"
-                                    
+
                                     />
                                 </div>
 
