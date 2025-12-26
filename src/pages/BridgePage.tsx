@@ -395,11 +395,19 @@ export const BridgePage: React.FC = () => {
                                 <div className="bg-white p-8 rounded-2xl">
                                     <QRCode
                                         value={`${window.location.origin}/#/v/${data.slug}`}
-                                        size={400}
+                                        size={200}
                                         ecLevel="H"
                                         fgColor={data.color || '#7c3aed'}
                                         bgColor="transparent"
-                                        qrStyle="dots"`r`n                                        eyeRadius={10}`r`n                                        logoImage={data.qr_logo_url || ''}`r`n                                        logoWidth={80}`r`n                                        logoHeight={80}`r`n                                        removeQrCodeBehindLogo={true}
+                                        qrStyle="dots"
+                                        eyeRadius={10}
+                                        removeQrCodeBehindLogo={true}
+                                        logoImage={data.imageUrl}
+                                        logoWidth={50}
+                                        logoHeight={50}
+                                        logoPadding={5}
+                                        logoPaddingStyle="circle"
+                                    
                                     />
                                 </div>
 
