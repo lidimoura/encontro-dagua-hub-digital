@@ -143,9 +143,12 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 <button
                     type="button"
                     onClick={(e) => {
+                        console.log('🚨 BUTTON CLICKED - START');
                         e.preventDefault();
                         e.stopPropagation();
+                        console.log('🚨 preventDefault called');
                         generateInvite();
+                        return false;
                     }}
                     disabled={generating}
                     className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-acai-900 to-acai-700 text-white rounded-lg font-semibold hover:shadow-xl hover:shadow-acai-900/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
