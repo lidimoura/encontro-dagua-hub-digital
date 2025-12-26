@@ -432,8 +432,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Middle Content (Header + Page) */}
           <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 ease-in-out">
             {/* Ambient background glow */}
-            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px]"></div>
-            <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px]"></div>
+            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px] pointer-events-none"></div>
 
             {/* Header */}
             <header className="h-16 px-6 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10 glass relative z-20">
