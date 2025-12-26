@@ -248,7 +248,7 @@ export const BridgePage: React.FC = () => {
                                                 <QRCode
                                                     value={`${window.location.origin}/#/v/${data.slug}`}
                                                     size={200}
-                                                    ececLevel=\"H\"
+                                                    ecLevel="H"
                                                     fgColor={data.color || '#7c3aed'}
                                                     bgColor="transparent"
                                                     qrStyle="dots"
