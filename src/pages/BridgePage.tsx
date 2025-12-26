@@ -396,10 +396,10 @@ export const BridgePage: React.FC = () => {
                                     <QRCode
                                         value={`${window.location.origin}/#/v/${data.slug}`}
                                         size={400}
-                                        ecLevel=\"H\"
+                                        ecLevel="H"
                                         fgColor={data.color || '#7c3aed'}
                                         bgColor="transparent"
-                                        qrStyle=\"dots\"`r`n                                        eyeRadius={10}`r`n                                        logoImage={data.qr_logo_url || ''}`r`n                                        logoWidth={80}`r`n                                        logoHeight={80}`r`n                                        removeQrCodeBehindLogo={true}
+                                        qrStyle="dots"`r`n                                        eyeRadius={10}`r`n                                        logoImage={data.qr_logo_url || ''}`r`n                                        logoWidth={80}`r`n                                        logoHeight={80}`r`n                                        removeQrCodeBehindLogo={true}
                                     />
                                 </div>
 
