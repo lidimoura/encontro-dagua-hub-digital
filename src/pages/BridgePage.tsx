@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { QRCode } from 'react-qrcode-logo';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCode } from 'qrcode.react';
 import { ExternalLink, Phone, Instagram, Copy, Check, Download, Share2, X } from 'lucide-react';
 
 interface BridgePageData {
@@ -44,32 +44,40 @@ export const BridgePage: React.FC = () => {
     };
 
     const handleDownloadQR = () => {
-        const svg = document.getElementById('qr-code-svg');
-        if (!svg) return;
+        // Use the styled QR Code canvas from react-qrcode-logo
+        const qrCanvas = document.querySelector('#qr-code-styled canvas') as HTMLCanvasElement;
+        if (!qrCanvas) {
+            console.error('QR Code canvas not found');
+            return;
+        }
 
-        const svgData = new XMLSerializer().serializeToString(svg);
+        // Create high-res version
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const img = new Image();
+        if (!ctx) return;
 
+        // Set high resolution (1000x1000)
         canvas.width = 1000;
         canvas.height = 1000;
 
-        img.onload = () => {
-            ctx?.drawImage(img, 0, 0, 1000, 1000);
-            canvas.toBlob((blob) => {
-                if (blob) {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `qr - code - ${data?.slug || 'download'}.png`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                }
-            });
-        };
+        // Fill white background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, 1000, 1000);
 
-        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        // Draw the styled QR code
+        ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+
+        // Download
+        canvas.toBlob((blob) => {
+            if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `qr-code-${data?.slug || 'download'}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }, 'image/png');
     };
 
     const handleShareWhatsApp = () => {
@@ -235,21 +243,20 @@ export const BridgePage: React.FC = () => {
                                             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-purple-400/60 rounded-bl-lg"></div>
                                             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-purple-400/60 rounded-br-lg"></div>
 
-                                            {/* QR Code - White on Transparent */}
-                                            <div className="bg-white/95 p-4 rounded-xl">
-                                                <QRCodeSVG
-                                                    id="qr-code-svg"
+                                            {/* QR Code - Styled with Dots */}
+                                            <div id="qr-code-styled" className="bg-white/95 p-4 rounded-xl">
+                                                <QRCode
                                                     value={`${window.location.origin}/#/v/${data.slug}`}
                                                     size={200}
-                                                    level="H"
+                                                    ececLevel=\"H\"
                                                     fgColor={data.color || '#7c3aed'}
                                                     bgColor="transparent"
-                                                    imageSettings={data.qr_logo_url ? {
-                                                        src: data.qr_logo_url,
-                                                        height: 40,
-                                                        width: 40,
-                                                        excavate: true,
-                                                    } : undefined}
+                                                    qrStyle="dots"
+                                                    eyeRadius={10}
+                                                    logoImage={data.qr_logo_url || ''}
+                                                    logoWidth={40}
+                                                    logoHeight={40}
+                                                    removeQrCodeBehindLogo={true}
                                                 />
                                             </div>
 
@@ -386,18 +393,13 @@ export const BridgePage: React.FC = () => {
                             {/* QR Code Container */}
                             <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/20">
                                 <div className="bg-white p-8 rounded-2xl">
-                                    <QRCodeSVG
+                                    <QRCode
                                         value={`${window.location.origin}/#/v/${data.slug}`}
                                         size={400}
-                                        level="H"
+                                        ecLevel=\"H\"
                                         fgColor={data.color || '#7c3aed'}
                                         bgColor="transparent"
-                                        imageSettings={data.qr_logo_url ? {
-                                            src: data.qr_logo_url,
-                                            height: 80,
-                                            width: 80,
-                                            excavate: true,
-                                        } : undefined}
+                                        qrStyle=\"dots\"`r`n                                        eyeRadius={10}`r`n                                        logoImage={data.qr_logo_url || ''}`r`n                                        logoWidth={80}`r`n                                        logoHeight={80}`r`n                                        removeQrCodeBehindLogo={true}
                                     />
                                 </div>
 
