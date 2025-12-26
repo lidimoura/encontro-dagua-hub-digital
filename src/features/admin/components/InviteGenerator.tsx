@@ -18,9 +18,12 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
     const generateInvite = async () => {
         setGenerating(true);
         setShowModal(false); // Reset modal state
+        setGeneratedLink(''); // Clear previous link
+
         try {
             // Generate unique token
             const token = crypto.randomUUID();
+            console.log('🔑 Generated token:', token);
 
             // Insert into company_invites table
             const { error } = await supabase
@@ -32,12 +35,23 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                     expires_at: null, // No expiration for now
                 });
 
-            if (error) throw error;
+            if (error) {
+                console.error('❌ Database error:', error);
+                throw error;
+            }
 
             // Generate invite link
             const inviteLink = `${window.location.origin}/#/join?token=${token}`;
+            console.log('✅ Generated invite link:', inviteLink);
+
+            // Set link FIRST, then show modal
             setGeneratedLink(inviteLink);
-            setShowModal(true); // ALWAYS show modal after successful generation
+
+            // Use setTimeout to ensure state update completes before showing modal
+            setTimeout(() => {
+                setShowModal(true);
+                console.log('🎉 Modal should now be visible');
+            }, 100);
 
             showToast(
                 offerDiscount
@@ -48,9 +62,10 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
 
             onInviteGenerated?.();
         } catch (error: any) {
-            console.error('Error generating invite:', error);
+            console.error('❌ Error generating invite:', error);
             showToast('Erro ao gerar convite. Tente novamente.', 'error');
             setShowModal(false);
+            setGeneratedLink('');
         } finally {
             setGenerating(false);
         }
@@ -126,7 +141,12 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
 
                 {/* Generate Button */}
                 <button
-                    onClick={generateInvite}
+                    type="button"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        generateInvite();
+                    }}
                     disabled={generating}
                     className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-acai-900 to-acai-700 text-white rounded-lg font-semibold hover:shadow-xl hover:shadow-acai-900/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -144,37 +164,40 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 </button>
 
                 {/* Generated Link Display - Modal */}
-                {showModal && generatedLink && (
-                    <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl animate-in fade-in duration-300">
-                        <label className="block text-sm font-medium text-green-900 dark:text-green-300 mb-2">
-                            ✅ Link Gerado com Sucesso!
-                        </label>
-                        <div className="flex items-center gap-2 p-3 bg-white dark:bg-rionegro-950 border border-green-200 dark:border-green-800 rounded-lg mb-3">
-                            <input
-                                type="text"
-                                value={generatedLink}
-                                readOnly
-                                className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0"
-                            />
+                {(() => {
+                    console.log('🔍 Modal render check:', { showModal, hasLink: !!generatedLink, generatedLink });
+                    return showModal && generatedLink ? (
+                        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-xl animate-in fade-in duration-300 shadow-lg">
+                            <label className="block text-sm font-medium text-green-900 dark:text-green-300 mb-2">
+                                ✅ Link Gerado com Sucesso!
+                            </label>
+                            <div className="flex items-center gap-2 p-3 bg-white dark:bg-rionegro-950 border border-green-200 dark:border-green-800 rounded-lg mb-3">
+                                <input
+                                    type="text"
+                                    value={generatedLink}
+                                    readOnly
+                                    className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0"
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={copyToClipboard}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+                                >
+                                    <Copy size={16} />
+                                    Copiar Link
+                                </button>
+                                <button
+                                    onClick={sendViaWhatsApp}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+                                >
+                                    <ExternalLink size={16} />
+                                    Enviar no WhatsApp
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={copyToClipboard}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
-                            >
-                                <Copy size={16} />
-                                Copiar Link
-                            </button>
-                            <button
-                                onClick={sendViaWhatsApp}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
-                            >
-                                <ExternalLink size={16} />
-                                Enviar no WhatsApp
-                            </button>
-                        </div>
-                    </div>
-                )}
+                    ) : null;
+                })()}
             </div>
         </div>
     );

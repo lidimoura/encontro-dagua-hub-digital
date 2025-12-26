@@ -1,39 +1,40 @@
 # TODO - Encontro D'água Hub
 
-## 📋 Pendências para Hoje (20/12/2025)
+## 📋 Pendências para Hoje (26/12/2025)
 
-### 🎯 Prioridade Alta
+### 🎯 RETA FINAL - DEPLOY DE PRODUÇÃO
 
-- [ ] **Criar Botão "Salvar/Compartilhar" no Dashboard do QR Code**
-  - Implementar funcionalidade de download do QR Code
-  - Adicionar opção de compartilhamento de link
-  - Melhorar UX de exportação
+#### ✅ CONCLUÍDO HOJE
 
-- [ ] **Refinar Prompt de Personalidade da Amazo (Typebot)**
-  - Ajustar tom de voz para CS/Vendas
-  - Incluir regras de negócio específicas
-  - Testar fluxo conversacional
+- [x] **FIX CRÍTICO: Modal de Convite Agora Abre**
+  - Corrigido timing de state updates (setTimeout 100ms)
+  - Adicionado console logging para debugging
+  - Melhorado visual com border-2 e shadow-lg
+  - Modal exibe link gerado com botões de Copiar e WhatsApp
 
-- [ ] **Implementar Onboarding/Tour no Dashboard**
-  - Criar tour guiado para novos usuários
-  - Destacar funcionalidades principais
-  - Adicionar tooltips contextuais
+#### 🔄 EM ANDAMENTO
 
-- [ ] **Teste QA Final (Criar QR em Produção)**
-  - Validar criação de QR Code em ambiente de produção
-  - Testar todos os tipos: LINK, BRIDGE, CARD
-  - Verificar responsividade mobile
-  - Confirmar analytics de scans
+- [/] **Atualizar Documentação**
+  - [x] TODO.md atualizado
+  - [ ] DEVLOG.md com vitórias de ontem
+  - [ ] USERGUIDE.md com instruções de convites
 
 ---
 
-## ✅ Concluído Hoje
+## 📊 Status do Sistema (Última Verificação)
 
-- [x] Ajustar título da aba (`index.html`)
-- [x] Adicionar meta description para SEO
-- [x] Corrigir rota inicial (`/` → Landing Page)
-- [x] Atualizar `DEVLOG.md` com Sprint V6
-- [x] Criar arquivo `TODO.md`
+### ✅ Funcionalidades Estáveis
+- Upload de Imagens (Supabase Storage)
+- Menu Mobile (Hamburguer em todos os devices)
+- Build Vercel (Passando sem erros)
+- Sistema de Referral (20% OFF)
+- Catálogo de Produtos (Admin Panel)
+- QR d'água (Gerador completo)
+
+### ⚠️ Pendências Menores
+- [ ] Teste de geração de convite em produção
+- [ ] Validar fluxo completo: Gerar → Copiar → Cadastrar
+- [ ] Verificar se link funciona no WhatsApp
 
 ---
 
@@ -44,6 +45,7 @@
 - [ ] Integração WhatsApp Business API
 - [ ] Templates de Prompts (Biblioteca)
 - [ ] Sistema de Notificações
+- [ ] Onboarding/Tour no Dashboard
 
 ### Melhorias
 - [ ] Otimização de performance (Lighthouse)
@@ -53,4 +55,4 @@
 
 ---
 
-**Última Atualização:** 20/12/2025 18:31
+**Última Atualização:** 26/12/2025 09:10

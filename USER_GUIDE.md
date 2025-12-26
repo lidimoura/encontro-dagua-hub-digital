@@ -19,15 +19,82 @@ O Hub Digital é uma plataforma completa que integra:
 
 ### Como Convidar Alguém (Admin)
 
-1. **Acesse o Painel Admin** (`/admin`)
-2. **Localize o Gerador de Convites** (topo da página)
-3. **Preencha o email** (opcional - será pré-preenchido no cadastro)
-4. **Marque "Oferecer 20% de desconto"** se quiser dar desconto na 1ª mensalidade
-5. **Clique em "Gerar Link de Convite"**
-6. **Copie o link** ou **Envie direto no WhatsApp**
-7. **Compartilhe com o novo usuário**
+**Pré-requisito:** Você precisa ter acesso de Admin (role: admin) para gerar convites.
 
-**Link gerado:** `https://[dominio]/#/join?token=[TOKEN]`
+#### Passo a Passo Completo:
+
+1. **Acesse o Painel Admin**
+   - Navegue para `/admin` ou clique em "Admin" no menu
+   - Apenas usuários com email autorizado (lidimfc@gmail.com) têm acesso
+
+2. **Localize o Gerador de Convites**
+   - Está no topo da página, logo abaixo do cabeçalho
+   - Card roxo com ícone de envelope
+
+3. **Preencha os Dados do Convite**
+   - **Email (Opcional):** Se preenchido, será pré-preenchido no cadastro do convidado
+   - **Desconto 20% OFF:** Marque se quiser oferecer desconto na 1ª mensalidade
+     - Aparece uma mensagem especial no WhatsApp
+     - O cupom é aplicado automaticamente no cadastro
+
+4. **Gere o Link**
+   - Clique em **"Gerar Link de Convite"**
+   - Aguarde alguns segundos (aparece "Gerando...")
+   - ✅ Toast de sucesso aparece no topo da tela
+
+5. **Modal com Link Aparece**
+   - **IMPORTANTE:** O modal verde aparece logo abaixo do botão
+   - Contém o link completo: `https://[dominio]/#/join?token=[TOKEN]`
+   - Dois botões disponíveis:
+     - **Copiar Link:** Copia para área de transferência
+     - **Enviar no WhatsApp:** Abre WhatsApp com mensagem pré-formatada
+
+6. **Compartilhe o Convite**
+   - **Via WhatsApp (Recomendado):**
+     - Clique em "Enviar no WhatsApp"
+     - Escolha o contato
+     - Mensagem já vem formatada com instruções
+   
+   - **Via Copiar Link:**
+     - Clique em "Copiar Link"
+     - Cole onde preferir (email, SMS, DM, etc.)
+
+#### Formato do Link Gerado:
+```
+https://[seu-dominio]/#/join?token=abc123-def456-ghi789
+```
+
+#### Mensagem WhatsApp (com desconto):
+```
+Olá! Você foi convidado para o Encontro D'água Hub 
+com 20% de desconto na primeira mensalidade! 🎉
+
+Cadastre-se aqui: [LINK]
+```
+
+#### Mensagem WhatsApp (sem desconto):
+```
+Olá! Você foi convidado para o Encontro D'água Hub!
+
+Cadastre-se aqui: [LINK]
+```
+
+#### ⚠️ Solução de Problemas:
+
+**Modal não aparece após clicar em "Gerar"?**
+- Verifique o console do navegador (F12)
+- Procure por logs com emoji 🔑, ✅ ou 🎉
+- Se aparecer erro ❌, verifique conexão com Supabase
+
+**Link não funciona?**
+- Verifique se o token foi criado na tabela `company_invites`
+- Confirme que o link está completo (não foi cortado ao copiar)
+- Teste abrindo em aba anônima
+
+**Toast aparece mas modal não?**
+- Aguarde 2-3 segundos (pode haver delay de rede)
+- Recarregue a página e tente novamente
+- Verifique se há erros no console
 
 ### Como Navegar na Galeria
 
