@@ -156,6 +156,9 @@ export const AdminUsersPage: React.FC = () => {
         <div className="p-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-8">
+                <h1 className="text-4xl font-black text-red-600 mb-4 border-4 border-red-600 p-4 bg-yellow-200">
+                    ⚠️ ATUALIZAÇÃO CONFIRMADA - VERSÃO SEM MODAL ⚠️
+                </h1>
                 <div className="flex items-center gap-3 mb-2">
                     <UserCog className="w-8 h-8 text-acai-900" />
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -225,8 +228,8 @@ export const AdminUsersPage: React.FC = () => {
                                     <td className="px-6 py-4">
                                         <span
                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin'
-                                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
-                                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                                                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                                                 }`}
                                         >
                                             {user.role === 'admin' ? 'Admin' : 'Vendedor'}

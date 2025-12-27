@@ -15,6 +15,7 @@ interface Profile {
     created_at?: string;
     referred_by?: string | null; // UUID of user who referred this user
     discount_credits: number; // Number of 20% discount coupons accumulated
+    is_super_admin?: boolean; // Super admin flag for global access
 }
 
 interface AuthContextType {
