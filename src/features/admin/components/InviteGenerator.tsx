@@ -1,94 +1,51 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/context/ToastContext';
-import { Copy, Mail, Gift, ExternalLink } from 'lucide-react';
 
 interface InviteGeneratorProps {
     onInviteGenerated?: () => void;
 }
 
 export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenerated }) => {
-    const { showToast } = useToast();
-    const [email, setEmail] = useState('');
-    const [offerDiscount, setOfferDiscount] = useState(false);
-    const [generating, setGenerating] = useState(false);
-    const [generatedLink, setGeneratedLink] = useState('');
-    const [showModal, setShowModal] = useState(false);
-
     const generateInvite = async () => {
-        setGenerating(true);
-        setShowModal(false); // Reset modal state
-        setGeneratedLink(''); // Clear previous link
+        // LOBOTOMY: Pure JavaScript, NO React states, NO modal
+        document.body.style.cursor = 'wait';
 
         try {
             // Generate unique token
             const token = crypto.randomUUID();
-            console.log('🔑 Generated token:', token);
 
             // Insert into company_invites table
             const { error } = await supabase
                 .from('company_invites')
                 .insert({
                     token,
-                    email: email.trim() || null, // Safely handle empty email
-                    offer_discount: offerDiscount,
-                    expires_at: null, // No expiration for now
+                    email: null,
+                    offer_discount: false,
+                    expires_at: null,
                 });
 
-            if (error) {
-                console.error('❌ Database error:', error);
-                throw error;
-            }
+            document.body.style.cursor = 'default';
+
+            if (error) throw error;
 
             // Generate invite link
             const inviteLink = `${window.location.origin}/#/join?token=${token}`;
-            console.log('✅ Generated invite link:', inviteLink);
 
-            // Set link FIRST, then show modal
-            setGeneratedLink(inviteLink);
-
-            // Use setTimeout to ensure state update completes before showing modal
-            setTimeout(() => {
-                setShowModal(true);
-                console.log('🎉 Modal should now be visible');
-            }, 100);
-
-            showToast(
-                offerDiscount
-                    ? 'Link de convite com 20% OFF gerado!'
-                    : 'Link de convite gerado!',
-                'success'
-            );
+            // PURE WINDOW.PROMPT - Works on ANY mobile device
+            window.prompt("✅ CONVITE CRIADO! COPIE ABAIXO:", inviteLink);
 
             onInviteGenerated?.();
         } catch (error: any) {
-            console.error('❌ Error generating invite:', error);
-            showToast('Erro ao gerar convite. Tente novamente.', 'error');
-            setShowModal(false);
-            setGeneratedLink('');
-        } finally {
-            setGenerating(false);
+            document.body.style.cursor = 'default';
+            alert("Erro ao gerar convite: " + error.message);
         }
-    };
-
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(generatedLink);
-        showToast('Link copiado!', 'success');
-    };
-
-    const sendViaWhatsApp = () => {
-        const message = offerDiscount
-            ? `Olá! Você foi convidado para o Encontro D'água Hub com 20% de desconto na primeira mensalidade! 🎉\n\nCadastre-se aqui: ${generatedLink}`
-            : `Olá! Você foi convidado para o Encontro D'água Hub!\n\nCadastre-se aqui: ${generatedLink}`;
-
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     };
 
     return (
         <div className="bg-white dark:bg-rionegro-900 rounded-2xl shadow-xl border border-solimoes-400/20 dark:border-solimoes-400/10 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-white" />
+                    <span className="text-white text-xl">📧</span>
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -100,110 +57,19 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 </div>
             </div>
 
-            <div className="space-y-4">
-                {/* Email Input (Optional) */}
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Email (Opcional)
-                    </label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="usuario@exemplo.com"
-                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                    />
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        Se preenchido, o email será pré-preenchido no cadastro
-                    </p>
-                </div>
-
-                {/* Discount Checkbox */}
-                <div className="p-4 bg-gradient-to-r from-amber-50 to-solimoes-50 dark:from-amber-900/10 dark:to-solimoes-900/10 border border-amber-200 dark:border-amber-800 rounded-xl">
-                    <label className="flex items-start gap-3 cursor-pointer group">
-                        <input
-                            type="checkbox"
-                            checked={offerDiscount}
-                            onChange={(e) => setOfferDiscount(e.target.checked)}
-                            className="mt-1 w-4 h-4 text-amber-600 bg-white dark:bg-rionegro-950 border-amber-300 dark:border-amber-700 rounded focus:ring-2 focus:ring-amber-500 cursor-pointer"
-                        />
-                        <div className="flex-1">
-                            <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center gap-2">
-                                <Gift className="w-4 h-4" />
-                                Oferecer 20% de desconto na 1ª mensalidade
-                            </span>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                                O usuário receberá um cupom de 20% OFF ao se cadastrar
-                            </p>
-                        </div>
-                    </label>
-                </div>
-
-                {/* Generate Button */}
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        console.log('🚨 BUTTON CLICKED - START');
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('🚨 preventDefault called');
+            {/* LOBOTOMY: Pure div button, NO form, NO modal */}
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={generateInvite}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
                         generateInvite();
-                        return false;
-                    }}
-                    disabled={generating}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-acai-900 to-acai-700 text-white rounded-lg font-semibold hover:shadow-xl hover:shadow-acai-900/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {generating ? (
-                        <>
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            Gerando...
-                        </>
-                    ) : (
-                        <>
-                            <Mail className="w-5 h-5" />
-                            Gerar Link de Convite
-                        </>
-                    )}
-                </button>
-
-                {/* Generated Link Display - Modal */}
-                {(() => {
-                    console.log('🔍 Modal render check:', { showModal, hasLink: !!generatedLink, generatedLink });
-                    return showModal && generatedLink ? (
-                        <div className="mt-4 p-6 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-xl animate-in fade-in duration-300 shadow-2xl relative z-50">
-                            <label className="block text-base font-bold text-green-900 dark:text-green-300 mb-3">
-                                ✅ Link de Convite Gerado com Sucesso!
-                            </label>
-                            <div className="flex items-center gap-2 p-4 bg-white dark:bg-rionegro-950 border-2 border-green-300 dark:border-green-700 rounded-lg mb-4">
-                                <input
-                                    type="text"
-                                    value={generatedLink}
-                                    readOnly
-                                    onClick={(e) => e.currentTarget.select()}
-                                    className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0 cursor-text"
-                                />
-                            </div>
-                            <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={copyToClipboard}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg"
-                                >
-                                    <Copy size={18} />
-                                    Copiar Link
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={sendViaWhatsApp}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg"
-                                >
-                                    <ExternalLink size={18} />
-                                    Enviar no WhatsApp
-                                </button>
-                            </div>
-                        </div>
-                    ) : null;
-                })()}
+                    }
+                }}
+                className="cursor-pointer w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-acai-900/20 text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-acai-900 transition-all active:scale-[0.98] select-none"
+            >
+                GERAR CONVITE (ANTI-CRASH)
             </div>
         </div>
     );
