@@ -127,6 +127,7 @@ export const UsersPage: React.FC = () => {
     };
 
     const handleGenerateLink = async () => {
+        console.log("BOTÃO CLICADO - SEM REFRESH");
         setSendingInvites(true);
         setError(null);
         try {
