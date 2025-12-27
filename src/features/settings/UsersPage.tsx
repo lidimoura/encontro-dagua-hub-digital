@@ -234,6 +234,7 @@ export const UsersPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto pb-10">
+
             {/* Header */}
             <div className="mb-10">
                 <div className="flex items-start justify-between">
@@ -245,13 +246,98 @@ export const UsersPage: React.FC = () => {
                             {users.length} {users.length === 1 ? 'membro' : 'membros'} • {admins.length} admin{admins.length !== 1 && 's'}, {vendedores.length} vendedor{vendedores.length !== 1 && 'es'}
                         </p>
                     </div>
+                </div>
+            </div>
+
+            {/* INLINE INVITE GENERATOR - NO MODAL */}
+            <div className="mb-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-lg">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Gerar Novo Convite</h3>
+
+                <div className="space-y-4">
+                    {/* Role Selection */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Cargo
+                        </label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setNewUserRole('vendedor')}
+                                className={`p-3 rounded-xl border-2 text-left transition-all ${newUserRole === 'vendedor'
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                    : 'border-slate-200 dark:border-slate-700'
+                                    }`}
+                            >
+                                <span className="font-medium text-sm">Vendedor</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setNewUserRole('admin')}
+                                className={`p-3 rounded-xl border-2 text-left transition-all ${newUserRole === 'admin'
+                                    ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+                                    : 'border-slate-200 dark:border-slate-700'
+                                    }`}
+                            >
+                                <span className="font-medium text-sm">Admin</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Expiration */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Expiração
+                        </label>
+                        <div className="grid grid-cols-3 gap-3">
+                            {[
+                                { label: '7 dias', value: 7 },
+                                { label: '30 dias', value: 30 },
+                                { label: 'Nunca', value: null }
+                            ].map((opt) => (
+                                <button
+                                    key={opt.label}
+                                    type="button"
+                                    onClick={() => setExpirationDays(opt.value)}
+                                    className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all ${expirationDays === opt.value
+                                        ? 'bg-slate-800 text-white border-slate-800'
+                                        : 'bg-white text-slate-600 border-slate-200'
+                                        }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Generate Button */}
                     <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="group flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-500 transition-all shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 hover:-translate-y-0.5 font-medium"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleGenerateLink();
+                        }}
+                        disabled={sendingInvites}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-semibold disabled:opacity-50 transition-all shadow-lg"
                     >
-                        <UserPlus className="w-4 h-4 transition-transform group-hover:scale-110" />
-                        Convidar
+                        {sendingInvites ? (
+                            <>
+                                <Loader2 className="animate-spin h-4 w-4" />
+                                Gerando...
+                            </>
+                        ) : (
+                            <>
+                                <Link className="h-4 w-4" />
+                                Gerar Link de Convite
+                            </>
+                        )}
                     </button>
+
+                    {error && (
+                        <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-sm">
+                            {error}
+                        </div>
+                    )}
                 </div>
             </div>
 
