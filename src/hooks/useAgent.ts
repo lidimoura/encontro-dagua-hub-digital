@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { streamText, CoreMessage } from 'ai';
+import { streamText } from 'ai';
 import { google } from '@ai-sdk/google';
 import { anthropic } from '@ai-sdk/anthropic';
 import { getModel } from '@/services/ai/config';
@@ -78,8 +78,8 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
       setInput('');
 
       try {
-        // Convert internal messages to SDK CoreMessage format
-        let history: CoreMessage[] = await Promise.all(
+        // Convert internal messages to SDK message format
+        let history: any[] = await Promise.all(
           messages.map(async m => {
             interface TextPart {
               type: 'text';
@@ -145,7 +145,7 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
             return {
               role: m.role as 'user' | 'assistant' | 'system',
               content: parts.length > 1 ? parts : m.content,
-            } as CoreMessage;
+            } as any;
           })
         );
 
@@ -206,7 +206,7 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
           }
         }
 
-        const newUserMessage: CoreMessage = {
+        const newUserMessage: any = {
           role: 'user',
           content: newParts.length > 1 ? newParts : content,
         };
@@ -224,7 +224,7 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
               providerOptions: {
                 anthropic: { cacheControl: { type: 'ephemeral' } },
               },
-            } as CoreMessage,
+            } as any,
             ...history,
           ];
           systemPrompt = undefined; // Clear top-level system to avoid duplication
