@@ -179,13 +179,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 active={location.pathname === '/reports'}
                 prefetch="reports"
               />
-              <NavItem
-                to="/settings"
-                icon={Settings}
-                label="Configurações"
-                active={location.pathname === '/settings'}
-                prefetch="settings"
-              />
+              {profile?.role === 'admin' && (
+                <NavItem
+                  to="/settings"
+                  icon={Settings}
+                  label="Configurações"
+                  active={location.pathname === '/settings'}
+                  prefetch="settings"
+                />
+              )}
               {profile?.email === 'lidimfc@gmail.com' && (
                 <NavItem
                   to="/admin"
@@ -334,13 +336,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               active={location.pathname === '/reports'}
               prefetch="reports"
             />
-            <NavItem
-              to="/settings"
-              icon={Settings}
-              label="Configurações"
-              active={location.pathname === '/settings'}
-              prefetch="settings"
-            />
+            {profile?.role === 'admin' && (
+              <NavItem
+                to="/settings"
+                icon={Settings}
+                label="Configurações"
+                active={location.pathname === '/settings'}
+                prefetch="settings"
+              />
+            )}
             {profile?.email === 'lidimfc@gmail.com' && (
               <NavItem
                 to="/admin"
