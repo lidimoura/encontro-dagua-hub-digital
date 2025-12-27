@@ -211,5 +211,5 @@ Este documento define o protocolo obrigatório de testes para todas as entregas 
 
 ---
 
-**Última Atualização:** 2025-12-21
+**Última Atualização:** 2025-12-26 (Hotfixes de Produção)  
 **Responsável:** Equipe de Desenvolvimento

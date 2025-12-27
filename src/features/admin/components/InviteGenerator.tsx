@@ -170,31 +170,34 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 {(() => {
                     console.log('🔍 Modal render check:', { showModal, hasLink: !!generatedLink, generatedLink });
                     return showModal && generatedLink ? (
-                        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-xl animate-in fade-in duration-300 shadow-lg">
-                            <label className="block text-sm font-medium text-green-900 dark:text-green-300 mb-2">
-                                ✅ Link Gerado com Sucesso!
+                        <div className="mt-4 p-6 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-xl animate-in fade-in duration-300 shadow-2xl relative z-50">
+                            <label className="block text-base font-bold text-green-900 dark:text-green-300 mb-3">
+                                ✅ Link de Convite Gerado com Sucesso!
                             </label>
-                            <div className="flex items-center gap-2 p-3 bg-white dark:bg-rionegro-950 border border-green-200 dark:border-green-800 rounded-lg mb-3">
+                            <div className="flex items-center gap-2 p-4 bg-white dark:bg-rionegro-950 border-2 border-green-300 dark:border-green-700 rounded-lg mb-4">
                                 <input
                                     type="text"
                                     value={generatedLink}
                                     readOnly
-                                    className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0"
+                                    onClick={(e) => e.currentTarget.select()}
+                                    className="flex-1 bg-transparent border-none text-sm font-mono text-slate-900 dark:text-white focus:ring-0 p-0 cursor-text"
                                 />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <button
+                                    type="button"
                                     onClick={copyToClipboard}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg"
                                 >
-                                    <Copy size={16} />
+                                    <Copy size={18} />
                                     Copiar Link
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={sendViaWhatsApp}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg"
                                 >
-                                    <ExternalLink size={16} />
+                                    <ExternalLink size={18} />
                                     Enviar no WhatsApp
                                 </button>
                             </div>

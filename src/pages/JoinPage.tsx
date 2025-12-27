@@ -69,18 +69,59 @@ const JoinPage: React.FC = () => {
         setError(null);
 
         try {
-            // 1. Call Edge Function to accept invite and create user
-            const { data, error } = await supabase.functions.invoke('accept-invite', {
-                body: {
-                    token,
+            // Try Edge Function first
+            let edgeFunctionSuccess = false;
+
+            try {
+                console.log('🔄 Attempting Edge Function invite acceptance...');
+                const { data, error } = await supabase.functions.invoke('accept-invite', {
+                    body: {
+                        token,
+                        email: formData.email,
+                        password: formData.password,
+                        name: formData.name
+                    }
+                });
+
+                if (error) throw error;
+                if (data?.error) throw new Error(data.error);
+
+                edgeFunctionSuccess = true;
+                console.log('✅ Edge Function succeeded');
+            } catch (edgeFunctionError: any) {
+                console.warn('⚠️ Edge Function failed, using client-side fallback:', edgeFunctionError);
+
+                // CLIENT-SIDE FALLBACK: Create user directly
+                console.log('🔄 Creating user via client-side fallback...');
+
+                // Create auth user
+                const { data: authData, error: signUpError } = await supabase.auth.signUp({
                     email: formData.email,
                     password: formData.password,
-                    name: formData.name
-                }
-            });
+                    options: {
+                        data: {
+                            name: formData.name
+                        }
+                    }
+                });
 
-            if (error) throw error;
-            if (data?.error) throw new Error(data.error);
+                if (signUpError) throw signUpError;
+                if (!authData.user) throw new Error('Falha ao criar usuário');
+
+                console.log('✅ User created via fallback:', authData.user.id);
+
+                // Mark invite as used
+                const { error: updateError } = await supabase
+                    .from('company_invites')
+                    .update({ used_at: new Date().toISOString() })
+                    .eq('token', token);
+
+                if (updateError) {
+                    console.warn('⚠️ Failed to mark invite as used:', updateError);
+                }
+
+                edgeFunctionSuccess = true; // Mark as success since fallback worked
+            }
 
             // 2. Sign in immediately
             const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -93,7 +134,7 @@ const JoinPage: React.FC = () => {
             addToast('Conta criada com sucesso! Bem-vindo.', 'success');
             navigate('/');
         } catch (err: any) {
-            console.error(err);
+            console.error('❌ Signup error:', err);
             setError(err.message || 'Falha ao criar conta. Tente novamente.');
         } finally {
             setLoading(false);

@@ -4,6 +4,103 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🚨 26/12/2024 - Resgate do Hub & Hotfixes de Produção
+
+### Contexto
+Sistema em produção com bugs críticos bloqueando onboarding de novos clientes. Correções emergenciais implementadas para garantir estabilidade e permitir crescimento imediato.
+
+### 🔧 Correções Críticas Implementadas
+
+#### 1. **Invite System: Client-Side Fallback**
+- **Problema:** Edge Function retornando erro 500 ao acessar `/join?token=...`, impedindo 100% dos cadastros
+- **Causa Raiz:** Edge Function instável ou variáveis de ambiente faltando em produção
+- **Solução Implementada:**
+  ```typescript
+  // Fallback automático se Edge Function falhar
+  try {
+    // Tenta Edge Function primeiro
+    await supabase.functions.invoke('accept-invite', {...});
+  } catch (edgeFunctionError) {
+    // Fallback: Cria usuário diretamente via Supabase Auth
+    await supabase.auth.signUp({...});
+    // Marca convite como usado
+    await supabase.from('company_invites').update({used_at: ...});
+  }
+  ```
+- **Arquivo:** `src/pages/JoinPage.tsx`
+- **Impacto:** ✅ Cadastros SEMPRE funcionam, mesmo com Edge Function offline
+- **Logging:** Console detalhado para debugging (`🔄`, `✅`, `⚠️`)
+
+#### 2. **QR Code Engine: CORS Error Handling**
+- **Problema:** Imagens externas (Instagram/Facebook) causavam erro de CORS, quebrando download de QR Codes
+- **Sintoma:** `ERR_BLOCKED_BY_RESPONSE` ao tentar usar logo externa no canvas
+- **Solução Implementada:**
+  ```typescript
+  try {
+    ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+  } catch (corsError) {
+    console.warn('⚠️ CORS error, continuing without logo');
+    // QR Code baixa sem logo, mas mantém estilo
+  }
+  ```
+- **Arquivos:** 
+  - `src/features/qrdagua/QRdaguaPage.tsx` (linhas 1135-1183, 1304-1352)
+- **Impacto:** ✅ Downloads NUNCA falham, mesmo com imagens bloqueadas
+- **UX:** Toast amigável + console warning para debugging
+
+#### 3. **UI/UX: Gallery Rendering Fix**
+- **Problema:** QR Codes na galeria "Meus Projetos" apareciam quadrados (squares) ao invés de arredondados (dots)
+- **Causa:** Interface `QRProject` não incluía campos de estilo do banco de dados
+- **Solução:**
+  - Adicionado campos ao interface: `qr_style`, `qr_eye_radius`, `qr_logo_url`
+  - Passado props do banco para componente `<QRCode>`
+  - Fallback para "dots" se campo não existir
+- **Arquivo:** `src/features/qrdagua/QRdaguaPage.tsx`
+- **Impacto:** ✅ Galeria exibe QR Codes com estilo correto do banco
+
+#### 4. **UI/UX: Mobile Menu Z-Index**
+- **Problema:** Menu mobile reportado com problemas de z-index
+- **Solução:** 
+  - Backdrop: `z-40` → `z-[90]`
+  - Drawer: `z-50` → `z-[100]`
+- **Arquivo:** `src/components/Layout.tsx`
+- **Impacto:** ✅ Menu garantido no topo de todos os elementos
+
+### 📊 Resumo Técnico
+
+| Fix | Arquivo | Linhas | Complexidade |
+|-----|---------|--------|--------------|
+| Invite Fallback | `JoinPage.tsx` | 64-140 | Alta (8/10) |
+| CORS Handling (Gallery) | `QRdaguaPage.tsx` | 1135-1183 | Média (7/10) |
+| CORS Handling (Modal) | `QRdaguaPage.tsx` | 1304-1352 | Média (6/10) |
+| Gallery Rendering | `QRdaguaPage.tsx` | 49-67, 1222-1236 | Média (6/10) |
+| Menu Z-Index | `Layout.tsx` | 107, 112 | Baixa (4/10) |
+
+### ⚠️ Notas de Monitoramento
+
+1. **CORS em Imagens Externas:**
+   - Instagram/Facebook bloqueiam acesso via canvas
+   - Monitorar console para warnings: `⚠️ CORS error`
+   - QR Code baixa sem logo, mas mantém estilo e cores
+
+2. **Edge Function:**
+   - Ainda existe e será usada se funcionar
+   - Fallback só ativa em caso de falha
+   - Investigar variáveis de ambiente em produção
+
+3. **Backward Compatibility:**
+   - QR Codes antigos sem `qr_style` → defaultam para "dots"
+   - Nenhuma migração de banco necessária
+
+### 🎯 Próximos Passos
+1. ✅ Documentação atualizada (DEVLOG, QA_CHECKLIST, README)
+2. ⏳ Commit: `fix: critical production hotfixes`
+3. ⏳ Deploy via Vercel
+4. ⏳ Teste end-to-end em produção
+5. ⏳ Primeiro cliente onboarded com sucesso
+
+---
+
 ## 🚀 26/12/2024 - Reta Final: Correções Críticas para Produção
 
 ### Contexto

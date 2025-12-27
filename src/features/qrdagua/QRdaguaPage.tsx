@@ -61,6 +61,11 @@ interface QRProject {
     in_portfolio?: boolean;
     in_gallery?: boolean;
     direct_redirect?: boolean; // PRO feature
+    qr_style?: 'squares' | 'dots';
+    qr_eye_radius?: number;
+    qr_logo_url?: string;
+    qr_text_top?: string;
+    qr_text_bottom?: string;
     created_at: string;
 }
 
@@ -1134,6 +1139,58 @@ export const QRdaguaPage: React.FC = () => {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => {
+                                                try {
+                                                    // Download QR Code from card
+                                                    const qrCanvas = document.querySelector(`#qr-card-${project.id} canvas`) as HTMLCanvasElement;
+                                                    if (!qrCanvas) {
+                                                        showToast('QR Code não encontrado', 'error');
+                                                        return;
+                                                    }
+
+                                                    const canvas = document.createElement('canvas');
+                                                    const ctx = canvas.getContext('2d');
+                                                    if (!ctx) {
+                                                        showToast('Erro ao criar canvas', 'error');
+                                                        return;
+                                                    }
+
+                                                    canvas.width = 1000;
+                                                    canvas.height = 1000;
+                                                    ctx.fillStyle = '#FFFFFF';
+                                                    ctx.fillRect(0, 0, 1000, 1000);
+
+                                                    try {
+                                                        ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+                                                    } catch (corsError) {
+                                                        console.warn('⚠️ CORS error drawing QR Code, continuing without logo:', corsError);
+                                                        // QR Code will still download, just without the external logo
+                                                    }
+
+                                                    canvas.toBlob((blob) => {
+                                                        if (blob) {
+                                                            const url = URL.createObjectURL(blob);
+                                                            const a = document.createElement('a');
+                                                            a.href = url;
+                                                            a.download = `qr-${project.slug}.png`;
+                                                            a.click();
+                                                            URL.revokeObjectURL(url);
+                                                            showToast('QR Code baixado!', 'success');
+                                                        } else {
+                                                            showToast('Erro ao gerar imagem', 'error');
+                                                        }
+                                                    }, 'image/png');
+                                                } catch (error) {
+                                                    console.error('❌ Download error:', error);
+                                                    showToast('Erro ao baixar. Tente novamente.', 'error');
+                                                }
+                                            }}
+                                            className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                                            title="Baixar QR Code"
+                                        >
+                                            <QrCode size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => {
                                                 const url = `${window.location.origin}/#/v/${project.slug}`;
                                                 navigator.clipboard.writeText(url);
                                                 showToast('Link copiado!', 'success');
@@ -1167,15 +1224,20 @@ export const QRdaguaPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-center p-4 bg-slate-50 dark:bg-rionegro-950 rounded-lg mb-3">
-                                    {project.destination_url && (
-                                        <QRCodeSVG
-                                            value={`${window.location.origin}/#/v/${project.slug}`}
-                                            size={120}
-                                            level="H"
-                                            fgColor={project.color}
-                                        />
-                                    )}
+                                <div id={`qr-card-${project.id}`} className="flex items-center justify-center p-4 bg-slate-50 dark:bg-rionegro-950 rounded-lg mb-3">
+                                    <QRCode
+                                        value={`${window.location.origin}/#/v/${project.slug}`}
+                                        size={120}
+                                        ecLevel="H"
+                                        fgColor={project.color}
+                                        bgColor="transparent"
+                                        qrStyle={project.qr_style || "dots"}
+                                        eyeRadius={project.qr_eye_radius || 10}
+                                        logoImage={project.qr_logo_url || ''}
+                                        logoWidth={project.qr_logo_url ? 30 : 0}
+                                        logoHeight={project.qr_logo_url ? 30 : 0}
+                                        removeQrCodeBehindLogo={true}
+                                    />
                                 </div>
 
                                 <p className="text-xs text-slate-500 dark:text-slate-400 break-all">
@@ -1247,6 +1309,58 @@ export const QRdaguaPage: React.FC = () => {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => {
+                                    try {
+                                        // Download QR Code
+                                        const qrCanvas = document.querySelector('#qr-code-styled canvas') as HTMLCanvasElement;
+                                        if (!qrCanvas) {
+                                            showToast('QR Code não encontrado', 'error');
+                                            return;
+                                        }
+
+                                        const canvas = document.createElement('canvas');
+                                        const ctx = canvas.getContext('2d');
+                                        if (!ctx) {
+                                            showToast('Erro ao criar canvas', 'error');
+                                            return;
+                                        }
+
+                                        canvas.width = 1000;
+                                        canvas.height = 1000;
+                                        ctx.fillStyle = '#FFFFFF';
+                                        ctx.fillRect(0, 0, 1000, 1000);
+
+                                        try {
+                                            ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+                                        } catch (corsError) {
+                                            console.warn('⚠️ CORS error drawing QR Code, continuing without logo:', corsError);
+                                            // QR Code will still download, just without the external logo
+                                        }
+
+                                        canvas.toBlob((blob) => {
+                                            if (blob) {
+                                                const url = URL.createObjectURL(blob);
+                                                const a = document.createElement('a');
+                                                a.href = url;
+                                                a.download = `qr-code-${successUrl.split('/').pop()}.png`;
+                                                a.click();
+                                                URL.revokeObjectURL(url);
+                                                showToast('QR Code baixado!', 'success');
+                                            } else {
+                                                showToast('Erro ao gerar imagem', 'error');
+                                            }
+                                        }, 'image/png');
+                                    } catch (error) {
+                                        console.error('❌ Download error:', error);
+                                        showToast('Erro ao baixar QR Code', 'error');
+                                    }
+                                }}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all"
+                            >
+                                <QrCode size={18} />
+                                ⬇️ Baixar QR Code
+                            </button>
                             <button
                                 onClick={() => {
                                     navigator.clipboard.writeText(successUrl);

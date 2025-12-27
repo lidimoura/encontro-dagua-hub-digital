@@ -104,12 +104,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 z-[90] md:hidden animate-in fade-in duration-200"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
           {/* Drawer */}
-          <aside className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-50 md:hidden shadow-2xl animate-in slide-in-from-left duration-300 ease-out flex flex-col">
+          <aside className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-[100] md:hidden shadow-2xl animate-in slide-in-from-left duration-300 ease-out flex flex-col">
             {/* Header do Drawer */}
             <div className="h-16 px-5 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10">
               <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
