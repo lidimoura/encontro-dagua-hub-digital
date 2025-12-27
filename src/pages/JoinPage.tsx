@@ -101,7 +101,8 @@ const JoinPage: React.FC = () => {
                     options: {
                         data: {
                             name: formData.name
-                        }
+                        },
+                        emailRedirectTo: 'https://encontro-dagua-hub.vercel.app/auth/callback',
                     }
                 });
 
