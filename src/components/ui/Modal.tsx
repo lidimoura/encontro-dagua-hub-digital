@@ -56,7 +56,7 @@ interface ModalFormProps extends React.FormHTMLAttributes<HTMLFormElement> {
 }
 
 export const ModalForm: React.FC<ModalFormProps> = ({ children, className, ...props }) => (
-  <form className={cn('space-y-4', className)} {...props}>
+  <div className={cn('space-y-4', className)} {...props as any}>
     {children}
-  </form>
+  </div>
 );
