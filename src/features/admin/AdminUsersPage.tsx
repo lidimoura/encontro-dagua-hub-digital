@@ -170,33 +170,47 @@ export const AdminUsersPage: React.FC = () => {
                 </p>
             </div>
 
-            {/* INLINE INVITE GENERATOR - NO FORM, NO COMPONENTS */}
+            {/* INLINE INVITE GENERATOR - MOBILE FRIENDLY */}
             <div className="mb-8 bg-white dark:bg-rionegro-950 rounded-xl shadow-lg border border-slate-200 dark:border-rionegro-800 p-6">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">🔗 Gerar Convite (Inline - Sem Form)</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">🔗 Gerar Convite</h3>
 
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Email (Opcional)
-                        </label>
-                        <input
-                            type="email"
-                            placeholder="usuario@exemplo.com"
-                            className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white"
-                        />
-                    </div>
-
                     <button
                         type="button"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log("🚨 BOTÃO INLINE CLICADO - SEM FORM");
-                            alert("Convite gerado! (Implementar lógica)");
+
+                            try {
+                                // Generate unique token
+                                const token = crypto.randomUUID();
+
+                                // Insert into company_invites
+                                const { error } = await supabase
+                                    .from('company_invites')
+                                    .insert({
+                                        token,
+                                        email: null,
+                                        offer_discount: false,
+                                        expires_at: null,
+                                    });
+
+                                if (error) throw error;
+
+                                // Generate link
+                                const inviteLink = `${window.location.origin}/#/join?token=${token}`;
+
+                                // MOBILE-FRIENDLY: Use window.prompt (works 100% on mobile)
+                                window.prompt("✅ Convite Gerado! Copie o link abaixo:", inviteLink);
+
+                                addToast('Convite gerado com sucesso!', 'success');
+                            } catch (error: any) {
+                                addToast(`Erro: ${error.message}`, 'error');
+                            }
                         }}
                         className="w-full px-6 py-3 bg-acai-900 hover:bg-acai-800 text-white rounded-lg font-semibold transition-colors"
                     >
-                        GERAR CONVITE (NO FORM)
+                        GERAR LINK DE CONVITE
                     </button>
                 </div>
             </div>
