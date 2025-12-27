@@ -67,7 +67,20 @@ export default function LandingPage() {
     setIsOptimizing(true);
     setTestResponse(null);
     setTimeout(() => {
-      setOptimizedResult(`## 🌀 Prompt Estruturado (Hub)\n\n**CONTEXTO:** Especialista em comunicação persuasiva.\n\n**TAREFA:** "${idea}"\n\n**ESTRUTURA:**\n1. Use gatilhos mentais.\n2. Crie 3 opções de copy.\n3. Finalize com CTA.\n\n*Prompt criado pelo Otimizador Gratuito do Hub.*`);
+      // Generate 3 copy options based on input
+      const topic = idea.trim();
+      setOptimizedResult(`## ✨ 3 Opções de Copy Prontas
+
+✅ **Opção 1 - Direto e Impactante:**
+"${topic}? Descubra a solução que você precisa. Clique e transforme seu resultado agora!"
+
+✅ **Opção 2 - Storytelling Emocional:**
+"Imagine ter ${topic} resolvido de forma simples e eficaz. É possível, e começa aqui."
+
+✅ **Opção 3 - Oferta Urgente:**
+"🔥 ${topic} com condição especial! Aproveite enquanto há vagas disponíveis."
+
+💡 *Gerado pelo Otimizador do Hub. Escolha, ajuste e use!*`);
       setIsOptimizing(false);
     }, 800);
   };
@@ -404,7 +417,7 @@ export default function LandingPage() {
                       rel="noopener noreferrer"
                       className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start cursor-pointer group"
                     >
-                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
                         <QRCodeSVG
                           value={`${window.location.origin}/#/v/${project.slug}`}
                           size={112}

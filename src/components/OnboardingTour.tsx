@@ -22,8 +22,8 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
         gradient: 'from-blue-500 to-cyan-500',
     },
     {
-        title: 'Amazo IA 🤖',
-        description: 'Clique aqui para ter ajuda 24h. Seu assistente de IA está sempre disponível no canto inferior direito.',
+        title: 'Aiflow - Suporte IA 🤖',
+        description: 'Precisa de ajuda? O Aiflow está sempre disponível no canto inferior direito para te guiar pelo sistema.',
         icon: MessageCircle,
         gradient: 'from-emerald-500 to-teal-500',
     },
@@ -106,8 +106,8 @@ export const OnboardingTour: React.FC = () => {
                                 key={index}
                                 onClick={() => setCurrentStep(index)}
                                 className={`h-2 rounded-full transition-all ${index === currentStep
-                                        ? 'w-8 bg-primary-500'
-                                        : 'w-2 bg-slate-300 dark:bg-slate-600 hover:bg-primary-300'
+                                    ? 'w-8 bg-primary-500'
+                                    : 'w-2 bg-slate-300 dark:bg-slate-600 hover:bg-primary-300'
                                     }`}
                                 aria-label={`Ir para passo ${index + 1}`}
                             />
