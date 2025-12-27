@@ -548,7 +548,14 @@ export const QRdaguaPage: React.FC = () => {
             resetForm();
             fetchProjects();
         } catch (error: any) {
-            console.error('Erro ao salvar:', error);
+            console.error('❌ ERRO AO SALVAR PROJETO:', error);
+            console.error('📋 Error details:', {
+                code: error?.code,
+                message: error?.message,
+                details: error?.details,
+                hint: error?.hint,
+                full: error
+            });
 
             // Handle specific error cases
             if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
@@ -557,12 +564,16 @@ export const QRdaguaPage: React.FC = () => {
             } else if (error?.code === '23502') {
                 // Not null constraint
                 showToast('Erro: Campo obrigatório faltando. Verifique os dados.', 'error');
+            } else if (error?.code === '42501' || error?.message?.includes('policy')) {
+                // RLS Policy violation
+                console.error('🚨 RLS POLICY ERROR - Database bloqueando INSERT!');
+                showToast('Erro de permissão. Execute a migration 009_fix_rls_policies.sql', 'error');
             } else if (error?.message) {
                 // Show specific error message from database
                 showToast(`Erro: ${error.message}`, 'error');
             } else {
                 // Generic error
-                showToast('Erro ao salvar projeto. Tente novamente.', 'error');
+                showToast('Erro ao salvar projeto. Verifique o console.', 'error');
             }
         } finally {
             setIsSaving(false);
@@ -1140,52 +1151,66 @@ export const QRdaguaPage: React.FC = () => {
                                         <button
                                             onClick={() => {
                                                 try {
-                                                    // Download QR Code from card
+                                                    console.log('🖼️ Starting high-res QR Code download...');
+
+                                                    // Get the original canvas from react-qrcode-logo
                                                     const qrCanvas = document.querySelector(`#qr-card-${project.id} canvas`) as HTMLCanvasElement;
                                                     if (!qrCanvas) {
                                                         showToast('QR Code não encontrado', 'error');
                                                         return;
                                                     }
 
+                                                    // Create high-resolution canvas (2000x2000 for print quality)
                                                     const canvas = document.createElement('canvas');
-                                                    const ctx = canvas.getContext('2d');
+                                                    const ctx = canvas.getContext('2d', { alpha: false });
                                                     if (!ctx) {
                                                         showToast('Erro ao criar canvas', 'error');
                                                         return;
                                                     }
 
-                                                    canvas.width = 1000;
-                                                    canvas.height = 1000;
+                                                    // Set high resolution
+                                                    const highResSize = 2000;
+                                                    canvas.width = highResSize;
+                                                    canvas.height = highResSize;
+
+                                                    // White background
                                                     ctx.fillStyle = '#FFFFFF';
-                                                    ctx.fillRect(0, 0, 1000, 1000);
+                                                    ctx.fillRect(0, 0, highResSize, highResSize);
+
+                                                    // Disable image smoothing for crisp QR codes
+                                                    ctx.imageSmoothingEnabled = false;
 
                                                     try {
-                                                        ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+                                                        // Draw QR code scaled up to high resolution
+                                                        ctx.drawImage(qrCanvas, 0, 0, highResSize, highResSize);
+                                                        console.log('✅ QR Code drawn at', highResSize, 'x', highResSize);
                                                     } catch (corsError) {
                                                         console.warn('⚠️ CORS error drawing QR Code, continuing without logo:', corsError);
                                                         // QR Code will still download, just without the external logo
                                                     }
 
+                                                    // Convert to blob and download
                                                     canvas.toBlob((blob) => {
                                                         if (blob) {
                                                             const url = URL.createObjectURL(blob);
                                                             const a = document.createElement('a');
                                                             a.href = url;
-                                                            a.download = `qr-${project.slug}.png`;
+                                                            a.download = `qr-${project.slug}-${highResSize}px.png`;
                                                             a.click();
                                                             URL.revokeObjectURL(url);
-                                                            showToast('QR Code baixado!', 'success');
+                                                            showToast(`QR Code baixado em ${highResSize}px!`, 'success');
+                                                            console.log('✅ Download completed:', a.download);
                                                         } else {
                                                             showToast('Erro ao gerar imagem', 'error');
                                                         }
-                                                    }, 'image/png');
+                                                    }, 'image/png', 1.0); // Quality 1.0 = maximum
                                                 } catch (error) {
                                                     console.error('❌ Download error:', error);
                                                     showToast('Erro ao baixar. Tente novamente.', 'error');
                                                 }
                                             }}
                                             className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
-                                            title="Baixar QR Code"
+                                            title="Baixar QR Code (Alta Resolução)"
                                         >
                                             <QrCode size={16} />
                                         </button>
@@ -1312,45 +1337,59 @@ export const QRdaguaPage: React.FC = () => {
                             <button
                                 onClick={() => {
                                     try {
-                                        // Download QR Code
+                                        console.log('🖼️ Starting high-res QR Code download from modal...');
+
+                                        // Get the original canvas from react-qrcode-logo
                                         const qrCanvas = document.querySelector('#qr-code-styled canvas') as HTMLCanvasElement;
                                         if (!qrCanvas) {
                                             showToast('QR Code não encontrado', 'error');
                                             return;
                                         }
 
+                                        // Create high-resolution canvas (2000x2000 for print quality)
                                         const canvas = document.createElement('canvas');
-                                        const ctx = canvas.getContext('2d');
+                                        const ctx = canvas.getContext('2d', { alpha: false });
                                         if (!ctx) {
                                             showToast('Erro ao criar canvas', 'error');
                                             return;
                                         }
 
-                                        canvas.width = 1000;
-                                        canvas.height = 1000;
+                                        // Set high resolution
+                                        const highResSize = 2000;
+                                        canvas.width = highResSize;
+                                        canvas.height = highResSize;
+
+                                        // White background
                                         ctx.fillStyle = '#FFFFFF';
-                                        ctx.fillRect(0, 0, 1000, 1000);
+                                        ctx.fillRect(0, 0, highResSize, highResSize);
+
+                                        // Disable image smoothing for crisp QR codes
+                                        ctx.imageSmoothingEnabled = false;
 
                                         try {
-                                            ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+                                            // Draw QR code scaled up to high resolution
+                                            ctx.drawImage(qrCanvas, 0, 0, highResSize, highResSize);
+                                            console.log('✅ QR Code drawn at', highResSize, 'x', highResSize);
                                         } catch (corsError) {
                                             console.warn('⚠️ CORS error drawing QR Code, continuing without logo:', corsError);
                                             // QR Code will still download, just without the external logo
                                         }
 
+                                        // Convert to blob and download
                                         canvas.toBlob((blob) => {
                                             if (blob) {
                                                 const url = URL.createObjectURL(blob);
                                                 const a = document.createElement('a');
                                                 a.href = url;
-                                                a.download = `qr-code-${successUrl.split('/').pop()}.png`;
+                                                a.download = `qr-code-${successUrl.split('/').pop()}-${highResSize}px.png`;
                                                 a.click();
                                                 URL.revokeObjectURL(url);
-                                                showToast('QR Code baixado!', 'success');
+                                                showToast(`QR Code baixado em ${highResSize}px!`, 'success');
+                                                console.log('✅ Download completed:', a.download);
                                             } else {
                                                 showToast('Erro ao gerar imagem', 'error');
                                             }
-                                        }, 'image/png');
+                                        }, 'image/png', 1.0); // Quality 1.0 = maximum
                                     } catch (error) {
                                         console.error('❌ Download error:', error);
                                         showToast('Erro ao baixar QR Code', 'error');
@@ -1359,7 +1398,7 @@ export const QRdaguaPage: React.FC = () => {
                                 className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all"
                             >
                                 <QrCode size={18} />
-                                ⬇️ Baixar QR Code
+                                ⬇️ Baixar QR Code (2000px)
                             </button>
                             <button
                                 onClick={() => {

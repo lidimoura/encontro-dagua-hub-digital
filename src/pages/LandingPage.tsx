@@ -73,7 +73,7 @@ export default function LandingPage() {
   };
 
   const handleTestInPlace = () => {
-    setTestResponse("🤖 IA Responde: 'Olá! Aqui estão suas 3 opções de copy baseadas no prompt...' (Isso é uma simulação. No Hub Pro, você conecta seus próprios Agentes!)");
+    setTestResponse("🤖 IA Responde: 'Olá! Aqui estão suas 3 opções de copy baseadas no prompt...' No Hub Pro, você conecta seus próprios Agentes e APIs!");
   };
 
   // Gallery Projects State
@@ -289,9 +289,14 @@ export default function LandingPage() {
             <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
               <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
               <p className="text-slate-400 text-sm mb-6">Condições especiais para impacto social.</p>
-              <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                <MessageCircle size={18} /> Consultoria Social (WhatsApp)
-              </button>
+              <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                  <MessageCircle size={18} /> Consultoria Social (WhatsApp)
+                </button>
+                <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                  <Bot size={18} /> Falar com Amazo IA
+                </button>
+              </div>
             </div>
           </div>
         </section>

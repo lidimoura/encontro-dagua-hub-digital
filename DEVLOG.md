@@ -4,6 +4,94 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🚨 26/12/2024 - Hotfix Crítico Vercel/Supabase (Noite)
+
+### Contexto
+Bugs impeditivos de lançamento identificados após deploy: cadastros não persistindo (loop de refresh), QR Codes pixelados para impressão, e menu desktop invisível. Correções emergenciais aplicadas para viabilizar onboarding de clientes HOJE.
+
+### 🔧 Correções Críticas Implementadas
+
+#### 1. **RLS Policies - Database Desbloqueado**
+- **Problema:** INSERT/UPDATE bloqueados por falta de políticas RLS no Supabase
+- **Sintoma:** Formulários mostravam "sucesso" mas dados não salvavam, página dava refresh
+- **Causa Raiz:** Tabelas `qr_codes` e `company_invites` sem políticas permissivas para usuários autenticados
+- **Solução Implementada:**
+  - **Migration:** `009_fix_rls_policies.sql`
+  - Políticas criadas:
+    - `qr_codes`: INSERT/SELECT/UPDATE/DELETE para `owner_id = auth.uid()`
+    - `company_invites`: INSERT/SELECT/UPDATE para authenticated users
+    - Public SELECT para gallery items (`in_gallery = true`)
+  - Verificação automática via query `pg_policies`
+- **Arquivo:** `supabase/migrations/009_fix_rls_policies.sql`
+- **Status:** ✅ Aplicado em produção
+
+#### 2. **QR Code - Alta Resolução para Impressão**
+- **Problema:** Downloads geravam imagens pixeladas/borradas (baixa qualidade)
+- **Causa:** Canvas exportando em 1000x1000px, insuficiente para gráfica
+- **Solução Implementada:**
+  ```typescript
+  // Upgrade de 1000px → 2000px
+  const highResSize = 2000;
+  canvas.width = highResSize;
+  canvas.height = highResSize;
+  
+  // Desabilitar suavização para QR nítido
+  ctx.imageSmoothingEnabled = false;
+  
+  // Qualidade PNG máxima
+  canvas.toBlob(blob, 'image/png', 1.0);
+  ```
+- **Melhorias:**
+  - Resolução: 1000px → **2000x2000px**
+  - Image smoothing desabilitado (QR codes ficam nítidos)
+  - Qualidade PNG em 1.0 (máxima)
+  - Logging detalhado para debugging
+  - Filename inclui resolução: `qr-slug-2000px.png`
+- **Arquivos:** 
+  - `src/features/qrdagua/QRdaguaPage.tsx` (linhas 1140-1191, 1309-1368)
+- **Status:** ✅ Pronto para impressão gráfica
+
+#### 3. **Menu Desktop - Navegação Restaurada**
+- **Problema:** Sidebar completamente oculta em desktop, sem navegação alternativa
+- **Causa:** Classe Tailwind `hidden` sem `md:flex` para mostrar em telas maiores
+- **Solução:**
+  - Sidebar: `hidden` → `hidden md:flex`
+  - Hamburger: visível sempre → `md:hidden` (só mobile)
+- **Arquivo:** `src/components/Layout.tsx`
+- **Status:** ✅ Desktop com sidebar fixa, mobile com hamburger
+
+#### 4. **Error Logging - Diagnóstico Aprimorado**
+- **Adicionado:** Console detalhado para debugging de erros de banco
+  ```typescript
+  console.error('📋 Error details:', {
+    code: error?.code,
+    message: error?.message,
+    details: error?.details,
+    hint: error?.hint
+  });
+  ```
+- **Detecta:** Erros RLS (code 42501), duplicatas (23505), null constraints (23502)
+- **Arquivo:** `src/features/qrdagua/QRdaguaPage.tsx`
+
+### 📊 Resumo Técnico
+
+| Fix | Arquivo | Tipo | Impacto |
+|-----|---------|------|---------|
+| RLS Policies | `009_fix_rls_policies.sql` | SQL Migration | CRÍTICO - Desbloqueia cadastros |
+| QR High-Res | `QRdaguaPage.tsx` | Canvas Export | ALTO - Qualidade impressão |
+| Desktop Menu | `Layout.tsx` | CSS/Tailwind | MÉDIO - UX desktop |
+| Error Logging | `QRdaguaPage.tsx` | Debug | BAIXO - Diagnóstico |
+
+### 🎯 Próximos Passos
+1. ✅ Migration SQL executada em produção
+2. ✅ Código atualizado e testado localmente
+3. ✅ Documentação atualizada (DEVLOG, QA, README, USER_GUIDE)
+4. ⏳ Commit final e deploy via Vercel
+5. ⏳ Teste end-to-end em produção
+6. ⏳ Onboarding do primeiro cliente
+
+---
+
 ## 🚨 26/12/2024 - Resgate do Hub & Hotfixes de Produção
 
 ### Contexto
