@@ -194,8 +194,9 @@ export const AdminUsersPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">🔗 Gerar Convite</h3>
 
                 <div className="space-y-4">
-                    <button
-                        type="button"
+                    <div
+                        role="button"
+                        tabIndex={0}
                         onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -220,17 +221,22 @@ export const AdminUsersPage: React.FC = () => {
                                 const inviteLink = `${window.location.origin}/#/join?token=${token}`;
 
                                 // MOBILE-FRIENDLY: Use window.prompt (works 100% on mobile)
-                                window.prompt("✅ Convite Gerado! Copie o link abaixo:", inviteLink);
+                                window.prompt("✅ CONVITE GERADO! Copie o link:", inviteLink);
 
                                 addToast('Convite gerado com sucesso!', 'success');
                             } catch (error: any) {
                                 addToast(`Erro: ${error.message}`, 'error');
                             }
                         }}
-                        className="w-full px-6 py-3 bg-acai-900 hover:bg-acai-800 text-white rounded-lg font-semibold transition-colors"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.currentTarget.click();
+                            }
+                        }}
+                        className="cursor-pointer w-full px-6 py-3 bg-acai-900 hover:bg-acai-800 text-white text-center rounded-lg font-bold transition-colors select-none"
                     >
-                        GERAR LINK DE CONVITE
-                    </button>
+                        GERAR CONVITE (ANTI-REFRESH)
+                    </div>
                 </div>
             </div>
 
