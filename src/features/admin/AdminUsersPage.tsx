@@ -14,6 +14,7 @@ interface User {
     company_name?: string;
     is_super_admin: boolean;
     created_at: string;
+    plan?: 'free' | 'pro' | 'enterprise'; // God Mode: Plan management
 }
 
 interface Company {
@@ -72,6 +73,7 @@ export const AdminUsersPage: React.FC = () => {
           company_id,
           is_super_admin,
           created_at,
+          plan,
           companies:company_id (name)
         `)
                 .order('created_at', { ascending: false });
@@ -141,6 +143,23 @@ export const AdminUsersPage: React.FC = () => {
         } catch (error: any) {
             addToast(`Erro ao atualizar usuário: ${error.message}`, 'error');
             console.error('Error updating user:', error);
+        }
+    };
+
+    // GOD MODE: Update user plan
+    const handlePlanChange = async (userId: string, newPlan: 'free' | 'pro' | 'enterprise') => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ plan: newPlan })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            addToast(`Plano atualizado para ${newPlan.toUpperCase()}`, 'success');
+            fetchUsers(); // Refresh list
+        } catch (error: any) {
+            addToast(`Erro ao atualizar plano: ${error.message}`, 'error');
         }
     };
 
@@ -234,6 +253,12 @@ export const AdminUsersPage: React.FC = () => {
                                     Empresa
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                    💎 Plano
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                    🎛️ Acessos
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                                     Ações
                                 </th>
                             </tr>
@@ -284,6 +309,32 @@ export const AdminUsersPage: React.FC = () => {
                                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                                             <Building2 className="w-4 h-4" />
                                             {user.company_name}
+                                        </div>
+                                    </td>
+                                    {/* GOD MODE: Plan Selector */}
+                                    <td className="px-6 py-4">
+                                        <select
+                                            value={user.plan || 'free'}
+                                            onChange={(e) => handlePlanChange(user.id, e.target.value as 'free' | 'pro' | 'enterprise')}
+                                            className="px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-rionegro-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                        >
+                                            <option value="free">Free</option>
+                                            <option value="pro">Pro</option>
+                                            <option value="enterprise">Enterprise</option>
+                                        </select>
+                                    </td>
+                                    {/* GOD MODE: Access Badges */}
+                                    <td className="px-6 py-4">
+                                        <div className="flex gap-2">
+                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" title="Prompt Lab">
+                                                🤖
+                                            </span>
+                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" title="QR Code">
+                                                📱
+                                            </span>
+                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" title="CRM">
+                                                📊
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
