@@ -218,7 +218,7 @@ export const AdminUsersPage: React.FC = () => {
                                 if (error) throw error;
 
                                 // Generate link
-                                const inviteLink = `${window.location.origin}/#/join?token=${token}`;
+                                const inviteLink = `https://encontro-dagua-hub.vercel.app/#/join?token=${token}`;
 
                                 // MOBILE-FRIENDLY: Use window.prompt (works 100% on mobile)
                                 window.prompt("✅ CONVITE GERADO! Copie o link:", inviteLink);

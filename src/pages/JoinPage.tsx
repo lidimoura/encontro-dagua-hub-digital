@@ -52,7 +52,12 @@ const JoinPage: React.FC = () => {
                     setFormData(prev => ({ ...prev, email: data.email }));
                 }
             } catch (err: any) {
-                setError(err.message);
+                // UX IMPROVEMENT: Better error messages
+                if (err.message?.includes('Email not confirmed') || err.message?.includes('not confirmed')) {
+                    setError('Cadastro iniciado! Por favor, acesse seu email para confirmar a conta antes de entrar.');
+                } else {
+                    setError(err.message);
+                }
             } finally {
                 setValidating(false);
             }

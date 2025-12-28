@@ -16,6 +16,8 @@ interface Profile {
     referred_by?: string | null; // UUID of user who referred this user
     discount_credits: number; // Number of 20% discount coupons accumulated
     is_super_admin?: boolean; // Super admin flag for global access
+    status?: string; // God Mode: User status (active, inactive, etc)
+    access_level?: string[]; // God Mode: Access permissions array
 }
 
 interface AuthContextType {

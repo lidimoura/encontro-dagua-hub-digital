@@ -29,7 +29,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
             if (error) throw error;
 
             // Generate invite link
-            const inviteLink = `${window.location.origin}/#/join?token=${token}`;
+            const inviteLink = `https://encontro-dagua-hub.vercel.app/#/join?token=${token}`;
 
             // PURE WINDOW.PROMPT - Works on ANY mobile device
             window.prompt("✅ CONVITE CRIADO! COPIE ABAIXO:", inviteLink);
