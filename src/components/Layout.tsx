@@ -558,15 +558,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <ol className="space-y-3 text-sm text-slate-600 dark:text-slate-300 mb-6">
                     <li className="flex gap-3">
                       <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">1</span>
-                      <span><strong>Crie um Board</strong> para organizar seus negócios por etapa do funil</span>
+                      <span><strong>Gere QR D'água</strong> personalizados para seus links e compartilhe facilmente</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">2</span>
-                      <span><strong>Adicione um Negócio</strong> ao Board com informações do cliente</span>
+                      <span><strong>Use o Prompt Lab</strong> para criar conteúdos com IA de forma profissional</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">3</span>
-                      <span><strong>Fale com a IA</strong> clicando no botão "Falar" ou no ícone flutuante ✨</span>
+                      <span><strong>Gerencie seus contatos</strong> e clientes de forma simples no Hub Digital</span>
                     </li>
                   </ol>
                   <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-500/20 rounded-lg p-3 mb-4">

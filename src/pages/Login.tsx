@@ -92,6 +92,28 @@ const Login: React.FC = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
+                            <div className="mt-2 text-right">
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        if (!email) {
+                                            alert('Por favor, digite seu email primeiro');
+                                            return;
+                                        }
+                                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                                            redirectTo: 'https://encontro-dagua-hub.vercel.app/#/reset-password',
+                                        });
+                                        if (error) {
+                                            alert('Erro: ' + error.message);
+                                        } else {
+                                            alert('Email de recuperação enviado! Verifique sua caixa de entrada.');
+                                        }
+                                    }}
+                                    className="text-sm text-acai-900 hover:text-acai-800 dark:text-acai-400 dark:hover:text-acai-300 font-medium transition-colors"
+                                >
+                                    Esqueci minha senha
+                                </button>
+                            </div>
                         </div>
 
                         {error && (
@@ -118,7 +140,7 @@ const Login: React.FC = () => {
                 </div>
 
                 <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
-                    &copy; {new Date().getFullYear()} CRM IA. Todos os direitos reservados.
+                    &copy; {new Date().getFullYear()} Encontro D'água Hub. Todos os direitos reservados.
                 </p>
             </div>
         </div>
