@@ -155,17 +155,40 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
-    // GOD MODE: Update user plan
+    // GOD MODE: Update user plan with automatic date calculation
     const handlePlanChange = async (userId: string, newPlan: 'free' | 'pro' | 'enterprise') => {
         try {
+            // Calculate valid_until based on plan
+            let validUntil: string | null = null;
+            const today = new Date();
+
+            if (newPlan === 'pro') {
+                // Monthly: +30 days
+                const monthlyDate = new Date(today);
+                monthlyDate.setDate(monthlyDate.getDate() + 30);
+                validUntil = monthlyDate.toISOString();
+            } else if (newPlan === 'enterprise') {
+                // Annual: +365 days
+                const annualDate = new Date(today);
+                annualDate.setDate(annualDate.getDate() + 365);
+                validUntil = annualDate.toISOString();
+            }
+            // free = lifetime = null (no expiration)
+
             const { error } = await supabase
                 .from('profiles')
-                .update({ plan: newPlan })
+                .update({
+                    plan: newPlan,
+                    valid_until: validUntil // Automatic date
+                })
                 .eq('id', userId);
 
             if (error) throw error;
 
-            addToast(`Plano atualizado para ${newPlan.toUpperCase()}`, 'success');
+            const dateMsg = validUntil
+                ? ` até ${new Date(validUntil).toLocaleDateString('pt-BR')}`
+                : ' (sem expiração)';
+            addToast(`Plano atualizado para ${newPlan.toUpperCase()}${dateMsg}`, 'success');
             fetchUsers(); // Refresh list
         } catch (error: any) {
             addToast(`Erro ao atualizar plano: ${error.message}`, 'error');
