@@ -36,6 +36,7 @@ export const AdminUsersPage: React.FC = () => {
         role: 'vendedor' as 'admin' | 'vendedor',
         company_id: '',
         is_super_admin: false,
+        access_level: [] as string[], // GOD MODE: Access permissions
     });
 
     // Check if user is super admin
@@ -117,6 +118,7 @@ export const AdminUsersPage: React.FC = () => {
             role: user.role,
             company_id: user.company_id,
             is_super_admin: user.is_super_admin,
+            access_level: user.access_level || [], // GOD MODE
         });
     };
 
@@ -124,16 +126,19 @@ export const AdminUsersPage: React.FC = () => {
         if (!editingUser) return;
 
         try {
-            // Call Postgres function to update user
-            const { error } = await supabase.rpc('update_user_admin', {
-                user_id: editingUser.id,
-                new_email: formData.email,
-                new_first_name: formData.first_name || null,
-                new_last_name: formData.last_name || null,
-                new_role: formData.role,
-                new_company_id: formData.company_id,
-                new_is_super_admin: formData.is_super_admin,
-            });
+            // Update user via direct Supabase (includes access_level)
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    email: formData.email,
+                    first_name: formData.first_name || null,
+                    last_name: formData.last_name || null,
+                    role: formData.role,
+                    company_id: formData.company_id,
+                    is_super_admin: formData.is_super_admin,
+                    access_level: formData.access_level, // GOD MODE
+                })
+                .eq('id', editingUser.id);
 
             if (error) throw error;
 
