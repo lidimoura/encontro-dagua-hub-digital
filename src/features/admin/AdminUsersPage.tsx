@@ -15,6 +15,8 @@ interface User {
     is_super_admin: boolean;
     created_at: string;
     plan?: 'free' | 'pro' | 'enterprise'; // God Mode: Plan management
+    status?: string; // God Mode: User status
+    access_level?: string[]; // God Mode: Access permissions
 }
 
 interface Company {
@@ -75,6 +77,8 @@ export const AdminUsersPage: React.FC = () => {
           is_super_admin,
           created_at,
           plan,
+          status,
+          access_level,
           companies:company_id (name)
         `)
                 .order('created_at', { ascending: false });
