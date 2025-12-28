@@ -69,37 +69,20 @@ export default function LandingPage() {
     setTimeout(() => {
       const topic = idea.trim().toLowerCase();
 
-      // REAL MARKETING TEMPLATES - Not just repeating input
-      let copy1, copy2, copy3;
+      // FINAL OPTIMIZED PROMPT - Single result like Prompt Lab
+      let finalPrompt;
 
-      // Detect product/service type and use appropriate templates
+      // Detect product/service type and generate ONE perfect prompt
       if (topic.includes('bolo') || topic.includes('doce') || topic.includes('comida')) {
-        copy1 = `Descubra o sabor que vicia! ${idea} artesanal, feito com amor e ingredientes selecionados. Peça já e sinta a diferença! 🍰`;
-        copy2 = `Cansado de doces sem graça? Experimente a explosão de sabor do nosso ${idea}. Cada mordida é uma experiência única. Faça seu pedido agora!`;
-        copy3 = `🔥 PROMOÇÃO RELÂMPAGO: ${idea} com 15% OFF hoje! Entrega rápida na sua região. Aproveite antes que acabe!`;
+        finalPrompt = `Descubra o sabor que vicia! ${idea} artesanal, feito com amor e ingredientes selecionados. Peça já e sinta a diferença! 🍰`;
       } else if (topic.includes('serviço') || topic.includes('consultoria') || topic.includes('curso')) {
-        copy1 = `Transforme seu negócio com ${idea} profissional. Resultados comprovados em até 30 dias. Agende sua consulta gratuita!`;
-        copy2 = `Imagine ter ${idea} que realmente funciona. Sem enrolação, só resultados práticos. Comece hoje mesmo!`;
-        copy3 = `⚡ VAGAS LIMITADAS: ${idea} com condição especial para os 10 primeiros. Garanta sua vaga agora!`;
+        finalPrompt = `Transforme seu negócio com ${idea} profissional. Resultados comprovados em até 30 dias. Agende sua consulta gratuita!`;
       } else {
-        // Generic high-conversion templates
-        copy1 = `${idea}? A solução que você procura está aqui! Qualidade garantida, resultados rápidos. Clique e descubra!`;
-        copy2 = `Já imaginou ter ${idea} sem complicação? É possível, é simples e começa agora. Veja como!`;
-        copy3 = `🎯 OFERTA EXCLUSIVA: ${idea} com condições imperdíveis! Não perca essa chance. Aproveite hoje!`;
+        // Generic high-conversion template
+        finalPrompt = `${idea}? A solução que você procura está aqui! Qualidade garantida, resultados rápidos. Clique e descubra!`;
       }
 
-      setOptimizedResult(`## ✨ 3 Opções de Copy Prontas
-
-✅ **Opção 1 - AIDA (Atenção, Interesse, Desejo, Ação):**
-${copy1}
-
-✅ **Opção 2 - PAS (Problema, Agitação, Solução):**
-${copy2}
-
-✅ **Opção 3 - Urgência & Escassez:**
-${copy3}
-
-💡 *Copie, ajuste para sua voz e use! Gerado pelo Otimizador do Hub.*`);
+      setOptimizedResult(`## ✨ Prompt Otimizado\n\n${finalPrompt}\n\n---\n\n**Pronto para usar!** Copie e cole onde precisar.`);
       setIsOptimizing(false);
     }, 800);
   };
