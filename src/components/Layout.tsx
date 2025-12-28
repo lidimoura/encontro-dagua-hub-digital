@@ -564,10 +564,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">2</span>
                       <span><strong>Use o Prompt Lab</strong> para criar conteúdos com IA de forma profissional</span>
                     </li>
-                    <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">3</span>
-                      <span><strong>Gerencie seus contatos</strong> e clientes de forma simples no Hub Digital</span>
-                    </li>
+                    {/* DYNAMIC HELP: Only show Hub Digital if user has access */}
+                    {profile?.access_level?.includes('hub_digital') && (
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">3</span>
+                        <span><strong>Gerencie seus contatos</strong> e clientes de forma simples no Hub Digital</span>
+                      </li>
+                    )}
                   </ol>
                   <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-500/20 rounded-lg p-3 mb-4">
                     <p className="text-xs text-purple-900 dark:text-purple-300">
