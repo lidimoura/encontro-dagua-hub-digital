@@ -102,8 +102,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                 <button
                     onClick={() => setMode('venda')}
                     className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${mode === 'venda'
-                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/50'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/50'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                         }`}
                 >
                     🛍️ Modo Venda
@@ -111,8 +111,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                 <button
                     onClick={() => setMode('bio')}
                     className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${mode === 'bio'
-                            ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/50'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/50'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                         }`}
                 >
                     👤 Modo Bio
@@ -120,8 +120,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                 <button
                     onClick={() => setMode('pix')}
                     className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${mode === 'pix'
-                            ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/50'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/50'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                         }`}
                 >
                     💰 Modo Pix
@@ -165,7 +165,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                 {screens[mode].title}
             </p>
 
-            <style jsx>{`
+            <style>{`
         @keyframes fade-in {
           from {
             opacity: 0;
