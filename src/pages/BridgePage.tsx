@@ -55,16 +55,16 @@ export const BridgePage: React.FC = () => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Set high resolution (1000x1000)
-        canvas.width = 1000;
-        canvas.height = 1000;
+        // Set high resolution (4000x4000 for print quality)
+        canvas.width = 4000;
+        canvas.height = 4000;
 
         // Fill white background
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, 1000, 1000);
+        ctx.fillRect(0, 0, 4000, 4000);
 
         // Draw the styled QR code
-        ctx.drawImage(qrCanvas, 0, 0, 1000, 1000);
+        ctx.drawImage(qrCanvas, 0, 0, 4000, 4000);
 
         // Download
         canvas.toBlob((blob) => {

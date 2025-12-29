@@ -1072,6 +1072,9 @@ export const QRdaguaPage: React.FC = () => {
                                             Seu projeto pode inspirar outros empreendedores e trazer visibilidade extra para seu negócio!
                                             Você pode desativar isso a qualquer momento.
                                         </p>
+                                        <p className="text-xs text-amber-700 dark:text-amber-500 mt-2 font-medium">
+                                            ⚠️ Marque esta opção APENAS se quiser que este modelo apareça na vitrine pública do Hub para todos verem. Seus projetos privados são salvos automaticamente na sua conta.
+                                        </p>
                                     </div>
                                 </label>
                             </div>
@@ -1160,7 +1163,7 @@ export const QRdaguaPage: React.FC = () => {
                                                         return;
                                                     }
 
-                                                    // Create high-resolution canvas (2000x2000 for print quality)
+                                                    // Create high-resolution canvas (4000x4000 for print quality)
                                                     const canvas = document.createElement('canvas');
                                                     const ctx = canvas.getContext('2d', { alpha: false });
                                                     if (!ctx) {
@@ -1169,7 +1172,7 @@ export const QRdaguaPage: React.FC = () => {
                                                     }
 
                                                     // Set high resolution
-                                                    const highResSize = 2000;
+                                                    const highResSize = 4000;
                                                     canvas.width = highResSize;
                                                     canvas.height = highResSize;
 
@@ -1346,7 +1349,7 @@ export const QRdaguaPage: React.FC = () => {
                                             return;
                                         }
 
-                                        // Create high-resolution canvas (2000x2000 for print quality)
+                                        // Create high-resolution canvas (4000x4000 for print quality)
                                         const canvas = document.createElement('canvas');
                                         const ctx = canvas.getContext('2d', { alpha: false });
                                         if (!ctx) {
@@ -1355,7 +1358,7 @@ export const QRdaguaPage: React.FC = () => {
                                         }
 
                                         // Set high resolution
-                                        const highResSize = 2000;
+                                        const highResSize = 4000;
                                         canvas.width = highResSize;
                                         canvas.height = highResSize;
 

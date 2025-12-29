@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { ApplicationModal } from '@/components/ApplicationModal';
+import { PhoneSimulator } from '@/components/PhoneSimulator';
 
 const TEAM_MEMBERS = [
   {
@@ -153,7 +154,9 @@ export default function LandingPage() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#lab" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Prompt Lab</a>
+            <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Showcase</a>
             <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Soluções</a>
+            <a href="#manifesto" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Manifesto</a>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold">Painel</button>
             ) : (
@@ -211,11 +214,25 @@ export default function LandingPage() {
                     Prompt Lab
                   </a>
                   <a
+                    href="#showcase"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    Showcase
+                  </a>
+                  <a
                     href="#solucoes"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
                     Soluções
+                  </a>
+                  <a
+                    href="#manifesto"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    Manifesto
                   </a>
 
                   <div className="border-t border-white/10 my-4" />
@@ -489,8 +506,45 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* PHONE SIMULATOR SHOWCASE */}
+        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <Sparkles className="w-3 h-3" /> Modos QR D'água
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Veja Como Funciona</h2>
+            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
+              Clique nos botões para ver diferentes modos de uso do QR D'água
+            </p>
+            <PhoneSimulator className="mx-auto" />
+          </div>
+        </section>
+
+        {/* MANIFESTO */}
+        <section id="manifesto" className="py-20 px-6 bg-[#02040a] border-t border-white/5">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-slate-300 leading-relaxed mb-6">
+                Este projeto nasceu de uma necessidade real: tornar a tecnologia acessível para quem mais precisa.
+                Não acreditamos em soluções complexas que excluem. Acreditamos em ferramentas que empoderam.
+              </p>
+              <p className="text-lg text-slate-300 leading-relaxed mb-6">
+                Começamos com um simples gerador de QR Codes em Streamlit. Hoje, somos um ecossistema completo:
+                CRM nativo, agentes de IA, prompt lab, e muito mais. Tudo pensado para ser <strong className="text-amber-400">mobile-first</strong>,
+                <strong className="text-fuchsia-400"> AI-first</strong>, e acima de tudo, <strong className="text-white">humano</strong>.
+              </p>
+              <p className="text-lg text-slate-300 leading-relaxed">
+                Nossa missão é clara: <strong className="text-amber-400">ninguém fica para trás</strong>. Mães atípicas, neurodivergentes,
+                comunidades originárias, negócios locais — todos merecem acesso às melhores ferramentas tecnológicas.
+                E nós estamos aqui para garantir isso.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* SOLUÇÕES REAIS */}
-        <section id="solucoes" className="py-20 px-6 bg-[#02040a] text-center">
+        <section id="solucoes" className="py-20 px-6 bg-[#05020a] text-center border-t border-white/5">
           <h2 className="text-3xl font-bold text-white mb-12">Nossas Soluções</h2>
           <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {/* Cards com textos do README */}
