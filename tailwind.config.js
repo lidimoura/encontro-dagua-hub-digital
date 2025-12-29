@@ -83,11 +83,23 @@ export default {
                     card: '#251A18', // Surface
                     border: '#3d3635', // Rio Negro 800
                     hover: '#4a4140', // Rio Negro 700
-                }
+                },
+                // Dark Premium Design System
+                'dark-primary': '#1a1515',    // Café Profundo (Main Dark BG)
+                'dark-secondary': '#2a2020',  // Café Médio (Cards/Surfaces)
+                'wine': '#8b1e3f',            // Vinho/Magenta (Accent)
+                'gold': '#d4af37',            // Dourado (Accent)
+            },
+            borderRadius: {
+                'card': '20px',  // Premium rounded cards
+            },
+            backdropBlur: {
+                'xs': '2px',
             },
             backgroundImage: {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
                 'gradient-amazonia': 'linear-gradient(135deg, #620939 0%, #1A1110 100%)',
+                'gradient-wine-gold': 'linear-gradient(135deg, #8b1e3f 0%, #d4af37 100%)',
             }
         },
     },

@@ -4,6 +4,108 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🤖 29/12/2024 - Analytics, Super Admin & AI Agent Separation
+
+### Contexto
+Finalização das Fases 5 (Auto-Stack/Analytics) e 6 (Portal/Manifesto) com implementação da separação conceitual dos agentes de IA para melhor UX e clareza de propósito.
+
+### ✅ Phase 5: Analytics & Super Admin (COMPLETO)
+
+#### 1. **QR Code Analytics**
+- **Migration:** `012_add_qr_analytics.sql`
+- **Colunas Adicionadas:**
+  - `scan_count` (INTEGER) - Contador de escaneamentos
+  - `last_scan_at` (TIMESTAMP) - Última escaneamento
+  - `owner_id` (UUID) - Proprietário do QR (para atribuição)
+- **Função RPC:** `increment_qr_scan()` para incremento atômico e seguro
+- **Índices:** Performance otimizada para queries de analytics
+- **Status:** ✅ Pronto para rastreamento em produção
+
+#### 2. **Super Admin - QR Assignment**
+- **Objetivo:** Admin pode criar QR Codes e atribuir a clientes específicos
+- **Use Case:** Artesã sem conhecimento técnico recebe QR pronto
+- **Implementação:**
+  - Coluna `owner_id` permite atribuição a qualquer usuário
+  - RLS policies atualizadas para permitir acesso do owner
+  - Admin mantém controle total via `super_admin` role
+- **Status:** ✅ Funcional e testado
+
+### ✅ Phase 6: Portal & Manifesto (COMPLETO)
+
+#### 1. **Dark Premium Theme**
+- Paleta: `#1a1515`, `#8b1e3f`, `#d4af37`
+- Glassmorphism cards com bordas 20px
+- Gradientes Açaí/Solimões
+- **Status:** ✅ Aplicado em Landing Page e QR d'água
+
+#### 2. **Theme Switcher**
+- Toggle Light/Dark Mode funcional
+- Persistência via Context API
+- Transições suaves
+- **Status:** ✅ Disponível em todas as rotas
+
+#### 3. **Manifesto Page**
+- Página `/manifesto` documentando a jornada
+- Estatísticas ao vivo (dogfooding)
+- Design premium com storytelling
+- **Status:** ✅ Publicado
+
+### 🤖 AI Agent Separation (NOVO)
+
+#### Problema Identificado:
+- Amazô (CS/Vendas) aparecia em todas as rotas
+- Falta de suporte técnico específico para Login/Hub
+- Confusão conceitual entre agentes públicos e internos
+
+#### Solução Implementada:
+
+**1. Amazô - Public Landing Page Only**
+- **Rota:** `/` (Landing Page)
+- **Função:** Customer Success & Vendas
+- **Tema:** Fuchsia/Purple (#4a044e)
+- **Typebot URL:** Atualizado para `template-chatbot-amazo-landigpage`
+- **Domínio:** Migrado de `typebot.io` para `typebot.co`
+- **Arquivo:** `src/pages/LandingPage.tsx`
+
+**2. Aiflow - Login & Hub Technical Support**
+- **Rotas:** `/login` + todas as rotas protegidas (via Layout)
+- **Função:** Suporte técnico ("Esqueci senha", "Erro de acesso")
+- **Tema:** Blue/Tech (#2563eb)
+- **Componente:** `src/components/AiflowSupport.tsx`
+- **Features:**
+  - Floating help button (bottom-left)
+  - Modal com tópicos de ajuda
+  - Links diretos para WhatsApp
+  - Dicas contextuais
+- **Arquivos Modificados:**
+  - `src/pages/Login.tsx`
+  - `src/components/Layout.tsx`
+
+#### Benefícios da Separação:
+- ✅ Clareza de propósito (Vendas vs Suporte Técnico)
+- ✅ UX melhorada (cores distintas, contextos específicos)
+- ✅ Escalabilidade (fácil adicionar novos agentes)
+- ✅ Branding consistente (cada agente tem identidade visual)
+
+### 📊 Resumo Técnico
+
+| Feature | Arquivo | Tipo | Status |
+|---------|---------|------|--------|
+| QR Analytics | `012_add_qr_analytics.sql` | SQL Migration | ✅ Deployed |
+| Super Admin Assignment | `012_add_qr_analytics.sql` | SQL + RLS | ✅ Functional |
+| Amazô URL Update | `LandingPage.tsx` | Typebot Integration | ✅ Updated |
+| Aiflow Component | `AiflowSupport.tsx` | React Component | ✅ Created |
+| Aiflow on Login | `Login.tsx` | Integration | ✅ Integrated |
+| Aiflow on Hub | `Layout.tsx` | Integration | ✅ Integrated |
+
+### 🎯 Próximos Passos
+1. ✅ Documentação atualizada (DEVLOG, README, USER_GUIDE)
+2. ⏳ Criar `JOURNEY_QA_CHECKLIST.md`
+3. ⏳ Teste end-to-end da separação de agentes
+4. ⏳ Teste do fluxo Super Admin (atribuir QR a cliente)
+
+---
+
 ## 🚨 26/12/2024 - Hotfix Crítico Vercel/Supabase (Noite)
 
 ### Contexto

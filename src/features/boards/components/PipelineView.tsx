@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DealDetailModal } from './Modals/DealDetailModal';
 import { CreateDealModal } from './Modals/CreateDealModal';
 import { CreateBoardModal } from './Modals/CreateBoardModal';
 import { BoardCreationWizard } from './BoardCreationWizard';
 import { KanbanHeader } from './Kanban/KanbanHeader';
-import { BoardStrategyHeader } from './Kanban/BoardStrategyHeader';
+import { BoardTabs } from './BoardTabs';
 import { KanbanBoard } from './Kanban/KanbanBoard';
 import { KanbanList } from './Kanban/KanbanList';
+import { MobileKanbanView } from './Mobile/MobileKanbanView';
 import { DealView, CustomFieldDefinition, DealStatus, Board, BoardStage } from '@/types';
+import { useCRM } from '@/context/CRMContext';
 
 interface PipelineViewProps {
   // Boards
@@ -95,10 +97,32 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
   handleQuickAddActivity,
   setLastMouseDownDealId,
 }) => {
+  const { updateDeal } = useCRM();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleUpdateStage = (updatedStage: BoardStage) => {
     if (!activeBoard) return;
     const newStages = activeBoard.stages.map(s => (s.id === updatedStage.id ? updatedStage : s));
     handleUpdateBoard({ ...activeBoard, stages: newStages });
+  };
+
+  // Handle status change from mobile view
+  const handleMobileStatusChange = async (dealId: string, newStatus: string) => {
+    const deal = filteredDeals.find(d => d.id === dealId);
+    if (!deal) return;
+
+    await updateDeal(dealId, { status: newStatus });
   };
 
   // Listen for quick-add deal event from empty columns
@@ -158,10 +182,19 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
             onNewDeal={() => setIsCreateModalOpen(true)}
           />
 
-          <BoardStrategyHeader board={activeBoard} />
+          <BoardTabs board={activeBoard} />
 
           <div className="flex-1 overflow-hidden">
-            {viewMode === 'kanban' ? (
+            {isMobile ? (
+              // Mobile View - List with status change buttons
+              <MobileKanbanView
+                stages={activeBoard.stages}
+                filteredDeals={filteredDeals}
+                setSelectedDealId={setSelectedDealId}
+                onStatusChange={handleMobileStatusChange}
+              />
+            ) : viewMode === 'kanban' ? (
+              // Desktop Kanban View
               <KanbanBoard
                 stages={activeBoard.stages}
                 filteredDeals={filteredDeals}
@@ -176,6 +209,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
                 setLastMouseDownDealId={setLastMouseDownDealId}
               />
             ) : (
+              // Desktop List View
               <KanbanList
                 stages={activeBoard.stages}
                 filteredDeals={filteredDeals}

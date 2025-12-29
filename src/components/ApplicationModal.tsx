@@ -1,0 +1,258 @@
+import React, { useState } from 'react';
+import { X, Sparkles, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import { useToast } from '@/context/ToastContext';
+
+interface ApplicationModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onClose }) => {
+    const { addToast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        whatsapp: '',
+        email: '',
+        businessType: '',
+        referralSource: '',
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!formData.name || !formData.whatsapp) {
+            addToast('Por favor, preencha nome e WhatsApp', 'error');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            // 1. Add to waitlist
+            const { error: waitlistError } = await supabase
+                .from('waitlist')
+                .insert([{
+                    name: formData.name,
+                    whatsapp: formData.whatsapp,
+                    email: formData.email || null,
+                    referred_by: formData.referralSource || null,
+                    status: 'PENDING',
+                    metadata: {
+                        businessType: formData.businessType,
+                        source: 'landing_page_optimizer',
+                        timestamp: new Date().toISOString(),
+                    },
+                }]);
+
+            if (waitlistError) throw waitlistError;
+
+            // 2. Create contact as LEAD_QUENTE
+            const { error: contactError } = await supabase
+                .from('contacts')
+                .insert([{
+                    name: formData.name,
+                    phone: formData.whatsapp,
+                    email: formData.email || `${formData.whatsapp}@temp.com`,
+                    status: 'ACTIVE',
+                    stage: 'LEAD', // Will be updated by admin to LEAD_QUENTE
+                    source: 'WEBSITE',
+                    notes: `Aplicação via Otimizador de Prompts\nTipo de Negócio: ${formData.businessType || 'Não informado'}\nReferência: ${formData.referralSource || 'Nenhuma'}`,
+                    company_id: null, // Will be created by admin
+                }]);
+
+            if (contactError) {
+                console.warn('Contact creation failed (may already exist):', contactError);
+            }
+
+            addToast('🎉 Aplicação enviada com sucesso!', 'success');
+
+            // Reset form
+            setFormData({
+                name: '',
+                whatsapp: '',
+                email: '',
+                businessType: '',
+                referralSource: '',
+            });
+
+            // Close modal after short delay
+            setTimeout(() => {
+                onClose();
+            }, 1500);
+
+        } catch (error: any) {
+            console.error('Error submitting application:', error);
+            addToast(`Erro ao enviar aplicação: ${error.message}`, 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+            <div className="bg-[#0f0518] border border-fuchsia-500/30 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-slide-up">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="w-6 h-6 text-fuchsia-400" />
+                            <h2 className="text-2xl font-bold text-white">Quero Acesso ao Hub Pro</h2>
+                        </div>
+                        <p className="text-sm text-slate-400">
+                            Preencha os dados abaixo e entraremos em contato em até 24h
+                        </p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white"
+                        disabled={isSubmitting}
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Name */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            Nome Completo *
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            placeholder="Seu nome"
+                            required
+                            disabled={isSubmitting}
+                        />
+                    </div>
+
+                    {/* WhatsApp */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            WhatsApp *
+                        </label>
+                        <input
+                            type="tel"
+                            value={formData.whatsapp}
+                            onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            placeholder="(92) 99999-9999"
+                            required
+                            disabled={isSubmitting}
+                        />
+                    </div>
+
+                    {/* Email (Optional) */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            Email (Opcional)
+                        </label>
+                        <input
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            placeholder="seu@email.com"
+                            disabled={isSubmitting}
+                        />
+                    </div>
+
+                    {/* Business Type */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            Tipo de Negócio
+                        </label>
+                        <select
+                            value={formData.businessType}
+                            onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            disabled={isSubmitting}
+                        >
+                            <option value="">Selecione...</option>
+                            <option value="freelancer">Freelancer / Autônomo</option>
+                            <option value="startup">Startup / Empresa Pequena</option>
+                            <option value="agency">Agência / Consultoria</option>
+                            <option value="ecommerce">E-commerce / Loja Online</option>
+                            <option value="local">Negócio Local / Físico</option>
+                            <option value="ngo">ONG / Impacto Social</option>
+                            <option value="other">Outro</option>
+                        </select>
+                    </div>
+
+                    {/* Referral Source */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            Como conheceu o Hub?
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.referralSource}
+                            onChange={(e) => setFormData({ ...formData, referralSource: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
+                            placeholder="Ex: Instagram, indicação, busca no Google..."
+                            disabled={isSubmitting}
+                        />
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full px-6 py-3 bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 hover:from-fuchsia-500 hover:to-fuchsia-400 text-white font-bold rounded-lg transition-all shadow-lg shadow-fuchsia-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Enviando...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-5 h-5" />
+                                Enviar Aplicação
+                            </>
+                        )}
+                    </button>
+
+                    {/* Privacy Note */}
+                    <p className="text-xs text-slate-500 text-center">
+                        Seus dados estão seguros. Não compartilhamos com terceiros.
+                    </p>
+                </form>
+            </div>
+
+            <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes slide-up {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
+        </div>
+    );
+};

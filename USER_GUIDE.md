@@ -380,6 +380,82 @@ Gerencie o catálogo de produtos e serviços da sua loja diretamente no Admin Pa
 
 ---
 
+## 🛡️ Super Admin - Atribuir QR Code a Cliente
+
+**Pré-requisito:** Você precisa ter role `super_admin` para esta funcionalidade.
+
+### Caso de Uso: Artesã sem Conhecimento Técnico
+
+Imagine que você tem uma cliente artesã que não sabe criar QR Codes. Como Super Admin, você pode criar o QR Code para ela e atribuir à conta dela.
+
+#### Passo a Passo:
+
+1. **Crie o QR Code Normalmente**
+   - Acesse `/qrdagua`
+   - Preencha todos os dados como se fosse para você
+   - Escolha cores, logo, textos, etc.
+   - **NÃO salve ainda!**
+
+2. **Atribua ao Cliente (Via Supabase - Temporário)**
+   - Após salvar o QR Code, acesse o Supabase Dashboard
+   - Vá em `Table Editor` → `qr_codes`
+   - Encontre o QR Code recém-criado
+   - Edite a coluna `owner_id`
+   - Cole o UUID do usuário cliente (encontre em `profiles`)
+   - Salve
+
+3. **Cliente Vê o QR Code**
+   - Cliente faz login na conta dela
+   - Acessa `/qrdagua`
+   - QR Code aparece automaticamente na galeria dela
+   - Ela pode baixar, editar e compartilhar
+
+#### 💡 Nota Futura:
+Em breve teremos um botão "Atribuir a Cliente" diretamente na interface do Admin Panel, eliminando a necessidade de acessar o Supabase manualmente.
+
+---
+
+## 🤖 Agentes de IA - Quem é Quem?
+
+O Hub conta com múltiplos agentes de IA, cada um com função específica:
+
+### Amazô (Fuchsia/Purple) 💜
+- **Onde:** Landing Page pública (`/`)
+- **Função:** Customer Success & Vendas
+- **Ajuda com:**
+  - Qualificação de leads
+  - Informações sobre planos
+  - Dúvidas pré-venda
+  - Direcionamento para WhatsApp
+- **Visual:** Botão fuchsia no canto inferior direito
+- **Tecnologia:** Typebot integrado
+
+### Aiflow (Blue/Tech) 💙
+- **Onde:** Login (`/login`) + Hub protegido (todas as rotas internas)
+- **Função:** Suporte Técnico
+- **Ajuda com:**
+  - "Esqueci minha senha"
+  - "Não recebi o email de confirmação"
+  - "Erro ao fazer login"
+  - Problemas de navegação
+  - Suporte direto via WhatsApp
+- **Visual:** Botão azul no canto inferior esquerdo
+- **Tecnologia:** Componente React nativo
+
+### Diferença Prática:
+
+| Aspecto | Amazô | Aiflow |
+|---------|-------|--------|
+| **Público** | Visitantes (não logados) | Usuários (logados ou tentando logar) |
+| **Foco** | Vendas e conversão | Suporte e troubleshooting |
+| **Cor** | Fuchsia (#4a044e) | Blue (#2563eb) |
+| **Posição** | Bottom-right | Bottom-left |
+| **Tom** | Comercial, persuasivo | Técnico, solucionador |
+
+💡 **Dica:** Se você está na Landing Page e precisa de ajuda técnica, faça login primeiro para acessar o Aiflow!
+
+---
+
 ## 🤖 Amazo IA - Assistente 24/7
 
 O Amazo está sempre disponível no canto inferior direito da tela.

@@ -62,9 +62,24 @@ npm run build
 ## 👩‍💻 Inteligência Híbrida (Equipe)
 
 - **Lidi (Founder):** Estratégia e Visão.
-- **Amazo (IA):** Customer Success.
+- **Amazô (IA - Fuchsia):** Customer Success & Vendas (Landing Page pública).
+- **Aiflow (IA - Blue):** Suporte Técnico (Login & Hub).
 - **Precy (IA):** Tech Lead.
 - **Jury (IA):** Compliance.
+
+## 🏗️ Arquitetura
+
+**Mobile First:** Interface otimizada para dispositivos móveis com menu hamburguer universal.
+
+**AI Agent Separation:**
+- **Amazô** → Landing Page pública (vendas, qualificação de leads)
+- **Aiflow** → Login + Hub protegido (suporte técnico, recuperação de senha)
+- Cada agente tem identidade visual distinta (cores, ícones, posicionamento)
+
+**Database:**
+- Supabase PostgreSQL com RLS policies granulares
+- Analytics de QR Codes (`scan_count`, `last_scan_at`)
+- Super Admin: Atribuição de QR Codes a clientes via `owner_id`
 
 ## 📋 Features Principais
 

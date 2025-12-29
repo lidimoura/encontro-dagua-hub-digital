@@ -30,6 +30,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { prefetchRoute, RouteName } from '@/lib/prefetch';
 import { FloatingAIWidget } from './FloatingAIWidget';
+import { AiflowSupport } from './AiflowSupport';
 
 // Lazy load AI Assistant (heavy component with Gemini SDK)
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -595,6 +596,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Floating AI Widget - Omnipresent */}
       <FloatingAIWidget isAuthenticated={!!profile} />
+
+      {/* Aiflow Technical Support - Hub Routes Only */}
+      <AiflowSupport />
     </div>
   );
 };

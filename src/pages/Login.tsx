@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
+import { AiflowSupport } from '@/components/AiflowSupport';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -143,6 +144,9 @@ const Login: React.FC = () => {
                     &copy; {new Date().getFullYear()} Encontro D'água Hub. Todos os direitos reservados.
                 </p>
             </div>
+
+            {/* Aiflow Technical Support */}
+            <AiflowSupport />
         </div>
     );
 };

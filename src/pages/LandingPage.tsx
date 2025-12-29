@@ -7,6 +7,7 @@ import {
   Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { ApplicationModal } from '@/components/ApplicationModal';
 
 const TEAM_MEMBERS = [
   {
@@ -29,6 +30,7 @@ export default function LandingPage() {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTeamIndex, setActiveTeamIndex] = useState(0);
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
 
   // Prompt Lab State
   const [idea, setIdea] = useState('');
@@ -41,7 +43,7 @@ export default function LandingPage() {
   useEffect(() => {
     const script = document.createElement('script');
     script.type = 'module';
-    script.innerHTML = `import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'; Typebot.initBubble({ typebot: "template-chatbot-amazo-4valfnc", apiHost: "https://typebot.io", theme: { button: { backgroundColor: "#4a044e", customIconSrc: "https://s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/al5llo2evf2ahjg5u4valfnc/bubble-icon?v=1766194905653", }, chatWindow: { backgroundColor: "#F8F8F8" } }, });`;
+    script.innerHTML = `import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'; Typebot.initBubble({ typebot: "template-chatbot-amazo-landigpage", apiHost: "https://typebot.co", theme: { button: { backgroundColor: "#4a044e", customIconSrc: "https://s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/al5llo2evf2ahjg5u4valfnc/bubble-icon?v=1766194905653", }, chatWindow: { backgroundColor: "#F8F8F8" } }, });`;
     document.body.appendChild(script);
     return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
   }, []);
@@ -344,8 +346,8 @@ export default function LandingPage() {
                     <button onClick={() => { navigator.clipboard.writeText(optimizedResult); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000) }} className="text-white bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
                       {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} Copiar
                     </button>
-                    <button onClick={handleTestInPlace} className="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                      <Play size={16} /> Testar Aqui
+                    <button onClick={() => setIsApplicationModalOpen(true)} className="bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg shadow-fuchsia-500/30">
+                      <Sparkles size={16} /> Quero Acesso ao Hub Pro
                     </button>
                   </div>
                 </div>
@@ -543,6 +545,12 @@ export default function LandingPage() {
           <p>Inspirado na natureza, codificado para o mundo.</p>
         </footer>
       </div>
+
+      {/* Application Modal */}
+      <ApplicationModal
+        isOpen={isApplicationModalOpen}
+        onClose={() => setIsApplicationModalOpen(false)}
+      />
     </div>
   );
 }

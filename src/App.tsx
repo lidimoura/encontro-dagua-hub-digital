@@ -53,6 +53,12 @@ const BridgePage = lazy(() =>
 const LandingPage = lazy(() =>
   import('@/pages/LandingPage').then(m => ({ default: m.default }))
 );
+const ManifestoPage = lazy(() =>
+  import('@/pages/ManifestoPage').then(m => ({ default: m.ManifestoPage }))
+);
+const ClientPortalPage = lazy(() =>
+  import('@/pages/ClientPortalPage').then(m => ({ default: m.ClientPortalPage }))
+);
 
 
 
@@ -78,9 +84,12 @@ const App: React.FC = () => {
                     {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
+                    {/* Invite Only - Redirect register to landing page */}
+                    <Route path="/register" element={<Navigate to="/?action=apply" replace />} />
                     <Route path="/join" element={<JoinPage />} />
                     <Route path="/setup" element={<SetupWizard />} />
                     <Route path="/v/:slug" element={<BridgePage />} />
+                    <Route path="/manifesto" element={<ManifestoPage />} />
 
 
                     {/* PROTECTED ROUTES - REQUIRE AUTH */}
@@ -100,6 +109,7 @@ const App: React.FC = () => {
                       <Route path="prompt-lab" element={<PromptLabPage />} />
                       <Route path="admin" element={<AdminPage />} />
                       <Route path="admin/users" element={<AdminUsersPage />} />
+                      <Route path="portal" element={<ClientPortalPage />} />
                     </Route>
 
                     {/* Catch-all redirect */}

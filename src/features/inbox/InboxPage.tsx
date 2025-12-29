@@ -3,8 +3,11 @@ import { useInboxController } from './hooks/useInboxController';
 import { ViewModeToggle } from './components/ViewModeToggle';
 import { InboxListView } from './components/InboxListView';
 import { InboxFocusView } from './components/InboxFocusView';
+import { useDeepLink } from '@/hooks/useDeepLink';
+import { useNavigate } from 'react-router-dom';
 
 export const InboxPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     // View Mode
     viewMode,
@@ -42,6 +45,11 @@ export const InboxPage: React.FC = () => {
     handleDismissSuggestion,
     handleSnoozeSuggestion,
   } = useInboxController();
+
+  // Deep linking support - navigate to boards when dealId is detected
+  useDeepLink((dealId) => {
+    navigate(`/boards?dealId=${dealId}`);
+  });
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
