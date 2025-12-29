@@ -53,7 +53,12 @@ export const AiflowSupport: React.FC = () => {
         <>
             {/* Floating Help Button - Blue Theme */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                }}
+                type="button"
                 className="fixed bottom-6 left-6 z-[9999] w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
                 aria-label="Aiflow Technical Support"
             >

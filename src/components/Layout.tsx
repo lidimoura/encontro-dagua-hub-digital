@@ -24,6 +24,8 @@ import {
   RefreshCcw,
   HelpCircle,
   Shield,
+  BookOpen,
+  Package,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
