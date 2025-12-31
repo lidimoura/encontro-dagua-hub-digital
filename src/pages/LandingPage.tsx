@@ -9,6 +9,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { ApplicationModal } from '@/components/ApplicationModal';
 import { PhoneSimulator } from '@/components/PhoneSimulator';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const TEAM_MEMBERS = [
   {
@@ -18,12 +19,13 @@ const TEAM_MEMBERS = [
     type: "human",
     image: "/profile.png",
     color: "border-amber-500 text-amber-400",
-    linkedin: "https://linkedin.com/in/sua-url", // Coloque seu LinkedIn aqui
-    pitch: "Minha missão é desenhar soluções tecnológicas que devolvam tempo e liberdade para você empreender."
+    linkedin: "https://linkedin.com/in/sua-url",
+    pitch: "Formada em Psicologia pela UFAM (onde seu avô, professor de Matemática, dá nome a um bloco acadêmico), Lidi traz uma bagagem única. Como artista viajante e nômade, aprendeu a se adaptar; da mãe professora de inglês herdou a habilidade de comunicação e do pai técnico de informática, a lógica. Hoje, atua como criadora de soluções digitais e fundadora do hub. Trabalha no modo heutagógico, aprendendo e fazendo com suporte estratégico de IAs. Sua missão é integrar essa herança criativa e técnica para oferecer autonomia e prosperidade real para todos."
   },
-  { id: 'amazo', name: "Amazo", role: "CS & Vendas", type: "ai", color: "border-fuchsia-500 text-fuchsia-400", pitch: "Atendimento 24h. Garanto que nenhum cliente fique sem resposta." },
+  { id: 'amazo', name: "Amazo", role: "CS & Vendas", type: "ai", image: "/avatar-amazo.jpeg", color: "border-fuchsia-500 text-fuchsia-400", pitch: "Atendimento 24h. Garanto que nenhum cliente fique sem resposta." },
   { id: 'precy', name: "Precy", role: "Tech Lead", type: "ai", color: "border-blue-500 text-blue-400", pitch: "Estabilidade e segurança. Cuido para que seu QR D'água funcione sempre." },
-  { id: 'jury', name: "Jury", role: "Compliance", type: "ai", color: "border-red-500 text-red-400", pitch: "Ética e responsabilidade. Garanto privacidade e valores humanos." }
+  { id: 'jury', name: "Jury", role: "Compliance", type: "ai", color: "border-red-500 text-red-400", pitch: "Ética e responsabilidade. Garanto privacidade e valores humanos." },
+  { id: 'aiflow', name: "Aiflow", role: "Board Assistant", type: "ai", color: "border-green-500 text-green-400", pitch: "Organização e produtividade. Gerencio seu board e fluxos de trabalho." }
 ];
 
 export default function LandingPage() {
@@ -38,7 +40,8 @@ export default function LandingPage() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizedResult, setOptimizedResult] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [testResponse, setTestResponse] = useState<string | null>(null); // Simulação do teste
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResponse, setTestResponse] = useState<string | null>(null);
 
   // Amazo Init
   useEffect(() => {
@@ -68,30 +71,86 @@ export default function LandingPage() {
   const handleOptimize = async () => {
     if (!idea.trim()) return;
     setIsOptimizing(true);
+    setOptimizedResult(null);
     setTestResponse(null);
-    setTimeout(() => {
-      const topic = idea.trim().toLowerCase();
 
-      // FINAL OPTIMIZED PROMPT - Single result like Prompt Lab
-      let finalPrompt;
-
-      // Detect product/service type and generate ONE perfect prompt
-      if (topic.includes('bolo') || topic.includes('doce') || topic.includes('comida')) {
-        finalPrompt = `Descubra o sabor que vicia! ${idea} artesanal, feito com amor e ingredientes selecionados. Peça já e sinta a diferença! 🍰`;
-      } else if (topic.includes('serviço') || topic.includes('consultoria') || topic.includes('curso')) {
-        finalPrompt = `Transforme seu negócio com ${idea} profissional. Resultados comprovados em até 30 dias. Agende sua consulta gratuita!`;
-      } else {
-        // Generic high-conversion template
-        finalPrompt = `${idea}? A solução que você procura está aqui! Qualidade garantida, resultados rápidos. Clique e descubra!`;
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error('API Key do Gemini não configurada');
       }
 
-      setOptimizedResult(`## ✨ Prompt Otimizado\n\n${finalPrompt}\n\n---\n\n**Pronto para usar!** Copie e cole onde precisar.`);
+      const genAI = new GoogleGenerativeAI(apiKey);
+      let model;
+      try {
+        model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      } catch {
+        model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      }
+
+      const systemPrompt = `Atue como um Engenheiro de Prompt Sênior especializado em otimização de prompts para LLMs.
+
+Sua missão é transformar ideias brutas em prompts estruturados, detalhados e prontos para obter o melhor resultado de uma LLM.
+
+REGRAS DE OTIMIZAÇÃO:
+1. Seja específico e detalhado
+2. Defina claramente o papel/persona que a IA deve assumir
+3. Especifique o formato de saída desejado
+4. Inclua exemplos quando relevante
+5. Adicione restrições e requisitos importantes
+6. Use linguagem clara e objetiva
+7. Estruture o prompt em seções quando necessário
+
+FORMATO DE SAÍDA:
+Retorne APENAS o prompt otimizado, sem explicações adicionais ou meta-comentários.
+O prompt deve estar pronto para ser copiado e colado diretamente em uma LLM.
+
+IDEIA BRUTA DO USUÁRIO:
+${idea}
+
+Agora, gere o prompt perfeito:`;
+
+      const result = await model.generateContent(systemPrompt);
+      const response = await result.response;
+      const text = response.text().trim();
+
+      setOptimizedResult(text);
+    } catch (error) {
+      console.error('Erro ao otimizar prompt:', error);
+      setOptimizedResult('❌ Erro ao otimizar. Verifique sua conexão ou tente novamente.');
+    } finally {
       setIsOptimizing(false);
-    }, 800);
+    }
   };
 
-  const handleTestInPlace = () => {
-    setTestResponse("🤖 IA Responde: 'Olá! Aqui estão suas 3 opções de copy baseadas no prompt...' No Hub Pro, você conecta seus próprios Agentes e APIs!");
+  const handleTestPrompt = async () => {
+    if (!optimizedResult) return;
+    setIsTesting(true);
+    setTestResponse(null);
+
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error('API Key não configurada');
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      let model;
+      try {
+        model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      } catch {
+        model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      }
+
+      const result = await model.generateContent(optimizedResult);
+      const response = await result.response;
+      const text = response.text().trim();
+
+      setTestResponse(text);
+    } catch (error) {
+      console.error('Erro ao testar:', error);
+      setTestResponse('❌ Erro ao testar prompt. Tente novamente.');
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   // Gallery Projects State
@@ -162,7 +221,7 @@ export default function LandingPage() {
             ) : (
               <div className="flex gap-4">
                 <button onClick={() => navigate('/login')} className="text-white text-sm font-bold">Login</button>
-                <button onClick={() => navigate('/register')} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">Criar Conta Grátis</button>
+                <button onClick={() => setIsApplicationModalOpen(true)} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">Quero ser cliente</button>
               </div>
             )}
           </div>
@@ -253,10 +312,10 @@ export default function LandingPage() {
                         Entrar
                       </button>
                       <button
-                        onClick={() => { setIsMenuOpen(false); navigate('/register'); }}
+                        onClick={() => { setIsMenuOpen(false); setIsApplicationModalOpen(true); }}
                         className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-sm font-bold transition-colors shadow-lg"
                       >
-                        Cadastro
+                        Quero ser cliente
                       </button>
                     </>
                   )}
@@ -338,14 +397,14 @@ export default function LandingPage() {
         {/* PROMPT LAB (INTERATIVO) */}
         <section id="lab" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Engenharia de Ideias</span></div>
-            <h3 className="text-3xl font-bold text-white mb-2">Otimizador de Prompts</h3>
-            <p className="text-slate-400 mb-8">Digite sua intenção. A gente estrutura o comando perfeito.</p>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
+            <h3 className="text-3xl font-bold text-white mb-2">Prompt Lab</h3>
+            <p className="text-slate-400 mb-8">Engenharia de ideias. Transforme intenções em prompts estruturados mais eficientes usando prompt engineering.</p>
 
             <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
-              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} placeholder="Ex: Criar legenda para foto de produto..." className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
-              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-600 hover:bg-fuchsia-500 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
-                {isOptimizing ? '...' : 'Otimizar'}
+              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder="Ex: Criar legenda para foto de produto..." className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
+              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
+                {isOptimizing ? '⏳ Otimizando...' : '✨ Otimizar'}
               </button>
             </div>
 
@@ -369,10 +428,30 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* RESULTADO DO TESTE SIMULADO */}
+                {/* RESULTADO DO TESTE */}
                 {testResponse && (
-                  <div className="mt-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg text-green-200 text-sm animate-fade-in">
-                    {testResponse}
+                  <div className="mt-4 p-6 bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-2 border-blue-500/40 rounded-2xl animate-fade-in">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-lg font-bold text-blue-200 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5" /> Resposta da IA
+                      </h4>
+                      <button onClick={() => { navigator.clipboard.writeText(testResponse); }} className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                        <Copy size={14} /> Copiar
+                      </button>
+                    </div>
+                    <pre className="text-sm text-white whitespace-pre-wrap leading-relaxed bg-black/30 p-4 rounded-lg">{testResponse}</pre>
+                  </div>
+                )}
+
+                {/* BOTÃO TESTAR */}
+                {optimizedResult && !isTesting && (
+                  <button onClick={handleTestPrompt} className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg flex items-center justify-center gap-2">
+                    <Play size={18} /> 🧪 Testar Prompt
+                  </button>
+                )}
+                {isTesting && (
+                  <div className="w-full mt-4 px-6 py-3 bg-blue-900/30 text-blue-300 rounded-xl font-bold flex items-center justify-center gap-2">
+                    ⏳ Testando...
                   </div>
                 )}
               </div>
@@ -510,11 +589,11 @@ export default function LandingPage() {
         <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> Modos QR D'água
+              <Sparkles className="w-3 h-3" /> QR D'água
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Veja Como Funciona</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Seu Canal Digital</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              Clique nos botões para ver diferentes modos de uso do QR D'água
+              Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.
             </p>
             <PhoneSimulator className="mx-auto" />
           </div>
@@ -526,19 +605,84 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                Este projeto nasceu de uma necessidade real: tornar a tecnologia acessível para quem mais precisa.
-                Não acreditamos em soluções complexas que excluem. Acreditamos em ferramentas que empoderam.
+                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
               </p>
-              <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                Começamos com um simples gerador de QR Codes em Streamlit. Hoje, somos um ecossistema completo:
-                CRM nativo, agentes de IA, prompt lab, e muito mais. Tudo pensado para ser <strong className="text-amber-400">mobile-first</strong>,
-                <strong className="text-fuchsia-400"> AI-first</strong>, e acima de tudo, <strong className="text-white">humano</strong>.
+            </div>
+          </div>
+        </section>
+
+        {/* CRM NATIVO */}
+        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
+                <TrendingUp className="w-3 h-3" /> CRM Nativo
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Gestão Inteligente</h2>
+              <p className="text-slate-400 mb-2 max-w-2xl mx-auto">
+                Em breve: criação de CRMs personalizados para o seu negócio
               </p>
-              <p className="text-lg text-slate-300 leading-relaxed">
-                Nossa missão é clara: <strong className="text-amber-400">ninguém fica para trás</strong>. Mães atípicas, neurodivergentes,
-                comunidades originárias, negócios locais — todos merecem acesso às melhores ferramentas tecnológicas.
-                E nós estamos aqui para garantir isso.
+              <p className="text-xs text-slate-500 max-w-2xl mx-auto">
+                Baseado no CRM Open Source criado por Thales Laray e disponibilizado exclusivamente para alunos vitalícios da Escola de Automação
               </p>
+            </div>
+
+            {/* White Label Kanban Simulator */}
+            <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-white/10 rounded-2xl p-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Column 1: LEAD */}
+                <div className="bg-slate-900/80 border border-amber-500/30 rounded-xl p-4">
+                  <h3 className="text-amber-400 font-bold mb-3 flex items-center gap-2">
+                    <Users size={16} /> LEAD
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
+                      <p className="text-white font-semibold">Maria Silva</p>
+                      <p className="text-slate-400">Interesse em QR D'água</p>
+                    </div>
+                    <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
+                      <p className="text-white font-semibold">João Santos</p>
+                      <p className="text-slate-400">Consultoria CRM</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: EM NEGOCIAÇÃO */}
+                <div className="bg-slate-900/80 border border-blue-500/30 rounded-xl p-4">
+                  <h3 className="text-blue-400 font-bold mb-3 flex items-center gap-2">
+                    <MessageCircle size={16} /> EM NEGOCIAÇÃO
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
+                      <p className="text-white font-semibold">Ana Costa</p>
+                      <p className="text-slate-400">Proposta enviada</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3: CLIENTE */}
+                <div className="bg-slate-900/80 border border-green-500/30 rounded-xl p-4">
+                  <h3 className="text-green-400 font-bold mb-3 flex items-center gap-2">
+                    <CheckCircle size={16} /> CLIENTE
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
+                      <p className="text-white font-semibold">Pedro Alves</p>
+                      <p className="text-slate-400">Ativo desde Jan/2025</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setIsApplicationModalOpen(true)}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg"
+                >
+                  Tenho interesse no CRM
+                </button>
+              </div>
             </div>
           </div>
         </section>
