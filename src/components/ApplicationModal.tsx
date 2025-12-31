@@ -11,6 +11,7 @@ interface ApplicationModalProps {
 export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onClose }) => {
     const { addToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         whatsapp: '',
@@ -77,10 +78,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                 referralSource: '',
             });
 
-            // Close modal after short delay
-            setTimeout(() => {
-                onClose();
-            }, 1500);
+            // Show success screen instead of closing
+            setIsSuccess(true);
 
         } catch (error: any) {
             console.error('Error submitting application:', error);
@@ -90,8 +89,45 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
         }
     };
 
+    const handleClose = () => {
+        setIsSuccess(false);
+        onClose();
+    };
+
     if (!isOpen) return null;
 
+    // Success Screen
+    if (isSuccess) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+                <div className="bg-[#0f0518] border border-green-500/30 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up text-center">
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Sparkles className="w-8 h-8 text-green-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Aplicação Recebida!</h2>
+                    <p className="text-slate-300 mb-6">Entraremos em contato em até 24h.</p>
+                    
+                    <a
+                        href="https://wa.me/5592992943998?text=Olá! Gostaria de agendar uma consultoria gratuita."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block w-full px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold mb-4 hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg"
+                    >
+                        💬 Quero uma consultoria free
+                    </a>
+                    
+                    <button
+                        onClick={handleClose}
+                        className="text-slate-400 hover:text-white text-sm transition-colors"
+                    >
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Form Screen
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
             <div className="bg-[#0f0518] border border-fuchsia-500/30 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-slide-up">
@@ -107,7 +143,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                         </p>
                     </div>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white"
                         disabled={isSubmitting}
                     >
