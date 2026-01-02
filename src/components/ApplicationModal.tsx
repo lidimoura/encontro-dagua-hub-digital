@@ -31,26 +31,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
         setIsSubmitting(true);
 
         try {
-            // 1. Add to waitlist
-            const { error: waitlistError } = await supabase
-                .from('waitlist')
-                .insert([{
-                    name: formData.name,
-                    whatsapp: formData.whatsapp,
-                    email: formData.email || null,
-                    referred_by: formData.referralSource || null,
-                    status: 'PENDING',
-                    metadata: {
-                        businessType: formData.businessType,
-                        intent: formData.businessType,
-                        source: 'landing_page_application_modal',
-                        timestamp: new Date().toISOString(),
-                    },
-                }]);
-
-            if (waitlistError) throw waitlistError;
-
-            // 2. Create contact as LEAD_QUENTE
+            // Insert directly into contacts table (CRM integration)
             const { error: contactError } = await supabase
                 .from('contacts')
                 .insert([{
@@ -58,16 +39,18 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     phone: formData.whatsapp,
                     email: formData.email || `${formData.whatsapp}@temp.com`,
                     status: 'ACTIVE',
-                    stage: 'LEAD', // Will be updated by admin to LEAD_QUENTE
+                    stage: 'LEAD',
                     source: 'WEBSITE',
                     notes: `Aplicação via Landing Page\nIntenção/Diagnóstico: ${formData.businessType || 'Não informado'}\nReferência: ${formData.referralSource || 'Nenhuma'}`,
                     company_id: null, // Will be created by admin
                 }]);
 
             if (contactError) {
-                console.warn('Contact creation failed (may already exist):', contactError);
+                console.error('❌ Contact creation error:', contactError);
+                throw new Error(`Erro ao salvar lead: ${contactError.message}`);
             }
 
+            console.log('✅ Lead salvo com sucesso no CRM');
             addToast('🎉 Aplicação enviada com sucesso!', 'success');
 
             // Reset form

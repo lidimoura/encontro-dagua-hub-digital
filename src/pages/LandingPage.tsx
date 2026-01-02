@@ -369,6 +369,21 @@ Agora, gere o prompt perfeito:`;
 
         {/* ========== B. NOSSAS SOLUÇÕES ========== */}
 
+        {/* INTRO: Nossas Soluções */}
+        <section className="py-16 px-6 bg-[#02040a] text-center border-t border-white/5">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Nossas Soluções
+            </h2>
+            <p className="text-lg text-slate-300 leading-relaxed mb-4">
+              O Encontro D'água é um <span className="text-fuchsia-400 font-semibold">ecossistema digital vivo</span> que integra estratégias humanas com a eficiência da IA.
+            </p>
+            <p className="text-slate-400">
+              Explore nossas ferramentas abaixo e descubra como podemos potencializar seu negócio.
+            </p>
+          </div>
+        </section>
+
         {/* PROMPT LAB (INTERATIVO) - Solução #1 */}
         <section id="solucoes" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
           <div className="max-w-4xl mx-auto">
