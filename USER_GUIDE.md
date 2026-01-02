@@ -230,6 +230,125 @@ Transforme ideias brutas em prompts perfeitos para LLMs.
 - Resultado exibido em modal
 - CTA para solicitar acesso completo
 
+### 📝 Formulário de Diagnóstico (Novo!)
+
+**Onde Encontrar:** Botão "Quero ser cliente" na Landing Page
+
+O novo formulário inteligente ajuda a qualificar leads automaticamente através de um sistema de diagnóstico de intenção.
+
+#### Como Funciona:
+
+1. **Acesse o Formulário**
+   - Clique em "Quero ser cliente" no header
+   - Ou em qualquer CTA da Landing Page
+
+2. **Preencha os Dados Básicos**
+   - Nome completo (obrigatório)
+   - WhatsApp (obrigatório)
+   - Email (opcional)
+   - Como conheceu o Hub (opcional)
+
+3. **Selecione sua Intenção/Diagnóstico**
+   
+   Escolha a opção que melhor descreve sua necessidade:
+   
+   - **Quero aprender a criar (Mentoria/Consultoria)**
+     - Para quem quer aprender a usar IA e automações
+     - Consultoria personalizada
+   
+   - **Quero contratar Agentes de IA / Chatbots**
+     - Implementação de chatbots (Typebot, WhatsApp)
+     - Agentes de IA para atendimento
+   
+   - **Preciso de um CRM Personalizado**
+     - CRM adaptado ao seu negócio
+     - Integração com IA
+   
+   - **Automações Específicas**
+     - Fluxos de trabalho automatizados
+     - Integrações entre ferramentas
+   
+   - **QR Code Dinâmico / Cartão Digital**
+     - QR Codes profissionais
+     - Cartões digitais (mini linktree)
+   
+   - **Acesso Total ao Prompt Lab**
+     - Plano Pro Mensal (R$ 3,00)
+     - Templates de especialistas
+   
+   - **Não sei a solução (Quero Diagnóstico)**
+     - Conversa com Amazô IA
+     - Diagnóstico gratuito
+
+4. **Envie o Formulário**
+   - Clique em "Enviar Aplicação"
+   - Aguarde confirmação de sucesso
+
+5. **Pós-Envio**
+   - Tela de sucesso aparece
+   - Botão verde: **"💬 Quero uma consultoria free"**
+   - Link direto para WhatsApp da Admin
+   - Resposta em até 24h
+
+#### Integração Automática com CRM
+
+✅ **Seu lead é salvo automaticamente no CRM!**
+
+- Aparece na coluna "LEAD" do Kanban
+- Campo "Notas" inclui sua intenção/diagnóstico
+- Admin pode qualificar e mover pelo funil
+- Rastreamento completo da origem (Landing Page)
+
+#### Dicas para Preencher:
+
+- **Seja específico** no campo "Como conheceu o Hub"
+- **Escolha a intenção correta** para receber proposta adequada
+- **Use WhatsApp válido** - é o principal canal de contato
+- Se não souber qual solução precisa, escolha "Quero Diagnóstico"
+
+### 🧪 Prompt Lab Público - Teste Grátis
+
+**Onde Encontrar:** Seção "Prompt Lab" na Landing Page (não precisa login!)
+
+#### Como Usar:
+
+1. **Acesse a Landing Page** (`/`)
+2. **Role até a seção "Prompt Lab"** (badge roxo "Prova D'água")
+3. **Digite sua ideia bruta** no campo de texto
+   - Exemplo: "Criar legenda para foto de produto"
+4. **Clique em "✨ Otimizar"**
+5. **Aguarde o processamento** (API Gemini 2.0 Flash)
+6. **Veja o resultado estruturado**
+   - Prompt otimizado aparece em card roxo
+   - Botões disponíveis:
+     - **Copiar**: Copia prompt para área de transferência
+     - **🧪 Testar Prompt**: Executa o prompt e mostra resposta da IA
+     - **👍/👎**: Avalie a qualidade (feedback)
+
+#### Teste de Prompt em Tempo Real:
+
+1. Após otimizar, clique em **"🧪 Testar Prompt"**
+2. Aguarde processamento (pode levar 5-10 segundos)
+3. **Resposta da IA aparece em card azul**
+4. Botão "Copiar" disponível para salvar resultado
+
+#### Upgrade para Hub Pro:
+
+- Clique em **"Quero Acesso ao Hub Pro"** no resultado
+- Formulário de diagnóstico abre
+- Escolha "Acesso Total ao Prompt Lab"
+- Receba proposta personalizada
+
+#### Limitações da Versão Pública:
+
+- ❌ Não salva prompts (sem biblioteca)
+- ❌ Não tem personas especializadas
+- ✅ Otimização funcional completa
+- ✅ Teste de prompts ilimitado
+- ✅ Sem necessidade de login
+
+💡 **Dica:** Use o Prompt Lab público para testar a qualidade antes de assinar o Pro!
+
 ---
 
 ## 🎨 Temas e Personalização

@@ -367,10 +367,35 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* ========== B. NOSSAS SOLUÇÕES ========== */}
+        {/* MANIFESTO SOCIAL */}
+        <section id="manifesto" className="py-24 px-6 bg-[#02040a] text-center border-t border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.8)]">
+          <div className="max-w-5xl mx-auto">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
 
-        {/* PROMPT LAB (INTERATIVO) - Solução #1 */}
-        <section id="solucoes" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              {["Mães e Pais Atípicos", "Neurodivergentes", "Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "Comunidades", "ONGs"].map((tag) => (
+                <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
+              ))}
+            </div>
+
+            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
+              <p className="text-slate-400 text-sm mb-6">Condições especiais para impacto social.</p>
+              <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                  <MessageCircle size={18} /> Consultoria Social (WhatsApp)
+                </button>
+                <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                  <Bot size={18} /> Falar com Amazo IA
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PROMPT LAB (INTERATIVO) */}
+        <section id="lab" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
             <h3 className="text-3xl font-bold text-white mb-2">Prompt Lab</h3>
@@ -450,22 +475,8 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* QR D'ÁGUA - Solução #2 */}
-        <section className="py-20 px-6 bg-[#02040a] border-t border-white/5">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> QR D'água
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Seu Canal Digital</h2>
-            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.
-            </p>
-            <PhoneSimulator className="mx-auto" />
-          </div>
-        </section>
-
         {/* VITRINE DA COMUNIDADE (SHOWCASE) */}
-        <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center border-t border-white/5">
+        <section id="showcase" className="py-20 px-6 bg-[#02040a] text-center border-t border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
               <Sparkles className="w-3 h-3" /> Vitrine da Comunidade
@@ -574,36 +585,33 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* AMAZÔ IA - Solução #3 */}
-        <section className="py-20 px-6 bg-[#02040a] border-t border-white/5 text-center">
-          <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Bot className="w-3 h-3" /> Agente de IA
+        {/* PHONE SIMULATOR SHOWCASE */}
+        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <Sparkles className="w-3 h-3" /> QR D'água
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Amazô IA</h2>
-            <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-              A Amazô ajuda no diagnóstico. Atendimento 24/7 para CS e Vendas direto no WhatsApp.
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Seu Canal Digital</h2>
+            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
+              Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.
             </p>
+            <PhoneSimulator className="mx-auto" />
+          </div>
+        </section>
 
-            <div className="bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 p-8 rounded-3xl border border-fuchsia-500/20 max-w-2xl mx-auto">
-              <div className="w-20 h-20 bg-fuchsia-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bot className="w-10 h-10 text-fuchsia-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Converse com a Amazô</h3>
-              <p className="text-slate-300 text-sm mb-6">
-                Tire dúvidas, peça diagnóstico ou saiba mais sobre nossas soluções
+        {/* MANIFESTO */}
+        <section id="manifesto" className="py-20 px-6 bg-[#02040a] border-t border-white/5">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-slate-300 leading-relaxed mb-6">
+                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
               </p>
-              <button
-                onClick={openAmazoChat}
-                className="px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg flex items-center justify-center gap-2 mx-auto"
-              >
-                <MessageCircle size={20} /> Falar com Amazô agora
-              </button>
             </div>
           </div>
         </section>
 
-        {/* CRM NATIVO - Solução #4 */}
+        {/* CRM NATIVO */}
         <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -679,43 +687,30 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
-
-        {/* MANIFESTO SOCIAL */}
-        <section id="manifesto" className="py-24 px-6 bg-[#02040a] text-center border-t border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.8)]">
-          <div className="max-w-5xl mx-auto">
-            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
-
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {["Mães e Pais Atípicos", "Neurodivergentes", "Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "Comunidades", "ONGs"].map((tag) => (
-                <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
-              ))}
+        {/* SOLUÇÕES REAIS */}
+        <section id="solucoes" className="py-20 px-6 bg-[#05020a] text-center border-t border-white/5">
+          <h2 className="text-3xl font-bold text-white mb-12">Nossas Soluções</h2>
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Cards com textos do README */}
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-amber-500/50 transition">
+              <Brain className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <h3 className="font-bold text-white">Prompt Lab</h3>
+              <p className="text-xs text-slate-400 mt-2">Engenharia de ideias. Transforme intenções em estratégias estruturadas.</p>
             </div>
-
-            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
-              <p className="text-slate-400 text-sm mb-6">Condições especiais para impacto social.</p>
-              <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <MessageCircle size={18} /> Consultoria Social (WhatsApp)
-                </button>
-                <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <Bot size={18} /> Falar com Amazo IA
-                </button>
-              </div>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-blue-500/50 transition">
+              <QrCode className="w-10 h-10 text-blue-400 mx-auto mb-4" />
+              <h3 className="font-bold text-white">QR D'água</h3>
+              <p className="text-xs text-slate-400 mt-2">Conexão instantânea. Cartões digitais e links que resolvem problemas reais.</p>
             </div>
-          </div>
-        </section>
-
-        {/* MANIFESTO (TEXTO) */}
-        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
-            <div className="prose prose-invert max-w-none">
-              <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
-              </p>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-fuchsia-500/50 transition cursor-pointer" onClick={openAmazoChat}>
+              <Bot className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
+              <h3 className="font-bold text-white">Amazo IA</h3>
+              <p className="text-xs text-slate-400 mt-2">Atendimento 24/7. Agente de IA para CS e Vendas no WhatsApp.</p>
+            </div>
+            <div className="p-6 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-green-500/50 transition">
+              <Users className="w-10 h-10 text-green-500 mx-auto mb-4" />
+              <h3 className="font-bold text-white">CRM Nativo</h3>
+              <p className="text-xs text-slate-400 mt-2">Gestão simplificada de leads com IA integrada e recursos estratégicos.</p>
             </div>
           </div>
         </section>

@@ -42,7 +42,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     status: 'PENDING',
                     metadata: {
                         businessType: formData.businessType,
-                        source: 'landing_page_optimizer',
+                        intent: formData.businessType,
+                        source: 'landing_page_application_modal',
                         timestamp: new Date().toISOString(),
                     },
                 }]);
@@ -59,7 +60,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     status: 'ACTIVE',
                     stage: 'LEAD', // Will be updated by admin to LEAD_QUENTE
                     source: 'WEBSITE',
-                    notes: `Aplicação via Otimizador de Prompts\nTipo de Negócio: ${formData.businessType || 'Não informado'}\nReferência: ${formData.referralSource || 'Nenhuma'}`,
+                    notes: `Aplicação via Landing Page\nIntenção/Diagnóstico: ${formData.businessType || 'Não informado'}\nReferência: ${formData.referralSource || 'Nenhuma'}`,
                     company_id: null, // Will be created by admin
                 }]);
 
@@ -106,7 +107,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">Aplicação Recebida!</h2>
                     <p className="text-slate-300 mb-6">Entraremos em contato em até 24h.</p>
-                    
+
                     <a
                         href="https://wa.me/5592992943998?text=Olá! Gostaria de agendar uma consultoria gratuita."
                         target="_blank"
@@ -115,7 +116,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     >
                         💬 Quero uma consultoria free
                     </a>
-                    
+
                     <button
                         onClick={handleClose}
                         className="text-slate-400 hover:text-white text-sm transition-colors"
@@ -136,7 +137,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <Sparkles className="w-6 h-6 text-fuchsia-400" />
-                            <h2 className="text-2xl font-bold text-white">Quero Acesso ao Hub Pro</h2>
+                            <h2 className="text-2xl font-bold text-white">Quero ser cliente</h2>
                         </div>
                         <p className="text-sm text-slate-400">
                             Preencha os dados abaixo e entraremos em contato em até 24h
@@ -200,10 +201,10 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                         />
                     </div>
 
-                    {/* Business Type */}
+                    {/* Diagnostic Intent */}
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-2">
-                            Tipo de Negócio
+                            O que você precisa? (Diagnóstico)
                         </label>
                         <select
                             value={formData.businessType}
@@ -211,14 +212,14 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                             className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all"
                             disabled={isSubmitting}
                         >
-                            <option value="">Selecione...</option>
-                            <option value="freelancer">Freelancer / Autônomo</option>
-                            <option value="startup">Startup / Empresa Pequena</option>
-                            <option value="agency">Agência / Consultoria</option>
-                            <option value="ecommerce">E-commerce / Loja Online</option>
-                            <option value="local">Negócio Local / Físico</option>
-                            <option value="ngo">ONG / Impacto Social</option>
-                            <option value="other">Outro</option>
+                            <option value="">Selecione sua necessidade...</option>
+                            <option value="mentoria">Quero aprender a criar (Mentoria/Consultoria)</option>
+                            <option value="agentes-ia">Quero contratar Agentes de IA / Chatbots</option>
+                            <option value="crm">Preciso de um CRM Personalizado</option>
+                            <option value="automacoes">Automações Específicas</option>
+                            <option value="qr-code">QR Code Dinâmico / Cartão Digital</option>
+                            <option value="prompt-lab">Acesso Total ao Prompt Lab</option>
+                            <option value="diagnostico">Não sei a solução (Quero Diagnóstico)</option>
                         </select>
                     </div>
 
