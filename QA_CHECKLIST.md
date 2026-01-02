@@ -183,6 +183,53 @@ Este documento define o protocolo obrigatório de testes para todas as entregas 
 
 ---
 
+### 6. Landing Page Reorganization & Diagnostic Form [DONE]
+
+**COMO TESTAR:**
+
+1. **Verificar Nova Estrutura da Landing Page:**
+   - Vá para: `/#/`
+   - Verifique ordem das seções:
+     - [ ] HERO (topo com parallax)
+     - [ ] SOLUÇÕES (Prompt Lab → QR D'água → Amazô IA → CRM)
+     - [ ] SOBRE NÓS (Manifesto Social → Manifesto → Team)
+
+2. **Testar Prompt Lab Público:**
+   - Role até seção "Prompt Lab" (badge roxo "Prova D'água")
+   - Digite: "criar legenda para produto"
+   - Clique: "✨ Otimizar"
+   - [ ] Resultado estruturado aparece
+   - [ ] Botão "Copiar" funciona
+   - [ ] Botão "🧪 Testar Prompt" funciona
+   - [ ] Resposta da IA aparece em card azul
+
+3. **Testar Formulário de Diagnóstico:**
+   - Clique: "Quero ser cliente" (header ou CTAs)
+   - Preencha dados básicos
+   - [ ] Dropdown "O que você precisa?" tem 7 opções
+   - [ ] Opções corretas: Mentoria, Agentes IA, CRM, Automações, QR Code, Prompt Lab, Diagnóstico
+   - Envie formulário
+   - [ ] Toast de sucesso aparece (z-index correto, visível)
+   - [ ] Tela de sucesso com botão verde "💬 Quero uma consultoria free"
+   - [ ] Botão abre WhatsApp com mensagem pré-formatada
+
+4. **Verificar Integração CRM:**
+   - Login como admin
+   - Acesse: `/#/boards` ou `/#/contacts`
+   - [ ] Lead aparece na coluna "LEAD"
+   - [ ] Campo "Notas" inclui intenção/diagnóstico selecionado
+   - [ ] Source: "WEBSITE"
+
+**Critérios de Sucesso:**
+- [x] Landing Page reorganizada na ordem correta
+- [x] Prompt Lab público funcional com API Gemini
+- [x] Formulário com 7 opções de diagnóstico
+- [x] Toast visível acima do modal (z-index 99999)
+- [x] WhatsApp CTA pós-envio funcional
+- [ ] Lead aparece automaticamente no CRM (TESTAR EM PRODUÇÃO)
+
+---
+
 ## 🚨 Checklist Pendente - Próxima Fase
 
 ### 6. Botão "Falar com Amazô" (CRÍTICO)

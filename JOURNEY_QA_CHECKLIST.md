@@ -267,4 +267,51 @@ Antes de considerar o release aprovado:
 
 ---
 
+## 🆕 Cenário 6: Visitante → Lead via Formulário de Diagnóstico (02/01/2026)
+
+**Objetivo:** Validar o novo fluxo de conversão com seletor de diagnóstico e integração automática com CRM.
+
+### Passos:
+
+1. **Acesse a Landing Page**
+   - [ ] Navegue para `https://[dominio]/#/`
+   - [ ] Verifique nova ordem: HERO → SOLUÇÕES → SOBRE NÓS
+
+2. **Teste Prompt Lab Público (Lead Magnet)**
+   - [ ] Role até "Prompt Lab" (badge roxo "Prova D'água")
+   - [ ] Digite: "criar post para Instagram"
+   - [ ] Clique "✨ Otimizar" → Prompt otimizado aparece
+   - [ ] Clique "🧪 Testar Prompt" → Resposta da IA aparece
+   - [ ] Botões "Copiar" funcionam
+
+3. **Abra o Formulário de Diagnóstico**
+   - [ ] Clique "Quero ser cliente" (header ou CTAs)
+   - [ ] Modal abre com título "Quero ser cliente"
+
+4. **Preencha o Formulário**
+   - [ ] Nome: "João Teste QA"
+   - [ ] WhatsApp: "92999887766"
+   - [ ] **Diagnóstico:** Selecione uma das 7 opções
+     - Mentoria, Agentes IA, CRM, Automações, QR Code, Prompt Lab, Diagnóstico
+
+5. **Envie e Verifique Feedback**
+   - [ ] Toast de sucesso aparece (verde, z-index correto)
+   - [ ] Tela de sucesso com botão "💬 Quero uma consultoria free"
+   - [ ] Botão abre WhatsApp com mensagem pré-formatada
+
+6. **Verifique Integração CRM**
+   - [ ] Login como admin → `/boards` ou `/contacts`
+   - [ ] Lead "João Teste QA" na coluna "LEAD"
+   - [ ] Campo "Notas" contém diagnóstico selecionado
+   - [ ] `source: 'WEBSITE'`
+
+### ✅ Critérios de Sucesso:
+- Formulário com 7 opções funciona
+- Toast visível (z-index 99999)
+- WhatsApp CTA funcional
+- Lead salvo automaticamente no CRM
+- Diagnóstico registrado nas notas
+
+---
+
 *Encontro D'água Hub - Tecnologia que flui, IA que potencializa pessoas.*
