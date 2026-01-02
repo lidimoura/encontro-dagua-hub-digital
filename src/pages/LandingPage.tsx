@@ -81,9 +81,11 @@ export default function LandingPage() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
+
+      // Try gemini-2.5-flash-lite first, fallback to gemini-1.5-flash (same as internal PromptLab)
       let model;
       try {
-        model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
       } catch {
         model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       }
@@ -388,8 +390,14 @@ Agora, gere o prompt perfeito:`;
         <section id="solucoes" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
-            <h3 className="text-3xl font-bold text-white mb-2">Prompt Lab</h3>
-            <p className="text-slate-400 mb-8">Engenharia de ideias. Transforme intenções em prompts estruturados mais eficientes usando prompt engineering.</p>
+            <h3 className="text-3xl font-bold text-white mb-4">Prompt Lab</h3>
+            <p className="text-lg text-slate-300 mb-4">
+              Transforme ideias brutas em <span className="text-fuchsia-400 font-semibold">prompts estruturados e eficientes</span> usando engenharia de prompts profissional.
+            </p>
+            <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
+              Nossa IA analisa sua intenção e cria prompts otimizados prontos para usar em qualquer LLM (ChatGPT, Claude, Gemini).
+              Teste gratuitamente abaixo e veja a diferença na qualidade das respostas.
+            </p>
 
             <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
               <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder="Ex: Criar legenda para foto de produto..." className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
