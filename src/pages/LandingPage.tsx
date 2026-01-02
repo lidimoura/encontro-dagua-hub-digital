@@ -7,6 +7,7 @@ import {
   Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { QRCode } from 'react-qrcode-logo';
 import { ApplicationModal } from '@/components/ApplicationModal';
 import { PhoneSimulator } from '@/components/PhoneSimulator';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -530,11 +531,18 @@ Agora, gere o prompt perfeito:`;
                       className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start cursor-pointer group"
                     >
                       <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
-                        <QRCodeSVG
+                        <QRCode
                           value={`${window.location.origin}/#/v/${project.slug}`}
                           size={112}
-                          level="H"
-                          fgColor={project.color || '#000000'}
+                          ecLevel="H"
+                          fgColor={project.color || '#620939'}
+                          bgColor="#FFFFFF"
+                          qrStyle="dots"
+                          eyeRadius={10}
+                          logoImage={project.qr_logo_url || ''}
+                          logoWidth={project.qr_logo_url ? 28 : 0}
+                          logoHeight={project.qr_logo_url ? 28 : 0}
+                          removeQrCodeBehindLogo={true}
                         />
                       </div>
                       <h3 className="font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">{project.client_name}</h3>
