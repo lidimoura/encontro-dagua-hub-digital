@@ -4,6 +4,155 @@ Este arquivo registra todas as mudanças significativas no projeto, organizadas 
 
 ---
 
+## 🎨 02/01/2026 - Major Refactor: Landing Page Reorganization & Form Fixes
+
+### Contexto
+Reorganização completa da Landing Page para nova arquitetura de negócio: HERO → SOLUÇÕES → SOBRE NÓS. Correção crítica do ApplicationModal para integração com CRM e implementação de sistema de diagnóstico de leads.
+
+### ✅ Landing Page Reorganization (COMPLETO)
+
+#### Nova Estrutura
+**A. HERO SECTION** (Topo)
+- Parallax background mantido
+- CTA "Conhecer o Hub" com scroll suave
+
+**B. NOSSAS SOLUÇÕES** (Seção Principal)
+1. **Prompt Lab (Prova D'água)** - Solução #1
+   - Badge "Prova D'água" (fuchsia)
+   - Input + API Gemini 2.0 Flash (fallback 1.5 Flash)
+   - Resultado estruturado com botões Copy e Test
+   - Teste de prompt com resposta da IA em tempo real
+   - Cards de especialistas (Agentes de IA, Personalizar LLMs)
+   - CTA: "Assinar Pro Mensal (R$ 3,00)"
+
+2. **QR D'água** - Solução #2
+   - PhoneSimulator visual
+   - Copy: "Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio)"
+   - **Showcase Gallery** integrada
+     - Fetch real de projetos com `in_gallery: true`
+     - Scroll horizontal com setas de navegação (desktop)
+     - Fallback para mockups quando sem dados
+     - Limite de 10 projetos
+
+3. **Amazô IA** - Solução #3
+   - Badge "Agente de IA" (fuchsia)
+   - Copy: "A Amazô ajuda no diagnóstico"
+   - Card destacado com ícone Bot
+   - CTA: "Falar com Amazô agora" (abre Typebot)
+
+4. **CRM Nativo** - Solução #4
+   - Badge "CRM Nativo" (blue)
+   - **White Label Kanban Simulator**
+     - 3 colunas: LEAD (amber) → EM NEGOCIAÇÃO (blue) → CLIENTE (green)
+     - Cards mockup com exemplos
+   - Crédito: Thales Laray / Escola de Automação
+   - CTA: "Tenho interesse no CRM" → ApplicationModal
+
+**C. SOBRE NÓS** (Institucional)
+1. **Manifesto Social** - "Tecnologia para Todos"
+   - 11 badges de públicos (Mães Atípicos, Neurodivergentes, etc)
+   - CTAs: "Consultoria Social (WhatsApp)" + "Falar com Amazo IA"
+
+2. **Manifesto** (Texto)
+   - História do hub em 3ª pessoa
+   - "Não nasceu no Vale do Silício..."
+
+3. **Team** (Carrossel)
+   - Lidi (Founder) + 4 AI Agents
+   - Bio completa da Lidi com herança familiar
+
+#### Arquivos Modificados
+- `src/pages/LandingPage.tsx` (~1021 linhas após limpeza)
+- Removidas ~250 linhas de seções duplicadas
+
+### ✅ ApplicationModal - Critical Fixes (COMPLETO)
+
+#### 1. **Diagnostic Intent Dropdown**
+**Problema:** Campo genérico "Tipo de Negócio" não qualificava leads adequadamente
+
+**Solução Implementada:**
+- Dropdown renomeado para "O que você precisa? (Diagnóstico)"
+- **7 opções de intenção:**
+  1. Quero aprender a criar (Mentoria/Consultoria)
+  2. Quero contratar Agentes de IA / Chatbots
+  3. Preciso de um CRM Personalizado
+  4. Automações Específicas
+  5. QR Code Dinâmico / Cartão Digital
+  6. Acesso Total ao Prompt Lab
+  7. Não sei a solução (Quero Diagnóstico)
+
+- **Metadata tracking:**
+  ```typescript
+  metadata: {
+    businessType: formData.businessType,
+    intent: formData.businessType, // Duplicado para analytics
+    source: 'landing_page_application_modal',
+    timestamp: new Date().toISOString(),
+  }
+  ```
+
+#### 2. **Modal Title Update**
+- Antes: "Quero Acesso ao Hub Pro"
+- Depois: **"Quero ser cliente"**
+- Mais direto e menos técnico
+
+#### 3. **CRM Integration**
+**Status:** ✅ JÁ FUNCIONAVA
+- Form já enviava para tabela `contacts` do Supabase
+- Campo `notes` inclui intenção/diagnóstico
+- `stage: 'LEAD'` para qualificação posterior
+- `source: 'WEBSITE'` para rastreamento
+
+**Nota Importante:** RLS policies precisam permitir INSERT para authenticated users
+
+#### 4. **Post-Submission UX**
+**Status:** ✅ JÁ IMPLEMENTADO
+- Tela de sucesso com botão verde
+- **"💬 Quero uma consultoria free"**
+- Link direto: `https://wa.me/5592992943998?text=Olá! Gostaria de agendar uma consultoria gratuita.`
+
+#### 5. **Toast Z-Index Fix**
+**Problema:** Toast invisível atrás do modal (z-50)
+
+**Solução:**
+- `ToastContext.tsx`: `z-50` → `z-[99999]`
+- Agora visível acima de todos os modals
+
+#### Arquivos Modificados
+- `src/components/ApplicationModal.tsx`
+- `src/context/ToastContext.tsx`
+
+### 📊 Resumo Técnico
+
+| Feature | Arquivo | Tipo | Status |
+|---------|---------|------|--------|
+| Landing Page Reorganization | `LandingPage.tsx` | Major Refactor | ✅ Complete |
+| Diagnostic Dropdown | `ApplicationModal.tsx` | Form Enhancement | ✅ Implemented |
+| Modal Title Update | `ApplicationModal.tsx` | UX Copy | ✅ Updated |
+| Toast Z-Index | `ToastContext.tsx` | CSS Fix | ✅ Fixed |
+| CRM Integration | `ApplicationModal.tsx` | Database | ✅ Already Working |
+| WhatsApp CTA | `ApplicationModal.tsx` | Post-Submit UX | ✅ Already Working |
+
+### 📚 Documentation Updates
+
+| Document | Section | Status |
+|----------|---------|--------|
+| README.md | Soluções do Hub | ✅ Updated (Public vs Internal) |
+| DEVLOG.md | Major Refactor Entry | ✅ This Entry |
+| USER_GUIDE.md | Diagnostic Selector | ⏳ Pending |
+
+### 🎯 Próximos Passos
+1. ✅ Reorganização da Landing Page completa
+2. ✅ ApplicationModal com diagnóstico implementado
+3. ✅ Toast z-index corrigido
+4. ✅ README atualizado
+5. ✅ DEVLOG atualizado
+6. ⏳ USER_GUIDE atualizado
+7. ⏳ Commit e deploy
+8. ⏳ Teste end-to-end em produção
+
+---
+
 ## 🤖 29/12/2024 - Analytics, Super Admin & AI Agent Separation
 
 ### Contexto

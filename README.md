@@ -52,11 +52,16 @@ npm run build
 
 ## 🎯 Soluções do Hub
 
-- **🧠 Prompt Lab:** Engenharia de ideias. Transforme intenções em prompts estratégicos estruturados.
-- **📱 QR D'água:** Conexão instantânea. QR Codes dinâmicos, cartões digitais e links que resolvem problemas reais.
+### Públicas (Landing Page)
+- **🧠 Prompt Lab (Prova D'água):** Engenharia de ideias com IA. Transforme intenções brutas em prompts estruturados usando Gemini API. Teste prompts gratuitamente e veja resultados em tempo real.
+- **📱 QR D'água:** Conexão instantânea. QR Codes dinâmicos, cartões digitais e links que resolvem problemas reais. Galeria pública com projetos da comunidade.
+- **🤖 Amazo IA:** Atendimento 24/7 via Typebot. Agente de IA para diagnóstico, CS e Vendas direto no WhatsApp.
+- **💼 CRM Simulator (White Label):** Preview do sistema Kanban (LEAD → EM NEGOCIAÇÃO → CLIENTE). Demonstração visual da gestão de leads.
+- **📝 Diagnóstico de Leads:** Formulário inteligente com 7 opções de intenção (Mentoria, Agentes IA, CRM, Automações, QR Code, Prompt Lab, Diagnóstico). Integração automática com CRM.
+
+### Internas (Hub Pro)
 - **🏪 Catálogo:** Gestão de produtos e serviços. CRUD completo integrado ao CRM.
-- **🤖 Amazo IA:** Atendimento 24/7. Agente de IA para CS e Vendas.
-- **💼 CRM Nativo:** Gestão simplificada de leads com IA integrada.
+- **💼 CRM Nativo:** Gestão completa de leads com IA integrada e automações.
 - **🎁 Sistema de Indicação:** Referral com 20% OFF para indicador e indicado.
 
 ## 👩‍💻 Inteligência Híbrida (Equipe)
