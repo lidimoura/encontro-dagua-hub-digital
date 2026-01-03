@@ -65,6 +65,10 @@ export default function LandingPage() {
   const [isTesting, setIsTesting] = useState(false);
   const [testResponse, setTestResponse] = useState<string | null>(null);
 
+  // CRM Simulator Interactive State
+  const [showAIInsight, setShowAIInsight] = useState(true);
+  const [cardMoved, setCardMoved] = useState(false);
+
   // Amazo Init
   useEffect(() => {
     const script = document.createElement('script');
@@ -74,10 +78,35 @@ export default function LandingPage() {
     return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
   }, []);
 
-  // FORCE OPEN CHAT - Direct link to Typebot (infalível)
+  // AMAZÔ CHAT - Keep user on page (NO new tab)
   const openAmazoChat = () => {
-    // Open Typebot in new tab - guaranteed to work
-    window.open('https://typebot.co/template-chatbot-amazo-landigpage', '_blank');
+    // Try Typebot.open() first
+    if (typeof window !== 'undefined' && (window as any).Typebot) {
+      try {
+        (window as any).Typebot.open();
+        return;
+      } catch (error) {
+        console.warn('Typebot.open() failed:', error);
+      }
+    }
+
+    // Fallback: Visual cue to floating widget
+    const bubble = document.querySelector('typebot-bubble');
+    if (bubble) {
+      // Scroll to bottom where widget is
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      // Show visual indicator
+      const indicator = document.createElement('div');
+      indicator.innerHTML = '⬇️ Chat Amazô no canto inferior direito';
+      indicator.style.cssText = 'position: fixed; bottom: 100px; right: 20px; background: linear-gradient(135deg, #d946ef, #a855f7); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; z-index: 9999; animation: bounce 1s infinite; box-shadow: 0 4px 20px rgba(217, 70, 239, 0.5);';
+      document.body.appendChild(indicator);
+
+      setTimeout(() => indicator.remove(), 4000);
+    } else {
+      // Last resort: alert
+      alert('🤖 Amazô IA está carregando. Aguarde alguns segundos e tente novamente.');
+    }
   };
 
   // Test Prompt with correct API config
@@ -558,7 +587,7 @@ Agora, gere o prompt perfeito:`;
                           size={112}
                           ecLevel="H"
                           fgColor={project.color || '#620939'}
-                          bgColor="#FFFFFF"
+                          bgColor="transparent"
                           qrStyle="dots"
                           eyeRadius={10}
                           logoImage={project.qr_logo_url || ''}
