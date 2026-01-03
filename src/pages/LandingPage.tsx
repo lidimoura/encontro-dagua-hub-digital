@@ -508,20 +508,25 @@ Agora, gere o prompt perfeito:`;
               </div>
             )}
 
-            <div className="mt-8 grid md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
-              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
-                <h4 className="text-amber-400 font-bold text-sm mb-1">🔥 Especialista: Agentes de IA</h4>
-                <p className="text-slate-400 text-xs">Cria "cérebros" completos para seus chatbots (Typebot/OpenAI). <span className="text-white underline cursor-pointer" onClick={() => navigate('/login')}>Acessar no Hub Pro</span></p>
-              </div>
-              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
-                <h4 className="text-amber-400 font-bold text-sm mb-1">⚙️ Especialista: Personalizar LLMs</h4>
-                <p className="text-slate-400 text-xs">Instruções para treinar seu ChatGPT/Gemini com sua voz. <span className="text-white underline cursor-pointer" onClick={() => navigate('/login')}>Acessar no Hub Pro</span></p>
-              </div>
-            </div>
 
-            <div className="mt-6 p-4 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl inline-block">
-              <p className="text-sm font-bold text-fuchsia-300">💡 Quer apenas o Prompt Lab?</p>
-              <button onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Pro Mensal por R$ 3,00', '_blank')} className="text-white hover:text-white underline mt-1 text-xs">Assinar Pro Mensal (R$ 3,00)</button>
+            <div className="mt-8 p-6 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl max-w-2xl mx-auto">
+              <p className="text-lg font-bold text-fuchsia-300 mb-3">💡 Quer apenas o Prompt Lab?</p>
+              <ul className="text-sm text-slate-300 space-y-2 mb-4">
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400">🔥</span>
+                  <span><strong>Agentes de IA:</strong> Cria "cérebros" completos para chatbots (Typebot/OpenAI)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400">⚙️</span>
+                  <span><strong>Personalizar LLMs:</strong> Instruções para treinar ChatGPT/Gemini com sua voz</span>
+                </li>
+              </ul>
+              <button
+                onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Pro Mensal por R$ 3,00', '_blank')}
+                className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg"
+              >
+                Assinar Pro Mensal (R$ 3,00)
+              </button>
             </div>
           </div>
         </section>

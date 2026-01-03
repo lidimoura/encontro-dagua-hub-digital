@@ -55,12 +55,12 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
 
                             {/* AI Insight Popup */}
                             {showAIInsight && !cardMoved && (
-                                <div className="absolute -top-24 left-0 right-0 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white p-4 rounded-xl shadow-2xl z-10 animate-fade-in">
+                                <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 w-[calc(100%-1rem)] max-w-xs bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white p-4 rounded-xl shadow-2xl z-10 animate-fade-in">
                                     <div className="flex items-start gap-2 mb-3">
                                         <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
                                         <div className="flex-1">
                                             <p className="text-xs font-bold mb-1">💡 Insight da IA</p>
-                                            <p className="text-xs">Maria interagiu 3x. Converter para Cliente?</p>
+                                            <p className="text-xs">Maria demonstrou interesse no Serviço X. Enviar Proposta?</p>
                                         </div>
                                     </div>
                                     <button
