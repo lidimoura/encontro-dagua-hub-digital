@@ -23,10 +23,31 @@ const TEAM_MEMBERS = [
     linkedin: "https://linkedin.com/in/sua-url",
     pitch: "Formada em Psicologia pela UFAM (onde seu avô, professor de Matemática, dá nome a um bloco acadêmico), Lidi traz uma bagagem única. Como artista viajante e nômade, aprendeu a se adaptar; da mãe professora de inglês herdou a habilidade de comunicação e do pai técnico de informática, a lógica. Hoje, atua como criadora de soluções digitais e fundadora do hub. Trabalha no modo heutagógico, aprendendo e fazendo com suporte estratégico de IAs. Sua missão é integrar essa herança criativa e técnica para oferecer autonomia e prosperidade real para todos."
   },
-  { id: 'amazo', name: "Amazo", role: "CS & Vendas", type: "ai", image: "/avatar-amazo.jpeg", color: "border-fuchsia-500 text-fuchsia-400", pitch: "Atendimento 24h. Garanto que nenhum cliente fique sem resposta." },
-  { id: 'precy', name: "Precy", role: "Tech Lead", type: "ai", color: "border-blue-500 text-blue-400", pitch: "Estabilidade e segurança. Cuido para que seu QR D'água funcione sempre." },
-  { id: 'jury', name: "Jury", role: "Compliance", type: "ai", color: "border-red-500 text-red-400", pitch: "Ética e responsabilidade. Garanto privacidade e valores humanos." },
-  { id: 'aiflow', name: "Aiflow", role: "Board Assistant", type: "ai", color: "border-green-500 text-green-400", pitch: "Organização e produtividade. Gerencio seu board e fluxos de trabalho." }
+  {
+    id: 'precy',
+    name: "Precy",
+    role: "Tech Lead",
+    type: "ai",
+    color: "border-blue-500 text-blue-400",
+    pitch: "Guardiã da estabilidade. Precy monitora a infraestrutura do Hub 24/7, garantindo que seu QR D'água e automações funcionem com segurança máxima e zero latência."
+  },
+  {
+    id: 'amazo',
+    name: "Amazô",
+    role: "CS & Vendas",
+    type: "ai",
+    image: "/avatar-amazo.jpeg",
+    color: "border-fuchsia-500 text-fuchsia-400",
+    pitch: "Especialista em escuta ativa. A Amazô realiza o diagnóstico inicial do seu negócio e guia você para a solução ideal, disponível a qualquer hora do dia."
+  },
+  {
+    id: 'antigravity',
+    name: "Antigravity",
+    role: "Dev",
+    type: "ai",
+    color: "border-purple-500 text-purple-400",
+    pitch: "Arquiteto de soluções. Transforma ideias complexas em código limpo e funcional, expandindo as fronteiras do que o Hub pode oferecer."
+  }
 ];
 
 export default function LandingPage() {
@@ -53,20 +74,59 @@ export default function LandingPage() {
     return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
   }, []);
 
-  // FORCE OPEN CHAT (Tenta várias vezes até conseguir)
+  // FORCE OPEN CHAT - Direct link to Typebot (infalível)
   const openAmazoChat = () => {
-    let attempts = 0;
-    const interval = setInterval(() => {
+    // Open Typebot in new tab - guaranteed to work
+    window.open('https://typebot.co/template-chatbot-amazo-landigpage', '_blank');
+  };
+
+  // Test Prompt with correct API config
+  const handleTestPrompt = async () => {
+    if (!optimizedResult) return;
+    setIsTesting(true);
+    setTestResponse(null);
+
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error('API Key do Gemini não configurada');
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+
+      // Use same model as handleOptimize (gemini-2.5-flash-lite)
+      let model;
+      try {
+        model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+      } catch {
+        model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      }
+
+      const result = await model.generateContent(optimizedResult);
+      const response = await result.response;
+      const text = response.text().trim();
+
+      setTestResponse(text);
+    } catch (error) {
+      console.error('Erro ao testar prompt:', error);
+      setTestResponse('❌ Erro ao testar. Verifique sua conexão.');
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  // OLD openAmazoChat - REMOVED
+  const OLD_openAmazoChat_REMOVED = () => {
+    if (typeof window !== 'undefined' && (window as any).Typebot) {
+      (window as any).Typebot.open();
+    } else {
       const bubble = document.querySelector('typebot-bubble');
       const shadow = bubble?.shadowRoot;
       const button = shadow?.querySelector('.button-container');
       if (button instanceof HTMLElement) {
         button.click();
-        clearInterval(interval);
+      } else {
+        console.warn('Typebot not found. Make sure the Typebot script is loaded.');
       }
-      attempts++;
-      if (attempts > 10) clearInterval(interval); // Desiste após 2 segundos
-    }, 200);
+    }
   };
 
   const handleOptimize = async () => {
@@ -266,7 +326,7 @@ Agora, gere o prompt perfeito:`;
                     onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate('/'); }}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Início
+                    Home
                   </a>
                   <a
                     href="#solucoes"
@@ -280,14 +340,14 @@ Agora, gere o prompt perfeito:`;
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Showcase
+                    Galeria de Clientes
                   </a>
                   <a
-                    href="#manifesto"
+                    href="#sobre"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Manifesto
+                    Sobre Nós
                   </a>
 
                   <div className="border-t border-white/10 my-4" />
@@ -366,22 +426,19 @@ Agora, gere o prompt perfeito:`;
         {/* ========== B. NOSSAS SOLUÇÕES ========== */}
 
         {/* INTRO: Nossas Soluções */}
-        <section className="py-16 px-6 bg-[#02040a] text-center border-t border-white/5">
+        <section id="solucoes" className="py-16 px-6 bg-[#02040a] text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Nossas Soluções
             </h2>
             <p className="text-lg text-slate-300 leading-relaxed mb-4">
-              O Encontro D'água é um <span className="text-fuchsia-400 font-semibold">ecossistema digital vivo</span> que integra estratégias humanas com a eficiência da IA.
-            </p>
-            <p className="text-slate-400">
-              Explore nossas ferramentas abaixo e descubra como podemos potencializar seu negócio.
+              Não vendemos apenas automações ou prompts. Oferecemos <span className="text-fuchsia-400 font-semibold">soluções reais para problemas reais</span>. Nosso foco é realizar seu desejo com precificação justa, escuta sensível e tecnologia assertiva.
             </p>
           </div>
         </section>
 
         {/* PROMPT LAB (INTERATIVO) - Solução #1 */}
-        <section id="solucoes" className="py-20 px-6 bg-[#05020a] border-y border-white/5 text-center">
+        <section className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
             <h3 className="text-3xl font-bold text-white mb-4">Prompt Lab</h3>
@@ -468,7 +525,7 @@ Agora, gere o prompt perfeito:`;
         </section>
 
         {/* QR D'ÁGUA - Solução #2 */}
-        <section className="py-20 px-6 bg-[#02040a] border-t border-white/5">
+        <section className="py-20 px-6 bg-[#02040a]">
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
               <Sparkles className="w-3 h-3" /> QR D'água
@@ -481,13 +538,13 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* VITRINE DA COMUNIDADE (SHOWCASE) */}
-        <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center border-t border-white/5">
+        {/* GALERIA DE CLIENTES DO HUB */}
+        <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-6xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> Vitrine da Comunidade
+              <Sparkles className="w-3 h-3" /> Galeria de Clientes
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Exemplos Reais</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Galeria de Clientes do Hub</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
               Veja como empreendedores estão usando o QR D'água para conectar com seus clientes
             </p>

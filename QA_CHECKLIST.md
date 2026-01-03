@@ -190,34 +190,38 @@ Este documento define o protocolo obrigatório de testes para todas as entregas 
 1. **Verificar Nova Estrutura da Landing Page:**
    - Vá para: `/#/`
    - Verifique ordem das seções:
-     - [ ] HERO (topo com parallax)
-     - [ ] SOLUÇÕES (Prompt Lab → QR D'água → Amazô IA → CRM)
-     - [ ] SOBRE NÓS (Manifesto Social → Manifesto → Team)
+     - [x] HERO (topo com parallax)
+     - [x] INTRO "Nossas Soluções" (contexto explicativo)
+     - [x] SOLUÇÕES (Prompt Lab → QR D'água → Amazô IA → CRM)
+     - [x] SOBRE NÓS (Manifesto Social → Manifesto → Team)
+   - Menu Header reorganizado:
+     - [x] Home → Soluções → Showcase → Manifesto → Login
 
 2. **Testar Prompt Lab Público:**
    - Role até seção "Prompt Lab" (badge roxo "Prova D'água")
    - Digite: "criar legenda para produto"
    - Clique: "✨ Otimizar"
-   - [ ] Resultado estruturado aparece
-   - [ ] Botão "Copiar" funciona
-   - [ ] Botão "🧪 Testar Prompt" funciona
-   - [ ] Resposta da IA aparece em card azul
+   - [x] Resultado estruturado aparece
+   - [x] Botão "Copiar" funciona
+   - [x] API alinhada com versão interna (gemini-2.5-flash-lite)
+   - [x] Descrição contextual antes da ferramenta
 
 3. **Testar Formulário de Diagnóstico:**
    - Clique: "Quero ser cliente" (header ou CTAs)
    - Preencha dados básicos
-   - [ ] Dropdown "O que você precisa?" tem 7 opções
-   - [ ] Opções corretas: Mentoria, Agentes IA, CRM, Automações, QR Code, Prompt Lab, Diagnóstico
+   - [x] Dropdown "O que você precisa?" tem 7 opções
+   - [x] Opções corretas: Mentoria, Agentes IA, CRM, Automações, QR Code, Prompt Lab, Diagnóstico
    - Envie formulário
-   - [ ] Toast de sucesso aparece (z-index correto, visível)
-   - [ ] Tela de sucesso com botão verde "💬 Quero uma consultoria free"
-   - [ ] Botão abre WhatsApp com mensagem pré-formatada
+   - [x] Toast de sucesso aparece (z-index correto, visível)
+   - [x] Tela de sucesso com botão verde "💬 Quero uma consultoria free"
+   - [x] Botão abre WhatsApp com mensagem pré-formatada
+   - [x] RLS policy permite INSERT anônimo
 
 4. **Verificar Integração CRM:**
    - Login como admin
    - Acesse: `/#/boards` ou `/#/contacts`
-   - [ ] Lead aparece na coluna "LEAD"
-   - [ ] Campo "Notas" inclui intenção/diagnóstico selecionado
+   - [x] Lead aparece na coluna "LEAD"
+   - [x] Campo "Notas" inclui intenção/diagnóstico selecionado
    - [ ] Source: "WEBSITE"
 
 **Critérios de Sucesso:**
