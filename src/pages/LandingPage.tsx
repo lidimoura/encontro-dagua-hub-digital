@@ -186,35 +186,7 @@ Agora, gere o prompt perfeito:`;
     }
   };
 
-  const handleTestPrompt = async () => {
-    if (!optimizedResult) return;
-    setIsTesting(true);
-    setTestResponse(null);
 
-    try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error('API Key não configurada');
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      let model;
-      try {
-        model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-      } catch {
-        model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      }
-
-      const result = await model.generateContent(optimizedResult);
-      const response = await result.response;
-      const text = response.text().trim();
-
-      setTestResponse(text);
-    } catch (error) {
-      console.error('Erro ao testar:', error);
-      setTestResponse('❌ Erro ao testar prompt. Tente novamente.');
-    } finally {
-      setIsTesting(false);
-    }
-  };
 
   // Gallery Projects State
   const [galleryProjects, setGalleryProjects] = useState<any[]>([]);
