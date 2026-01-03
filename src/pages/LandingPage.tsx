@@ -269,11 +269,11 @@ Agora, gere o prompt perfeito:`;
                     Início
                   </a>
                   <a
-                    href="#lab"
+                    href="#solucoes"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Prompt Lab
+                    Soluções
                   </a>
                   <a
                     href="#showcase"
@@ -281,13 +281,6 @@ Agora, gere o prompt perfeito:`;
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
                     Showcase
-                  </a>
-                  <a
-                    href="#solucoes"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
-                  >
-                    Soluções
                   </a>
                   <a
                     href="#manifesto"
