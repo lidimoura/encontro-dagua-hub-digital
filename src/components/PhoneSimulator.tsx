@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCode } from 'react-qrcode-logo';
 
 type SimulatorMode = 'venda' | 'bio' | 'pix';
 
@@ -22,12 +22,14 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                     </div>
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
                         <div className="flex justify-center mb-3">
-                            <QRCodeSVG
+                            <QRCode
                                 value="https://exemplo.com/venda"
                                 size={120}
-                                level="H"
+                                ecLevel="H"
                                 fgColor="#7c3aed"
                                 bgColor="transparent"
+                                qrStyle="dots"
+                                eyeRadius={10}
                             />
                         </div>
                         <p className="text-white text-xs text-center">Escaneie para pedir</p>
@@ -75,12 +77,14 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ className = '' }
                     </div>
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
                         <div className="flex justify-center mb-4">
-                            <QRCodeSVG
+                            <QRCode
                                 value="00020126580014br.gov.bcb.pix0136"
                                 size={140}
-                                level="H"
+                                ecLevel="H"
                                 fgColor="#14b8a6"
                                 bgColor="transparent"
+                                qrStyle="dots"
+                                eyeRadius={10}
                             />
                         </div>
                         <p className="text-white text-xs text-center font-mono bg-black/30 p-2 rounded">
