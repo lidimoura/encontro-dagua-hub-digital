@@ -697,8 +697,20 @@ Agora, gere o prompt perfeito:`;
 
         {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
 
-        {/* MANIFESTO SOCIAL */}
-        <section id="manifesto" className="py-24 px-6 bg-[#02040a] text-center border-t border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.8)]">
+        {/* 1. MANIFESTO (TEXTO) */}
+        <section id="sobre" className="py-20 px-6 bg-[#05020a]">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-slate-300 leading-relaxed mb-6">
+                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 2. TECNOLOGIA PARA TODOS */}
+        <section className="py-24 px-6 bg-[#02040a] text-center">
           <div className="max-w-5xl mx-auto">
             <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
@@ -724,21 +736,9 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* MANIFESTO (TEXTO) */}
-        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
-            <div className="prose prose-invert max-w-none">
-              <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* TEAM */}
-        <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10 border-t border-white/5">
-          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">Sobre Nós</h2></div>
+        {/* 3. EQUIPE */}
+        <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10">
+          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">Equipe</h2></div>
           <div className="relative max-w-lg mx-auto h-[400px] flex items-center justify-center">
             <button onClick={() => setActiveTeamIndex((p) => p === 0 ? TEAM_MEMBERS.length - 1 : p - 1)} className="absolute left-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronLeft /></button>
 
