@@ -277,10 +277,9 @@ Agora, gere o prompt perfeito:`;
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#lab" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Prompt Lab</a>
-            <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Showcase</a>
             <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Soluções</a>
-            <a href="#manifesto" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Manifesto</a>
+            <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Galeria</a>
+            <a href="#sobre" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Sobre Nós</a>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold">Painel</button>
             ) : (
@@ -321,7 +320,6 @@ Agora, gere o prompt perfeito:`;
                   <X size={24} />
                 </button>
 
-                {/* Menu Items */}
                 <nav className="flex flex-col gap-6">
                   <a
                     href="#"
@@ -342,7 +340,7 @@ Agora, gere o prompt perfeito:`;
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Galeria de Clientes
+                    Galeria
                   </a>
                   <a
                     href="#sobre"
