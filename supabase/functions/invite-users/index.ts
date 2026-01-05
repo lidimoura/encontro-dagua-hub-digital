@@ -71,12 +71,14 @@ serve(async (req) => {
       throw new Error("At least one email is required");
     }
 
-    if (!role || !["admin", "vendedor"].includes(role)) {
-      throw new Error("Invalid role. Must be 'admin' or 'vendedor'");
+    if (!role || !["admin", "equipe", "cliente", "cliente_restrito"].includes(role)) {
+      throw new Error("Invalid role. Must be 'admin', 'equipe', 'cliente', or 'cliente_restrito'");
     }
 
-    // Get site URL for redirect
-    const siteUrl = Deno.env.get("SITE_URL") || "http://localhost:3000";
+    // Get site URL for redirect - prioritize production URL
+    const siteUrl = Deno.env.get("SITE_URL") || Deno.env.get("VERCEL_URL")
+      ? `https://${Deno.env.get("VERCEL_URL")}`
+      : "https://crm-encontro-dagua.vercel.app";
 
     // Send invites
     const results: InviteResult[] = [];
@@ -102,7 +104,7 @@ serve(async (req) => {
 
         // Send invite email using Supabase Admin API
         const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
-          redirectTo: `${siteUrl}/auth/callback?role=${role}&company_id=${profile.company_id}`,
+          redirectTo: `${siteUrl}/#/update-password?role=${role}&company_id=${profile.company_id}`,
           data: {
             role,
             company_id: profile.company_id,

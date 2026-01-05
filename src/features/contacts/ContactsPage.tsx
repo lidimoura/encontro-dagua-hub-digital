@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useContactsController } from './hooks/useContactsController';
 import { ContactsHeader } from './components/ContactsHeader';
 import { ContactsFilters } from './components/ContactsFilters';
@@ -7,9 +7,51 @@ import { ContactsStageTabs } from './components/ContactsStageTabs';
 import { ContactsList } from './components/ContactsList';
 import { ContactFormModal } from './components/ContactFormModal';
 import ConfirmModal from '@/components/ConfirmModal';
+import { MazoSuggestionCard } from '@/components/MazoSuggestionCard';
+import { MazoInviteModal } from '@/components/MazoInviteModal';
 
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
+    const [mazoInviteModal, setMazoInviteModal] = useState<{
+        isOpen: boolean;
+        contactName: string;
+        contactEmail: string;
+        contactId: string;
+    }>({
+        isOpen: false,
+        contactName: '',
+        contactEmail: '',
+        contactId: '',
+    });
+    const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+
+    // Mazô AI Logic: Find clients who won but don't have user_id (need onboarding)
+    const mazoSuggestion = useMemo(() => {
+        const wonClients = controller.filteredContacts.filter(
+            contact =>
+                contact.stage === 'CUSTOMER' &&
+                !contact.user_id &&
+                !dismissedSuggestions.has(contact.id)
+        );
+        return wonClients.length > 0 ? wonClients[0] : null;
+    }, [controller.filteredContacts, dismissedSuggestions]);
+
+    const handleAcceptMazoSuggestion = () => {
+        if (mazoSuggestion) {
+            setMazoInviteModal({
+                isOpen: true,
+                contactName: mazoSuggestion.name,
+                contactEmail: mazoSuggestion.email,
+                contactId: mazoSuggestion.id,
+            });
+        }
+    };
+
+    const handleDismissMazoSuggestion = () => {
+        if (mazoSuggestion) {
+            setDismissedSuggestions(prev => new Set(prev).add(mazoSuggestion.id));
+        }
+    };
 
     return (
         <div className="space-y-6 p-8 max-w-[1600px] mx-auto">
