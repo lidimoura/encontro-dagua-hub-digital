@@ -73,6 +73,15 @@ export const ContactsPage: React.FC = () => {
                 />
             )}
 
+            {/* Mazô CS Copilot Suggestion */}
+            {mazoSuggestion && (
+                <MazoSuggestionCard
+                    contactName={mazoSuggestion.name}
+                    onAccept={handleAcceptMazoSuggestion}
+                    onDismiss={handleDismissMazoSuggestion}
+                />
+            )}
+
             {/* Stage Tabs - Funil de Contatos */}
             <ContactsStageTabs
                 activeStage={controller.stageFilter}
@@ -117,6 +126,15 @@ export const ContactsPage: React.FC = () => {
                 message="Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita."
                 confirmText="Excluir"
                 variant="danger"
+            />
+
+            {/* Mazô Invite Modal */}
+            <MazoInviteModal
+                isOpen={mazoInviteModal.isOpen}
+                onClose={() => setMazoInviteModal({ ...mazoInviteModal, isOpen: false })}
+                contactName={mazoInviteModal.contactName}
+                contactEmail={mazoInviteModal.contactEmail}
+                contactId={mazoInviteModal.contactId}
             />
         </div>
     );
