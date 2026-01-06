@@ -48,6 +48,9 @@ const AdminUsersPage = lazy(() =>
   import('@/features/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage }))
 );
 const AdminPage = lazy(() => import('@/features/admin/AdminPage'));
+const TechStackPage = lazy(() =>
+  import('@/features/admin/TechStackPage').then(m => ({ default: m.TechStackPage }))
+);
 const BridgePage = lazy(() =>
   import('@/pages/BridgePage').then(m => ({ default: m.BridgePage }))
 );
@@ -152,6 +155,11 @@ const App: React.FC = () => {
                       <Route path="admin/users" element={
                         <RoleBasedRoute allowedRoles={['admin']}>
                           <AdminUsersPage />
+                        </RoleBasedRoute>
+                      } />
+                      <Route path="admin/tech-stack" element={
+                        <RoleBasedRoute allowedRoles={['admin']}>
+                          <TechStackPage />
                         </RoleBasedRoute>
                       } />
 
