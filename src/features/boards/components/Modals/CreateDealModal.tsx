@@ -254,7 +254,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
 
                         {products.length === 0 && (
                             <div className="text-center py-6 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-black/10 rounded-lg">
-                                Nenhum produto cadastrado. Cadastre produtos no Painel Admin primeiro.
+                                {t('noProductsAdminFirst')}
                             </div>
                         )}
 

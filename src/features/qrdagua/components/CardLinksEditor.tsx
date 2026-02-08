@@ -83,7 +83,7 @@ export const CardLinksEditor: React.FC<LinksEditorProps> = ({ links, onChange })
             {links.length === 0 ? (
                 <div className="bg-slate-50 dark:bg-rionegro-950 border-2 border-dashed border-slate-300 dark:border-rionegro-700 rounded-lg p-8 text-center">
                     <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        Nenhum link adicionado. Clique em "Adicionar Link" para começar.
+                        {t('noLinksAdded')}
                     </p>
                 </div>
             ) : (
