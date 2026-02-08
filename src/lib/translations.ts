@@ -224,7 +224,6 @@ export const translations = {
         help: "Ajuda",
         user: "Usuário",
         refreshPermissions: "Atualizar permissões",
-        openMenu: "Abrir menu",
         lightMode: "Modo Claro",
         darkMode: "Modo Escuro",
 
@@ -464,7 +463,6 @@ export const translations = {
         help: "Help",
         user: "User",
         refreshPermissions: "Refresh permissions",
-        openMenu: "Open menu",
         lightMode: "Light Mode",
         darkMode: "Dark Mode",
 
