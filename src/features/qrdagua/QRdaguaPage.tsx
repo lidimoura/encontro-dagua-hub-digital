@@ -1087,7 +1087,7 @@ export const QRdaguaPage: React.FC = () => {
                                     className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-acai-900 to-acai-700 text-white rounded-lg font-semibold hover:shadow-xl hover:shadow-acai-900/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Save className="w-5 h-5" />
-                                    {isSaving ? 'Salvando...' : editingId ? 'Atualizar Projeto' : 'Salvar Projeto'}
+                                    {isSaving ? t('saving') : editingId ? t('updateProject') : t('saveProject')}
                                 </button>
                             </div>
                         </form>
@@ -1123,8 +1123,8 @@ export const QRdaguaPage: React.FC = () => {
                 ) : projects.length === 0 ? (
                     <div className="bg-white dark:bg-rionegro-900 rounded-2xl shadow-xl border border-solimoes-400/20 dark:border-solimoes-400/10 p-12 text-center">
                         <QrCode className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-                        <p className="text-slate-500 dark:text-slate-400">
-                            Nenhum projeto criado ainda. Crie seu primeiro projeto acima!
+                        <p className="text-slate-500 dark:text-slate-400 text-center py-8">
+                            {t('noProjectsYet')}
                         </p>
                     </div>
                 ) : (
@@ -1241,6 +1241,9 @@ export const QRdaguaPage: React.FC = () => {
                                             title="Editar"
                                         >
                                             <Edit2 size={16} />
+                                        </button>
+                                        <button onClick={handleCancelEdit} className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                            {t('cancelEdit')}
                                         </button>
                                         <button
                                             onClick={() => handleDelete(project.id)}

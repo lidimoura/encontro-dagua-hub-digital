@@ -107,7 +107,7 @@ export const ContactFormModalV2: React.FC<ContactFormModalProps> = ({
         )}
 
         <SubmitButton isLoading={isSubmitting}>
-          {editingContact ? 'Salvar Alterações' : 'Criar Contato'}
+          {editingContact ? t('saveChanges') : t('createContact')}
         </SubmitButton>
       </ModalForm>
     </Modal>

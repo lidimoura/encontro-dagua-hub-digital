@@ -145,7 +145,7 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
         />
 
         <SubmitButton isLoading={isSubmitting}>
-          {editingActivity ? 'Salvar Alterações' : 'Criar Atividade'}
+          {editingActivity ? t('saveChanges') : t('createActivity')}
         </SubmitButton>
       </ModalForm>
     </Modal>

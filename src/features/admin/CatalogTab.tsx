@@ -155,7 +155,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                             onClick={onClose}
                             className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition"
                         >
-                            Cancelar
+                            {t('cancel')}
                         </button>
                         <button
                             type="submit"
@@ -168,7 +168,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                                     Salvando...
                                 </>
                             ) : (
-                                'Salvar'
+                                { t('save') }
                             )}
                         </button>
                     </div>
@@ -302,7 +302,7 @@ export default function CatalogTab() {
             {products.length === 0 ? (
                 <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                     <Package className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                    <p className="text-slate-600 dark:text-slate-400 mb-4">Nenhum produto cadastrado</p>
+                    <p className="text-slate-600 dark:text-slate-400 mb-4">{t('noProductsRegistered')}</p>
                     <button
                         onClick={() => setShowCreateModal(true)}
                         className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition"

@@ -418,7 +418,7 @@ Agora, gere o prompt perfeito:`;
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                         </svg>
-                                        Salvar
+                                        {t('save')}
                                     </button>
                                 </div>
                             )}
@@ -483,7 +483,7 @@ Agora, gere o prompt perfeito:`;
                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                                             </svg>
-                                                            Salvar
+                                                            {t('save')}
                                                         </button>
                                                     </div>
                                                 )}
@@ -575,7 +575,7 @@ Agora, gere o prompt perfeito:`;
                     <div className="bg-white dark:bg-rionegro-900 rounded-2xl shadow-xl border border-purple-400/20 dark:border-purple-400/10 p-12 text-center">
                         <Wand2 className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
                         <p className="text-slate-500 dark:text-slate-400">
-                            Nenhum prompt salvo ainda. Otimize um prompt e clique em "Salvar"!
+                            {t('noPromptsSaved')}
                         </p>
                     </div>
                 ) : (
@@ -627,7 +627,7 @@ Agora, gere o prompt perfeito:`;
                     <div className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200" onClick={() => setShowSaveModal(false)} />
                     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in zoom-in-95 fade-in duration-200">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Salvar Prompt</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('savePrompt')}</h3>
                             <button
                                 onClick={() => setShowSaveModal(false)}
                                 className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
@@ -665,7 +665,7 @@ Agora, gere o prompt perfeito:`;
                                 disabled={isSaving || !saveTitle.trim()}
                                 className="w-full py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isSaving ? 'Salvando...' : 'Salvar'}
+                                {isSaving ? t('saving') : t('save')}
                             </button>
                         </div>
                     </div>

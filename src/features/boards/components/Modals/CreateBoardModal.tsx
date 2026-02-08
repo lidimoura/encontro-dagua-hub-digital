@@ -203,7 +203,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
                 onChange={(e) => setLinkedLifecycleStage(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <option value="">Nenhum (board genérico)</option>
+                <option value="">{t('noneGenericBoard')}</option>
                 {lifecycleStages.map(stage => (
                   <option key={stage.id} value={stage.id}>{stage.name}</option>
                 ))}
@@ -223,7 +223,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
                 onChange={(e) => setNextBoardId(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <option value="">Nenhum (Finalizar aqui)</option>
+                <option value="">{t('noneFinishHere')}</option>
                 {validNextBoards.map(board => (
                   <option key={board.id} value={board.id}>
                     {board.name}
@@ -339,14 +339,14 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
             >
-              Cancelar
+              {t('cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={!name.trim()}
               className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
             >
-              {editingBoard ? 'Salvar Alterações' : 'Criar Board'}
+              {editingBoard ? t('saveChanges') : t('createBoard')}
             </button>
           </div>
         </div>

@@ -3,24 +3,22 @@
  * Central de Decisões - Página principal
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
+  Crosshair,
   Sparkles,
-  RefreshCw,
   CheckCircle2,
-  AlertTriangle,
+  XCircle,
   Clock,
-  TrendingUp,
-  Trash2,
-  Loader2,
-  Inbox,
-  Zap,
+  AlertTriangle,
 } from 'lucide-react';
 import { DecisionCard } from './components/DecisionCard';
 import { useDecisionQueue } from './hooks/useDecisionQueue';
+import { useTranslation } from '@/hooks/useTranslation';
 import { PRIORITY_LABELS, CATEGORY_LABELS } from './types';
 
 export const DecisionQueuePage: React.FC = () => {
+  const { t } = useTranslation();
   const {
     decisions,
     stats,
@@ -169,7 +167,7 @@ export const DecisionQueuePage: React.FC = () => {
               <Sparkles size={32} />
             </div>
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              Nenhuma decisão pendente
+              {t('noDecisionsPending')}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
               Clique em "Analisar Agora" para que a IA analise seu CRM e sugira ações

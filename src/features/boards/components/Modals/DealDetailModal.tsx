@@ -615,7 +615,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                   <div className="space-y-3 pl-4 border-l border-slate-200 dark:border-slate-800">
                     {dealActivities.length === 0 && (
                       <p className="text-sm text-slate-500 italic pl-4">
-                        Nenhuma atividade registrada.
+                        {t('noActivitiesRecorded')}
                       </p>
                     )}
                     {dealActivities.map(activity => (
@@ -627,7 +627,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                           const act = activities.find(a => a.id === id);
                           if (act) updateActivity(id, { completed: !act.completed });
                         }}
-                        onEdit={() => {}} // Edit not implemented in modal yet
+                        onEdit={() => { }} // Edit not implemented in modal yet
                         onDelete={id => deleteActivity(id)}
                       />
                     ))}
@@ -686,7 +686,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         {!deal.items || deal.items.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-4 py-8 text-center text-slate-500 italic">
-                              Nenhum produto adicionado. O valor do negócio é manual.
+                              {t('noProductsAdded')}
                             </td>
                           </tr>
                         ) : (

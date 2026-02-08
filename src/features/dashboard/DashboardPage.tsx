@@ -66,7 +66,7 @@ const DashboardPage: React.FC = () => {
               if (count > 0) {
                 addToast(`${count} alertas de risco gerados na lista de atividades!`, 'warning');
               } else {
-                addToast('Nenhum novo risco detectado. Carteira saudável!', 'success');
+                addToast(t('noRisksDetected'), 'success');
               }
             }}
             className="bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-5 py-2 rounded-lg text-sm font-medium transition-all"
@@ -238,7 +238,7 @@ const DashboardPage: React.FC = () => {
               <ActivityFeedItem key={activity.id} activity={activity} />
             ))}
             {activities.length === 0 && (
-              <p className="text-sm text-slate-500 text-center py-4">Nenhuma atividade recente.</p>
+              <p className="text-sm text-slate-500 text-center py-4">{t('noRecentActivities')}</p>
             )}
           </div>
           <button
