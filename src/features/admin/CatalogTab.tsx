@@ -168,7 +168,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                                     Salvando...
                                 </>
                             ) : (
-                                { t('save') }
+                                t('save')
                             )}
                         </button>
                     </div>
