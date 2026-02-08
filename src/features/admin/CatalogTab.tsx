@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Plus, Edit, Trash2, X, Package } from 'lucide-react';
 import { Product } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ProductFormData {
     name: string;
@@ -19,6 +20,7 @@ interface ProductModalProps {
 }
 
 function ProductModal({ product, onClose, onSave }: ProductModalProps) {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState<ProductFormData>({
         name: product?.name || '',
         price: product?.price || 0,
@@ -179,6 +181,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
 }
 
 export default function CatalogTab() {
+    const { t } = useTranslation();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -194,6 +197,7 @@ export default function CatalogTab() {
             const { data, error } = await supabase
                 .from('products')
                 .select('*')
+                .or('product_type.neq.tech_stack,is_internal.eq.false')
                 .order('created_at', { ascending: false });
 
             if (error) throw error;

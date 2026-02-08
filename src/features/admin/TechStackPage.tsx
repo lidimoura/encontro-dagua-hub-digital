@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
     Server,
     Database,
@@ -54,6 +55,7 @@ const CATEGORY_COLORS = {
 };
 
 export const TechStackPage: React.FC = () => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const [products, setProducts] = useState<TechStackProduct[]>([]);
     const [loading, setLoading] = useState(true);

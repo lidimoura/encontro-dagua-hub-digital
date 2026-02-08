@@ -4,6 +4,7 @@ import { Board, BoardStage, ContactStage } from '@/types';
 import { BOARD_TEMPLATES, BoardTemplateType } from '@/board-templates';
 import { LifecycleSettingsModal } from '@/features/settings/components/LifecycleSettingsModal';
 import { useCRM } from '@/context/CRMContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface CreateBoardModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
   editingBoard,
   availableBoards
 }) => {
+  const { t } = useTranslation();
   const { lifecycleStages } = useCRM();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
