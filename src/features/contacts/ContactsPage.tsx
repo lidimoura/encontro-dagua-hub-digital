@@ -12,6 +12,17 @@ import { MazoInviteModal } from '@/components/MazoInviteModal';
 
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
+
+    // DEBUG: Log contact data for visibility diagnosis
+    React.useEffect(() => {
+        console.log('🔍 CONTACTS DEBUG:', {
+            totalContacts: controller.contacts.length,
+            filteredContacts: controller.filteredContacts.length,
+            isLoading: controller.isLoading,
+            rawData: controller.contacts
+        });
+    }, [controller.contacts, controller.filteredContacts, controller.isLoading]);
+
     const [mazoInviteModal, setMazoInviteModal] = useState<{
         isOpen: boolean;
         contactName: string;
