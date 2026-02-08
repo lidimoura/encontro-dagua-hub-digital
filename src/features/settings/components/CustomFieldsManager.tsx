@@ -2,6 +2,7 @@ import React from 'react';
 import { PenTool, Pencil, Check, Plus, List, Tag, Trash2 } from 'lucide-react';
 import { SettingsSection } from './SettingsSection';
 import { CustomFieldDefinition, CustomFieldType } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface CustomFieldsManagerProps {
   customFieldDefinitions: CustomFieldDefinition[];
@@ -32,6 +33,7 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
   onSaveField,
   onRemoveField
 }) => {
+  const { t } = useTranslation();
   return (
     <SettingsSection title="Campos Personalizados" icon={PenTool}>
       <p className="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
