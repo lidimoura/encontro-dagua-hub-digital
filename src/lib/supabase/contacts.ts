@@ -125,13 +125,22 @@ export const contactsService = {
   /**
    * Retrieves all contacts for the authenticated user's company
    * 
+   * SECURITY: Explicitly filters by company_id for defense-in-depth.
+   * Does NOT rely solely on RLS policies.
+   * 
+   * @param {string} companyId - User's company ID from profile
    * @returns {Promise<{data: Contact[] | null, error: Error | null}>} Array of contacts or error
    */
-  async getAll(): Promise<{ data: Contact[] | null; error: Error | null }> {
+  async getAll(companyId: string): Promise<{ data: Contact[] | null; error: Error | null }> {
     try {
+      if (!companyId) {
+        return { data: null, error: new Error('Company ID is required') };
+      }
+
       const { data, error } = await supabase
         .from('contacts')
         .select('*')
+        .eq('company_id', companyId) // EXPLICIT FILTER - Defense in depth
         .order('created_at', { ascending: false });
 
       if (error) return { data: null, error };

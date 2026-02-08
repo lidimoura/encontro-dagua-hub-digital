@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Heart, TrendingUp, AlertTriangle, Sparkles, MessageCircle, Calendar } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, TrendingUp, AlertTriangle, Sparkles, MessageCircle, Calendar, DollarSign } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useDealContext } from '@/context/DealContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/services/ai/bilingualService';
 
 interface MazoAgentProps {
     boardId: string;
@@ -21,6 +25,9 @@ interface HealthScore {
 
 export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
     const { addToast } = useToast();
+    const { t } = useTranslation();
+    const dealContext = useDealContext();
+    const { language } = useLanguage();
     const [customerName, setCustomerName] = useState('');
     const [lastContact, setLastContact] = useState('');
     const [satisfaction, setSatisfaction] = useState(5);
@@ -89,6 +96,34 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
             recommendations.push('🚨 URGENTE: Agendar reunião de retenção imediatamente');
         }
 
+        // Add ROI-based insights from Precy if available
+        if (dealContext?.quoteData?.roi) {
+            const roi = dealContext.quoteData.roi;
+            const roiPercent = roi.percentage.toFixed(1);
+            const returnValue = formatCurrency(roi.return, language);
+
+            if (status === 'healthy') {
+                recommendations.push(
+                    language === 'en'
+                        ? `💰 With ROI of ${roiPercent}% (${returnValue} return), you can be more aggressive in upselling`
+                        : `💰 Com ROI de ${roiPercent}% (retorno de ${returnValue}), você pode ser mais agressivo no upsell`
+                );
+            } else if (status === 'at-risk') {
+                const monthsToPayback = Math.ceil(roi.investment / (roi.return / 12));
+                recommendations.push(
+                    language === 'en'
+                        ? `📊 Show the ROI: ${roiPercent}% return pays for itself in ~${monthsToPayback} months`
+                        : `📊 Mostre o ROI: retorno de ${roiPercent}% se paga em ~${monthsToPayback} meses`
+                );
+            } else if (status === 'critical') {
+                recommendations.push(
+                    language === 'en'
+                        ? `💡 Emphasize value: ${returnValue} return on investment (${roiPercent}% ROI) - the real cost is zero`
+                        : `💡 Enfatize o valor: retorno de ${returnValue} (ROI de ${roiPercent}%) - o custo real é zero`
+                );
+            }
+        }
+
         const health: HealthScore = {
             score: totalScore,
             status,
@@ -137,10 +172,10 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 <Heart className="w-6 h-6 text-pink-600" />
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        Análise de Saúde do Cliente
+                        {t('healthAnalysis')}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Focada em retenção, empatia e prevenção de churn
+                        {t('retentionFocus')}
                     </p>
                 </div>
             </div>
@@ -150,7 +185,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 {/* Customer Name */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Nome do Cliente
+                        {t('customerName')}
                     </label>
                     <input
                         type="text"
@@ -164,7 +199,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 {/* Last Contact */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Último Contato
+                        {t('lastContact')}
                     </label>
                     <input
                         type="date"
@@ -177,7 +212,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 {/* Satisfaction */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Satisfação (1-10)
+                        {t('satisfaction')}
                     </label>
                     <div className="flex items-center gap-3">
                         <input
@@ -197,24 +232,24 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 {/* Usage Frequency */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Frequência de Uso
+                        {t('usageFrequency')}
                     </label>
                     <select
                         value={usageFrequency}
                         onChange={(e) => setUsageFrequency(e.target.value as any)}
                         className="w-full px-4 py-2 bg-white dark:bg-rionegro-900 border border-slate-300 dark:border-rionegro-700 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     >
-                        <option value="daily">Diário</option>
-                        <option value="weekly">Semanal</option>
-                        <option value="monthly">Mensal</option>
-                        <option value="rarely">Raramente</option>
+                        <option value="daily">{t('daily')}</option>
+                        <option value="weekly">{t('weekly')}</option>
+                        <option value="monthly">{t('monthly')}</option>
+                        <option value="rarely">{t('rarely')}</option>
                     </select>
                 </div>
 
                 {/* Payment Status */}
                 <div className="md:col-span-2">
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Status de Pagamento
+                        {t('paymentStatus')}
                     </label>
                     <div className="flex gap-3">
                         {[
@@ -226,8 +261,8 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                                 key={option.value}
                                 onClick={() => setPaymentStatus(option.value as any)}
                                 className={`flex-1 px-4 py-2 rounded-lg border-2 font-semibold transition-all ${paymentStatus === option.value
-                                        ? option.color
-                                        : 'bg-white dark:bg-rionegro-900 text-slate-500 border-slate-300 dark:border-rionegro-700'
+                                    ? option.color
+                                    : 'bg-white dark:bg-rionegro-900 text-slate-500 border-slate-300 dark:border-rionegro-700'
                                     }`}
                             >
                                 {option.label}
@@ -244,7 +279,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 className="w-full px-6 py-3 bg-gradient-to-r from-pink-600 to-rose-500 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 <TrendingUp className="w-5 h-5" />
-                Analisar Saúde do Cliente
+                {t('analyzeHealth')}
             </button>
 
             {/* Results */}
@@ -257,28 +292,28 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                             {healthScore.score}%
                         </div>
                         <div className="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                            {healthScore.status === 'healthy' && 'Cliente Saudável'}
-                            {healthScore.status === 'at-risk' && 'Cliente em Risco'}
-                            {healthScore.status === 'critical' && 'Risco Crítico de Churn'}
+                            {healthScore.status === 'healthy' && t('healthy')}
+                            {healthScore.status === 'at-risk' && t('atRisk')}
+                            {healthScore.status === 'critical' && t('critical')}
                         </div>
                     </div>
 
                     {/* Factors Breakdown */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Engajamento</div>
+                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('engagement')}</div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{healthScore.factors.engagement}%</div>
                         </div>
                         <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Satisfação</div>
+                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('satisfaction')}</div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{healthScore.factors.satisfaction}%</div>
                         </div>
                         <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Uso</div>
+                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('usage')}</div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{healthScore.factors.usage}%</div>
                         </div>
                         <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Pagamento</div>
+                            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('payment')}</div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{healthScore.factors.payment}%</div>
                         </div>
                     </div>
@@ -287,7 +322,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                     <div className="pt-4 border-t border-white/20">
                         <h4 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                             <Sparkles className="w-5 h-5" />
-                            Ações Recomendadas
+                            {t('recommendedActions')}
                         </h4>
                         <div className="space-y-2">
                             {healthScore.recommendations.map((rec, idx) => (

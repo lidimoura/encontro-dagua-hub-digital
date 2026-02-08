@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { LifecycleStage, Product, CustomFieldDefinition, Lead } from '@/types';
 import { settingsService, lifecycleStagesService } from '@/lib/supabase';
+import { productsService } from '@/lib/supabase/productsService';
 import { useAuth } from '../AuthContext';
 
 const DEFAULT_LIFECYCLE_STAGES: LifecycleStage[] = [
@@ -92,7 +93,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lifecycleStages, setLifecycleStages] = useState<LifecycleStage[]>(DEFAULT_LIFECYCLE_STAGES);
-  const [products] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [customFieldDefinitions, setCustomFieldDefinitions] = useState<CustomFieldDefinition[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -134,6 +135,12 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       const { data: stages } = await lifecycleStagesService.getAll();
       if (stages && stages.length > 0) {
         setLifecycleStages(stages);
+      }
+
+      // Fetch products from Supabase
+      const { data: productsData } = await productsService.getAll();
+      if (productsData) {
+        setProducts(productsData);
       }
     } catch (e) {
       console.error('Error fetching settings:', e);

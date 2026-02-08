@@ -10,6 +10,7 @@ import { KanbanList } from './Kanban/KanbanList';
 import { MobileKanbanView } from './Mobile/MobileKanbanView';
 import { DealView, CustomFieldDefinition, DealStatus, Board, BoardStage } from '@/types';
 import { useCRM } from '@/context/CRMContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface PipelineViewProps {
   // Boards
@@ -98,6 +99,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
   setLastMouseDownDealId,
 }) => {
   const { updateDeal } = useCRM();
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile viewport
@@ -137,7 +139,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>
+      <div className="flex items-center justify-center h-full text-slate-500">{t('loading')}</div>
     );
   }
 
@@ -149,17 +151,16 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
             <span className="text-4xl">🚀</span>
           </div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            Bem-vindo ao seu CRM
+            {t('welcomeCreateBoard')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 max-w-md mb-8">
-            Você ainda não tem nenhum board criado. Comece criando seu primeiro fluxo de trabalho
-            para organizar seus negócios.
+            {t('boardEmptyDesc')}
           </p>
           <button
             onClick={() => setIsWizardOpen(true)}
             className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-colors flex items-center gap-2 shadow-lg shadow-primary-600/20"
           >
-            ✨ Criar meu primeiro Board
+            ✨ {t('createFirstBoard')}
           </button>
         </div>
       ) : (

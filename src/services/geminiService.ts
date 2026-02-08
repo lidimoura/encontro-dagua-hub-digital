@@ -338,7 +338,7 @@ export const parseNaturalLanguageAction = async (
     
     Comando: "${text}"
     
-    Contexto Temporal: Hoje é ${now.toLocaleDateString('pt-BR')} (${now.toLocaleDateString('pt-BR', { weekday: 'long' })}), às ${now.toLocaleTimeString('pt-BR')}.
+    Temporal Context: Today is ${now.toLocaleDateString('en-US')} (${now.toLocaleDateString('en-US', { weekday: 'long' })}), at ${now.toLocaleTimeString('en-US')}.
     
     Instruções:
     1. Identifique a ação principal (Ligar, Reunião, Email, Tarefa).
@@ -498,21 +498,23 @@ export const generateBoardStructure = async (
   const lifecycleStagesList = lifecycleStages.map(s => `- ${s.name} (ID: ${s.id})`).join('\n');
 
   const promptStructure = `
-    Você é um Arquiteto de Processos.
-    O usuário quer um board para: "${description}"
+    You are a Process Architect.
+    The user wants a board for: "${description}"
 
-    Defina a ESTRUTURA do board (Fases do Processo).
+    Define the STRUCTURE of the board (Process Phases).
     
-    REGRAS DE LIFECYCLE STAGE (CRÍTICO):
-    - Para CADA estágio, defina um 'linkedLifecycleStage' usando APENAS:
+    LIFECYCLE STAGE RULES (CRITICAL):
+    - For EACH stage, define a 'linkedLifecycleStage' using ONLY:
     ${lifecycleStagesList}
-    - Se vazio, use: LEAD, MQL, PROSPECT, CUSTOMER, OTHER.
+    - If empty, use: LEAD, MQL, PROSPECT, CUSTOMER, OTHER.
     
-    REGRAS DE DESIGN:
+    DESIGN RULES:
     - "color": bg-blue-500, bg-yellow-500, bg-purple-500, bg-orange-500, bg-green-500.
-    - "name": MÁXIMO 2 PALAVRAS. Ex: "Qualificação", "Fechamento".
+    - "name": MAXIMUM 2 WORDS IN ENGLISH. Ex: "Qualification", "Closing".
     
-    Retorne JSON:
+    CRITICAL: ALL stage names and descriptions MUST be in ENGLISH, regardless of user input language.
+    
+    Return JSON:
     {
       "boardName": "...",
       "description": "...",
@@ -564,28 +566,30 @@ export const generateBoardStrategy = async (
   const model = getModel(provider, apiKey, modelId);
 
   const promptStrategy = `
-    Você é um Especialista em Estratégia de Negócios.
+    You are a Business Strategy Expert.
     
-    Temos este Board desenhado:
-    Nome: ${boardData.boardName}
-    Descrição: ${boardData.description}
-    Estágios: ${JSON.stringify(boardData.stages)}
+    We have this Board designed:
+    Name: ${boardData.boardName}
+    Description: ${boardData.description}
+    Stages: ${JSON.stringify(boardData.stages)}
 
-    Agora, defina a ESTRATÉGIA para operar este board.
+    Now, define the STRATEGY to operate this board.
 
-    1. META (Goal):
-       - KPI: Qual a métrica principal? (Ex: Taxa de Conversão, MRR, Tempo de Resolução)
-       - Target: Qual o alvo numérico? (Seja realista, não use 100% a menos que seja garantia).
-       - Descrição: Por que essa meta importa?
+    1. GOAL:
+       - KPI: What's the main metric? (Ex: Conversion Rate, MRR, Resolution Time)
+       - Target: What's the numeric target? (Be realistic, don't use 100% unless guaranteed).
+       - Description: Why does this goal matter?
 
-    2. AGENTE (Persona):
-       - Crie um especialista para operar ESTE processo específico.
-       - Nome: Sugira um nome humano (Ex: "Ana", "Carlos").
-       - Cargo: Ex: "SDR Senior", "Gerente de Onboarding".
-       - Comportamento: Descreva COMO ele deve agir em cada fase deste board. Seja detalhado.
+    2. AGENT (Persona):
+       - Create a specialist to operate THIS specific process.
+       - Name: Suggest a human name (Ex: "Ana", "Carlos").
+       - Role: Ex: "Senior SDR", "Onboarding Manager".
+       - Behavior: Describe HOW they should act in each phase of this board. Be detailed.
 
-    3. GATILHO (Entry Trigger):
-       - Quem entra na primeira fase (${boardData.stages[0]?.name})?
+    3. ENTRY TRIGGER:
+       - Who enters the first phase (${boardData.stages[0]?.name})?
+    
+    CRITICAL: ALL text outputs (goal description, agent behavior, entry trigger) MUST be in ENGLISH.
 
     Retorne JSON:
     {
@@ -656,8 +660,8 @@ export const refineBoardWithAI = async (
   // Format chat history for context
   const historyContext = chatHistory
     ? chatHistory
-        .map(msg => `${msg.role === 'user' ? 'Usuário' : 'Assistente'}: ${msg.content}`)
-        .join('\n')
+      .map(msg => `${msg.role === 'user' ? 'Usuário' : 'Assistente'}: ${msg.content}`)
+      .join('\n')
     : '';
 
   const prompt = `
@@ -752,9 +756,9 @@ export const refineBoardWithAI = async (
     const jsonStr = jsonMatch
       ? jsonMatch[0]
       : text
-          .replace(/```json/g, '')
-          .replace(/```/g, '')
-          .trim();
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
     const parsed = JSON.parse(jsonStr);
 
     // SAFETY MERGE: If AI returns a board but misses strategy fields, merge from currentBoard

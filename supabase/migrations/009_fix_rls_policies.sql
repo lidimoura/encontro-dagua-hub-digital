@@ -101,3 +101,4 @@ SELECT schemaname, tablename, policyname, permissive, roles, cmd
 FROM pg_policies
 WHERE tablename IN ('qr_codes', 'company_invites')
 ORDER BY tablename, policyname;
+ 
