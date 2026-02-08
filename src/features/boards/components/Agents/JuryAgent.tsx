@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, FileText, Download, Eye, Copy, CheckCircle, Sparkles } from 'lucide-react';
+import { Scale, FileText, Download, Eye, Copy, CheckCircle, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
+import { useDealContext } from '@/context/DealContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/services/ai/bilingualService';
+import jsPDF from 'jspdf';
 
 interface JuryAgentProps {
     boardId: string;
@@ -19,16 +23,32 @@ interface ContractTemplate {
 
 export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     const { addToast } = useToast();
+    const dealContext = useDealContext();
+    const { language } = useLanguage();
     const [templates, setTemplates] = useState<ContractTemplate[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState<ContractTemplate | null>(null);
+
+    // Contract type
+    const [contractType, setContractType] = useState<'simple' | 'complete'>('complete');
+
+    // Client data
     const [clientName, setClientName] = useState('');
     const [clientCpfCnpj, setClientCpfCnpj] = useState('');
     const [projectDescription, setProjectDescription] = useState('');
     const [value, setValue] = useState('');
+
+    // Hub contractor data
+    const [hubPersonType, setHubPersonType] = useState<'PF' | 'PJ'>('PF');
+    const [hubName, setHubName] = useState('Lidiany Moura');
+    const [hubCpf, setHubCpf] = useState('');
+    const [hubCnpj, setHubCnpj] = useState('');
+    const [hubAddress, setHubAddress] = useState('');
+
     const [generatedContract, setGeneratedContract] = useState('');
     const [showPreview, setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [exportingPDF, setExportingPDF] = useState(false);
 
     useEffect(() => {
         fetchContractTemplates();
@@ -62,16 +82,33 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         // Replace placeholders in template
         let contract = selectedTemplate.content;
 
-        // Common placeholders
+        // Client placeholders
         contract = contract.replace(/\[NOME_CLIENTE\]/g, clientName);
         contract = contract.replace(/\[CPF\/CNPJ\]/g, clientCpfCnpj || '[CPF/CNPJ]');
         contract = contract.replace(/\[DESCRIÇÃO_PROJETO\]/g, projectDescription || '[Descrição do Projeto]');
         contract = contract.replace(/\[VALOR\]/g, value || '[Valor]');
         contract = contract.replace(/\[DATA\]/g, new Date().toLocaleDateString('pt-BR'));
 
-        // Additional common placeholders
-        contract = contract.replace(/\[EMPRESA\]/g, 'Encontro D\'água Hub');
-        contract = contract.replace(/\[CNPJ_EMPRESA\]/g, '[CNPJ da Empresa]');
+        // Hub contractor placeholders (editable)
+        contract = contract.replace(/\[EMPRESA\]/g, hubName);
+        contract = contract.replace(/\[CONTRATANTE\]/g, hubName);
+
+        if (hubPersonType === 'PJ') {
+            contract = contract.replace(/\[CNPJ_EMPRESA\]/g, hubCnpj || '[CNPJ]');
+            contract = contract.replace(/\[CPF_EMPRESA\]/g, '');
+        } else {
+            contract = contract.replace(/\[CPF_EMPRESA\]/g, hubCpf || '[CPF]');
+            contract = contract.replace(/\[CNPJ_EMPRESA\]/g, '');
+        }
+
+        contract = contract.replace(/\[ENDEREÇO_EMPRESA\]/g, hubAddress || '[Endereço]');
+
+        // Contract type: if simple, remove clauses (basic implementation)
+        if (contractType === 'simple') {
+            // Simple contracts typically have fewer clauses
+            // This is a placeholder - actual implementation would depend on template structure
+            contract = '=== CONTRATO SIMPLIFICADO ===\n\n' + contract;
+        }
 
         setGeneratedContract(contract);
         setShowPreview(true);
@@ -84,17 +121,110 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const downloadContract = () => {
-        const blob = new Blob([generatedContract], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `contrato_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        addToast('Contrato baixado!', 'success');
+    const exportToPDF = async () => {
+        if (!generatedContract) return;
+
+        setExportingPDF(true);
+        try {
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Professional formatting
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            let yPosition = margin;
+
+            // Header
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(16);
+            const title = language === 'en' ? 'SERVICE CONTRACT' : 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS';
+            pdf.text(title, pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 15;
+
+            // Contract content
+            pdf.setFont('times', 'normal');
+            pdf.setFontSize(11);
+
+            const lines = pdf.splitTextToSize(generatedContract, contentWidth);
+
+            for (let i = 0; i < lines.length; i++) {
+                if (yPosition > pageHeight - 60) {
+                    pdf.addPage();
+                    yPosition = margin;
+                }
+                pdf.text(lines[i], margin, yPosition);
+                yPosition += 6;
+            }
+
+            // Quote data from Precy (if available)
+            if (dealContext?.quoteData) {
+                const quote = dealContext.quoteData;
+                yPosition += 10;
+
+                if (yPosition > pageHeight - 80) {
+                    pdf.addPage();
+                    yPosition = margin;
+                }
+
+                pdf.setFont('times', 'bold');
+                pdf.setFontSize(12);
+                pdf.text(language === 'en' ? 'PRICING BREAKDOWN' : 'DETALHAMENTO FINANCEIRO', margin, yPosition);
+                yPosition += 8;
+
+                pdf.setFont('times', 'normal');
+                pdf.setFontSize(10);
+                pdf.text(`${language === 'en' ? 'Total Cost' : 'Custo Total'}: ${formatCurrency(quote.totalCost, language)}`, margin, yPosition);
+                yPosition += 6;
+                pdf.text(`${language === 'en' ? 'Revenue' : 'Receita'}: ${formatCurrency(quote.revenue, language)}`, margin, yPosition);
+                yPosition += 6;
+                pdf.text(`${language === 'en' ? 'Profit Margin' : 'Margem de Lucro'}: ${quote.marginPercentage.toFixed(1)}%`, margin, yPosition);
+                yPosition += 6;
+                if (quote.roi) {
+                    pdf.text(`ROI: ${quote.roi.percentage.toFixed(1)}%`, margin, yPosition);
+                    yPosition += 10;
+                }
+            }
+
+            // Signature section
+            if (yPosition > pageHeight - 80) {
+                pdf.addPage();
+                yPosition = margin;
+            }
+
+            yPosition += 10;
+            pdf.setFont('times', 'normal');
+            pdf.setFontSize(10);
+
+            const dateText = `${language === 'en' ? 'Date' : 'Data'}: ${new Date().toLocaleDateString(language === 'en' ? 'en-US' : 'pt-BR')}`;
+            pdf.text(dateText, margin, yPosition);
+            yPosition += 20;
+
+            // Client signature
+            pdf.line(margin, yPosition, margin + 70, yPosition);
+            yPosition += 6;
+            pdf.text(language === 'en' ? 'Client Signature' : 'Assinatura do Cliente', margin, yPosition);
+
+            // Contractor signature
+            const contractorX = pageWidth - margin - 70;
+            pdf.line(contractorX, yPosition - 6, contractorX + 70, yPosition - 6);
+            pdf.text(language === 'en' ? 'Contractor Signature' : 'Assinatura do Contratante', contractorX, yPosition);
+
+            // Save PDF
+            const filename = `contract_${clientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            pdf.save(filename);
+
+            addToast(language === 'en' ? 'Contract exported!' : 'Contrato exportado!', 'success');
+        } catch (error: any) {
+            console.error('PDF export error:', error);
+            addToast(error.message || 'Failed to export PDF', 'error');
+        } finally {
+            setExportingPDF(false);
+        }
     };
 
     return (
@@ -185,6 +315,114 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                             Dados do Contrato
                         </h4>
 
+                        {/* Contract Type Toggle */}
+                        <div className="flex items-center gap-4 pb-4 border-b border-purple-200 dark:border-purple-700">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tipo de Contrato:</label>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setContractType('simple')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${contractType === 'simple'
+                                        ? 'bg-purple-600 text-white shadow-lg'
+                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-purple-400'
+                                        }`}
+                                >
+                                    Simples
+                                </button>
+                                <button
+                                    onClick={() => setContractType('complete')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${contractType === 'complete'
+                                        ? 'bg-purple-600 text-white shadow-lg'
+                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-purple-400'
+                                        }`}
+                                >
+                                    Completo
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Hub Contractor Data */}
+                        <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-700 rounded-lg p-4 space-y-3">
+                            <h5 className="font-semibold text-slate-900 dark:text-white text-sm">Dados do Contratante (Hub)</h5>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Person Type */}
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Pessoa</label>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setHubPersonType('PF')}
+                                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${hubPersonType === 'PF'
+                                                ? 'bg-violet-600 text-white'
+                                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
+                                                }`}
+                                        >
+                                            PF
+                                        </button>
+                                        <button
+                                            onClick={() => setHubPersonType('PJ')}
+                                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${hubPersonType === 'PJ'
+                                                ? 'bg-violet-600 text-white'
+                                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
+                                                }`}
+                                        >
+                                            PJ
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Hub Name */}
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        {hubPersonType === 'PJ' ? 'Razão Social' : 'Nome Completo'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={hubName}
+                                        onChange={(e) => setHubName(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500"
+                                        placeholder="Ex: Lidiany Moura"
+                                    />
+                                </div>
+
+                                {/* CPF or CNPJ */}
+                                {hubPersonType === 'PF' ? (
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">CPF</label>
+                                        <input
+                                            type="text"
+                                            value={hubCpf}
+                                            onChange={(e) => setHubCpf(e.target.value)}
+                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500"
+                                            placeholder="000.000.000-00"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">CNPJ</label>
+                                        <input
+                                            type="text"
+                                            value={hubCnpj}
+                                            onChange={(e) => setHubCnpj(e.target.value)}
+                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500"
+                                            placeholder="00.000.000/0000-00"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Address */}
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Endereço</label>
+                                    <input
+                                        type="text"
+                                        value={hubAddress}
+                                        onChange={(e) => setHubAddress(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500"
+                                        placeholder="Rua, Número, Cidade - UF"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Client Name */}
                             <div>
@@ -203,7 +441,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                             {/* CPF/CNPJ */}
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                    CPF/CNPJ
+                                    CPF/CNPJ do Cliente
                                 </label>
                                 <input
                                     type="text"
@@ -283,19 +521,26 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                                     )}
                                 </button>
                                 <button
-                                    onClick={downloadContract}
+                                    onClick={handleExportPdf}
                                     className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
                                 >
                                     <Download className="w-4 h-4" />
-                                    Baixar
+                                    Exportar PDF
                                 </button>
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-6 max-h-96 overflow-y-auto border border-slate-200 dark:border-slate-700">
-                            <pre className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">
-                                {generatedContract}
-                            </pre>
+                        <div className="relative">
+                            <textarea
+                                readOnly
+                                value={generatedContract}
+                                onClick={(e) => e.currentTarget.select()}
+                                className="w-full h-96 p-4 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-sm leading-relaxed resize-none focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            />
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                💡 Clique no texto para selecionar tudo e copiar facilmente
+                            </p>
                         </div>
                     </div>
                 )

@@ -24,6 +24,7 @@ export interface DbDeal {
   created_at: string;
   updated_at: string;
   owner_id: string | null;
+  is_demo_data: boolean | null;
 }
 
 export interface DbDealItem {
@@ -88,10 +89,20 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
 };
 
 export const dealsService = {
-  async getAll(): Promise<{ data: Deal[] | null; error: Error | null }> {
+  async getAll(isDemoUser: boolean = false): Promise<{ data: Deal[] | null; error: Error | null }> {
     try {
+      let dealsQuery = supabase.from('deals').select('*').order('created_at', { ascending: false });
+
+      // Demo isolation: filter by is_demo_data flag
+      if (isDemoUser) {
+        dealsQuery = dealsQuery.eq('is_demo_data', true);
+      } else {
+        // Regular users see only non-demo data (or null for backward compatibility)
+        dealsQuery = dealsQuery.or('is_demo_data.is.null,is_demo_data.eq.false');
+      }
+
       const [dealsResult, itemsResult] = await Promise.all([
-        supabase.from('deals').select('*').order('created_at', { ascending: false }),
+        dealsQuery,
         supabase.from('deal_items').select('*'),
       ]);
 
@@ -123,7 +134,7 @@ export const dealsService = {
     }
   },
 
-  async create(deal: Omit<Deal, 'id' | 'createdAt'>, companyId: string): Promise<{ data: Deal | null; error: Error | null }> {
+  async create(deal: Omit<Deal, 'id' | 'createdAt'>, companyId: string, isDemoData: boolean = false): Promise<{ data: Deal | null; error: Error | null }> {
     try {
       // Sanitize: Convert empty string to null for UUID field
       const sanitizedCompanyId = companyId || null;
@@ -142,6 +153,7 @@ export const dealsService = {
           tags: deal.tags || [],
           custom_fields: deal.customFields || {},
           company_id: sanitizedCompanyId,
+          is_demo_data: isDemoData, // Demo isolation flag
         })
         .select()
         .single();

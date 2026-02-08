@@ -48,7 +48,7 @@ const DashboardPage: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display tracking-tight">
-            Visão Geral
+            Dashboard
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             O pulso do seu negócio em tempo real.

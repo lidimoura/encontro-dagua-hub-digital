@@ -3,6 +3,7 @@ import { Plus, Search, Filter, LayoutGrid, Table as TableIcon, User, Settings, L
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Board } from '@/types';
 import { BoardSelector } from '../BoardSelector';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface KanbanHeaderProps {
     // Boards
@@ -37,6 +38,7 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
     isFilterOpen, setIsFilterOpen,
     onNewDeal
 }) => {
+    const { t } = useTranslation();
     return (
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div className="flex items-center gap-4 w-full sm:w-auto flex-wrap">
@@ -118,7 +120,7 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                         type="text"
-                        placeholder="Filtrar negócios ou empresas..."
+                        placeholder={t('searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-white/5 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white backdrop-blur-sm"
@@ -130,8 +132,8 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
                         onChange={(e) => setOwnerFilter(e.target.value as 'all' | 'mine')}
                         className="pl-3 pr-8 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-white/5 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white backdrop-blur-sm appearance-none cursor-pointer"
                     >
-                        <option value="all">Todos os Negócios</option>
-                        <option value="mine">Meus Negócios</option>
+                        <option value="all">{t('allDeals')}</option>
+                        <option value="mine">{t('myDeals')}</option>
                     </select>
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                 </div>
@@ -148,7 +150,7 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
                     onClick={onNewDeal}
                     className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-primary-600/20"
                 >
-                    <Plus size={18} /> Novo Negócio
+                    <Plus size={18} /> {t('newDeal')}
                 </button>
             </div>
         </div>

@@ -57,7 +57,7 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Fetch contacts
   const fetchContacts = useCallback(async () => {
-    if (!profile) {
+    if (!profile?.company_id) {
       setContacts([]);
       setContactsLoading(false);
       return;
@@ -66,7 +66,7 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setContactsLoading(true);
     setContactsError(null);
 
-    const { data, error } = await contactsService.getAll();
+    const { data, error } = await contactsService.getAll(profile.company_id);
 
     if (error) {
       setContactsError(error.message);
@@ -76,7 +76,7 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
 
     setContactsLoading(false);
-  }, [profile]);
+  }, [profile?.company_id]);
 
   // Fetch companies
   const fetchCompanies = useCallback(async () => {

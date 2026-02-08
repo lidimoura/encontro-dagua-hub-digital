@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DealView, DealStatus } from '@/types';
 import { Building2, Hourglass } from 'lucide-react';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DealCardProps {
   deal: DealView;
@@ -33,6 +34,7 @@ export const DealCard: React.FC<DealCardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const [localDragging, setLocalDragging] = useState(false);
+  const { t } = useTranslation();
 
   const handleToggleMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -79,7 +81,7 @@ export const DealCard: React.FC<DealCardProps> = ({
       {isRotting && (
         <div
           className="absolute -top-2 -right-2 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 p-1 rounded-full shadow-sm z-10"
-          title="Negócio Estagnado (>10 dias sem atualização)"
+          title={t('dealStale')}
         >
           <Hourglass size={12} />
         </div>

@@ -123,7 +123,94 @@ Visão geral de suas métricas, negócios ativos e atividades recentes.
 
 ---
 
-### 2. 💼 CRM (Gestão de Negócios)
+### 2. 🤖 AI Hub - Assistente Inteligente do CRM
+
+**Onde Encontrar:** Menu lateral → "AI Hub" ou `/ai`
+
+O AI Hub é seu copiloto operacional, conectado diretamente aos dados do seu CRM. Ele pode buscar informações, criar atividades, mover deals e muito mais.
+
+#### Como Usar:
+
+1. **Acesse o AI Hub** pelo menu lateral
+2. **Digite sua pergunta ou comando** no chat
+   - Exemplos:
+     - "Quais deals estão parados há mais de 7 dias?"
+     - "Crie uma reunião com NovaMind para amanhã às 14h"
+     - "Mostre o pipeline atual"
+     - "Quais atividades tenho hoje?"
+3. **Aguarde a resposta** - O Flow AI busca dados reais do seu CRM
+4. **Interaja** - Faça perguntas de follow-up ou novos comandos
+
+#### Poderes do Flow AI:
+
+**Leitura:**
+- Buscar deals por status, valor ou nome
+- Listar atividades de hoje ou atrasadas
+- Ver estatísticas do pipeline
+- Consultar detalhes de contatos
+
+**Escrita:**
+- Criar novas atividades (reuniões, calls, tarefas)
+- Mover deals entre estágios
+- Atualizar valores de deals
+- Marcar atividades como concluídas
+
+**Análise:**
+- Identificar deals parados
+- Sugerir próximas ações
+- Calcular win rate e pipeline value
+
+#### 💡 Dicas:
+
+- Seja específico nas perguntas
+- Use nomes de deals/contatos exatos quando possível
+- O AI Hub funciona mesmo se a API Gemini estiver em quota (modo fallback)
+- Histórico de conversa é salvo automaticamente
+
+---
+
+### 3. 🎯 Decisions - Central de Priorização
+
+**Onde Encontrar:** Menu lateral → "Decisions" ou `/decisions`
+
+A aba Decisions analisa automaticamente seu CRM e sugere ações prioritárias baseadas em dados reais.
+
+#### Como Usar:
+
+1. **Acesse Decisions** pelo menu lateral
+2. **Clique em "Analisar Agora"** para executar análise completa
+3. **Revise as sugestões** organizadas por prioridade:
+   - 🔴 **Crítico** - Ações urgentes (deals parados, atividades atrasadas)
+   - 🟡 **Importante** - Oportunidades de alto valor
+   - 🟢 **Sugestões** - Melhorias e otimizações
+
+#### Tipos de Análise:
+
+**Deals Parados:**
+- Identifica negócios sem atualização há 7+ dias
+- Mostra valor em risco
+- Sugere ações de reativação
+
+**Atividades Atrasadas:**
+- Lista tarefas vencidas
+- Calcula dias de atraso
+- Prioriza por importância
+
+**Oportunidades de Alto Valor:**
+- Destaca deals com maior potencial
+- Sugere próximos passos
+- Calcula probabilidade de fechamento
+
+#### 💡 Dicas:
+
+- Execute análise diariamente (início do dia)
+- Priorize ações críticas primeiro
+- Use botões de ação rápida para executar sugestões
+- Combine com AI Hub para detalhes adicionais
+
+---
+
+### 4. 💼 CRM (Gestão de Negócios)
 
 **Boards Kanban:**
 - Arraste e solte negócios entre colunas

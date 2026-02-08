@@ -4,14 +4,19 @@ import { CRMProvider } from '@/context/CRMContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import { QueryProvider } from '@/lib/query';
 import Layout from '@/components/Layout';
 import { PageLoader } from '@/components/PageLoader';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { RoleBasedRoute } from '@/components/RoleBasedRoute';
+import { TypebotVisibilityController } from '@/components/TypebotVisibilityController';
 import Login from '@/pages/Login';
 import JoinPage from '@/pages/JoinPage';
 import SetupWizard from '@/pages/SetupWizard';
+
+// Import UUID polyfill to fix crypto.randomUUID() compatibility issues
+import '@/lib/utils/generateId';
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('@/features/dashboard/DashboardPage'));
@@ -79,105 +84,108 @@ const App: React.FC = () => {
   return (
     <QueryProvider>
       <ToastProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <CRMProvider>
-              <HashRouter>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
-                    {/* Invite Only - Redirect register to landing page */}
-                    <Route path="/register" element={<Navigate to="/?action=apply" replace />} />
-                    <Route path="/join" element={<JoinPage />} />
-                    <Route path="/setup" element={<SetupWizard />} />
-                    <Route path="/v/:slug" element={<BridgePage />} />
-                    <Route path="/manifesto" element={<ManifestoPage />} />
+        <LanguageProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <CRMProvider>
+                <HashRouter>
+                  <TypebotVisibilityController />
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/login" element={<Login />} />
+                      {/* Invite Only - Redirect register to landing page */}
+                      <Route path="/register" element={<Navigate to="/?action=apply" replace />} />
+                      <Route path="/join" element={<JoinPage />} />
+                      <Route path="/setup" element={<SetupWizard />} />
+                      <Route path="/v/:slug" element={<BridgePage />} />
+                      <Route path="/manifesto" element={<ManifestoPage />} />
 
 
-                    {/* PROTECTED ROUTES - REQUIRE AUTH */}
-                    <Route element={<ProtectedLayout />}>
-                      {/* Dashboard - All authenticated users */}
-                      <Route path="dashboard" element={<Dashboard />} />
+                      {/* PROTECTED ROUTES - REQUIRE AUTH */}
+                      <Route element={<ProtectedLayout />}>
+                        {/* Dashboard - All authenticated users */}
+                        <Route path="dashboard" element={<Dashboard />} />
 
-                      {/* Admin/Team Routes - Restricted to admin and vendedor */}
-                      <Route path="inbox" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <InboxPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="boards" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <BoardsPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="pipeline" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <BoardsPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="contacts" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <ContactsPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="settings/*" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <Settings />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="activities" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <ActivitiesPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="reports" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <ReportsPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="ai" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <AIHubPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="decisions" element={
-                        <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                          <DecisionQueuePage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="admin" element={
-                        <RoleBasedRoute allowedRoles={['admin']}>
-                          <AdminPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="admin/users" element={
-                        <RoleBasedRoute allowedRoles={['admin']}>
-                          <AdminUsersPage />
-                        </RoleBasedRoute>
-                      } />
-                      <Route path="admin/tech-stack" element={
-                        <RoleBasedRoute allowedRoles={['admin']}>
-                          <TechStackPage />
-                        </RoleBasedRoute>
-                      } />
+                        {/* Admin/Team Routes - Restricted to admin and vendedor */}
+                        <Route path="inbox" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <InboxPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="boards" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <BoardsPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="pipeline" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <BoardsPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="contacts" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <ContactsPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="settings/*" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <Settings />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="activities" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <ActivitiesPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="reports" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <ReportsPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="ai" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <AIHubPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="decisions" element={
+                          <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                            <DecisionQueuePage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="admin" element={
+                          <RoleBasedRoute allowedRoles={['admin']}>
+                            <AdminPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="admin/users" element={
+                          <RoleBasedRoute allowedRoles={['admin']}>
+                            <AdminUsersPage />
+                          </RoleBasedRoute>
+                        } />
+                        <Route path="admin/tech-stack" element={
+                          <RoleBasedRoute allowedRoles={['admin']}>
+                            <TechStackPage />
+                          </RoleBasedRoute>
+                        } />
 
-                      {/* Client Routes - Accessible to all roles */}
-                      <Route path="profile" element={<ProfilePage />} />
-                      <Route path="qrdagua" element={<QRdaguaPage />} />
-                      <Route path="prompt-lab" element={<PromptLabPage />} />
-                      <Route path="portal" element={<ClientPortalPage />} />
-                    </Route>
+                        {/* Client Routes - Accessible to all roles */}
+                        <Route path="profile" element={<ProfilePage />} />
+                        <Route path="qrdagua" element={<QRdaguaPage />} />
+                        <Route path="prompt-lab" element={<PromptLabPage />} />
+                        <Route path="portal" element={<ClientPortalPage />} />
+                      </Route>
 
-                    {/* Catch-all redirect */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </Suspense>
-              </HashRouter>
-            </CRMProvider>
-          </AuthProvider>
-        </ThemeProvider>
+                      {/* Catch-all redirect */}
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Suspense>
+                </HashRouter>
+              </CRMProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </LanguageProvider>
       </ToastProvider>
     </QueryProvider>
   );

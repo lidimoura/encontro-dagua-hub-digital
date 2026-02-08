@@ -32,7 +32,7 @@ export const getActivityStatus = (deal: DealView) => {
 };
 
 export const useBoardsController = () => {
-  // TanStack Query hooks
+  // TanStack Query hooks - REAL DATABASE CONNECTION ONLY
   const { data: boards = [], isLoading: boardsLoading } = useBoards();
   const { data: defaultBoard } = useDefaultBoard();
   const createBoardMutation = useCreateBoard();
@@ -49,16 +49,20 @@ export const useBoardsController = () => {
   useEffect(() => {
     if (!activeBoardId && defaultBoard) {
       setActiveBoardId(defaultBoard.id);
+    } else if (!activeBoardId && !boardsLoading && boards.length > 0) {
+      // If no active board and loading done, set first board
+      setActiveBoardId(boards[0].id);
     }
-  }, [activeBoardId, defaultBoard, setActiveBoardId]);
+  }, [activeBoardId, defaultBoard, setActiveBoardId, boardsLoading, boards]);
 
-  // Get active board
+  // Get active board from real database
   const activeBoard = useMemo(() => {
-    return boards.find(b => b.id === activeBoardId) || defaultBoard || null;
+    return boards.find(b => b.id === activeBoardId) || defaultBoard || boards[0] || null;
   }, [boards, activeBoardId, defaultBoard]);
 
-  // Deals for active board
+  // Deals for active board - REAL DATABASE ONLY
   const { data: deals = [], isLoading: dealsLoading } = useDealsByBoard(activeBoardId || '');
+
   const updateDealStatusMutation = useUpdateDealStatus();
   const createActivityMutation = useCreateActivity();
 
@@ -256,7 +260,7 @@ export const useBoardsController = () => {
   };
 
   return {
-    // Boards
+    // Boards (real database only)
     boards,
     activeBoard,
     activeBoardId,

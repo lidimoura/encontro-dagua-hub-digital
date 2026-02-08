@@ -698,6 +698,61 @@ Você é proativo - se perceber oportunidades ou riscos, mencione-os.`,
         // Ignorar abort
         return;
       }
+
+      // FALLBACK FOR GEMINI 429 (Quota Exceeded) - DEMO MODE
+      if (err instanceof Error && (err.message.includes('429') || err.message.includes('quota') || err.message.includes('Too Many Requests'))) {
+        console.warn('⚠️ Gemini API Quota Exceeded - Using Fallback Mode');
+
+        // Generate contextual fallback based on user query
+        let fallbackResponse = '⚠️ **[Demo Mode - API Limit Reached]**\n\n';
+
+        const query = content.toLowerCase();
+        if (query.includes('deal') || query.includes('pipeline') || query.includes('oportunidade')) {
+          const activeDeals = deals.filter(d => !['CLOSED_WON', 'CLOSED_LOST'].includes(d.status));
+          const totalValue = activeDeals.reduce((sum, d) => sum + d.value, 0);
+          fallbackResponse += `Based on your CRM data:\n\n`;
+          fallbackResponse += `📊 **Pipeline Overview:**\n`;
+          fallbackResponse += `- Active Deals: ${activeDeals.length}\n`;
+          fallbackResponse += `- Total Pipeline Value: R$ ${totalValue.toLocaleString()}\n\n`;
+          fallbackResponse += `💡 **Strategic Insight:** Focus on closing high-value deals in the Negotiation stage. Consider following up with stagnant opportunities.`;
+        } else if (query.includes('atividade') || query.includes('activity') || query.includes('hoje') || query.includes('today')) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const todayActivities = activities.filter(a => {
+            const actDate = new Date(a.date);
+            return actDate >= today && actDate < tomorrow && !a.completed;
+          });
+          fallbackResponse += `Based on your schedule:\n\n`;
+          fallbackResponse += `📅 **Today's Activities:** ${todayActivities.length} pending\n\n`;
+          if (todayActivities.length > 0) {
+            fallbackResponse += `Top priorities:\n`;
+            todayActivities.slice(0, 3).forEach((a, i) => {
+              fallbackResponse += `${i + 1}. ${a.title} (${a.type})\n`;
+            });
+          }
+          fallbackResponse += `\n💡 **Tip:** Complete high-priority tasks first to maintain momentum.`;
+        } else {
+          fallbackResponse += `I'm currently in demo mode due to API limits, but I can still help you navigate the CRM.\n\n`;
+          fallbackResponse += `📊 **Quick Stats:**\n`;
+          fallbackResponse += `- Total Deals: ${deals.length}\n`;
+          fallbackResponse += `- Total Contacts: ${contacts.length}\n`;
+          fallbackResponse += `- Pending Activities: ${activities.filter(a => !a.completed).length}\n\n`;
+          fallbackResponse += `💡 Try asking about specific deals, activities, or use the navigation menu to explore your CRM data.`;
+        }
+
+        const fallbackMessage: AgentMessage = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: fallbackResponse,
+        };
+
+        setMessages(prev => [...prev, fallbackMessage]);
+        setIsLoading(false);
+        return;
+      }
+
       setError(err instanceof Error ? err : new Error('Erro desconhecido'));
       console.error('CRM Agent Error:', err);
     } finally {

@@ -15,6 +15,7 @@ import { Board } from '@/types';
 import { useAgent, Message, Attachment } from '@/hooks/useAgent';
 import { useCRMAgent } from '@/features/ai-hub/hooks/useCRMAgent';
 import AudioPlayer from '@/components/ui/AudioPlayer';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AIAssistantProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   activeBoard,
 }) => {
   const { deals, contacts, boards } = useCRM();
+  const { language } = useTranslation();
   const [mode, setMode] = useState<AgentMode>('global');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,6 +54,11 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
       ? activeBoard.agentPersona?.role || 'Especialista'
       : 'Assistente Global';
 
+  // Language instruction for AI
+  const languageInstruction = language === 'en'
+    ? 'CRITICAL: You MUST respond in English. All analysis, suggestions, and communication must be in English.'
+    : 'CRÍTICO: Você DEVE responder em Português. Toda análise, sugestões e comunicação devem ser em Português.';
+
   // Construct System Prompt based on Mode
   const systemPrompt = useMemo(() => {
     if (mode === 'board' && activeBoard) {
@@ -67,6 +74,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         currentBoardIndex < boards.length - 1 ? boards[currentBoardIndex + 1] : null;
 
       return `
+        ${languageInstruction}
+        
         Você é ${activeBoard.agentPersona?.name || 'o Agente'}, ${activeBoard.agentPersona?.role || 'Especialista'}.
         Seu comportamento deve ser: ${activeBoard.agentPersona?.behavior || 'Profissional'}.
         
@@ -89,6 +98,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
       `;
     } else {
       return `
+        ${languageInstruction}
+        
         Você é o Flow AI, o assistente central deste CRM.
         
         DADOS GERAIS:

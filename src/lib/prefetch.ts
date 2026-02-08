@@ -8,11 +8,17 @@
 const routeImports = {
   dashboard: () => import('@/features/dashboard/DashboardPage'),
   inbox: () => import('@/features/inbox/InboxPage'),
+  board: () => import('@/features/boards/BoardsPage'),
   boards: () => import('@/features/boards/BoardsPage'),
   contacts: () => import('@/features/contacts/ContactsPage'),
   settings: () => import('@/features/settings/SettingsPage'),
   activities: () => import('@/features/activities/ActivitiesPage'),
   reports: () => import('@/features/reports/ReportsPage'),
+  'qrdagua': () => import('@/features/qrdagua/QRDaguaPage'),
+  'prompt-lab': () => import('@/features/prompt-lab/PromptLabPage'),
+  ai: () => import('@/features/ai-hub/AIHubPage'),
+  decisions: () => import('@/features/decisions/DecisionQueuePage'),
+  admin: () => import('@/features/admin/AdminPage'),
 } as const;
 
 export type RouteName = keyof typeof routeImports;
@@ -26,6 +32,12 @@ const prefetchedRoutes = new Set<RouteName>();
  */
 export const prefetchRoute = (route: RouteName): void => {
   if (prefetchedRoutes.has(route)) return;
+
+  // Safety check: ensure route import exists
+  if (!routeImports[route] || typeof routeImports[route] !== 'function') {
+    console.warn(`[Prefetch] Route "${route}" not found in routeImports`);
+    return;
+  }
 
   prefetchedRoutes.add(route);
 

@@ -5,6 +5,7 @@ import { isDealRotting, getActivityStatus } from '@/features/boards/hooks/useBoa
 import { Settings } from 'lucide-react';
 
 import { useCRM } from '@/context/CRMContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface KanbanBoardProps {
   stages: BoardStage[];
@@ -37,6 +38,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const { lifecycleStages } = useCRM();
+  const { t } = useTranslation();
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
 
   return (
@@ -118,14 +120,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       <span className="text-2xl text-slate-400 group-hover:text-white transition-colors">+</span>
                     </div>
                     <span className="text-sm text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400 font-medium transition-colors">
-                      Adicionar Negócio
+                      {t('addDeal')}
                     </span>
                   </div>
                 </button>
               )}
               {isOver && stageDeals.length === 0 && (
                 <div className="h-full flex items-center justify-center text-green-500 dark:text-green-400 text-sm py-8 font-bold animate-pulse pointer-events-none">
-                  ✓ Solte aqui!
+                  {t('dropHere')}
                 </div>
               )}
               {stageDeals.map(deal => (

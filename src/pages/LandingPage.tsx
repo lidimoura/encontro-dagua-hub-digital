@@ -12,6 +12,7 @@ import { ApplicationModal } from '@/components/ApplicationModal';
 import { PhoneSimulator } from '@/components/PhoneSimulator';
 import { CRMSimulator } from '@/components/CRMSimulator';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const TEAM_MEMBERS = [
   {
@@ -54,6 +55,7 @@ const TEAM_MEMBERS = [
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTeamIndex, setActiveTeamIndex] = useState(0);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
@@ -277,15 +279,29 @@ Agora, gere o prompt perfeito:`;
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Soluções</a>
-            <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Galeria</a>
-            <a href="#sobre" className="text-slate-200 hover:text-amber-400 text-sm font-medium">Sobre Nós</a>
+            <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('solutions')}</a>
+            <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('gallery')}</a>
+            <a href="#sobre" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('aboutUs')}</a>
+
+            {/* Language Selector */}
+            <button
+              onClick={() => {
+                const newLang = localStorage.getItem('language') === 'en' ? 'pt' : 'en';
+                localStorage.setItem('language', newLang);
+                window.location.reload();
+              }}
+              className="p-2 text-slate-200 hover:text-amber-400 transition-all active:scale-95"
+              title={localStorage.getItem('language') === 'en' ? 'Mudar para Português' : 'Switch to English'}
+            >
+              <span className="text-base leading-none">{localStorage.getItem('language') === 'en' ? '🇺🇸' : '🇧🇷'}</span>
+            </button>
+
             {user ? (
-              <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold">Painel</button>
+              <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-fuchsia-900 rounded-full text-sm font-bold">{t('dashboard')}</button>
             ) : (
               <div className="flex gap-4">
-                <button onClick={() => navigate('/login')} className="text-white text-sm font-bold">Login</button>
-                <button onClick={() => setIsApplicationModalOpen(true)} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">Quero ser cliente</button>
+                <button onClick={() => navigate('/login')} className="text-white text-sm font-bold">{t('login')}</button>
+                <button onClick={() => setIsApplicationModalOpen(true)} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">{t('becomeClient')}</button>
               </div>
             )}
           </div>
@@ -326,28 +342,28 @@ Agora, gere o prompt perfeito:`;
                     onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate('/'); }}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Home
+                    {t('home')}
                   </a>
                   <a
                     href="#solucoes"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Soluções
+                    {t('solutions')}
                   </a>
                   <a
                     href="#showcase"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Galeria
+                    {t('gallery')}
                   </a>
                   <a
                     href="#sobre"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
                   >
-                    Sobre Nós
+                    {t('aboutUs')}
                   </a>
 
                   <div className="border-t border-white/10 my-4" />
@@ -357,7 +373,7 @@ Agora, gere o prompt perfeito:`;
                       onClick={() => { setIsMenuOpen(false); navigate('/dashboard'); }}
                       className="w-full px-6 py-3 bg-fuchsia-900 hover:bg-fuchsia-800 rounded-full text-sm font-bold transition-colors"
                     >
-                      Painel
+                      {t('dashboard')}
                     </button>
                   ) : (
                     <>
@@ -365,13 +381,13 @@ Agora, gere o prompt perfeito:`;
                         onClick={() => { setIsMenuOpen(false); navigate('/login'); }}
                         className="w-full px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-full text-sm font-bold transition-colors"
                       >
-                        Entrar
+                        {t('enter')}
                       </button>
                       <button
                         onClick={() => { setIsMenuOpen(false); setIsApplicationModalOpen(true); }}
                         className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-sm font-bold transition-colors shadow-lg"
                       >
-                        Quero ser cliente
+                        {t('becomeClient')}
                       </button>
                     </>
                   )}
@@ -412,11 +428,11 @@ Agora, gere o prompt perfeito:`;
               Tecnologia mais <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500">acessível.</span>
             </h1>
             <p className="text-xl md:text-2xl text-white font-medium max-w-3xl mx-auto drop-shadow-xl">
-              Um ecossistema digital que oferece as melhores soluções tecnológicas para resolver problemas reais e garantir resultados e prosperidade para todos.
+              {t('heroSubtitle')}
             </p>
             <div className="pt-10 w-full flex justify-center">
               <button onClick={() => document.getElementById('manifesto')?.scrollIntoView({ behavior: 'smooth' })} className="animate-bounce flex flex-col items-center gap-2 text-white hover:text-amber-400">
-                <span className="text-xs uppercase tracking-widest font-bold">Conheça o Hub</span>
+                <span className="text-xs uppercase tracking-widest font-bold">{t('knowHub')}</span>
                 <ArrowRight className="w-6 h-6 rotate-90 text-amber-500" />
               </button>
             </div>
@@ -429,7 +445,7 @@ Agora, gere o prompt perfeito:`;
         <section id="solucoes" className="py-16 px-6 bg-[#02040a] text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Nossas Soluções
+              {t('ourSolutions')}
             </h2>
             <p className="text-lg text-slate-300 leading-relaxed mb-4">
               Não vendemos apenas automações ou prompts. Oferecemos <span className="text-fuchsia-400 font-semibold">soluções reais para problemas reais</span>. Nosso foco é realizar seu desejo com precificação justa, escuta sensível e tecnologia assertiva.
@@ -441,7 +457,7 @@ Agora, gere o prompt perfeito:`;
         <section className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
-            <h3 className="text-3xl font-bold text-white mb-4">Prompt Lab</h3>
+            <h3 className="text-3xl font-bold text-white mb-4">{t('promptLabTitle')}</h3>
             <p className="text-lg text-slate-300 mb-4">
               Transforme ideias brutas em <span className="text-fuchsia-400 font-semibold">prompts estruturados e eficientes</span> usando engenharia de prompts profissional.
             </p>
@@ -535,7 +551,7 @@ Agora, gere o prompt perfeito:`;
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
               <Sparkles className="w-3 h-3" /> QR D'água
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Seu Canal Digital</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('qrWaterTitle')}</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
               Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.
             </p>
@@ -549,9 +565,9 @@ Agora, gere o prompt perfeito:`;
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
               <Sparkles className="w-3 h-3" /> Galeria de Clientes
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Galeria de Clientes do Hub</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('clientGallery')}</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              Veja como empreendedores estão usando o QR D'água para conectar com seus clientes
+              {t('clientGalleryDesc')}
             </p>
 
             {/* Horizontal Scroll Container with Navigation Arrows */}
@@ -698,7 +714,7 @@ Agora, gere o prompt perfeito:`;
         {/* 1. MANIFESTO (TEXTO) */}
         <section id="sobre" className="py-20 px-6 bg-[#05020a]">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">Manifesto</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">{t('manifesto')}</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-lg text-slate-300 leading-relaxed mb-6">
                 O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
@@ -711,7 +727,7 @@ Agora, gere o prompt perfeito:`;
         <section className="py-24 px-6 bg-[#02040a] text-center">
           <div className="max-w-5xl mx-auto">
             <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Tecnologia para Todos</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('technologyForAll')}</h2>
 
             <div className="flex flex-wrap justify-center gap-3 mb-12">
               {["Mães e Pais Atípicos", "Neurodivergentes", "Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "Comunidades", "ONGs"].map((tag) => (
@@ -720,8 +736,8 @@ Agora, gere o prompt perfeito:`;
             </div>
 
             <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-white mb-2">🤝 Ninguém fica para trás</h3>
-              <p className="text-slate-400 text-sm mb-6">Condições especiais para impacto social.</p>
+              <h3 className="text-xl font-bold text-white mb-2">{t('noOneLeftBehind')}</h3>
+              <p className="text-slate-400 text-sm mb-6">{t('socialImpact')}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
                 <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
                   <MessageCircle size={18} /> Consultoria Social (WhatsApp)
@@ -736,7 +752,7 @@ Agora, gere o prompt perfeito:`;
 
         {/* 3. EQUIPE */}
         <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10">
-          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">Equipe</h2></div>
+          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">{t('team')}</h2></div>
           <div className="relative max-w-lg mx-auto h-[400px] flex items-center justify-center">
             <button onClick={() => setActiveTeamIndex((p) => p === 0 ? TEAM_MEMBERS.length - 1 : p - 1)} className="absolute left-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronLeft /></button>
 
@@ -759,7 +775,7 @@ Agora, gere o prompt perfeito:`;
         {/* FOOTER */}
         <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] border-t border-white/5">
           <p className="mb-2 text-white font-bold">Encontro D'água .hub 🌀</p>
-          <p>Inspirado na natureza, codificado para o mundo.</p>
+          <p>{t('footer')}</p>
         </footer>
       </div>
 

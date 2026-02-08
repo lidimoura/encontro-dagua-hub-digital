@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   KanbanSquare,
@@ -30,9 +30,11 @@ import {
 import { useCRM } from '../context/CRMContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { prefetchRoute, RouteName } from '@/lib/prefetch';
 import { FloatingAIWidget } from './FloatingAIWidget';
 import { AiflowSupport } from './AiflowSupport';
+import { supabase } from '@/lib/supabase/client';
 
 // Lazy load AI Assistant (heavy component with Gemini SDK)
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -72,13 +74,15 @@ const NavItem = ({
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { profile, signOut, refreshProfile } = useAuth();
+  const { language, switchLanguage, t } = useTranslation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [hasUnreadNotification, setHasUnreadNotification] = useState(true); // Notification badge state
-  const [isHelpOpen, setIsHelpOpen] = useState(false); // Help modal state
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   // Gera iniciais do email
   const userInitials = profile?.email?.substring(0, 2).toUpperCase() || 'U';
@@ -100,6 +104,112 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     };
   }, [isMobileMenuOpen]);
 
+  // Fetch notifications
+  useEffect(() => {
+    if (!profile?.company_id) return;
+
+    const fetchNotifications = async () => {
+      setLoadingNotifications(true);
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('company_id', profile.company_id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          setNotifications(data);
+          setUnreadCount(data.filter(n => !n.read).length);
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      } finally {
+        setLoadingNotifications(false);
+      }
+    };
+
+    fetchNotifications();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `company_id=eq.${profile.company_id}`
+        },
+        () => fetchNotifications()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.company_id]);
+
+  // Mark notification as read
+  const markAsRead = async (notificationId: string) => {
+    try {
+      await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  // Navigation items - COMPLETE SIDEBAR RESTORATION
+  const navItems = [
+    // Core CRM - Admin & Vendedor
+    { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as RouteName },
+    { to: '/board', icon: KanbanSquare, label: t('boards'), prefetch: 'board' as RouteName },
+    { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as RouteName },
+    { to: '/inbox', icon: Inbox, label: t('inbox'), prefetch: 'inbox' as RouteName },
+    { to: '/activities', icon: CalendarCheck, label: t('activities'), prefetch: 'activities' as RouteName },
+
+    // Analytics & AI - Admin & Vendedor
+    { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as RouteName },
+    { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName },
+    { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
+
+    // Tools - All Users
+    { to: '/qrdagua', icon: QrCode, label: t('qrWater'), prefetch: 'qrdagua' as RouteName },
+    { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
+
+    // Settings - Admin & Vendedor
+    { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName },
+  ];
+
+  // Admin-only items
+  if (profile?.role === 'admin') {
+    navItems.push(
+      { to: '/admin', icon: Shield, label: t('admin'), prefetch: 'admin' as RouteName },
+      { to: '/admin/tech-stack', icon: Package, label: t('techStack'), prefetch: 'admin' as RouteName }
+    );
+  }
+
+  // Loading state
+  if (!profile) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-dark-bg">
+        <div className="text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">{t('loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
       {/* Mobile Drawer */}
@@ -115,298 +225,241 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <aside className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-[100] md:hidden shadow-2xl animate-in slide-in-from-left duration-300 ease-out flex flex-col">
             {/* Header do Drawer */}
             <div className="h-16 px-5 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10">
-              <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
-                  A
-                </div>
-                <span className="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                  Encontro D'água - Hub Digital
-                </span>
-              </a>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Menu</h2>
               <button
-
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
-                aria-label="Fechar menu"
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
 
-            {/* Navegação Mobile */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-              <NavItem
-                to="/inbox"
-                icon={Inbox}
-                label="Inbox"
-                active={location.pathname === '/inbox'}
-                prefetch="inbox"
-              />
-              <NavItem
-                to="/dashboard"
-                icon={LayoutDashboard}
-                label="Visão Geral"
-                active={location.pathname === '/dashboard'}
-                prefetch="dashboard"
-              />
-              <NavItem
-                to="/boards"
-                icon={KanbanSquare}
-                label="Boards"
-                active={location.pathname === '/boards' || location.pathname === '/pipeline'}
-                prefetch="boards"
-              />
-              <NavItem
-                to="/contacts"
-                icon={Users}
-                label="Contatos"
-                active={location.pathname === '/contacts'}
-                prefetch="contacts"
-              />
-              <NavItem
-                to="/qrdagua"
-                icon={QrCode}
-                label="QR d'água"
-                active={location.pathname === '/qrdagua'}
-              />
-              <NavItem
-                to="/prompt-lab"
-                icon={Wand2}
-                label="Prompt Lab"
-                active={location.pathname === '/prompt-lab'}
-              />
-              <NavItem
-                to="/reports"
-                icon={BarChart3}
-                label="Relatórios"
-                active={location.pathname === '/reports'}
-                prefetch="reports"
-              />
-              {profile?.role === 'admin' && (
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+              {navItems.map((item) => (
                 <NavItem
-                  to="/settings"
-                  icon={Settings}
-                  label="Configurações"
-                  active={location.pathname === '/settings'}
-                  prefetch="settings"
+                  key={item.to}
+                  to={item.to}
+                  icon={item.icon}
+                  label={item.label}
+                  active={location.pathname === item.to}
+                  prefetch={item.prefetch}
                 />
-              )}
-              {profile?.email === 'lidimfc@gmail.com' && (
-                <NavItem
-                  to="/admin"
-                  icon={Shield}
-                  label="Admin"
-                  active={location.pathname === '/admin'}
-                />
-              )}
+              ))}
             </nav>
-
-            {/* User Card no rodapé do drawer */}
-            <div className="p-4 border-t border-slate-200 dark:border-white/5">
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-white/5 border border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all group"
-                >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-slate-800 shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-white dark:ring-slate-800 shadow-lg">
-                      {profile?.first_name && profile?.last_name
-                        ? `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
-                        : profile?.nickname?.substring(0, 2).toUpperCase() || userInitials}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                      {profile?.nickname || profile?.first_name || profile?.email?.split('@')[0] || 'Usuário'}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {profile?.email || ''}
-                    </p>
-                  </div>
-                  <svg
-                    className={`w-4 h-4 text-slate-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    />
-                    <div className="absolute bottom-full left-0 right-0 mb-2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-150">
-                      <div className="p-1">
-                        <Link
-                          to="/profile"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg transition-colors"
-                        >
-                          <User className="w-4 h-4 text-slate-400" />
-                          Editar Perfil
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setIsUserMenuOpen(false);
-                            signOut();
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          Sair da conta
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
           </aside>
         </>
       )}
 
-      <div className="flex flex-1 h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
-        {/* Sidebar - Visible on desktop (md+), hidden on mobile */}
-        <aside className="hidden md:flex w-64 flex-col z-20 glass border-r border-slate-200 dark:border-white/5">
-          <div className="h-16 px-5 flex items-center border-b border-solimoes-400/20 dark:border-solimoes-400/10">
-            <a href="/#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center text-solimoes-400 font-bold text-lg shadow-lg shadow-acai-900/30">
-                E
-              </div>
-              <span className="text-lg font-bold font-display tracking-tight bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                Encontro D'água - Hub Digital
-              </span>
-            </a>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+        {/* Logo - Clickable */}
+        <Link to="/" className="h-16 px-6 flex items-center border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-acai-900 to-solimoes-600 bg-clip-text text-transparent">
+            Hub d'água
+          </h1>
+        </Link>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          {navItems.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={item.label}
+              active={location.pathname === item.to}
+              prefetch={item.prefetch}
+            />
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content Wrapper */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        {/* Ambient background glow */}
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        {/* Header - Fixed on mobile */}
+        <header className="fixed md:relative top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 z-50 md:z-auto">
+          {/* Mobile Menu Button - Always accessible */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors z-[60]"
+            aria-label={t('openMenu')}
+          >
+            <Menu size={24} />
+          </button>
+
+          {/* Page Title - Hidden on mobile when menu button is shown */}
+          <div className="hidden md:block">
+            {/* Page title can be added here if needed */}
           </div>
 
+          <div className="flex-1" />
 
-          <nav className="flex-1 p-4 space-y-2">
-            <NavItem
-              to="/inbox"
-              icon={Inbox}
-              label="Inbox"
-              active={location.pathname === '/inbox'}
-              prefetch="inbox"
-            />
-            <NavItem
-              to="/dashboard"
-              icon={LayoutDashboard}
-              label="Visão Geral"
-              active={location.pathname === '/dashboard'}
-              prefetch="dashboard"
-            />
-            <NavItem
-              to="/boards"
-              icon={KanbanSquare}
-              label="Boards"
-              active={location.pathname === '/boards' || location.pathname === '/pipeline'}
-              prefetch="boards"
-            />
-            <NavItem
-              to="/contacts"
-              icon={Users}
-              label="Contatos"
-              active={location.pathname === '/contacts'}
-              prefetch="contacts"
-            />
-            <NavItem
-              to="/qrdagua"
-              icon={QrCode}
-              label="QR d'água"
-              active={location.pathname === '/qrdagua'}
-            />
-            <NavItem
-              to="/prompt-lab"
-              icon={Wand2}
-              label="Prompt Lab"
-              active={location.pathname === '/prompt-lab'}
-            />
-            <NavItem
-              to="/reports"
-              icon={BarChart3}
-              label="Relatórios"
-              active={location.pathname === '/reports'}
-              prefetch="reports"
-            />
-            {profile?.role === 'admin' && (
-              <NavItem
-                to="/settings"
-                icon={Settings}
-                label="Configurações"
-                active={location.pathname === '/settings'}
-                prefetch="settings"
-              />
-            )}
-            {profile?.email === 'lidimfc@gmail.com' && (
-              <NavItem
-                to="/admin"
-                icon={Shield}
-                label="Admin"
-                active={location.pathname === '/admin'}
-              />
-            )}
-          </nav>
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            {/* Refresh Profile Button */}
+            <button
+              onClick={async () => {
+                setIsRefreshing(true);
+                try {
+                  await refreshProfile();
+                } finally {
+                  setIsRefreshing(false);
+                }
+              }}
+              disabled={isRefreshing}
+              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all disabled:opacity-50"
+              title={t('refreshPermissions')}
+            >
+              <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+            </button>
 
-          <div className="p-4 border-t border-slate-100 dark:border-white/5">
+            {/* Language Toggle Button */}
+            <button
+              onClick={() => switchLanguage(language === 'pt' ? 'en' : 'pt')}
+              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95"
+              title={language === 'pt' ? 'Switch to English' : 'Mudar para Português'}
+            >
+              <span className="text-base leading-none">{language === 'pt' ? '🇧🇷' : '🇺🇸'}</span>
+            </button>
+
+            {/* Notification Bell */}
             <div className="relative">
-              {/* User Card - Clickable */}
               <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-white/5 border border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all group"
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative transition-colors"
+                title={t('notifications')}
               >
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Avatar"
-                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-slate-800 shadow-lg"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-white dark:ring-slate-800 shadow-lg">
-                    {profile?.first_name && profile?.last_name
-                      ? `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
-                      : profile?.nickname?.substring(0, 2).toUpperCase() || userInitials}
-                  </div>
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-dark-card">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                    {profile?.nickname || profile?.first_name || profile?.email?.split('@')[0] || 'Usuário'}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                    {profile?.email || ''}
-                  </p>
-                </div>
-                <svg
-                  className={`w-4 h-4 text-slate-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
               </button>
 
-              {/* Dropdown Menu */}
+              {/* Notification Popover */}
+              {isNotificationOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsNotificationOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-80 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-top-2 fade-in duration-150">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                      <h3 className="font-semibold text-slate-900 dark:text-white">{t('notifications')}</h3>
+                    </div>
+                    <div className="max-h-[400px] overflow-y-auto">
+                      {loadingNotifications ? (
+                        <div className="p-4 text-center text-slate-500">
+                          <div className="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <Bell className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                          <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
+                            {t('notificationsEmpty')}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {t('notificationsEmptyDesc')}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                          {notifications.map((notification) => (
+                            <button
+                              key={notification.id}
+                              onClick={() => {
+                                markAsRead(notification.id);
+                                if (notification.link) {
+                                  window.location.href = notification.link;
+                                }
+                                setIsNotificationOpen(false);
+                              }}
+                              className={`w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                                }`}
+                            >
+                              <div className="flex gap-3">
+                                <div className="flex-shrink-0">
+                                  <div className={`w-2 h-2 rounded-full mt-2 ${!notification.read ? 'bg-blue-500' : 'bg-transparent'
+                                    }`}></div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
+                                    {notification.title}
+                                  </p>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                                    {notification.message}
+                                  </p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                                    {new Date(notification.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95"
+              title={darkMode ? t('lightMode') : t('darkMode')}
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
+            {/* Help Button - Opens AiFlow */}
+            <button
+              onClick={() => {
+                const aiflowButton = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                if (aiflowButton) {
+                  aiflowButton.click();
+                }
+              }}
+              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all"
+              title={t('help')}
+            >
+              <HelpCircle size={20} />
+            </button>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2 p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-acai-900 to-acai-700 flex items-center justify-center text-white text-sm font-bold ring-2 ring-solimoes-400/20">
+                  {userInitials}
+                </div>
+              </button>
+
+              {/* User Dropdown */}
               {isUserMenuOpen && (
                 <>
-                  {/* Backdrop */}
                   <div
                     className="fixed inset-0 z-40"
                     onClick={() => setIsUserMenuOpen(false)}
                   />
-
-                  {/* Menu */}
-                  <div className="absolute bottom-full left-0 right-0 mb-2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-150">
+                  <div className="absolute right-0 top-full mt-2 w-64 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-top-2 fade-in duration-150">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                        {profile?.email}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        {profile?.role === 'admin' ? t('admin') : t('user')}
+                      </p>
+                    </div>
                     <div className="p-1">
                       <Link
                         to="/profile"
@@ -414,7 +467,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg transition-colors"
                       >
                         <User className="w-4 h-4 text-slate-400" />
-                        Editar Perfil
+                        {t('editProfile')}
                       </Link>
                       <button
                         onClick={() => {
@@ -424,7 +477,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
-                        Sair da conta
+                        {t('signOut')}
                       </button>
                     </div>
                   </div>
@@ -432,168 +485,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </div>
           </div>
-        </aside>
+        </header>
 
-        {/* Main Content Wrapper */}
-        <div className="flex-1 flex min-w-0 overflow-hidden relative">
-          {/* Middle Content (Header + Page) */}
-          <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 ease-in-out">
-            {/* Ambient background glow */}
-            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px] pointer-events-none"></div>
-            <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px] pointer-events-none"></div>
-
-            {/* Header */}
-            <header className="h-16 px-6 flex items-center justify-between border-b border-solimoes-400/20 dark:border-solimoes-400/10 glass relative z-20">
-              {/* Mobile Menu Button - Only visible on mobile */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 text-solimoes-400 hover:text-solimoes-500 hover:bg-rionegro-900/50 rounded-lg transition-colors"
-                aria-label="Abrir menu"
-              >
-                <Menu size={24} />
-              </button>
-
-              <div className="flex-1" />
-
-              {/* Right Actions */}
-              <div className="flex items-center gap-2">
-                {/* Refresh Profile Button */}
-                <button
-                  onClick={async () => {
-                    setIsRefreshing(true);
-                    try {
-                      await refreshProfile();
-                    } finally {
-                      setIsRefreshing(false);
-                    }
-                  }}
-                  disabled={isRefreshing}
-                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all disabled:opacity-50"
-                  title="Atualizar permissões"
-                >
-                  <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                </button>
-                {/* Notification Bell */}
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setIsNotificationOpen(!isNotificationOpen);
-                      setHasUnreadNotification(false); // Clear badge on click
-                    }}
-                    className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative transition-colors"
-                  >
-                    <Bell size={20} />
-                    {hasUnreadNotification && (
-                      <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-dark-card animate-pulse"></span>
-                    )}
-                  </button>
-
-                  {/* Notification Popover */}
-                  {isNotificationOpen && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setIsNotificationOpen(false)}
-                      />
-                      <div className="absolute right-0 top-full mt-2 w-80 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-top-2 fade-in duration-150">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-                          <h3 className="font-semibold text-slate-900 dark:text-white">Notificações</h3>
-                        </div>
-                        <div className="p-2">
-                          <Link
-                            to="/qrdagua"
-                            onClick={() => setIsNotificationOpen(false)}
-                            className="flex gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group"
-                          >
-                            <div className="flex-shrink-0">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-acai-900 to-acai-700 flex items-center justify-center group-hover:scale-105 transition-transform">
-                                <QrCode className="w-5 h-5 text-solimoes-400" />
-                              </div>
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
-                                Sistema atualizado
-                              </p>
-                              <p className="text-sm text-slate-600 dark:text-slate-400">
-                                Módulo QR d'água ativo
-                              </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
-                                Agora você pode criar e gerenciar QR Codes personalizados!
-                              </p>
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <button
-                  onClick={toggleDarkMode}
-                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95"
-                >
-                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-                {/* Help Button */}
-                <button
-                  onClick={() => setIsHelpOpen(true)}
-                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all"
-                  title="Ajuda"
-                >
-                  <HelpCircle size={20} />
-                </button>
-              </div>
-            </header>
-
-            {/* Help Modal */}
-            {isHelpOpen && (
-              <>
-                <div className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200" onClick={() => setIsHelpOpen(false)} />
-                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in zoom-in-95 fade-in duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Como usar o Hub 🚀</h3>
-                    <button
-                      onClick={() => setIsHelpOpen(false)}
-                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-                  <ol className="space-y-3 text-sm text-slate-600 dark:text-slate-300 mb-6">
-                    <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">1</span>
-                      <span><strong>Gere QR D'água</strong> personalizados para seus links e compartilhe facilmente</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">2</span>
-                      <span><strong>Use o Prompt Lab</strong> para criar conteúdos com IA de forma profissional</span>
-                    </li>
-                    {/* DYNAMIC HELP: Only show Hub Digital if user has access */}
-                    {profile?.access_level?.includes('hub_digital') && (
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-acai-900 text-white rounded-full font-bold text-xs">3</span>
-                        <span><strong>Gerencie seus contatos</strong> e clientes de forma simples no Hub Digital</span>
-                      </li>
-                    )}
-                  </ol>
-                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-500/20 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-purple-900 dark:text-purple-300">
-                      <strong>💎 Planos FREE vs PRO:</strong> Admins têm recursos PRO como redirecionamento direto de QR Codes. Vendedores usam o plano FREE com "Powered by" nas páginas.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setIsHelpOpen(false)}
-                    className="w-full py-2 bg-acai-900 text-white rounded-lg font-semibold hover:bg-acai-800 transition-colors"
-                  >
-                    Entendi!
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* Page Content */}
-            <div className="flex-1 overflow-auto p-6 relative z-10 scroll-smooth">{children}</div>
-          </main>
-        </div>
+        {/* Main Content Area - Mobile safe with padding-top */}
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe">
+          <div className="h-full">
+            <Outlet />
+          </div>
+        </main>
       </div>
 
       {/* Floating AI Widget - Omnipresent */}
@@ -604,6 +503,5 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     </div>
   );
 };
-
 
 export default Layout;

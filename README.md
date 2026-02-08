@@ -4,11 +4,11 @@
 
 O **Encontro D'água** é um ecossistema digital que se inspira na natureza como maior tecnologia fluida para integrar estratégias humanas com a eficiência da IA.
 
-## 📊 Status: Stable - v1.0.1 (Hotfix)
+## 📊 Status: Stable Beta - Mobile Ready
 
-**Última Atualização:** 26/12/2024  
+**Última Atualização:** 08/02/2026  
 **Build:** ✅ Passing  
-**Produção:** ✅ Stable com hotfixes críticos aplicados
+**Produção:** ✅ Stable with full mobile support, AI Hub & Decisions active
 
 ## 🔐 Acesso: Invite-Only
 
@@ -23,6 +23,7 @@ Este projeto é **privado e exclusivo**. O acesso é concedido apenas via convit
 - **QR Codes:** react-qrcode-logo (dots/rounded style)
 - **State:** React Context API
 - **Routing:** React Router v6 (HashRouter)
+- **i18n:** Custom translation hook (PT/EN)
 
 ## 🚀 Setup Local
 
@@ -106,6 +107,43 @@ npm run build
 - IA integrada para qualificação
 - Campos customizáveis
 - Automações
+
+## 🌍 Internacionalização / Demo Mode
+
+O sistema possui suporte completo para **Português (PT)** e **Inglês (EN)**.
+
+### Como Alternar Idiomas
+
+**Via URL:**
+```
+# Português (padrão)
+https://seu-dominio.com/
+
+# Inglês
+https://seu-dominio.com/?lang=en
+```
+
+**Persistência:**
+- A preferência de idioma é salva automaticamente no `localStorage`
+- Permanece ativa durante toda a sessão e em futuras visitas
+- Sincroniza com o parâmetro URL para compartilhamento fácil
+
+### Componentes Traduzidos
+
+✅ **Core CRM:** Kanban Board, Deal Cards, Mazo Agent, Mobile View, Board Selector  
+✅ **Landing Page:** Navegação, Hero Section, Títulos, Footer  
+✅ **Navegação Global:** Menu principal, Botões de ação
+
+### Para Desenvolvedores
+
+```typescript
+import { useTranslation } from '@/hooks/useTranslation';
+
+const { t, switchLanguage } = useTranslation();
+// Uso: <h1>{t('heroTitle')}</h1>
+```
+
+**Dicionário:** `src/lib/translations.ts` (100+ keys)
 
 ---
 

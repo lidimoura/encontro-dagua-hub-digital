@@ -1,4 +1,4 @@
--- Migration: Enable Public Contact Insert (Landing Page Form)
+ -- Migration: Enable Public Contact Insert (Landing Page Form)
 -- Date: 2026-01-02
 -- Purpose: Allow anonymous users to insert leads via landing page form
 

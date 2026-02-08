@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 import { AiflowSupport } from '@/components/AiflowSupport';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +12,7 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,13 +42,18 @@ const Login: React.FC = () => {
                 <div className="absolute top-[40%] -left-[10%] w-[40%] h-[40%] bg-blue-500/20 rounded-full blur-[100px]" />
             </div>
 
+            {/* Language Switcher - Top Right */}
+            <div className="absolute top-4 right-4 z-20">
+                <LanguageSwitcher variant="compact" />
+            </div>
+
             <div className="max-w-md w-full relative z-10 px-4">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display tracking-tight mb-2">
-                        Bem-vindo de volta
+                        {t('welcomeBack')}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
-                        Entre na sua conta para continuar.
+                        {t('loginSubtitle')}
                     </p>
                 </div>
 
@@ -53,7 +61,7 @@ const Login: React.FC = () => {
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email-address" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Email
+                                {t('email')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -75,7 +83,7 @@ const Login: React.FC = () => {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Senha
+                                {t('password')}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -112,7 +120,7 @@ const Login: React.FC = () => {
                                     }}
                                     className="text-sm text-acai-900 hover:text-acai-800 dark:text-acai-400 dark:hover:text-acai-300 font-medium transition-colors"
                                 >
-                                    Esqueci minha senha
+                                    {t('forgotPassword')}
                                 </button>
                             </div>
                         </div>
@@ -132,7 +140,7 @@ const Login: React.FC = () => {
                                 <Loader2 className="animate-spin h-5 w-5" />
                             ) : (
                                 <>
-                                    Entrar
+                                    {t('signIn')}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
                             )}

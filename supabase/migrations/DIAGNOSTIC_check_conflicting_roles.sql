@@ -46,7 +46,7 @@ WHERE role IS NULL;
 -- 2. Analise a lista de usuários conflitantes (query #2)
 -- 3. Para cada usuário, decida:
 --    - Converter para 'equipe' (membro da equipe interna)
---    - Converter para 'cliente' (cliente com acesso ao portal)
+--    - Converter para 'cliente' (cliente c om acesso ao portal)
 --    - Converter para 'cliente_restrito' (cliente com acesso limitado)
 --    - Deletar (se for conta de teste/inválida)
 -- 4. Informe ao Antigravity a decisão para cada email

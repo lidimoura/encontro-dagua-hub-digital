@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Plus, Settings, Trash2 } from 'lucide-react';
 import { Board } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface BoardSelectorProps {
   boards: Board[];
@@ -20,6 +21,7 @@ export const BoardSelector: React.FC<BoardSelectorProps> = ({
   onDeleteBoard,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="relative">
@@ -49,8 +51,8 @@ export const BoardSelector: React.FC<BoardSelectorProps> = ({
                 <div
                   key={board.id}
                   className={`group flex items-center justify-between px-4 py-3 cursor-pointer transition-colors ${board.id === activeBoard.id
-                      ? 'bg-primary-50 dark:bg-primary-500/10'
-                      : 'hover:bg-slate-50 dark:hover:bg-white/5'
+                    ? 'bg-primary-50 dark:bg-primary-500/10'
+                    : 'hover:bg-slate-50 dark:hover:bg-white/5'
                     }`}
                 >
                   <button
@@ -61,8 +63,8 @@ export const BoardSelector: React.FC<BoardSelectorProps> = ({
                       }`} />
                     <div>
                       <p className={`text-sm font-medium ${board.id === activeBoard.id
-                          ? 'text-primary-600 dark:text-primary-400'
-                          : 'text-slate-700 dark:text-slate-200'
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-slate-700 dark:text-slate-200'
                         }`}>
                         {board.name}
                       </p>
@@ -106,7 +108,7 @@ export const BoardSelector: React.FC<BoardSelectorProps> = ({
                 className="w-full flex items-center gap-2 px-4 py-3 text-sm text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors"
               >
                 <Plus size={16} />
-                Criar novo board
+                {t('createNewBoard')}
               </button>
             </div>
           </div>
