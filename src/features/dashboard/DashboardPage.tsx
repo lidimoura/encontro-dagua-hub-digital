@@ -8,8 +8,10 @@ import { ActivityFeedItem } from './components/ActivityFeedItem';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
 import { OnboardingTour } from '@/components/OnboardingTour';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { activities, checkWalletHealth } = useCRM();
   const { addToast } = useToast();
