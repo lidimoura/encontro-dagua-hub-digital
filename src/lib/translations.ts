@@ -253,33 +253,6 @@ export const translations = {
         noDealsFound: "Nenhum negócio encontrado",
         noRisksDetected: "Nenhum novo risco detectado. Carteira saudável!",
         noAssetsFound: "Nenhum ativo encontrado",
-
-        // --- BUTTONS & ACTIONS (NEW) ---
-        save: "Salvar",
-        saveChanges: "Salvar Alterações",
-        saveProject: "Salvar Projeto",
-        savePrompt: "Salvar Prompt",
-        savePassword: "Salvar Senha",
-        saveAsProduct: "Salvar como Produto",
-        cancel: "Cancelar",
-        cancelEdit: "Cancelar edição",
-        create: "Criar",
-        createBoard: "Criar Board",
-        createContact: "Criar Contato",
-        createActivity: "Criar Atividade",
-        updateProject: "Atualizar Projeto",
-        addTool: "Adicionar Ferramenta",
-        saving: "Salvando...",
-        updating: "Atualizando...",
-
-        // --- FORM OPTIONS (NEW) ---
-        noneGenericBoard: "Nenhum (board genérico)",
-        noneFinishHere: "Nenhum (Finalizar aqui)",
-        noneStartOfFunnel: "Nenhum (Início do Funil)",
-        noneEndOfFunnel: "Nenhum (Fim do Funil)",
-        none: "Nenhuma",
-        notInformed: "Não informado",
-        noReference: "Nenhuma",
     },
     en: {
         // --- GLOBAL NAV ---
@@ -520,32 +493,5 @@ export const translations = {
         noDealsFound: "No deals found",
         noRisksDetected: "No new risks detected. Healthy portfolio!",
         noAssetsFound: "No assets found",
-
-        // --- BUTTONS & ACTIONS (NEW) ---
-        save: "Save",
-        saveChanges: "Save Changes",
-        saveProject: "Save Project",
-        savePrompt: "Save Prompt",
-        savePassword: "Save Password",
-        saveAsProduct: "Save as Product",
-        cancel: "Cancel",
-        cancelEdit: "Cancel edit",
-        create: "Create",
-        createBoard: "Create Board",
-        createContact: "Create Contact",
-        createActivity: "Create Activity",
-        updateProject: "Update Project",
-        addTool: "Add Tool",
-        saving: "Saving...",
-        updating: "Updating...",
-
-        // --- FORM OPTIONS (NEW) ---
-        noneGenericBoard: "None (generic board)",
-        noneFinishHere: "None (Finish here)",
-        noneStartOfFunnel: "None (Start of Funnel)",
-        noneEndOfFunnel: "None (End of Funnel)",
-        none: "None",
-        notInformed: "Not informed",
-        noReference: "None",
     }
 };
