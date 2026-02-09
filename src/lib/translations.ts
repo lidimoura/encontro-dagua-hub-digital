@@ -252,6 +252,18 @@ export const translations = {
         noDealsFound: "Nenhum negócio encontrado",
         noRisksDetected: "Nenhum novo risco detectado. Carteira saudável!",
         noAssetsFound: "Nenhum ativo encontrado",
+
+        // --- SETTINGS PAGE ---
+        dangerZone: "⚠️ Zona de Perigo",
+        dangerZoneDesc: "Ações irreversíveis ou de debug. Use com cuidado.",
+        homePage: "Página Inicial",
+        homePageDesc: "Escolha qual tela deve abrir quando você iniciar o CRM.",
+        resetOnboarding: "🔄 Reiniciar Tutorial de Onboarding",
+        confirmResetOnboarding: "Tem certeza que deseja reiniciar o tutorial de onboarding? A página será recarregada.",
+
+        // --- CONTACTS PAGE ---
+        deleteContact: "Excluir Contato",
+        confirmDeleteContact: "Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita.",
     },
     en: {
         // --- GLOBAL NAV ---
@@ -491,5 +503,17 @@ export const translations = {
         noDealsFound: "No deals found",
         noRisksDetected: "No new risks detected. Healthy portfolio!",
         noAssetsFound: "No assets found",
+
+        // --- SETTINGS PAGE ---
+        dangerZone: "⚠️ Danger Zone",
+        dangerZoneDesc: "Irreversible or debug actions. Use with caution.",
+        homePage: "Home Page",
+        homePageDesc: "Choose which screen should open when you start the CRM.",
+        resetOnboarding: "🔄 Reset Onboarding Tutorial",
+        confirmResetOnboarding: "Are you sure you want to reset the onboarding tutorial? The page will be reloaded.",
+
+        // --- CONTACTS PAGE ---
+        deleteContact: "Delete Contact",
+        confirmDeleteContact: "Are you sure you want to delete this contact? This action cannot be undone.",
     }
 };
