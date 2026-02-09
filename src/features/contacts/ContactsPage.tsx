@@ -9,9 +9,11 @@ import { ContactFormModal } from './components/ContactFormModal';
 import ConfirmModal from '@/components/ConfirmModal';
 import { MazoSuggestionCard } from '@/components/MazoSuggestionCard';
 import { MazoInviteModal } from '@/components/MazoInviteModal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
+    const { t } = useTranslation();
 
     // DEBUG: Log contact data for visibility diagnosis
     React.useEffect(() => {
@@ -141,9 +143,9 @@ export const ContactsPage: React.FC = () => {
                 isOpen={!!controller.deleteId}
                 onClose={() => controller.setDeleteId(null)}
                 onConfirm={controller.confirmDelete}
-                title="Excluir Contato"
-                message="Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita."
-                confirmText="Excluir"
+                title={t('deleteContact')}
+                message={t('confirmDeleteContact')}
+                confirmText={t('delete')}
                 variant="danger"
             />
 

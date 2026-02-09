@@ -11,9 +11,11 @@ import { DataStorageSettings } from './components/DataStorageSettings';
 import { UsersPage } from './UsersPage';
 import { useAuth } from '@/context/AuthContext';
 import { Settings as SettingsIcon, Users, Database } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const GeneralSettings: React.FC = () => {
   const controller = useSettingsController();
+  const { t } = useTranslation();
 
 
   return (
@@ -21,9 +23,9 @@ const GeneralSettings: React.FC = () => {
       {/* General Settings */}
       <div className="mb-12">
         <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Página Inicial</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{t('homePage')}</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-            Escolha qual tela deve abrir quando você iniciar o CRM.
+            {t('homePageDesc')}
           </p>
           <select
             value={controller.defaultRoute}
@@ -73,13 +75,13 @@ const GeneralSettings: React.FC = () => {
       {/* Danger Zone */}
       <div className="mt-12">
         <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-red-900 dark:text-red-400 mb-1">⚠️ Zona de Perigo</h3>
+          <h3 className="text-lg font-semibold text-red-900 dark:text-red-400 mb-1">{t('dangerZone')}</h3>
           <p className="text-sm text-red-700 dark:text-red-300 mb-4">
-            Ações irreversíveis ou de debug. Use com cuidado.
+            {t('dangerZoneDesc')}
           </p>
           <button
             onClick={() => {
-              if (confirm('Tem certeza que deseja reiniciar o tutorial de onboarding? A página será recarregada.')) {
+              if (confirm(t('confirmResetOnboarding'))) {
                 localStorage.removeItem('onboarding_completed');
                 localStorage.removeItem('has_seen_tutorial');
                 localStorage.removeItem('first_visit_completed');
@@ -88,7 +90,7 @@ const GeneralSettings: React.FC = () => {
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
           >
-            🔄 Reiniciar Tutorial de Onboarding
+            {t('resetOnboarding')}
           </button>
         </div>
       </div>
