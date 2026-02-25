@@ -178,7 +178,7 @@ export const MobileKanbanView: React.FC<MobileKanbanViewProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedDealId(deal.id);
+                        if (deal.id) setSelectedDealId(deal.id);
                       }}
                       className="flex-1 px-4 py-2 bg-acai-900 text-white rounded-lg font-semibold hover:bg-acai-800 transition-colors"
                     >

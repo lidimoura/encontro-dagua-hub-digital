@@ -1,33 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Search, Shield, Users, CheckCircle, XCircle, Loader2, Edit, X, Package } from 'lucide-react';
-import CatalogTab from './CatalogTab';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Shield, Users, Package, Search, Edit, User, Building2, DollarSign, X, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
 import { InviteGenerator } from './components/InviteGenerator';
-
-interface Profile {
-    id: string;
-    email: string;
-    full_name?: string;
-    phone?: string;
-    role: string;
-    plan_type?: string;
-    status?: string;
-    created_at: string;
-}
-
-interface EditModalProps {
-    profile: Profile;
-    onClose: () => void;
-    onSave: (id: string, updates: Partial<Profile>) => Promise<void>;
-}
+import CatalogTab from './CatalogTab';
+import { useAuth } from '@/context/AuthContext';
+import { EditModalProps, Profile } from '@/types';
+import { useToast } from '@/context/ToastContext';
 
 function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         plan_type: profile.plan_type || 'free',
         status: profile.status || 'active',
         phone: profile.phone || '',
+        role: profile.role || 'user'
     });
     const [saving, setSaving] = useState(false);
 
@@ -35,10 +23,10 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
         e.preventDefault();
         setSaving(true);
         try {
-            await onSave(profile.id, formData);
+            await onSave(formData);
             onClose();
         } catch (error) {
-            console.error('Error saving:', error);
+            console.error('Error saving user:', error);
         } finally {
             setSaving(false);
         }
@@ -49,7 +37,7 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
             <div className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200" onClick={onClose} />
             <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in zoom-in-95 fade-in duration-200">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Editar Usuário</h3>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('editUser')}</h3>
                     <button
                         onClick={onClose}
                         className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
@@ -68,11 +56,11 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Plano
+                            {t('plan')}
                         </label>
                         <select
                             value={formData.plan_type}
-                            onChange={(e) => setFormData({ ...formData, plan_type: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, plan_type: e.target.value as any })}
                             className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         >
                             <option value="free">Free</option>
@@ -83,22 +71,22 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Status
+                            {t('status')}
                         </label>
                         <select
                             value={formData.status}
-                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                             className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         >
-                            <option value="active">Ativo</option>
-                            <option value="inactive">Inativo</option>
-                            <option value="suspended">Suspenso</option>
+                            <option value="active">{t('active')}</option>
+                            <option value="inactive">{t('inactive')}</option>
+                            <option value="suspended">Suspended</option>
                         </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Telefone
+                            {t('phone')}
                         </label>
                         <input
                             type="text"
@@ -115,7 +103,7 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
                             onClick={onClose}
                             className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition"
                         >
-                            Cancelar
+                            {t('cancel')}
                         </button>
                         <button
                             type="submit"
@@ -125,10 +113,10 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
                             {saving ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Salvando...
+                                    {t('saving')}
                                 </>
                             ) : (
-                                'Salvar'
+                                t('save')
                             )}
                         </button>
                     </div>
@@ -139,29 +127,31 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
 }
 
 export default function AdminPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { profile: currentUserProfile, loading: authLoading } = useAuth();
+    const { addToast } = useToast();
+
     const [profiles, setProfiles] = useState<Profile[]>([]);
-    const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
     const [activeTab, setActiveTab] = useState<'users' | 'catalog'>('users');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
 
-    // SECURITY CHECK: Only lidimfc@gmail.com can access
     useEffect(() => {
-        if (!user) {
-            navigate('/login');
-            return;
+        if (!authLoading) {
+            checkAdminAccess();
         }
+    }, [authLoading, currentUserProfile]);
 
-        if (user.email !== 'lidimfc@gmail.com') {
+    const checkAdminAccess = () => {
+        if (!currentUserProfile || (currentUserProfile.role !== 'admin' && currentUserProfile.role !== 'super_admin')) {
+            addToast('Acesso negado. Apenas administradores.', 'error');
             navigate('/dashboard');
             return;
         }
-
         fetchProfiles();
-    }, [user, navigate]);
+    };
 
     const fetchProfiles = async () => {
         try {
@@ -172,11 +162,10 @@ export default function AdminPage() {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-
             setProfiles(data || []);
-            setFilteredProfiles(data || []);
         } catch (error) {
             console.error('Error fetching profiles:', error);
+            addToast('Erro ao carregar usuários', 'error');
         } finally {
             setLoading(false);
         }
@@ -184,44 +173,37 @@ export default function AdminPage() {
 
     const handleSearch = (term: string) => {
         setSearchTerm(term);
-        if (!term.trim()) {
-            setFilteredProfiles(profiles);
-            return;
-        }
-
-        const searchLower = term.toLowerCase();
-        const filtered = profiles.filter(profile =>
-            profile.email.toLowerCase().includes(searchLower) ||
-            profile.full_name?.toLowerCase().includes(searchLower) ||
-            profile.phone?.includes(term)
-        );
-        setFilteredProfiles(filtered);
     };
 
-    const handleSaveUser = async (id: string, updates: Partial<Profile>) => {
+    const handleSaveUser = async (data: Partial<Profile>) => {
+        if (!editingProfile) return;
+
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update(updates)
-                .eq('id', id);
+                .update(data)
+                .eq('id', editingProfile.id);
 
             if (error) throw error;
 
-            // Update local state
-            setProfiles(prev =>
-                prev.map(p => p.id === id ? { ...p, ...updates } : p)
-            );
-            setFilteredProfiles(prev =>
-                prev.map(p => p.id === id ? { ...p, ...updates } : p)
-            );
+            setProfiles(profiles.map(p =>
+                p.id === editingProfile.id ? { ...p, ...data } : p
+            ));
+
+            addToast('Usuário atualizado com sucesso', 'success');
+            setEditingProfile(null);
         } catch (error) {
-            console.error('Error updating profile:', error);
-            alert('Erro ao atualizar usuário. Verifique o console.');
-            throw error;
+            console.error('Error updating user:', error);
+            addToast('Erro ao atualizar usuário', 'error');
         }
     };
 
-    if (loading) {
+    const filteredProfiles = profiles.filter(p =>
+        p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (loading || authLoading) {
         return (
             <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
@@ -236,11 +218,11 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3 mb-2">
                     <Shield className="w-8 h-8 text-primary-500" />
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-                        Admin Panel 2.0
+                        {t('adminPanelTitle')}
                     </h1>
                 </div>
                 <p className="text-slate-600 dark:text-slate-400 text-sm">
-                    Gerenciamento avançado de usuários e permissões
+                    {t('adminPanelSubtitle')}
                 </p>
             </div>
 
@@ -260,7 +242,7 @@ export default function AdminPage() {
                             }`}
                     >
                         <Users size={18} />
-                        Usuários
+                        {t('users')}
                     </button>
                     <button
                         onClick={() => setActiveTab('catalog')}
@@ -270,7 +252,7 @@ export default function AdminPage() {
                             }`}
                     >
                         <Package size={18} />
-                        Catálogo
+                        {t('catalog')}
                     </button>
                 </div>
             </div>
@@ -284,7 +266,7 @@ export default function AdminPage() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => handleSearch(e.target.value)}
-                            placeholder="Buscar por email, nome ou telefone..."
+                            placeholder={t('searchPlaceholder')}
                             className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                     </div>
@@ -297,16 +279,17 @@ export default function AdminPage() {
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 mb-1">
                             <Users className="w-4 h-4 text-slate-500" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400">Total</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{t('totalUsers')}</span>
                         </div>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
                             {profiles.length}
                         </p>
                     </div>
+                    {/* ... other stats ... */}
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 mb-1">
                             <CheckCircle className="w-4 h-4 text-green-500" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400">Monthly</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{t('planMonthly')}</span>
                         </div>
                         <p className="text-2xl font-bold text-green-600">
                             {profiles.filter(p => p.plan_type === 'monthly').length}
@@ -315,7 +298,7 @@ export default function AdminPage() {
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 mb-1">
                             <CheckCircle className="w-4 h-4 text-purple-500" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400">Annual</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{t('planAnnual')}</span>
                         </div>
                         <p className="text-2xl font-bold text-purple-600">
                             {profiles.filter(p => p.plan_type === 'annual').length}
@@ -324,7 +307,7 @@ export default function AdminPage() {
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 mb-1">
                             <XCircle className="w-4 h-4 text-slate-400" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400">Free</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{t('planFree')}</span>
                         </div>
                         <p className="text-2xl font-bold text-slate-600">
                             {profiles.filter(p => !p.plan_type || p.plan_type === 'free').length}
@@ -340,7 +323,7 @@ export default function AdminPage() {
                     <div className="space-y-3">
                         {filteredProfiles.length === 0 ? (
                             <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                                Nenhum usuário encontrado.
+                                {t('noUsersFound')}
                             </div>
                         ) : (
                             filteredProfiles.map((profile) => (
@@ -386,7 +369,7 @@ export default function AdminPage() {
                                             className="px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white"
                                         >
                                             <Edit className="w-4 h-4" />
-                                            Editar
+                                            {t('editUser')}
                                         </button>
                                     </div>
                                 </div>
@@ -405,7 +388,7 @@ export default function AdminPage() {
                     onClick={() => navigate('/dashboard')}
                     className="w-full md:w-auto px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition"
                 >
-                    ← Voltar ao Dashboard
+                    ← {t('backToDashboard')}
                 </button>
             </div>
 

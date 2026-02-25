@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase/client';
 import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
 import { CardLinksEditor } from './components/CardLinksEditor';
 import { ImageUpload } from '@/components/ImageUpload';
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 
@@ -71,6 +72,7 @@ interface QRProject {
 
 // Phone Mockup Component with Crash Protection
 const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
+    const { t } = useTranslation();
     const {
         projectType,
         destinationUrl,
@@ -134,7 +136,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                         {/* QR Code with Subtle Pulse Animation */}
                                         <div className="relative animate-pulse-subtle">
                                             <QRCode
-                                                value={`${window.location.origin} /#/v / ${formData.slug || 'preview'} `}
+                                                value={`${window.location.origin}/r/${formData.slug || 'preview'}`}
                                                 size={180}
                                                 ecLevel="H"
                                                 fgColor={safeColor}
@@ -160,7 +162,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                 {!qrTextBottom && (
                                     <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center flex items-center gap-1">
                                         <span className="inline-block w-1.5 h-1.5 bg-solimoes-400 rounded-full animate-pulse"></span>
-                                        Escaneie para acessar
+                                        {t('scanToAccess')}
                                     </p>
                                 )}
                             </div>
@@ -179,16 +181,16 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                     </div>
                                 )}
                                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                                    {pageTitle?.trim() || 'Título da Página'}
+                                    {pageTitle?.trim() || t('pageTitleDefault')}
                                 </h1>
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    {description?.trim() || 'Descrição do seu negócio'}
+                                    {description?.trim() || t('businessDescDefault')}
                                 </p>
                                 <button
                                     style={{ backgroundColor: safeColor }}
                                     className="px-6 py-3 text-white rounded-lg font-semibold shadow-lg"
                                 >
-                                    {buttonText?.trim() || 'Clique Aqui'}
+                                    {buttonText?.trim() || t('clickHere')}
                                 </button>
                             </div>
                         ) : projectType === 'CARD' ? (
@@ -207,10 +209,10 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                 )}
                                 <div className="text-center">
                                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                                        {clientName?.trim() || 'Nome do Cliente'}
+                                        {clientName?.trim() || t('clientNameDefault')}
                                     </h2>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                        {description?.trim() || 'Bio profissional'}
+                                        {description?.trim() || t('professionalBio')}
                                     </p>
                                 </div>
                                 <div className="w-full space-y-2">
@@ -241,7 +243,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                                     style={{ borderColor: safeColor, color: safeColor }}
                                                     className="block w-full px-4 py-2 border-2 rounded-lg text-center text-sm font-medium"
                                                 >
-                                                    {buttonText || '🌐 Website'}
+                                                    {buttonText || `🌐 ${t('website')}`}
                                                 </a>
                                             )}
                                             {whatsapp?.trim() && (
@@ -250,7 +252,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                                                     style={{ backgroundColor: safeColor }}
                                                     className="block w-full px-4 py-2 text-white rounded-lg text-center text-sm font-medium"
                                                 >
-                                                    💬 WhatsApp
+                                                    💬 {t('whatsapp')}
                                                 </a >
                                             )}
                                         </>
@@ -261,7 +263,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
                             <div className="flex flex-col items-center justify-center h-full text-center">
                                 <Smartphone className="w-16 h-16 text-slate-300 dark:text-slate-700 mb-4" />
                                 <p className="text-sm text-slate-400 dark:text-slate-600">
-                                    Preencha o formulário para ver o preview
+                                    {t('fillFormPreview')}
                                 </p>
                             </div>
                         )}
@@ -275,6 +277,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData }> = ({ formData }) => {
 export const QRdaguaPage: React.FC = () => {
     const { showToast } = useToast();
     const { profile } = useAuth();
+    const { t } = useTranslation();
 
     // Admin check based on database role
     const isAdmin = profile?.role === 'admin';
@@ -423,24 +426,66 @@ export const QRdaguaPage: React.FC = () => {
     };
 
     const handleEdit = (project: QRProject) => {
+        setEditingId(project.id);
+        const type = (project.project_type as ProjectType) || 'LINK';
+
+        // Parse links JSON if exists
+        let parsedLinks: any[] = [];
+        if (project.links_array) {
+            try {
+                parsedLinks = typeof project.links_array === 'string'
+                    ? JSON.parse(project.links_array)
+                    : project.links_array;
+            } catch (e) {
+                console.error("Error parsing links_array", e);
+                parsedLinks = [];
+            }
+        }
+
         setFormData({
-            id: project.id,
-            projectType: (project.project_type as ProjectType) || 'LINK',
+            projectType: type,
             clientName: project.client_name,
             destinationUrl: project.destination_url,
             slug: project.slug,
             color: project.color,
             description: project.description || '',
-            pageTitle: project.page_title,
-            buttonText: project.button_text,
-            imageUrl: project.image_url,
-            whatsapp: project.whatsapp,
+            pageTitle: project.page_title || '',
+            buttonText: project.button_text || '',
+            imageUrl: project.image_url || '',
+            whatsapp: project.whatsapp || '',
             inPortfolio: project.in_portfolio || false,
             inGallery: project.in_gallery || false,
-            directRedirect: project.direct_redirect || false, // PRO feature
+            directRedirect: project.direct_redirect || false,
+            qrLogoUrl: project.qr_logo_url || '',
+            qrTextTop: project.qr_text_top || '',
+            qrTextBottom: project.qr_text_bottom || '',
+            linksArray: parsedLinks
         });
-        setEditingId(project.id);
-        // Smooth scroll to top of form
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setFormData({
+            projectType: 'LINK',
+            clientName: '',
+            destinationUrl: '',
+            slug: '',
+            color: '#620939',
+            description: '',
+            pageTitle: '',
+            buttonText: '',
+            imageUrl: '',
+            whatsapp: '',
+            inPortfolio: false,
+            inGallery: false,
+            directRedirect: false,
+            qrLogoUrl: '',
+            qrTextTop: '',
+            qrTextBottom: '',
+            linksArray: []
+        });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -590,11 +635,11 @@ export const QRdaguaPage: React.FC = () => {
                         <QrCode className="w-6 h-6 text-solimoes-400" />
                     </div>
                     <h1 className="text-3xl font-bold font-display bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                        QR d'água - Concierge de Sites
+                        {t('qrPageTitle')}
                     </h1>
                 </div>
                 <p className="text-slate-600 dark:text-slate-400">
-                    Crie QR Codes, Páginas Ponte e Cartões Digitais personalizados
+                    {t('qrPageSubtitle')}
                 </p>
             </div>
 
@@ -611,7 +656,7 @@ export const QRdaguaPage: React.FC = () => {
                                     onClick={resetForm}
                                     className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                                 >
-                                    Cancelar edição
+                                    {t('cancel')}
                                 </button>
                             )}
                         </div>
@@ -620,7 +665,7 @@ export const QRdaguaPage: React.FC = () => {
                             {/* Project Type Selector */}
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-3">
-                                    Tipo de Projeto *
+                                    {t('qrType')} *
                                 </label>
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
@@ -632,8 +677,7 @@ export const QRdaguaPage: React.FC = () => {
                                             }`}
                                     >
                                         <LinkIcon className="w-6 h-6 mx-auto mb-2 text-acai-900" />
-                                        <p className="text-sm font-medium">Link</p>
-                                        <p className="text-xs text-slate-500 mt-1">QR Code Direto</p>
+                                        <p className="text-sm font-medium">{t('typeLink')}</p>
                                     </button>
                                     <button
                                         type="button"
@@ -645,10 +689,7 @@ export const QRdaguaPage: React.FC = () => {
                                             } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <Globe className="w-6 h-6 mx-auto mb-2 text-acai-900" />
-                                        <p className="text-sm font-medium">Bridge</p>
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {isAdmin ? 'Página Ponte' : '🔒 Admin'}
-                                        </p>
+                                        <p className="text-sm font-medium">{t('typeBridge')}</p>
                                     </button>
                                     <button
                                         type="button"
@@ -660,10 +701,7 @@ export const QRdaguaPage: React.FC = () => {
                                             } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <CreditCard className="w-6 h-6 mx-auto mb-2 text-acai-900" />
-                                        <p className="text-sm font-medium">Cartão Digital</p>
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {isAdmin ? 'Links Múltiplos' : '🔒 Admin'}
-                                        </p>
+                                        <p className="text-sm font-medium">{t('user')}</p>
                                     </button>
                                 </div>
                             </div>
@@ -671,7 +709,7 @@ export const QRdaguaPage: React.FC = () => {
                             {/* Client Name */}
                             <div>
                                 <label htmlFor="clientName" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                    Nome do Cliente *
+                                    {t('customerName')} *
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -684,7 +722,7 @@ export const QRdaguaPage: React.FC = () => {
                                         value={formData.clientName}
                                         onChange={handleInputChange}
                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                        placeholder="Ex: Restaurante Amazônia"
+                                        placeholder={t('bridgeTitlePlaceholder')}
                                         required
                                     />
                                 </div>
@@ -696,7 +734,7 @@ export const QRdaguaPage: React.FC = () => {
                                     <div>
                                         <div className="flex items-center justify-between mb-2">
                                             <label htmlFor="pageTitle" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400">
-                                                Título da Página
+                                                {t('bridgeTitle')}
                                             </label>
                                             <button
                                                 type="button"
@@ -705,7 +743,7 @@ export const QRdaguaPage: React.FC = () => {
                                                 className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-acai-900 to-acai-700 text-solimoes-400 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-acai-900/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Sparkles className="w-4 h-4" />
-                                                {isGeneratingTitle ? 'Gerando...' : '✨ Gerar'}
+                                                {isGeneratingTitle ? t('loading') : '✨ Gerar'}
                                             </button>
                                         </div>
                                         <input
@@ -715,13 +753,13 @@ export const QRdaguaPage: React.FC = () => {
                                             value={formData.pageTitle || ''}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                            placeholder="Ex: Bem-vindo ao nosso negócio"
+                                            placeholder={t('bridgeTitlePlaceholder')}
                                         />
                                     </div>
 
                                     <div>
                                         <label htmlFor="buttonText" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                            Botão de Ação Principal
+                                            {t('bridgeButton')}
                                         </label>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
                                             💡 Ex: "Ver Cardápio", "Ir para Site", "Falar Comigo"
@@ -733,7 +771,7 @@ export const QRdaguaPage: React.FC = () => {
                                             value={formData.buttonText || ''}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                            placeholder="Ex: Ver Cardápio"
+                                            placeholder={t('bridgeButtonPlaceholder')}
                                         />
                                     </div>
 
@@ -743,13 +781,13 @@ export const QRdaguaPage: React.FC = () => {
                                         bucket="qr-images"
                                         currentImageUrl={formData.imageUrl}
                                         onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
-                                        label="Imagem da Ponte"
+                                        label={t('logoUpload')}
                                         accept="image/*"
                                     />
 
                                     <div>
                                         <label htmlFor="whatsapp" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                            WhatsApp (com código do país)
+                                            {t('waNumber')}
                                         </label>
                                         <input
                                             type="tel"
@@ -758,7 +796,7 @@ export const QRdaguaPage: React.FC = () => {
                                             value={formData.whatsapp || ''}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                            placeholder="5511999999999"
+                                            placeholder={t('waPlaceholder')}
                                         />
                                     </div>
 
@@ -778,7 +816,7 @@ export const QRdaguaPage: React.FC = () => {
                             {formData.projectType !== 'CARD' && (
                                 <div>
                                     <label htmlFor="destinationUrl" className="block text-sm font-semibold text-slate-700 dark:text-solimoes-400 mb-2">
-                                        URL Destino *
+                                        {t('targetUrl')} *
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -791,7 +829,7 @@ export const QRdaguaPage: React.FC = () => {
                                             value={formData.destinationUrl}
                                             onChange={handleInputChange}
                                             className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
-                                            placeholder="https://exemplo.com"
+                                            placeholder={t('urlPlaceholder')}
                                             required
                                         />
                                     </div>

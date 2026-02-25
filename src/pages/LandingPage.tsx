@@ -14,43 +14,7 @@ import { CRMSimulator } from '@/components/CRMSimulator';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useTranslation } from '@/hooks/useTranslation';
 
-const TEAM_MEMBERS = [
-  {
-    id: 'lidi',
-    name: "Lidi",
-    role: "Founder & Visão",
-    type: "human",
-    image: "/profile.png",
-    color: "border-amber-500 text-amber-400",
-    linkedin: "https://linkedin.com/in/sua-url",
-    pitch: "Formada em Psicologia pela UFAM (onde seu avô, professor de Matemática, dá nome a um bloco acadêmico), Lidi traz uma bagagem única. Como artista viajante e nômade, aprendeu a se adaptar; da mãe professora de inglês herdou a habilidade de comunicação e do pai técnico de informática, a lógica. Hoje, atua como criadora de soluções digitais e fundadora do hub. Trabalha no modo heutagógico, aprendendo e fazendo com suporte estratégico de IAs. Sua missão é integrar essa herança criativa e técnica para oferecer autonomia e prosperidade real para todos."
-  },
-  {
-    id: 'precy',
-    name: "Precy",
-    role: "Tech Lead",
-    type: "ai",
-    color: "border-blue-500 text-blue-400",
-    pitch: "Guardiã da estabilidade. Precy monitora a infraestrutura do Hub 24/7, garantindo que seu QR D'água e automações funcionem com segurança máxima e zero latência."
-  },
-  {
-    id: 'amazo',
-    name: "Amazô",
-    role: "CS & Vendas",
-    type: "ai",
-    image: "/avatar-amazo.jpeg",
-    color: "border-fuchsia-500 text-fuchsia-400",
-    pitch: "Especialista em escuta ativa. A Amazô realiza o diagnóstico inicial do seu negócio e guia você para a solução ideal, disponível a qualquer hora do dia."
-  },
-  {
-    id: 'antigravity',
-    name: "Antigravity",
-    role: "Dev",
-    type: "ai",
-    color: "border-purple-500 text-purple-400",
-    pitch: "Arquiteto de soluções. Transforma ideias complexas em código limpo e funcional, expandindo as fronteiras do que o Hub pode oferecer."
-  }
-];
+// TEAM_MEMBERS MOVED INSIDE COMPONENT TO USE TRANSLATION
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -59,6 +23,44 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTeamIndex, setActiveTeamIndex] = useState(0);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+
+  const TEAM_MEMBERS = [
+    {
+      id: 'lidi',
+      name: "Lidi",
+      role: t('founderRole'),
+      type: "human",
+      image: "/profile.png",
+      color: "border-amber-500 text-amber-400",
+      linkedin: "https://linkedin.com/in/sua-url",
+      pitch: t('founderPitch')
+    },
+    {
+      id: 'precy',
+      name: "Precy",
+      role: t('techLeadRole'),
+      type: "ai",
+      color: "border-blue-500 text-blue-400",
+      pitch: t('precyPitch')
+    },
+    {
+      id: 'amazo',
+      name: "Amazô",
+      role: t('csRole'),
+      type: "ai",
+      image: "/avatar-amazo.jpeg",
+      color: "border-fuchsia-500 text-fuchsia-400",
+      pitch: t('amazoPitch')
+    },
+    {
+      id: 'antigravity',
+      name: "Antigravity",
+      role: t('devRole'),
+      type: "ai",
+      color: "border-purple-500 text-purple-400",
+      pitch: t('antigravityPitch')
+    }
+  ];
 
   // Prompt Lab State
   const [idea, setIdea] = useState('');
@@ -422,13 +424,13 @@ Agora, gere o prompt perfeito:`;
         <section className="min-h-[90vh] flex flex-col justify-center items-center px-6 text-center pt-20">
           <div className="max-w-5xl mx-auto space-y-8 animate-fade-in-up flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-widest text-amber-400 shadow-xl">
-              🚀 Mobile First • AI First • Impacto Real
+              {t('landingBadge')}
             </div>
             <h1 className="text-5xl md:text-8xl font-extrabold tracking-tight text-white leading-tight drop-shadow-2xl">
-              Tecnologia mais <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500">acessível.</span>
+              {t('accessibleTech')} <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500">{t('accessibleTechHighlight')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-white font-medium max-w-3xl mx-auto drop-shadow-xl">
-              {t('heroSubtitle')}
+              {t('heroSubtitleLanding')}
             </p>
             <div className="pt-10 w-full flex justify-center">
               <button onClick={() => document.getElementById('manifesto')?.scrollIntoView({ behavior: 'smooth' })} className="animate-bounce flex flex-col items-center gap-2 text-white hover:text-amber-400">
@@ -448,7 +450,7 @@ Agora, gere o prompt perfeito:`;
               {t('ourSolutions')}
             </h2>
             <p className="text-lg text-slate-300 leading-relaxed mb-4">
-              Não vendemos apenas automações ou prompts. Oferecemos <span className="text-fuchsia-400 font-semibold">soluções reais para problemas reais</span>. Nosso foco é realizar seu desejo com precificação justa, escuta sensível e tecnologia assertiva.
+              {t('solutionsDesc')}
             </p>
           </div>
         </section>
@@ -456,20 +458,19 @@ Agora, gere o prompt perfeito:`;
         {/* PROMPT LAB (INTERATIVO) - Solução #1 */}
         <section className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>Prova D'água</span></div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>{t('promptLabTag')}</span></div>
             <h3 className="text-3xl font-bold text-white mb-4">{t('promptLabTitle')}</h3>
             <p className="text-lg text-slate-300 mb-4">
-              Transforme ideias brutas em <span className="text-fuchsia-400 font-semibold">prompts estruturados e eficientes</span> usando engenharia de prompts profissional.
+              {t('promptLabHeadline')} <span className="text-fuchsia-400 font-semibold">{t('promptLabHeadlineHighlight')}</span> {t('promptLabSub')}
             </p>
             <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-              Nossa IA analisa sua intenção e cria prompts otimizados prontos para usar em qualquer LLM (ChatGPT, Claude, Gemini).
-              Teste gratuitamente abaixo e veja a diferença na qualidade das respostas.
+              {t('promptLabDesc')}
             </p>
 
             <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
-              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder="Ex: Criar legenda para foto de produto..." className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
+              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
               <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
-                {isOptimizing ? '⏳ Otimizando...' : '✨ Otimizar'}
+                {isOptimizing ? t('optimizing') : t('optimize')}
               </button>
             </div>
 
@@ -485,10 +486,10 @@ Agora, gere o prompt perfeito:`;
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => { navigator.clipboard.writeText(optimizedResult); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000) }} className="text-white bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                      {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} Copiar
+                      {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} {t('copy')}
                     </button>
                     <button onClick={() => setIsApplicationModalOpen(true)} className="bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg shadow-fuchsia-500/30">
-                      <Sparkles size={16} /> Quero Acesso ao Hub Pro
+                      <Sparkles size={16} /> {t('accessPro')}
                     </button>
                   </div>
                 </div>
@@ -498,10 +499,10 @@ Agora, gere o prompt perfeito:`;
                   <div className="mt-4 p-6 bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-2 border-blue-500/40 rounded-2xl animate-fade-in">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="text-lg font-bold text-blue-200 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5" /> Resposta da IA
+                        <Sparkles className="w-5 h-5" /> {t('aiResponse')}
                       </h4>
                       <button onClick={() => { navigator.clipboard.writeText(testResponse); }} className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
-                        <Copy size={14} /> Copiar
+                        <Copy size={14} /> {t('copy')}
                       </button>
                     </div>
                     <pre className="text-sm text-white whitespace-pre-wrap leading-relaxed bg-black/30 p-4 rounded-lg">{testResponse}</pre>
@@ -511,12 +512,12 @@ Agora, gere o prompt perfeito:`;
                 {/* BOTÃO TESTAR */}
                 {optimizedResult && !isTesting && (
                   <button onClick={handleTestPrompt} className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg flex items-center justify-center gap-2">
-                    <Play size={18} /> 🧪 Testar Prompt
+                    <Play size={18} /> {t('testPrompt')}
                   </button>
                 )}
                 {isTesting && (
                   <div className="w-full mt-4 px-6 py-3 bg-blue-900/30 text-blue-300 rounded-xl font-bold flex items-center justify-center gap-2">
-                    ⏳ Testando...
+                    {t('testing')}
                   </div>
                 )}
               </div>
@@ -524,22 +525,18 @@ Agora, gere o prompt perfeito:`;
 
 
             <div className="mt-8 p-6 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl max-w-2xl mx-auto">
-              <p className="text-lg font-bold text-fuchsia-300 mb-3">💡 Quer apenas o Prompt Lab?</p>
+              <p className="text-lg font-bold text-fuchsia-300 mb-3">{t('wantJustPromptLab')}</p>
               <ul className="text-sm text-slate-300 space-y-2 mb-4">
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400">🔥</span>
-                  <span><strong>Agentes de IA:</strong> Cria "cérebros" completos para chatbots (Typebot/OpenAI)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-amber-400">⚙️</span>
-                  <span><strong>Personalizar LLMs:</strong> Instruções para treinar ChatGPT/Gemini com sua voz</span>
+                  <span><strong>{t('promptLabBenefits')}</strong></span>
                 </li>
               </ul>
               <button
                 onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Pro Mensal por R$ 3,00', '_blank')}
                 className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg"
               >
-                Assinar Pro Mensal (R$ 3,00)
+                {t('subscribePro')}
               </button>
             </div>
           </div>
@@ -553,7 +550,7 @@ Agora, gere o prompt perfeito:`;
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('qrWaterTitle')}</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.
+              {t('qrDesc')}
             </p>
             <PhoneSimulator className="mx-auto" />
           </div>
@@ -656,7 +653,7 @@ Agora, gere o prompt perfeito:`;
 
               {/* Scroll Indicator */}
               <div className="text-center mt-2">
-                <p className="text-xs text-slate-500">← Deslize para ver mais →</p>
+                <p className="text-xs text-slate-500">{t('swipeToSee')}</p>
               </div>
             </div>
 
@@ -671,7 +668,7 @@ Agora, gere o prompt perfeito:`;
             `}</style>
 
             <div className="mt-8 text-sm text-slate-500">
-              💡 Quer aparecer aqui? Marque "Autorizar Galeria" ao criar seu projeto!
+              {t('wantToAppear')}
             </div>
           </div>
         </section>
@@ -680,26 +677,26 @@ Agora, gere o prompt perfeito:`;
         <section className="py-20 px-6 bg-[#02040a] border-t border-white/5 text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Bot className="w-3 h-3" /> Agente de IA
+              <Bot className="w-3 h-3" /> {t('amazoTag')}
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Amazô IA</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('amazoTitle')}</h2>
             <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-              A Amazô ajuda no diagnóstico. Atendimento 24/7 para CS e Vendas direto no WhatsApp.
+              {t('amazoDesc')}
             </p>
 
             <div className="bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 p-8 rounded-3xl border border-fuchsia-500/20 max-w-2xl mx-auto">
               <div className="w-20 h-20 bg-fuchsia-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Bot className="w-10 h-10 text-fuchsia-400" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Converse com a Amazô</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t('talkToAmazo')}</h3>
               <p className="text-slate-300 text-sm mb-6">
-                Tire dúvidas, peça diagnóstico ou saiba mais sobre nossas soluções
+                {t('talkToAmazoDesc')}
               </p>
               <button
                 onClick={openAmazoChat}
                 className="px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg flex items-center justify-center gap-2 mx-auto"
               >
-                <MessageCircle size={20} /> Falar com Amazô agora
+                <MessageCircle size={20} /> {t('chatWithAmazo')}
               </button>
             </div>
           </div>
@@ -717,7 +714,7 @@ Agora, gere o prompt perfeito:`;
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">{t('manifesto')}</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                O Encontro D'água Hub não nasceu no Vale do Silício, mas sim da necessidade real de conectar pessoas e tecnologia de forma mais sustentável e acessível. Começamos simples, criando GEMs personalizados, e hoje somos um ecossistema digital vivo com inteligência artificial integrada. Este hub é a prova do nosso compromisso: cada linha de código e estratégia foi criada pela fundadora com suporte da sua equipe de agentes de IA. Estamos construindo uma tecnologia sustentável que seja acessível para todos que precisam e assim ser mais prósperos.
+                {t('manifestoText')}
               </p>
             </div>
           </div>
@@ -727,10 +724,10 @@ Agora, gere o prompt perfeito:`;
         <section className="py-24 px-6 bg-[#02040a] text-center">
           <div className="max-w-5xl mx-auto">
             <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('technologyForAll')}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('techForAll')}</h2>
 
             <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {["Mães e Pais Atípicos", "Neurodivergentes", "Pessoas Originárias e em Retomada", "Mães e Pais Empreendedores", "Negócios Locais", "Ribeirinhos", "PCD", "LGBTQIAPN+", "Pretos e Pardos", "Comunidades", "ONGs"].map((tag) => (
+              {["Atypical Parents", "Neurodivergent", "Indigenous & Reclaiming", "Entrepreneur Parents", "Local Businesses", "Riverside Communities", "PwD", "LGBTQIAPN+", "Black & Brown People", "Communities", "NGOs"].map((tag) => (
                 <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
               ))}
             </div>
@@ -740,10 +737,10 @@ Agora, gere o prompt perfeito:`;
               <p className="text-slate-400 text-sm mb-6">{t('socialImpact')}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
                 <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <MessageCircle size={18} /> Consultoria Social (WhatsApp)
+                  <MessageCircle size={18} /> {t('socialConsult')}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <Bot size={18} /> Falar com Amazo IA
+                  <Bot size={18} /> {t('chatWithAmazo')}
                 </button>
               </div>
             </div>
@@ -775,7 +772,8 @@ Agora, gere o prompt perfeito:`;
         {/* FOOTER */}
         <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] border-t border-white/5">
           <p className="mb-2 text-white font-bold">Encontro D'água .hub 🌀</p>
-          <p>{t('footer')}</p>
+          <p>Base CRM developed for students... Powered by Encontro D'água Hub</p>
+          <p className="mt-2 text-slate-700">{t('footerRights')}</p>
         </footer>
       </div>
 

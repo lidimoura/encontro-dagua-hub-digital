@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Brain, DollarSign, Heart, Scale, Sparkles } from 'lucide-react';
 import { PrecyAgent } from './Agents/PrecyAgent';
 import { MazoAgent } from './Agents/MazoAgent';
@@ -11,35 +12,36 @@ interface InsightsPanelProps {
 }
 
 export const InsightsPanel: React.FC<InsightsPanelProps> = ({ boardId, dealId }) => {
+    const { t } = useTranslation();
     const [activeAgent, setActiveAgent] = useState<'precy' | 'mazo' | 'jury' | null>(null);
 
     const agents = [
         {
             id: 'precy' as const,
             name: 'PRECY',
-            role: 'Engenheira de Precificação',
+            role: t('pricingEngineer'),
             icon: DollarSign,
             color: 'from-green-600 to-emerald-500',
             borderColor: 'border-green-500',
-            description: 'Calcula preço justo baseado em custo, horas e impacto. Inclui precificação social.',
+            description: t('precyDesc'),
         },
         {
             id: 'mazo' as const,
             name: 'MAZÔ',
-            role: 'Customer Success Interno',
+            role: t('internalCS'),
             icon: Heart,
             color: 'from-pink-600 to-rose-500',
             borderColor: 'border-pink-500',
-            description: 'Focada em retenção, empatia e saúde do cliente. Previne churn proativamente.',
+            description: t('mazoDesc'),
         },
         {
             id: 'jury' as const,
             name: 'JURY',
-            role: 'Analista Legal',
+            role: t('legalAnalyst'),
             icon: Scale,
             color: 'from-purple-600 to-violet-500',
             borderColor: 'border-purple-500',
-            description: 'Gera contratos usando templates da biblioteca. Garante compliance e segurança.',
+            description: t('juryDesc'),
         },
     ];
 

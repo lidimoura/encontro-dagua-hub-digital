@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2, CheckCircle2, Circle, Sparkles, BrainCircuit, LayoutTemplate, Target, Eye, BookOpen } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export type ProcessingStep = 'analyzing' | 'structure' | 'strategy' | 'finalizing' | 'complete';
 export type SimulatorPhase = 'structure' | 'strategy';
@@ -11,48 +12,50 @@ interface AIProcessingModalProps {
 }
 
 export const AIProcessingModal: React.FC<AIProcessingModalProps> = ({ isOpen, currentStep, phase = 'structure' }) => {
+    const { t } = useLanguage();
+
     if (!isOpen) return null;
 
     // Define steps based on phase
     const structureSteps = [
         {
             id: 'analyzing',
-            label: 'Analisando seu negócio...',
+            label: t('analyzingBusiness'),
             icon: BrainCircuit,
-            description: 'Entendendo o contexto e necessidades.'
+            description: t('analyzingBusinessDesc')
         },
         {
             id: 'structure',
-            label: 'Desenhando Processo',
+            label: t('designingProcess'),
             icon: LayoutTemplate,
-            description: 'Criando fases do funil e automações.'
+            description: t('designingProcessDesc')
         },
         {
             id: 'finalizing',
-            label: 'Preparando Preview...',
+            label: t('preparingPreview'),
             icon: Eye,
-            description: 'Gerando visualização interativa.'
+            description: t('preparingPreviewDesc')
         }
     ];
 
     const strategySteps = [
         {
             id: 'analyzing', // Reusing ID for simplicity in state mapping
-            label: 'Lendo Contexto do Board...',
+            label: t('readingContext'),
             icon: BookOpen,
-            description: 'Analisando a estrutura final aprovada.'
+            description: t('readingContextDesc')
         },
         {
             id: 'strategy',
-            label: 'Definindo Estratégia',
+            label: t('definingStrategy'),
             icon: Target,
-            description: 'Configurando metas e persona do agente.'
+            description: t('definingStrategyDesc')
         },
         {
             id: 'finalizing',
-            label: 'Finalizando Criação...',
+            label: t('finalizingCreation'),
             icon: Sparkles,
-            description: 'Montando seu board personalizado.'
+            description: t('finalizingCreationDesc')
         }
     ];
 
@@ -80,10 +83,10 @@ export const AIProcessingModal: React.FC<AIProcessingModalProps> = ({ isOpen, cu
                         <Sparkles className="text-primary-600 dark:text-primary-400 animate-pulse drop-shadow-sm" size={32} />
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                        {phase === 'structure' ? 'Criando seu CRM' : 'Definindo Estratégia'}
+                        {phase === 'structure' ? t('creatingCRM') : t('definingStrategyTitle')}
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">
-                        {phase === 'structure' ? 'A IA está desenhando seu processo...' : 'A IA está alinhando metas e agentes...'}
+                        {phase === 'structure' ? t('aiAnalyzingDesc') : t('aiAligningDesc')}
                     </p>
                 </div>
 

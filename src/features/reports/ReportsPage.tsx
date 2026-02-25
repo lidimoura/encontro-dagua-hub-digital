@@ -1,9 +1,21 @@
-import React from 'react';
-import { TrendingUp, Clock, Target } from 'lucide-react';
-import { useDashboardMetrics } from '../dashboard/hooks/useDashboardMetrics';
-import { LazyRevenueTrendChart, ChartWrapper } from '@/components/charts';
+import React, { Suspense } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useDashboardMetrics } from '@/features/dashboard/hooks/useDashboardMetrics';
+import { Clock, Target, Loader2 } from 'lucide-react';
+
+// Lazy load the chart
+const LazyRevenueTrendChart = React.lazy(() => import('@/components/charts/RevenueTrendChart'));
+
+const ChartWrapper: React.FC<{ children: React.ReactNode; height?: number }> = ({ children, height = 300 }) => (
+  <div style={{ height }} className="w-full">
+    <Suspense fallback={<div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-slate-400" /></div>}>
+      {children}
+    </Suspense>
+  </div>
+);
 
 const ReportsPage: React.FC = () => {
+  const { t } = useTranslation();
   const {
     trendData,
     avgSalesCycle,
@@ -14,17 +26,17 @@ const ReportsPage: React.FC = () => {
     wonDeals,
     lostDeals,
     topLossReasons,
-    topDeals,
+    topDeals
   } = useDashboardMetrics();
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
       <div>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display tracking-tight">
-          Relatórios de Performance
+          {t('reportsTitle')}
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Análise detalhada de vendas e tendências.
+          {t('reportsSubtitle')}
         </p>
       </div>
 
@@ -32,10 +44,10 @@ const ReportsPage: React.FC = () => {
       <div className="glass p-6 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-            Tendência de Receita
+            {t('revenueTrend')}
           </h3>
           <span className="text-xs text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
-            Últimos 6 Meses
+            {t('last6Months')}
           </span>
         </div>
         <div className="h-80 w-full">
@@ -51,30 +63,30 @@ const ReportsPage: React.FC = () => {
         <div className="glass p-6 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display mb-4 flex items-center gap-2">
             <Clock className="text-blue-500" size={24} />
-            Ciclo de Vendas
+            {t('salesCycle')}
           </h2>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Média</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('avgDays')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {avgSalesCycle} dias
+                {avgSalesCycle} {t('days', { defaultValue: 'dias' })}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Mais Rápido</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('fastestDays')}</p>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {fastestDeal} dias
+                {fastestDeal} {t('days', { defaultValue: 'dias' })}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Mais Lento</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('slowestDays')}</p>
               <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                {slowestDeal} dias
+                {slowestDeal} {t('days', { defaultValue: 'dias' })}
               </p>
             </div>
           </div>
           <p className="text-xs text-slate-500 mt-4">
-            Baseado em {wonDealsWithDates.length} negócios fechados.
+            {t('basedOnDeals').replace('{count}', wonDealsWithDates.length.toString())}
           </p>
         </div>
 
@@ -82,17 +94,17 @@ const ReportsPage: React.FC = () => {
         <div className="glass p-6 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display mb-4 flex items-center gap-2">
             <Target className="text-emerald-500" size={24} />
-            Win/Loss Analysis
+            {t('winLossAnalysis')}
           </h2>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Taxa de Vitória</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('winRate')}</p>
               <p className="text-3xl font-bold text-slate-900 dark:text-white">
                 {actualWinRate.toFixed(1)}%
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Ganhos / Perdas</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('winsLosses')}</p>
               <p className="text-lg font-bold">
                 <span className="text-green-600 dark:text-green-400">{wonDeals.length}</span>
                 <span className="text-slate-400 mx-1">/</span>
@@ -103,8 +115,9 @@ const ReportsPage: React.FC = () => {
           {topLossReasons.length > 0 && (
             <div>
               <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">
-                Top Motivos de Perda
+                {t('topLossReasons')}
               </p>
+              {/* ... loss reasons loop ... */}
               <div className="space-y-2">
                 {topLossReasons.map(([reason, count]) => (
                   <div key={reason} className="flex items-center gap-2">
@@ -132,18 +145,18 @@ const ReportsPage: React.FC = () => {
       <div className="glass p-6 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-            Top Oportunidades
+            {t('topOpportunities')}
           </h3>
-          <button className="text-primary-500 text-sm hover:underline">Ver todas</button>
+          <button className="text-primary-500 text-sm hover:underline">{t('viewAll')}</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-white/5 border-y border-slate-100 dark:border-white/5">
               <tr>
-                <th className="px-4 py-2 font-medium">Oportunidade</th>
-                <th className="px-4 py-2 font-medium">Valor</th>
-                <th className="px-4 py-2 font-medium">Probabilidade</th>
-                <th className="px-4 py-2 font-medium">Dono</th>
+                <th className="px-4 py-2 font-medium">{t('opportunity')}</th>
+                <th className="px-4 py-2 font-medium">{t('value')}</th>
+                <th className="px-4 py-2 font-medium">{t('probability')}</th>
+                <th className="px-4 py-2 font-medium">{t('owner')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">

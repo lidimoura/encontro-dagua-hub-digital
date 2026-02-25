@@ -44,7 +44,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
         setDealItems([...dealItems, {
             productId: firstProduct.id,
             quantity: 1,
-            unitPrice: firstProduct.base_price || 0
+            unitPrice: firstProduct.basePrice || 0
         }]);
     };
 
@@ -60,7 +60,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 updated[index] = {
                     ...updated[index],
                     productId: value as string,
-                    unitPrice: product.base_price || 0
+                    unitPrice: product.basePrice || 0
                 };
             }
         } else {
@@ -118,15 +118,36 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 }
             }
 
-            // 2. Get first stage of active board
+            // 2. Get first stage of active board (Robust Fallback)
+            let finalStageId: string | null = null;
+
+            // Try to find the first stage of the current board
             const { data: stages } = await supabase
                 .from('board_stages')
                 .select('id')
                 .eq('board_id', activeBoardId)
-                .order('order', { ascending: true })
+                .order('position')
                 .limit(1);
 
-            const firstStageId = stages?.[0]?.id;
+            if (stages && stages.length > 0) {
+                finalStageId = stages[0].id;
+            } else {
+                // Fallback: Check if there are ANY stages for this board
+                const { data: allStages } = await supabase
+                    .from('board_stages')
+                    .select('id')
+                    .eq('board_id', activeBoardId)
+                    .limit(1);
+
+                if (allStages && allStages.length > 0) {
+                    finalStageId = allStages[0].id;
+                }
+            }
+
+            if (!finalStageId) {
+                console.error('No stages found for board:', activeBoardId);
+                throw new Error(t('noStagesFound') || 'No stages found for this board. Please add a stage first.');
+            }
 
             // 3. Create deal
             const { data: newDeal, error: dealError } = await supabase
@@ -136,13 +157,12 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     value: calculateTotalValue(),
                     contact_id: contactId,
                     board_id: activeBoardId,
-                    stage_id: firstStageId,
+                    stage_id: finalStageId,
                     company_id: profile.company_id,
                     owner_id: profile.id,
                     status: 'OPEN',
                     priority: 'medium',
                     probability: 10,
-                    selected_products: dealItems.map(item => item.productId), // Array of product IDs
                     metadata: {
                         items: dealItems,
                         companyName: newDealData.companyName
@@ -153,12 +173,14 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
 
             if (dealError) throw dealError;
 
-            addToast(t('dealCreated') || 'Deal created successfully!', 'success');
+            addToast(t('dealCreated' as any) || 'Deal created successfully!', 'success');
             onClose();
             setNewDealData({ title: '', companyName: '', contactName: '', email: '', phone: '' });
             setDealItems([]);
 
-            // Refresh page to show new deal
+            // Refresh page to show new deal - OPTIMIZED: Use context refresh if available, else reload
+            // window.location.reload(); // Hard reload is last resort, but acceptable for stability
+            // Ideally we should use a refreshDeals() from context, but reload is safe for "Ghost Deal" fix.
             window.location.reload();
         } catch (error: any) {
             console.error('Error creating deal:', error);
@@ -240,7 +262,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     {/* Products Section */}
                     <div className="pt-4 border-t border-slate-100 dark:border-white/5">
                         <div className="flex justify-between items-center mb-3">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase">Produtos/Serviços</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase">{t('productsServices')}</h3>
                             <button
                                 type="button"
                                 onClick={handleAddItem}
@@ -248,7 +270,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                                 className="flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Plus size={14} />
-                                Adicionar Produto
+                                {t('addProduct')}
                             </button>
                         </div>
 
@@ -265,11 +287,18 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                                     onChange={e => handleItemChange(index, 'productId', e.target.value)}
                                     className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                                 >
-                                    {products.map(product => (
-                                        <option key={product.id} value={product.id}>
-                                            {product.name} - R$ {product.base_price?.toFixed(2) || '0.00'}
-                                        </option>
-                                    ))}
+                                    {products
+                                        .filter(p =>
+                                            ['Consulting', 'Services', 'Setup', 'Subscription'].includes(p.category || '') &&
+                                            !['tech_stack', 'infra', 'api_cost'].includes(p.category || '') &&
+                                            !p.name.toLowerCase().includes('openai') &&
+                                            !p.name.toLowerCase().includes('vercel')
+                                        )
+                                        .map(product => (
+                                            <option key={product.id} value={product.id}>
+                                                {product.name} - R$ {product.basePrice?.toFixed(2) || '0.00'}
+                                            </option>
+                                        ))}
                                 </select>
                                 <input
                                     type="number"
@@ -277,7 +306,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                                     value={item.quantity}
                                     onChange={e => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
                                     className="w-20 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-                                    placeholder="Qtd"
+                                    placeholder={t('qty')}
                                 />
                                 <input
                                     type="number"
@@ -285,7 +314,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                                     value={item.unitPrice}
                                     onChange={e => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                                     className="w-28 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-                                    placeholder="Preço"
+                                    placeholder={t('price')}
                                 />
                                 <button
                                     type="button"
@@ -299,7 +328,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
 
                         {dealItems.length > 0 && (
                             <div className="mt-3 pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Valor Total:</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{t('totalValue')}:</span>
                                 <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
                                     R$ {calculateTotalValue().toFixed(2)}
                                 </span>

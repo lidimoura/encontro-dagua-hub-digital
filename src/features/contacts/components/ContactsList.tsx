@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Building2, Mail, Phone, Plus, Calendar, Pencil, Trash2, Globe, MoreHorizontal } from 'lucide-react';
 import { Contact, Company } from '@/types';
 import { StageBadge } from './ContactsStageTabs';
@@ -28,6 +29,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
     setDeleteId,
     addToast
 }) => {
+    const { t } = useTranslation();
     return (
         <div className="glass rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
@@ -38,12 +40,12 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                 <th className="w-12 px-6 py-4">
                                     <input type="checkbox" className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10" />
                                 </th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Nome</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Estágio</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Cargo / Empresa</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Contato</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Última Interação</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('name')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('stage')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('roleCompany')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('contact')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('status')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('lastInteraction')}</th>
                                 <th className="px-6 py-4"></th>
                             </tr>
                         </thead>
@@ -97,7 +99,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                         'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'
                                                     }`}
                                             >
-                                                {contact.status === 'ACTIVE' ? 'ATIVO' : contact.status === 'INACTIVE' ? 'INATIVO' : 'PERDIDO'}
+                                                {contact.status === 'ACTIVE' ? t('active') : contact.status === 'INACTIVE' ? t('inactive') : t('lost')}
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -114,7 +116,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs">
                                             <Calendar size={14} className="text-slate-400" />
-                                            <span>Hoje</span>
+                                            <span>{t('today')}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
@@ -146,10 +148,10 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                 <th className="w-12 px-6 py-4">
                                     <input type="checkbox" className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:bg-white/5 dark:border-white/10" />
                                 </th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Empresa</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Setor</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Criado em</th>
-                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">Pessoas Vinc.</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('company')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('industry')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('createdAt')}</th>
+                                <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200 font-display text-xs uppercase tracking-wider">{t('linkedPeople')}</th>
                                 <th className="px-6 py-4"></th>
                             </tr>
                         </thead>
@@ -176,7 +178,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="px-2 py-1 rounded bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 text-xs font-medium">
-                                            {company.industry || 'Indefinido'}
+                                            {company.industry || t('undefined')}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -192,7 +194,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                                                 </div>
                                             ))}
                                             {contacts.filter(c => c.companyId === company.id).length === 0 && (
-                                                <span className="text-slate-400 text-xs italic">Ninguém</span>
+                                                <span className="text-slate-400 text-xs italic">{t('nobody')}</span>
                                             )}
                                         </div>
                                     </td>

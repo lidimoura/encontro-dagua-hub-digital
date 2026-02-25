@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Users, MessageCircle, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface CRMSimulatorProps {
     onCTAClick: () => void;
 }
 
 export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
+    const { t } = useTranslation();
     const [showAIInsight, setShowAIInsight] = useState(true);
     const [cardMoved, setCardMoved] = useState(false);
 
@@ -19,14 +21,14 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
-                        <TrendingUp className="w-3 h-3" /> CRM Nativo
+                        <TrendingUp className="w-3 h-3" /> {t('crmNative')}
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Gestão Inteligente</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('smartManagement')}</h2>
                     <p className="text-slate-400 mb-2 max-w-2xl mx-auto">
-                        Veja como a IA assiste você na gestão de leads e clientes
+                        {t('crmSimDesc')}
                     </p>
                     <p className="text-xs text-slate-500 max-w-2xl mx-auto italic">
-                        💡 Clique em "Executar" no popup roxo para ver a mágica acontecer
+                        {t('crmSimTip')}
                     </p>
                 </div>
 
@@ -36,20 +38,20 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                         {/* Column 1: LEAD */}
                         <div className="bg-slate-900/80 border border-amber-500/30 rounded-xl p-4 relative">
                             <h3 className="text-amber-400 font-bold mb-3 flex items-center gap-2">
-                                <Users size={16} /> LEAD
+                                <Users size={16} /> {t('leadColumn')}
                             </h3>
                             <div className="space-y-2">
                                 {/* Maria Silva - Interactive Card */}
                                 {!cardMoved && (
                                     <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs relative transition-all duration-500">
                                         <p className="text-white font-semibold">Maria Silva</p>
-                                        <p className="text-slate-400">Interesse em QR D'água</p>
+                                        <p className="text-slate-400">{t('interestQr')}</p>
                                         <div className="absolute -top-1 -right-1 w-2 h-2 bg-fuchsia-500 rounded-full animate-pulse"></div>
                                     </div>
                                 )}
                                 <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
                                     <p className="text-white font-semibold">João Santos</p>
-                                    <p className="text-slate-400">Consultoria CRM</p>
+                                    <p className="text-slate-400">{t('consultingCrm')}</p>
                                 </div>
                             </div>
 
@@ -59,15 +61,15 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                                     <div className="flex items-start gap-2 mb-3">
                                         <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
                                         <div className="flex-1">
-                                            <p className="text-xs font-bold mb-1">💡 Insight da IA</p>
-                                            <p className="text-xs">Maria demonstrou interesse no Serviço X. Enviar Proposta?</p>
+                                            <p className="text-xs font-bold mb-1">{t('aiInsightTitle')}</p>
+                                            <p className="text-xs">{t('aiInsightText')}</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={handleExecuteAI}
                                         className="w-full bg-white text-fuchsia-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-fuchsia-50 transition-all shadow-lg"
                                     >
-                                        ✨ Executar
+                                        {t('executeBtn')}
                                     </button>
                                 </div>
                             )}
@@ -76,12 +78,12 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                         {/* Column 2: EM NEGOCIAÇÃO */}
                         <div className="bg-slate-900/80 border border-blue-500/30 rounded-xl p-4">
                             <h3 className="text-blue-400 font-bold mb-3 flex items-center gap-2">
-                                <MessageCircle size={16} /> EM NEGOCIAÇÃO
+                                <MessageCircle size={16} /> {t('negotiationColumn')}
                             </h3>
                             <div className="space-y-2">
                                 <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
                                     <p className="text-white font-semibold">Ana Costa</p>
-                                    <p className="text-slate-400">Proposta enviada</p>
+                                    <p className="text-slate-400">{t('proposalSent')}</p>
                                 </div>
                             </div>
                         </div>
@@ -89,19 +91,19 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                         {/* Column 3: CLIENTE */}
                         <div className="bg-slate-900/80 border border-green-500/30 rounded-xl p-4">
                             <h3 className="text-green-400 font-bold mb-3 flex items-center gap-2">
-                                <CheckCircle size={16} /> CLIENTE
+                                <CheckCircle size={16} /> {t('clientColumn')}
                             </h3>
                             <div className="space-y-2">
                                 <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs">
                                     <p className="text-white font-semibold">Pedro Alves</p>
-                                    <p className="text-slate-400">Ativo desde Jan/2025</p>
+                                    <p className="text-slate-400">{t('activeSince')}</p>
                                 </div>
 
                                 {/* Maria Silva - Moved Card with Animation */}
                                 {cardMoved && (
                                     <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-3 text-xs animate-slide-in">
                                         <p className="text-white font-semibold">✨ Maria Silva</p>
-                                        <p className="text-green-300">Convertida com sucesso!</p>
+                                        <p className="text-green-300">{t('convertedSuccess')}</p>
                                     </div>
                                 )}
                             </div>
@@ -111,7 +113,7 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                     {/* Credits Footer */}
                     <div className="mt-6 pt-4 border-t border-white/10 text-center">
                         <p className="text-xs text-slate-500 leading-relaxed">
-                            Base do CRM desenvolvida exclusivamente para alunos vitalícios da{' '}
+                            {t('crmCredits')}{' '}
                             <span className="text-slate-400 font-semibold">Escola de Automação de Thales Laray</span>.{' '}
                             Adaptado e potencializado pelo Hub Encontro D'água.
                         </p>
@@ -123,7 +125,7 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                             onClick={onCTAClick}
                             className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg"
                         >
-                            Tenho interesse no CRM
+                            {t('crmInterest')}
                         </button>
                     </div>
                 </div>

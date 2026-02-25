@@ -78,22 +78,34 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
         const recommendations: string[] = [];
 
         if (engagementScore < 75) {
-            recommendations.push('📞 Agendar check-in semanal para aumentar engajamento');
+            recommendations.push(language === 'en'
+                ? '📞 Schedule weekly check-in to boost engagement'
+                : '📞 Agendar check-in semanal para aumentar engajamento');
         }
         if (satisfactionScore < 70) {
-            recommendations.push('💬 Enviar pesquisa de satisfação e ouvir feedback');
+            recommendations.push(language === 'en'
+                ? '💬 Send satisfaction survey and listen to feedback'
+                : '💬 Enviar pesquisa de satisfação e ouvir feedback');
         }
         if (usageScore < 75) {
-            recommendations.push('📚 Oferecer treinamento ou tutorial personalizado');
+            recommendations.push(language === 'en'
+                ? '📚 Offer training or personalized tutorial'
+                : '📚 Oferecer treinamento ou tutorial personalizado');
         }
         if (paymentScore < 100) {
-            recommendations.push('💰 Revisar condições de pagamento e oferecer facilidades');
+            recommendations.push(language === 'en'
+                ? '💰 Review payment terms and offer flexibility'
+                : '💰 Revisar condições de pagamento e oferecer facilidades');
         }
         if (status === 'healthy') {
-            recommendations.push('⭐ Cliente saudável! Considere upsell ou pedir referência');
+            recommendations.push(language === 'en'
+                ? '⭐ Healthy client! Consider upselling or asking for referrals'
+                : '⭐ Cliente saudável! Considere upsell ou pedir referência');
         }
         if (status === 'critical') {
-            recommendations.push('🚨 URGENTE: Agendar reunião de retenção imediatamente');
+            recommendations.push(language === 'en'
+                ? '🚨 URGENT: Schedule retention meeting immediately'
+                : '🚨 URGENTE: Agendar reunião de retenção imediatamente');
         }
 
         // Add ROI-based insights from Precy if available
@@ -172,7 +184,7 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                 <Heart className="w-6 h-6 text-pink-600" />
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        {t('healthAnalysis')}
+                        {t('analyzeHealth')}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                         {t('retentionFocus')}
@@ -253,9 +265,9 @@ export const MazoAgent: React.FC<MazoAgentProps> = ({ boardId, dealId }) => {
                     </label>
                     <div className="flex gap-3">
                         {[
-                            { value: 'current', label: '✅ Em Dia', color: 'bg-green-100 text-green-700 border-green-300' },
-                            { value: 'late', label: '⏰ Atrasado', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
-                            { value: 'overdue', label: '🚨 Inadimplente', color: 'bg-red-100 text-red-700 border-red-300' },
+                            { value: 'current', label: t('paymentCurrent'), color: 'bg-green-100 text-green-700 border-green-300' },
+                            { value: 'late', label: t('paymentLate'), color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+                            { value: 'overdue', label: t('paymentOverdue'), color: 'bg-red-100 text-red-700 border-red-300' },
                         ].map((option) => (
                             <button
                                 key={option.value}

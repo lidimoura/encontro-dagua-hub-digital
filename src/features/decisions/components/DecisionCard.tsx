@@ -20,7 +20,8 @@ import {
   Target,
   Loader2,
 } from 'lucide-react';
-import { Decision, SuggestedAction, PRIORITY_COLORS, PRIORITY_LABELS } from '../types';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Decision, SuggestedAction, PRIORITY_COLORS } from '../types';
 
 interface DecisionCardProps {
   decision: Decision;
@@ -70,6 +71,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
   onSnooze,
   isExecuting = false,
 }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedAction, setSelectedAction] = useState<SuggestedAction>(decision.suggestedAction);
 
@@ -93,7 +95,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
             {/* Priority Badge */}
             <div className="flex items-center gap-2 mb-2">
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getPriorityBadge(decision.priority)}`}>
-                {PRIORITY_LABELS[decision.priority]}
+                {t(decision.priority)}
               </span>
               {decision.category === 'opportunity' && (
                 <TrendingUp size={14} className="text-green-500" />
@@ -121,7 +123,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
           className="flex items-center gap-1 mt-3 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
         >
           <Lightbulb size={14} />
-          <span>Por que estou sugerindo isso?</span>
+          <span>{t('reasoningLabel')}</span>
           {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
 
@@ -139,7 +141,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
       <div className="px-4 pb-3">
         <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
           <Target size={12} />
-          Ação sugerida:
+          {t('suggestedActionLabel')}
         </div>
 
         <div className="p-3 rounded-lg bg-primary-50 dark:bg-primary-500/10 border border-primary-200 dark:border-primary-500/30">
@@ -169,7 +171,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
         {/* Alternative Actions */}
         {decision.alternativeActions && decision.alternativeActions.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
-            <span className="text-xs text-slate-400 mr-1">Ou:</span>
+            <span className="text-xs text-slate-400 mr-1">{t('or')}</span>
             {decision.alternativeActions.map((action) => (
               <button
                 key={action.id}
@@ -201,14 +203,14 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
           ) : (
             <CheckCircle size={16} />
           )}
-          Aprovar: {selectedAction.label}
+          {t('approve')}: {selectedAction.label}
         </button>
 
         <button
           onClick={() => onSnooze(decision.id)}
           disabled={isExecuting}
           className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
-          title="Adiar"
+          title={t('snooze')}
         >
           <Clock size={18} />
         </button>
@@ -217,7 +219,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({
           onClick={() => onReject(decision.id)}
           disabled={isExecuting}
           className="p-2 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-          title="Ignorar"
+          title={t('ignore')}
         >
           <XCircle size={18} />
         </button>

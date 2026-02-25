@@ -48,11 +48,11 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   const activeAgentName =
     mode === 'board' && activeBoard
       ? activeBoard.agentPersona?.name || 'Agente do Board'
-      : 'Flow AI';
+      : 'Mazô';
   const activeAgentRole =
     mode === 'board' && activeBoard
       ? activeBoard.agentPersona?.role || 'Especialista'
-      : 'Assistente Global';
+      : 'Estrategista CX/CS';
 
   // Language instruction for AI
   const languageInstruction = language === 'en'
@@ -100,7 +100,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
       return `
         ${languageInstruction}
         
-        Você é o Flow AI, o assistente central deste CRM.
+        Você é Mazô, a Estrategista CX/CS e guardiã da experiência no Encontro D'água Hub.
+        Sua missão é garantir que o usuário tenha sucesso em suas vendas e relacionamento com clientes.
         
         DADOS GERAIS:
         - Total de Negócios: ${deals.length}
@@ -108,6 +109,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         - Total de Contatos: ${contacts.length}
         
         Ajude o usuário a navegar, encontrar informações e ter insights sobre suas vendas.
+        Seja proativa, empática e extremamente profissional.
       `;
     }
   }, [mode, activeBoard, deals, contacts]);
@@ -116,7 +118,10 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   const persistenceId = mode === 'board' && activeBoard ? `board_${activeBoard.id}` : 'global_chat';
 
   // Use CRM Agent with tools instead of generic useAgent
-  const { messages: crmMessages, isLoading, sendMessage } = useCRMAgent({ id: persistenceId });
+  const { messages: crmMessages, isLoading, sendMessage } = useCRMAgent({
+    id: persistenceId,
+    systemPrompt
+  });
 
   // Create compatibility layer to match useAgent interface
   const [input, setInput] = useState('');
@@ -159,7 +164,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
           {
             id: 'welcome-global',
             role: 'assistant',
-            content: 'Olá! Sou o Flow. Como posso ajudar com seus negócios hoje?',
+            content: 'Olá! Sou a Mazô. Como posso ajudar a impulsionar seus negócios hoje?',
           },
         ]);
       }
@@ -484,7 +489,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
               )}
             </div>
             <span className="text-[10px] text-slate-400 mt-1.5 px-1 opacity-60">
-              {msg.role === 'user' ? 'Você' : mode === 'board' ? activeAgentName : 'Flow AI'}
+              {msg.role === 'user' ? 'Você' : mode === 'board' ? activeAgentName : 'Mazô'}
             </span>
           </div>
         ))}
@@ -577,7 +582,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             placeholder={
               isRecording
                 ? 'Gravando...'
-                : `Pergunte para ${mode === 'board' ? activeAgentName.split(' ')[0] : 'Flow AI'}...`
+                : `Pergunte para ${mode === 'board' ? activeAgentName.split(' ')[0] : 'Mazô'}...`
             }
             value={input}
             onChange={e => setInput(e.target.value)}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { translations, Language } from '@/lib/translations';
 
 export const useTranslation = () => {
-    const [language, setLanguage] = useState<Language>('pt');
+    const [language, setLanguage] = useState<Language>('en');
 
     useEffect(() => {
         // Check URL query parameter ?lang=en or ?lang=pt

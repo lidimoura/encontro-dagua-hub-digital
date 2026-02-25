@@ -80,6 +80,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  // NEXUS DEBUG: Monitor navigation state
+  useEffect(() => {
+    console.log("🧭 NEXUS DEBUG: Navigation Update", {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      timestamp: new Date().toISOString()
+    });
+  }, [location]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
@@ -168,35 +178,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  // Navigation items - COMPLETE SIDEBAR RESTORATION
-  const navItems = [
-    // Core CRM - Admin & Vendedor
-    { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as RouteName },
-    { to: '/board', icon: KanbanSquare, label: t('boards'), prefetch: 'board' as RouteName },
-    { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as RouteName },
-    { to: '/inbox', icon: Inbox, label: t('inbox'), prefetch: 'inbox' as RouteName },
-    { to: '/activities', icon: CalendarCheck, label: t('activities'), prefetch: 'activities' as RouteName },
+  // Navigation items - MOVED INSIDE COMPONENT to access t() function
+  // This fixes "ReferenceError: t is not defined" error
+  const navItems = React.useMemo(() => {
+    const items = [
+      // Core CRM - Admin & Vendedor
+      { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as RouteName },
+      { to: '/boards', icon: KanbanSquare, label: t('boards'), prefetch: 'board' as RouteName },
+      { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as RouteName },
+      { to: '/inbox', icon: Inbox, label: t('inbox'), prefetch: 'inbox' as RouteName },
+      { to: '/activities', icon: CalendarCheck, label: t('activities'), prefetch: 'activities' as RouteName },
 
-    // Analytics & AI - Admin & Vendedor
-    { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as RouteName },
-    { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName },
-    { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
+      // Analytics & AI - Admin & Vendedor
+      { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as RouteName },
+      { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName },
+      { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
 
-    // Tools - All Users
-    { to: '/qrdagua', icon: QrCode, label: t('qrWater'), prefetch: 'qrdagua' as RouteName },
-    { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
+      // Tools - All Users
+      { to: '/qrdagua', icon: QrCode, label: t('qrWater'), prefetch: 'qrdagua' as RouteName },
+      { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
 
-    // Settings - Admin & Vendedor
-    { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName },
-  ];
+      // Settings - Admin & Vendedor
+      { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName },
+    ];
 
-  // Admin-only items
-  if (profile?.role === 'admin') {
-    navItems.push(
-      { to: '/admin', icon: Shield, label: t('admin'), prefetch: 'admin' as RouteName },
-      { to: '/admin/tech-stack', icon: Package, label: t('techStack'), prefetch: 'admin' as RouteName }
-    );
-  }
+    // Admin-only items
+    if (profile?.role === 'admin') {
+      items.push(
+        { to: '/admin', icon: Shield, label: t('admin'), prefetch: 'admin' as RouteName },
+        { to: '/admin/tech-stack', icon: Package, label: t('techStack'), prefetch: 'admin' as RouteName }
+      );
+    }
+
+    return items;
+  }, [t, profile?.role]);
 
   // Loading state
   if (!profile) {
@@ -282,7 +297,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px] pointer-events-none"></div>
 
         {/* Header - Fixed on mobile */}
-        <header className="fixed md:relative top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 z-50 md:z-auto">
+        <header className="fixed md:relative top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shrink-0 z-[50] md:z-auto">
           {/* Mobile Menu Button - Always accessible */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
@@ -489,9 +504,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </header>
 
         {/* Main Content Area - Mobile safe with padding-top */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe">
+        <main className="flex-1 w-full max-w-full overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe">
           <div className="h-full">
-            <Outlet />
+            {children}
           </div>
         </main>
       </div>
