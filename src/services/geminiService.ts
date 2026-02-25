@@ -13,6 +13,28 @@ export interface AIConfig {
   anthropicCaching: boolean;
 }
 
+// --- API FALLBACK HELPER ---
+const generateTextWithFallback = async (
+  params: Parameters<typeof generateText>[0],
+  provider: 'google' | 'openai' | 'anthropic',
+  modelId: string,
+  primaryKey: string
+) => {
+  try {
+    return await generateText(params);
+  } catch (error: any) {
+    const isQuota = error?.response?.status === 429 || error?.status === 429 || error?.toString().includes('429');
+    const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
+
+    if (isQuota && secondaryKey && primaryKey !== secondaryKey) {
+      console.warn('⚠️ Quota exceeded (429). Switching to Secondary API Key...');
+      const fallbackModel = getModel(provider, secondaryKey, modelId);
+      return await generateText({ ...params, model: fallbackModel });
+    }
+    throw error;
+  }
+};
+
 export const analyzeLead = async (
   deal: Deal | DealView,
   config?: AIConfig
@@ -43,10 +65,10 @@ export const analyzeLead = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     const text = result.text;
     const jsonStr = text
       .replace(/```json/g, '')
@@ -85,10 +107,10 @@ export const generateEmailDraft = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     return result.text;
   } catch (error) {
     console.error('Error generating email:', error);
@@ -120,10 +142,10 @@ export const generateObjectionResponse = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     const text = result.text;
     const jsonStr = text
       .replace(/```json/g, '')
@@ -167,7 +189,7 @@ export const processAudioNote = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       messages: [
         {
@@ -178,7 +200,7 @@ export const processAudioNote = async (
           ],
         },
       ],
-    });
+    }, provider, modelId, apiKey);
     const text = result.text;
     const jsonStr = text
       .replace(/```json/g, '')
@@ -227,10 +249,10 @@ export const generateDailyBriefing = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     return result.text;
   } catch (error) {
     console.error('Error generating briefing:', error);
@@ -294,10 +316,10 @@ export const generateRescueMessage = async (
   }
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     return result.text;
   } catch (error) {
     console.error('Error generating rescue message:', error);
@@ -350,10 +372,10 @@ export const parseNaturalLanguageAction = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
 
     const text = result.text;
     const jsonStr = text
@@ -396,10 +418,10 @@ export const chatWithCRM = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     return result.text;
   } catch (error) {
     console.error('Error in chatWithCRM:', error);
@@ -429,10 +451,10 @@ export const generateBirthdayMessage = async (
   `;
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
-    });
+    }, provider, modelId, apiKey);
     return result.text;
   } catch (error) {
     console.error('Error generating birthday message:', error);
@@ -526,7 +548,7 @@ export const generateBoardStructure = async (
   `;
 
   try {
-    const resultStructure = await generateText({ model, prompt: promptStructure });
+    const resultStructure = await generateTextWithFallback({ model, prompt: promptStructure }, provider, modelId, apiKey);
     const jsonStr = resultStructure.text
       .replace(/```json/g, '')
       .replace(/```/g, '')
@@ -600,7 +622,7 @@ export const generateBoardStrategy = async (
   `;
 
   try {
-    const resultStrategy = await generateText({ model, prompt: promptStrategy });
+    const resultStrategy = await generateTextWithFallback({ model, prompt: promptStrategy }, provider, modelId, apiKey);
     const jsonStr = resultStrategy.text
       .replace(/```json/g, '')
       .replace(/```/g, '')
@@ -743,12 +765,12 @@ export const refineBoardWithAI = async (
   }
 
   try {
-    const result = await generateText({
+    const result = await generateTextWithFallback({
       model,
       prompt,
       tools: tools as Parameters<typeof generateText>[0]['tools'],
       providerOptions: providerOptions as Parameters<typeof generateText>[0]['providerOptions'],
-    });
+    }, provider, modelId, apiKey);
 
     const text = result.text;
     // Extract JSON using regex to handle potential markdown or trailing text

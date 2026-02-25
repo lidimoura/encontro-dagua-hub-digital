@@ -4,7 +4,7 @@ import { Board, BoardStage, ContactStage } from '@/types';
 import { BOARD_TEMPLATES, BoardTemplateType } from '@/board-templates';
 import { LifecycleSettingsModal } from '@/features/settings/components/LifecycleSettingsModal';
 import { useCRM } from '@/context/CRMContext';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface CreateBoardModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
   editingBoard,
   availableBoards
 }) => {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { lifecycleStages } = useCRM();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -93,7 +93,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
 
     if (template && BOARD_TEMPLATES[template]) {
       const templateData = BOARD_TEMPLATES[template];
-      setName(templateData.name);
+      setName(templateData.name); // You might want to translate this too if it comes from raw constant
       setDescription(templateData.description);
       setLinkedLifecycleStage(templateData.linkedLifecycleStage || '');
       setStages(templateData.stages.map((s, idx) => ({
@@ -133,7 +133,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/10">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              {editingBoard ? 'Editar Board' : 'Criar Novo Board'}
+              {editingBoard ? t('editBoard') : t('createBoard')}
             </h2>
             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
               <X size={20} className="text-slate-500" />
@@ -145,7 +145,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Nome do Board *
+                {t('boardName')} *
               </label>
               <input
                 type="text"
@@ -159,7 +159,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Descrição
+                {t('boardDescription')}
               </label>
               <input
                 type="text"
@@ -174,22 +174,22 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             {!editingBoard && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  📋 Usar Template
+                  📋 {t('useTemplate')}
                 </label>
                 <select
                   value={selectedTemplate}
                   onChange={(e) => handleTemplateSelect(e.target.value as BoardTemplateType | '')}
                   className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
-                  <option value="">Board em branco</option>
-                  <option value="PRE_SALES">🎯 Pré-venda (Lead → MQL)</option>
-                  <option value="SALES">💰 Pipeline de Vendas</option>
-                  <option value="ONBOARDING">🚀 Onboarding de Clientes</option>
-                  <option value="CS">❤️ CS & Upsell</option>
+                  <option value="">{t('templateBlank')}</option>
+                  <option value="PRE_SALES">{t('templatePreSales')}</option>
+                  <option value="SALES">{t('templateSales')}</option>
+                  <option value="ONBOARDING">{t('templateOnboarding')}</option>
+                  <option value="CS">{t('templateCS')}</option>
                 </select>
                 {selectedTemplate && (
                   <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                    ✨ Template aplicado! Você pode editar os campos abaixo.
+                    {t('templateApplied')}
                   </p>
                 )}
               </div>
@@ -198,7 +198,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             {/* Linked Lifecycle Stage */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                🎯 Gerencia Contatos no Estágio
+                🎯 {t('manageContactsStage')}
               </label>
               <select
                 value={linkedLifecycleStage}
@@ -218,7 +218,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             {/* Next Board Automation */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Ao Ganhar, enviar para...
+                {t('finishHere')}
               </label>
               <select
                 value={nextBoardId}
@@ -241,7 +241,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Etapas do Kanban
+                  {t('kanbanStages')}
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -249,14 +249,14 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
                     className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
                   >
                     <Plus size={14} />
-                    Adicionar etapa
+                    {t('addStage')}
                   </button>
                   <button
                     onClick={() => setIsLifecycleModalOpen(true)}
                     className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                   >
                     <Settings size={14} />
-                    Gerenciar Estágios
+                    {t('manageStages')}
                   </button>
                 </div>
               </div>

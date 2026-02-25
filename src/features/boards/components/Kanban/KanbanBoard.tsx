@@ -84,17 +84,17 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 {linkedStageName ? (
                   <span className="text-[10px] uppercase font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-1.5 py-0.5 rounded border border-primary-100 dark:border-primary-800/50 flex items-center gap-1">
                     <span className="w-1 h-1 rounded-full bg-primary-500 animate-pulse"></span>
-                    Promove para: {linkedStageName}
+                    {t('promotesTo')}: {linkedStageName}
                   </span>
                 ) : (
                   <span className="text-[10px] px-1.5 py-0.5 opacity-0 select-none">
-                    Placeholder
+                    -
                   </span>
                 )}
               </div>
 
               <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-right">
-                Total:{' '}
+                {t('total')}:{' '}
                 <span className="text-slate-900 dark:text-white font-mono">
                   ${stageValue.toLocaleString()}
                 </span>

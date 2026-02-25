@@ -4,10 +4,10 @@ import { useDeals } from '@/lib/query/hooks/useDealsQuery';
 import { useContacts } from '@/lib/query/hooks/useContactsQuery';
 
 export const useDashboardMetrics = () => {
-  const { data: deals = [], isLoading: dealsLoading } = useDeals();
-  const { data: contacts = [], isLoading: contactsLoading } = useContacts();
+    const { data: deals = [], isLoading: dealsLoading } = useDeals();
+    const { data: contacts = [], isLoading: contactsLoading } = useContacts();
 
-  const isLoading = dealsLoading || contactsLoading;
+    const isLoading = dealsLoading || contactsLoading;
 
     // Calculate metrics
     const totalValue = deals.reduce((acc, deal) => acc + deal.value, 0);
@@ -113,7 +113,7 @@ export const useDashboardMetrics = () => {
         .sort(([, a], [, b]) => (b as number) - (a as number))
         .slice(0, 3);
 
-    return {
+    return React.useMemo(() => ({
         isLoading,
         deals,
         totalValue,
@@ -138,5 +138,30 @@ export const useDashboardMetrics = () => {
         lostDeals,
         topLossReasons,
         wonDealsWithDates
-    };
+    }), [
+        isLoading,
+        deals,
+        totalValue,
+        wonDeals,
+        winRate,
+        pipelineValue,
+        topDeals,
+        funnelData,
+        trendData,
+        activeContacts,
+        inactiveContacts,
+        churnedContacts,
+        activePercent,
+        inactivePercent,
+        churnedPercent,
+        avgLTV,
+        riskyCount,
+        avgSalesCycle,
+        fastestDeal,
+        slowestDeal,
+        actualWinRate,
+        lostDeals,
+        topLossReasons,
+        wonDealsWithDates
+    ]);
 };

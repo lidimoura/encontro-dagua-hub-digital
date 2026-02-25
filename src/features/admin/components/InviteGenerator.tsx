@@ -1,11 +1,14 @@
 import React from 'react';
 import { supabase } from '@/lib/supabase';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface InviteGeneratorProps {
     onInviteGenerated?: () => void;
 }
 
 export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenerated }) => {
+    const { t } = useTranslation();
+
     const generateInvite = async () => {
         // LOBOTOMY: Pure JavaScript, NO React states, NO modal
         document.body.style.cursor = 'wait';
@@ -32,12 +35,12 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
             const inviteLink = `https://encontro-dagua-hub.vercel.app/#/join?token=${token}`;
 
             // PURE WINDOW.PROMPT - Works on ANY mobile device
-            window.prompt("✅ CONVITE CRIADO! COPIE ABAIXO:", inviteLink);
+            window.prompt(t('inviteCreated'), inviteLink);
 
             onInviteGenerated?.();
         } catch (error: any) {
             document.body.style.cursor = 'default';
-            alert("Erro ao gerar convite: " + error.message);
+            alert(t('inviteError') + error.message);
         }
     };
 
@@ -49,10 +52,10 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        Gerar Link de Convite
+                        {t('generateInviteLink')}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Convide novos usuários para o Hub
+                        {t('inviteUsersDesc')}
                     </p>
                 </div>
             </div>
@@ -69,7 +72,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 }}
                 className="cursor-pointer w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-acai-900/20 text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-acai-900 transition-all active:scale-[0.98] select-none"
             >
-                GERAR CONVITE (ANTI-CRASH)
+                {t('generateInviteButton')}
             </div>
         </div>
     );

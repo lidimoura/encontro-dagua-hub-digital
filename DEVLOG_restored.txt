@@ -1,4 +1,5 @@
-﻿# DEVLOG - CRM Encontro d'├ígua hub
+﻿++ b/DEVLOG.md
+# DEVLOG - CRM Encontro d'├ígua hub
 
 Este arquivo registra todas as mudan├ºas significativas no projeto, organizadas por data e categoria.
 
@@ -54,6 +55,7 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 - Mobile (Mobile espec├¡fico)
 - IA (Intelig├¬ncia Artificial)
 - Branding (Marca e identidade visual)
+++ b/DEVLOG.md
 ## [09/12/2025] - Mobile UX (IMPLEMENTADO)
 
 - **Ô£à Menu Mobile Drawer Completo**: Implementado drawer mobile com anima├º├Áes suaves
@@ -69,6 +71,7 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 
 - **~~Implementado bot├úo Hamb├║rguer~~**: ÔØî Entrada incorreta no DEVLOG
 - **~~Estado isMobileMenuOpen~~**: ÔØî N├úo estava implementado at├® 09/12/2025
+++ b/DEVLOG.md
 ## [10/12/2025] - v1.0 - Lan├ºamento M├│dulo Concierge QR
 
 ### ­ƒÄ» Feature: QR d'├ígua - Construtor de Microsites
@@ -134,6 +137,7 @@ Transforma├º├úo completa do gerador de QR Codes em um construtor visual de
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÄû´©Å MARCO: [10/12/2025] - v1.1 - Business OS & Concierge
 
 ### ­ƒÅå Transforma├º├úo Estrat├®gica
@@ -357,6 +361,7 @@ features/
 ---
 
 
+++ b/DEVLOG.md
 ## ­ƒøí´©Å MARCO: [11/12/2025] - v1.2 - Security Hardening & Bug Bash
 
 ### ­ƒöÉ Database Security - Multi-tenant RLS
@@ -452,6 +457,7 @@ features/
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÜÇ MARCO: [11/12/2025] - v1.3 - QR Module Fixes & System Audit
 
 ### ­ƒöº QR d'├ígua - Corre├º├Áes Cr├¡ticas de Deploy
@@ -734,6 +740,7 @@ features/
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÜÇ MARCO: [15/12/2025] - v1.4 - System Stabilization & AI Widget
 
 ### ­ƒöº Critical Fixes - Layout Duplication Removed
@@ -841,6 +848,7 @@ features/
 ---
 
 
+++ b/DEVLOG.md
 ## ­ƒÜÇ MARCO: [18/12/2025] - v1.5 - Onboarding Sprint & Critical Fixes
 
 ### Ô£¿ Sprint UX: User Guide & Product Catalog
@@ -1057,6 +1065,7 @@ features/
 ---
 
 
+++ b/DEVLOG.md
 ## Sprint: Release V5 (Main) - Turno da Noite
 **Status:** Ô£à Conclu├¡do
 **Data:** 20/12/2025
@@ -1077,6 +1086,7 @@ features/
 ### ­ƒôØ Observa├º├Áes
 - Commit realizado manualmente devido a instabilidade no Agente de AI.
 - Deploy direto na branch `main`.
+++ b/DEVLOG.md
 ## Sprint: Mobile Polish & Final Setup (V6)
 **Status:** Ô£à Conclu├¡do
 **Data:** 20/12/2025
@@ -1106,6 +1116,7 @@ features/
 
 ---
 
+++ b/DEVLOG.md
 ## Sprint: Final Launch Features (V7)
 **Status:** Ô£à Conclu├¡do
 **Data:** 21/12/2025
@@ -1142,6 +1153,7 @@ features/
 - Todos os recursos de usabilidade implementados
 - Documenta├º├úo completa para usu├írios
 
+++ b/DEVLOG.md
 ## Sprint: Master Reset & Strategy (V8)
 **Status:** Ô£à Conclu├¡do
 **Data:** 22/12/2025
@@ -1220,6 +1232,7 @@ features/
 
 ---
 
+++ b/DEVLOG.md
 ## Sprint: Store Management (Miss├úo 2)
 **Status:** Ô£à Conclu├¡do
 **Data:** 22/12/2025
@@ -1325,6 +1338,7 @@ npm run build
 
 ---
 
+++ b/DEVLOG.md
 
 ---
 
@@ -1410,6 +1424,7 @@ A partir desta fase, todo desenvolvimento de IA complexa ser├í realizado na b
 ---
 
 **Nota:** Este roadmap ├® um documento vivo e ser├í atualizado conforme o projeto evolui.
+++ b/DEVLOG.md
 # DEVLOG - CRM Encontro d'├ígua hub
 
 Este arquivo registra todas as mudan├ºas significativas no projeto, organizadas por data e categoria.
@@ -1548,6 +1563,7 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 - Campos utilizados: `id`, `company_id`, `name`, `description`, `price`, `unit`, `category`, `is_active`
 - Trigger autom├ítico: `company_id` preenchido via `auth.uid()` no RLS
 - Pol├¡ticas RLS: Usu├írios s├│ veem produtos da pr├│pria empresa
+++ b/DEVLOG.md
 ## ­ƒÄü 24/12/2024 - Sistema de Indica├º├úo & Corre├º├Áes UX Cr├¡ticas
 
 ### Sistema de Referral (20% OFF)
@@ -1631,6 +1647,7 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 
 ## ­ƒôï CICLO DE VIDA DO CLIENTE (Customer Journey)
 
+++ b/DEVLOG.md
 ## ­ƒÜÇ 26/12/2024 - Reta Final: Corre├º├Áes Cr├¡ticas para Produ├º├úo
 
 ### Contexto
@@ -1708,6 +1725,7 @@ console.log('­ƒÄë Modal should now be visible');
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÜ¿ 26/12/2024 - Resgate do Hub & Hotfixes de Produ├º├úo
 
 ### Contexto
@@ -1805,6 +1823,7 @@ console.warn('ÔÜá´©Å CORS error, continuing without logo');
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÜ¿ 26/12/2024 - Hotfix Cr├¡tico Vercel/Supabase (Noite)
 
 ### Contexto
@@ -1893,6 +1912,7 @@ hint: error?.hint
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒñû 29/12/2024 - Analytics, Super Admin & AI Agent Separation
 
 ### Contexto
@@ -1995,6 +2015,7 @@ Finaliza├º├úo das Fases 5 (Auto-Stack/Analytics) e 6 (Portal/Manifesto) co
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÄ¿ 02/01/2026 - Major Refactor: Landing Page Reorganization & Form Fixes
 
 ### Contexto
@@ -2144,6 +2165,7 @@ timestamp: new Date().toISOString(),
 
 ---
 
+++ b/DEVLOG.md
 ## ­ƒÜæ 08/02/2026 - Emergency Fixes & Mobile Stabilization
 
 ### Contexto
@@ -2252,146 +2274,3 @@ Mobile Drawer: z-[100]
 
 ---
 
-
-## [14/02/2026] - Full System Repair & AI Update
-- **Ghost Deals Fixed**: Corrected CreateDealModal.tsx to handle stage fallback and optional products.
-- **AI Agents**: 
-  - **Jury**: Fixed PDF generation (UTF-8, spacing) and Chat context injection.
-  - **Precy**: Validated multi-currency logic.
-- **Deep Translation**: Applied 	() to KanbanBoard.tsx, CreateDealModal.tsx, ContactsList.tsx.
-- **Documentation**: Rewrote HUB_SHOWCASE.md (Founder's Journey) and README.md. Updated SAAS_MASTER_GUIDE.md with Dogfooding strategy.
-
-
-### [14/02/2026] - Jury Agent Fix (LLM Generation)
-- **Problem:** Jury Agent was using static regex templates instead of generating real contracts.
-- **Solution:** Refactored JuryAgent.tsx to use sendMessage (LLM) with a robust prompt.
-- **Context:** Chat now sees the generated contract for refinement.
-
-## [2026-02-15] - EMERGENCY FIXES & AGILITY FREEZE
-- **Emergency Fixes Applied**:
-  - Fixed `ReferenceError: t is not defined` in Dashboard and KanbanBoard by implementing `useTranslation` hook.
-  - Fixed `JuryAgent.tsx` crash by moving state initialization to top level.
-  - Added missing Tour translations to `en` locale.
-  - Fixed Mobile Kanban interaction (safeguarded deal ID click).
-- **Project Frozen**: Hub development paused to focus on "Agility OS".
-- **Documentation**: Created `AGILITY_BACKLOG.md` and `AGILITY_SPECS.md` for next phase.
-
-## [2026-02-18] - Nexus Logger Extraction
-- **Standardization**: Extracted "NEXUS DEBUG" logic from Layout/ProtectedRoute into `src/lib/NexusLogger.ts`.
-- **Agility OS**: Created standard logger class with navigation, success, auth, and error methods, plus webhook placeholder.
-
----
-
-## 🚀 [2026-02-25] - Strategic Pivots, QA & Environment Migration
-
-### Contexto
-Sessão de finalização antes da migração do ambiente de desenvolvimento para um PC de alta performance. Nenhuma alteração funcional de código foi realizada. Este registro consolida todas as decisões estratégicas tomadas nas últimas sprints.
-
----
-
-### 🔴 Pivô Estratégico — Foco no MVP do CRM Hub
-
-**Decisão:** A funcionalidade autônoma "Link D'água" (CRUD externo independente) foi **pausada indefinidamente**.
-
-**Motivo:**
-- O desenvolvimento de uma UI independente introduzia bugs complexos e difíceis de reproduzir relacionados à biblioteca **Radix UI** e ao uso de **`<canvas>`** causando Out-Of-Memory (OOM) em dispositivos móveis.
-- Manter dois frontends separados fragmenta o esforço de desenvolvimento.
-
-**Nova Diretriz:** O foco **exclusivo** é tornar o **CRM Hub** funcional e estável para o gerenciamento imediato de clientes (Modo Concierge). Toda a criação de páginas digitais para clientes passa pelo fluxo interno do Hub (QRD'água).
-
----
-
-### 🏗️ QRD'água — Nova Arquitetura de Iframe Cloaking (Pendente de Implementação)
-
-**Decisão:** Adotar **Iframe Cloaking** como estratégia padrão para entregar páginas digitais aos clientes de forma rápida, sem necessidade de desenvolver UIs complexas do zero.
-
-**Arquitetura Aprovada:**
-- Um iframe ocupa **100% da viewport** (`w-full h-[100dvh] border-none`) para envolver páginas externas (ex: Lovable, Google AI Studio) sob o nosso domínio (`encontrodagua.com`).
-- Uma sobreposição flutuante (`ProvaOverlay`) com o texto **"provadagua"** é posicionada de forma absoluta sobre o iframe com `pointer-events: none`, garantindo que o branding seja aplicado sem bloquear as interações do usuário com o conteúdo.
-
-**Status:** ⏳ Arquitetura aprovada. Implementação agendada para execução no novo PC.
-
-**Referência de Código (Padrão):**
-```tsx
-// Estrutura de container do iframe (Tailwind)
-<div className="relative w-full h-[100dvh] overflow-hidden">
-  <iframe
-    src={externalUrl}
-    className="w-full h-full border-none"
-    allow="fullscreen"
-  />
-  {/* Watermark flutuante, não bloqueia cliques */}
-  <div className="absolute bottom-4 right-4 pointer-events-none opacity-50 text-xs text-white font-bold bg-black/30 px-2 py-1 rounded">
-    provadagua
-  </div>
-</div>
-```
-
----
-
-### 📱 Regra de Segurança — Mobile Memory Safety (QR Code Downloads)
-
-**Problema Identificado:** O uso de `<canvas>` em alta resolução ou de `divs` ocultas fora da viewport para renderizar QR Codes causava crashes por **Out-Of-Memory (OOM)** em dispositivos móveis (especialmente Android de mid-range).
-
-**Regra Estabelecida (Aplicar em Toda a Codebase):**
-
-> ❌ **PROIBIDO:** Criar `<div>` ocultas (`display: none`, offscreen) para renderização de imagens antes do download.
->
-> ✅ **REGRA:** Usar `html-to-image` **exclusivamente em elementos visíveis** que já estão renderizados na tela.
->
-> ✅ **PIXEL RATIO:** Limitar `pixelRatio` a `1` ou `2` no máximo. Valores acima (`3`, `4`, `window.devicePixelRatio`) causam OOM em mobile.
-
-**Implementação Segura:**
-```typescript
-// ✅ Correto: elemento já visível + pixelRatio controlado
-import { toPng } from 'html-to-image';
-
-const downloadQR = async () => {
-  const node = document.getElementById('qr-preview-visible'); // Elemento NA TELA
-  if (!node) return;
-  const dataUrl = await toPng(node, {
-    pixelRatio: 2, // Máximo seguro para mobile
-    cacheBust: true,
-  });
-  // ... lógica de download
-};
-```
-
----
-
-### 🧠 Agility OS & Nexus Protocol — Padronização de Logs
-
-**Decisão:** O módulo `NexusLogger.ts` foi extraído como um **utilitário standalone** para ser reutilizado em todos os projetos do ecossistema.
-
-**Projetos Impactados:**
-- **CRM Hub** (`crm-encontro-dagua`): Já integrado via `src/lib/NexusLogger.ts`.
-- **Agility OS** (futuro): Receberá a mesma interface de log para garantir consistência nos dashboards de diagnóstico.
-
-**Objetivo:** Padronizar a saída de logs estruturados no console do browser (`[NEXUS]` prefix) em todos os sistemas, facilitando debugging remoto e rastreabilidade durante demos com clientes.
-
----
-
-### ✅ Status de QA (Pré-Migração)
-
-**QA realizado pelo Founder** em sessão rápida antes do desligamento da máquina.
-
-| Área | Status | Observação |
-|------|--------|------------|
-| CRM Hub (Dashboard/Kanban) | ✅ Funcional | Fluxo de deals operacional |
-| Modo Concierge (Criação de Clientes) | ✅ Funcional | Inserção direta na tabela `agency_clients` |
-| QRD'água (Geração de QR) | ✅ Funcional | Download com `pixelRatio: 2` estável |
-| Iframe Cloaking (ProvaOverlay) | ⏳ Pendente | Implementação na nova máquina |
-| Traduções / UI Strings | ⚠️ Minor bugs | Algumas chaves de tradução brutas visíveis (ex: `hero_title`). Correção agendada. |
-| Landing Page | ⚠️ Minor bugs | Chave de tradução `hero_title` aparecendo como string literal. Fix pendente. |
-| NexusLogger | ✅ Extraído | Pronto para replicação no Agility OS |
-
-**Próximos Passos (Executar na Nova Máquina):**
-1. Clonar repositório: `git clone <origin_url>`
-2. Implementar Iframe Cloaking na `QRLanding.tsx`
-3. Corrigir chaves de tradução pendentes na Landing Page
-4. Executar QA completo com `JOURNEY_QA_CHECKLIST.md`
-5. Ajustes finais de UI e deploy para produção
-
----
-
-**Responsável:** Lidi (Founder) | **Data:** 25/02/2026 | **Status da Máquina:** Desligamento programado ✈️

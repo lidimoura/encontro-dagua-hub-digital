@@ -320,6 +320,49 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
           onFinish({ id: assistantMsgId, role: 'assistant', content: fullResponse });
         }
       } catch (err) {
+        // RETRY LOGIC WITH SECONDARY KEY
+        if (err instanceof Error && (err.message.includes('429') || err.message.includes('quota') || err.message.includes('Too Many Requests'))) {
+          const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
+          if (secondaryKey && aiApiKey !== secondaryKey) {
+            console.warn('⚠️ Primary API Key Quota Exceeded (useAgent) - Switching to Secondary Key');
+            try {
+              // Re-create model with secondary key
+              // Note: We need to bypass getModel config which might use the primary key from context
+              const google = createGoogleGenerativeAI({ apiKey: secondaryKey });
+              const secondaryModel = google('gemini-2.5-flash');
+
+              // Retry streamText
+              const result = await streamText({
+                model: secondaryModel,
+                system: systemPrompt,
+                messages: history,
+                providerOptions: providerOptions as Parameters<typeof streamText>[0]['providerOptions'],
+                tools: tools as Parameters<typeof streamText>[0]['tools'],
+              });
+
+              // ... Handle result (duplicate logic from above, refactor ideally but inline for now) ...
+              // For brevity, we will copy the stream handling logic here
+              const assistantMsgId = crypto.randomUUID();
+              let fullResponse = '';
+              setMessages(prev => [...prev, { id: assistantMsgId, role: 'assistant', content: '' }]);
+
+              for await (const textPart of result.textStream) {
+                fullResponse += textPart;
+                setMessages(prev =>
+                  prev.map(m => (m.id === assistantMsgId ? { ...m, content: fullResponse } : m))
+                );
+              }
+              if (onFinish) {
+                onFinish({ id: assistantMsgId, role: 'assistant', content: fullResponse });
+              }
+              return; // Success!
+            } catch (secondaryErr) {
+              console.error('Secondary Key also failed:', secondaryErr);
+              // Fall through to error handling
+            }
+          }
+        }
+
         console.error('AI Agent Error:', err);
         const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
 

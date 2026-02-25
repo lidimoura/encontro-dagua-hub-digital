@@ -3,6 +3,7 @@ import { DollarSign, Calculator, TrendingUp, AlertCircle, Sparkles, Copy, CheckC
 import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency, formatPercentage } from '@/services/ai/bilingualService';
 import { useDealContext } from '@/context/DealContext';
 import { useAuth } from '@/context/AuthContext';
@@ -38,6 +39,7 @@ interface PricingCalculation {
 
 export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { addToast } = useToast();
+    const { t } = useTranslation();
 
     // Tech Stack
     const [techStackItems, setTechStackItems] = useState<TechStackItem[]>([]);
@@ -57,6 +59,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { language } = useLanguage();
     const dealContext = useDealContext();
     const { profile } = useAuth();
+    const [currency, setCurrency] = useState('BRL');
 
     // Quote-to-Product
     const [productName, setProductName] = useState('');
@@ -97,7 +100,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
             setTechStackItems(data || []);
         } catch (error: any) {
             console.error('Error fetching tech stack:', error);
-            addToast('Erro ao carregar tech stack', 'error');
+            addToast(t('errorLoadingPrompts'), 'error');
         } finally {
             setLoadingStack(false);
         }
@@ -147,58 +150,97 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         };
     };
 
+    // FIXED: Added missing handler to prevent crash
+    const handleSaveProduct = () => {
+        setSavingProduct(true);
+        // Simulate API call
+        setTimeout(() => {
+            setSavingProduct(false);
+            addToast(t('featureInDev'), 'info');
+        }, 1000);
+    };
+
+    const handleExportPdf = () => {
+        addToast(t('featureInDev'), 'info');
+    };
+
+    const handleConnect = () => {
+        addToast(t('featureInDev'), 'info');
+    };
+
     const copyToClipboard = () => {
         if (!calculation) return;
 
         const text = `
-💰 PROPOSTA COMERCIAL - PRECY
+💰 ${t('commercialProposal')} - PRECY
 
-📊 CÁLCULO DE PRECIFICAÇÃO:
-• Custo Stack: R$ ${calculation.stackCost.toFixed(2)}
-• Horas Estimadas: ${calculation.hours}h × R$ ${calculation.hourlyRate}/h = R$ ${calculation.laborCost.toFixed(2)}
-• Custo Total: R$ ${calculation.totalCost.toFixed(2)}
-• Margem: ${(calculation.margin * 100)}%
-• Preço Base: R$ ${calculation.basePrice.toFixed(2)}
+📊 ${t('pricingCalculation')}:
+• ${t('stackCost')}: ${formatCurrency(calculation.stackCost, language, currency)}
+• ${t('estimatedHours')}: ${calculation.hours}h × ${formatCurrency(calculation.hourlyRate, language, currency)}/h = ${formatCurrency(calculation.laborCost, language, currency)}
+• ${t('totalCost')}: ${formatCurrency(calculation.totalCost, language, currency)}
+• ${t('profitMarginLabel')}: ${(calculation.margin * 100)}%
+• ${t('basePrice')}: ${formatCurrency(calculation.basePrice, language, currency)}
 
-🎯 IMPACTO: ${impact.toUpperCase()}
+🎯 ${t('impact')}: ${impact.toUpperCase()}
 • Multiplicador: ${calculation.impactMultiplier}x
 
 ${isSocialPricing ? `
-🤝 PRECIFICAÇÃO SOCIAL (${(calculation.socialDiscount * 100)}% desconto):
-• Preço Social: R$ ${calculation.socialPrice.toFixed(2)}
+🤝 ${t('socialPricing')} (${(calculation.socialDiscount * 100)}% desconto):
+• Preço Social: ${formatCurrency(calculation.socialPrice, language, currency)}
 ` : ''}
 
-💵 PREÇO FINAL: R$ ${calculation.finalPrice.toFixed(2)}
+💵 ${t('finalPrice')}: ${formatCurrency(calculation.finalPrice, language, currency)}
     `.trim();
 
         navigator.clipboard.writeText(text);
         setCopied(true);
-        addToast('Proposta copiada!', 'success');
+        addToast(t('promptCopied'), 'success');
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-                <DollarSign className="w-6 h-6 text-green-600" />
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        Calculadora de Precificação Inteligente
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Fórmula: (Custo Stack + Horas × R$ {hourlyRate}) × (1 + {(margin * 100)}%) × Impacto
-                    </p>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <DollarSign className="w-6 h-6 text-green-600" />
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                            {t('smartPricingCalc')}
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {t('pricingFormula')}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Currency Selector */}
+                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg flex gap-1">
+                    {['BRL', 'USD', 'EUR', 'AUD'].map((c) => (
+                        <button
+                            key={c}
+                            onClick={() => setCurrency(c)}
+                            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${currency === c
+                                ? 'bg-green-600 text-white shadow'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                }`}
+                        >
+                            {c}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Editable Parameters */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-4">
-                <h4 className="font-semibold text-sm text-slate-900 dark:text-white mb-3">Parâmetros Editáveis</h4>
+                <h4 className="font-semibold text-sm text-slate-900 dark:text-white mb-3">
+                    {t('editableParams')}
+                </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Valor Hora Técnica (R$)
+                            {t('hourlyRateLabel')}
                         </label>
                         <input
                             type="number"
@@ -211,7 +253,7 @@ ${isSocialPricing ? `
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Margem de Lucro (%)
+                            {t('profitMarginLabel')}
                         </label>
                         <input
                             type="number"
@@ -229,20 +271,20 @@ ${isSocialPricing ? `
             {/* Tech Stack Selector */}
             <div className="mb-4">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Ferramentas do Projeto (Tech Stack)
+                    {t('projectTools')}
                 </label>
                 {loadingStack ? (
                     <div className="text-center py-4">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
-                        <p className="text-xs text-slate-500 mt-2">Carregando tech stack...</p>
+                        <p className="text-xs text-slate-500 mt-2">{t('loadingStack')}</p>
                     </div>
                 ) : techStackItems.length === 0 ? (
                     <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-center">
                         <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                            Nenhuma ferramenta cadastrada no Tech Stack.
+                            {t('noToolsRegistered')}
                         </p>
                         <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
-                            Adicione ferramentas na página Admin &gt; Tech Stack
+                            {t('addToolsHint')}
                         </p>
                     </div>
                 ) : (
@@ -269,7 +311,7 @@ ${isSocialPricing ? `
                                         {item.name}
                                     </div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">
-                                        R$ {item.price.toFixed(2)}/mês
+                                        {formatCurrency(item.price, language, currency)}/mês
                                     </div>
                                 </div>
                             </label>
@@ -277,7 +319,7 @@ ${isSocialPricing ? `
                     </div>
                 )}
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Custo total selecionado: <span className="font-mono font-semibold text-green-600">R$ {stackCost.toFixed(2)}</span>
+                    {language === 'en' ? 'Total selected cost: ' : 'Custo total selecionado: '} <span className="font-mono font-semibold text-green-600">{formatCurrency(stackCost, language, currency)}</span>
                 </p>
             </div>
 
@@ -286,7 +328,7 @@ ${isSocialPricing ? `
                 {/* Hours */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                        Horas Estimadas
+                        {language === 'en' ? 'Estimated Hours' : 'Horas Estimadas'}
                     </label>
                     <input
                         type="number"
@@ -298,26 +340,28 @@ ${isSocialPricing ? `
                         step="1"
                     />
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        Horas de trabalho necessárias (R$ {hourlyRate}/h)
+                        {language === 'en'
+                            ? `Required work hours (${formatCurrency(hourlyRate, language, currency)}/h)`
+                            : `Horas de trabalho necessárias (${formatCurrency(hourlyRate, language, currency)}/h)`}
                     </p>
                 </div>
 
                 {/* Impact Level */}
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                        Nível de Impacto (ROI)
+                        {language === 'en' ? 'Impact Level (ROI)' : 'Nível de Impacto (ROI)'}
                         <div className="group relative">
                             <AlertCircle className="w-4 h-4 text-blue-400 cursor-help" />
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-lg z-10">
                                 <div className="space-y-2">
                                     <div>
-                                        <strong className="text-green-400">🟢 Baixo (1.0x):</strong> Manutenções e ajustes. Preço de custo + margem padrão.
+                                        <strong className="text-green-400">🟢 {language === 'en' ? 'Low' : 'Baixo'} (1.0x):</strong> {language === 'en' ? 'Maintenance/Adjustments. Cost price + standard margin.' : 'Manutenções e ajustes. Preço de custo + margem padrão.'}
                                     </div>
                                     <div>
-                                        <strong className="text-yellow-400">🟡 Médio (1.2x):</strong> Features novas que agregam valor significativo. +20% premium.
+                                        <strong className="text-yellow-400">🟡 {language === 'en' ? 'Medium' : 'Médio'} (1.2x):</strong> {language === 'en' ? 'New features adding significant value. +20% premium.' : 'Features novas que agregam valor significativo. +20% premium.'}
                                     </div>
                                     <div>
-                                        <strong className="text-red-400">🔴 Alto (1.5x):</strong> Transformação digital e impacto estratégico. +50% premium justificado pelo ROI.
+                                        <strong className="text-red-400">🔴 {language === 'en' ? 'High' : 'Alto'} (1.5x):</strong> {language === 'en' ? 'Digital transformation & strategic impact. +50% premium via ROI.' : 'Transformação digital e impacto estratégico. +50% premium justificado pelo ROI.'}
                                     </div>
                                 </div>
                             </div>
@@ -328,9 +372,9 @@ ${isSocialPricing ? `
                         onChange={(e) => setImpact(e.target.value as 'low' | 'medium' | 'high')}
                         className="w-full px-4 py-2 bg-white dark:bg-rionegro-900 border border-slate-300 dark:border-rionegro-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
-                        <option value="low">Baixo (1.0x) - Manutenção/Ajustes</option>
-                        <option value="medium">Médio (1.2x) - Feature Nova</option>
-                        <option value="high">Alto (1.5x) - Transformação Digital</option>
+                        <option value="low">{language === 'en' ? 'Low (1.0x) - Maintenance/Adjustments' : 'Baixo (1.0x) - Manutenção/Ajustes'}</option>
+                        <option value="medium">{language === 'en' ? 'Medium (1.2x) - New Feature' : 'Médio (1.2x) - Feature Nova'}</option>
+                        <option value="high">{language === 'en' ? 'High (1.5x) - Digital Transformation' : 'Alto (1.5x) - Transformação Digital'}</option>
                     </select>
                 </div>
 
@@ -344,13 +388,13 @@ ${isSocialPricing ? `
                             className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
                         />
                         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Precificação Social (-60%)
+                            {language === 'en' ? 'Social Pricing (-60%)' : 'Precificação Social (-60%)'}
                         </span>
                     </label>
                     <div className="group relative">
                         <AlertCircle className="w-4 h-4 text-slate-400 cursor-help" />
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-64 p-2 bg-slate-900 text-white text-xs rounded-lg shadow-lg z-10">
-                            Para ONGs, grupos prioritários e impacto social
+                            {language === 'en' ? 'For NGOs, priority groups, and social impact' : 'Para ONGs, grupos prioritários e impacto social'}
                         </div>
                     </div>
                 </div>
@@ -360,18 +404,18 @@ ${isSocialPricing ? `
             {calculation && calculateROI() && (
                 <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6 space-y-4 animate-fade-in">
                     <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <LineChart className="w-5 h-5 text-purple-600" />
-                        Retorno Sobre Investimento (ROI)
+                        <TrendingUp className="w-5 h-5 text-purple-600" />
+                        {language === 'en' ? 'Return on Investment (ROI)' : 'Retorno Sobre Investimento (ROI)'}
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="text-slate-600 dark:text-slate-400">Investimento:</div>
+                        <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Investment:' : 'Investimento:'}</div>
                         <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                            R$ {calculateROI()?.investment.toFixed(2)}
+                            {formatCurrency(calculateROI()?.investment || 0, language, currency)}
                         </div>
 
-                        <div className="text-slate-600 dark:text-slate-400">Retorno Esperado:</div>
+                        <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Expected Return:' : 'Retorno Esperado:'}</div>
                         <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                            R$ {calculateROI()?.return.toFixed(2)}
+                            {formatCurrency(calculateROI()?.return || 0, language, currency)}
                         </div>
 
                         <div className="text-slate-600 dark:text-slate-400">ROI:</div>
@@ -380,7 +424,9 @@ ${isSocialPricing ? `
                         </div>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                        O ROI é uma estimativa baseada no custo total e no preço final com impacto.
+                        {language === 'en'
+                            ? 'ROI is an estimate based on total cost and final price with impact.'
+                            : 'O ROI é uma estimativa baseada no custo total e no preço final com impacto.'}
                     </p>
                 </div>
             )}
@@ -390,21 +436,21 @@ ${isSocialPricing ? `
                 <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6 space-y-4 animate-fade-in">
                     <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <Package className="w-5 h-5 text-indigo-600" />
-                        Gerar Produto/Serviço
+                        {language === 'en' ? 'Generate Product/Service' : 'Gerar Produto/Serviço'}
                     </h4>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Crie um produto ou serviço no sistema com base nesta precificação.
+                        {language === 'en' ? 'Create a product or service in the system based on this pricing.' : 'Crie um produto ou serviço no sistema com base nesta precificação.'}
                     </p>
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                            Nome do Produto/Serviço
+                            {language === 'en' ? 'Product/Service Name' : 'Nome do Produto/Serviço'}
                         </label>
                         <input
                             type="text"
                             value={productName}
                             onChange={(e) => setProductName(e.target.value)}
                             className="w-full px-4 py-2 bg-white dark:bg-rionegro-900 border border-slate-300 dark:border-rionegro-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            placeholder="Ex: Desenvolvimento de Landing Page"
+                            placeholder={language === 'en' ? 'Ex: Landing Page Development' : 'Ex: Desenvolvimento de Landing Page'}
                         />
                     </div>
                     <button
@@ -415,12 +461,12 @@ ${isSocialPricing ? `
                         {savingProduct ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Salvando...
+                                {language === 'en' ? 'Saving...' : 'Salvando...'}
                             </>
                         ) : (
                             <>
-                                <Save className="w-4 h-4" />
-                                Salvar como Produto
+                                <Sparkles className="w-4 h-4" />
+                                {language === 'en' ? 'Save as Product' : 'Salvar como Produto'}
                             </>
                         )}
                     </button>
@@ -434,7 +480,7 @@ ${isSocialPricing ? `
                 className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 <Calculator className="w-5 h-5" />
-                Calcular Preço Justo
+                {language === 'en' ? 'Calculate Fair Price' : 'Calcular Preço Justo'}
             </button>
 
             {/* Results */}
@@ -444,37 +490,37 @@ ${isSocialPricing ? `
                     <div className="space-y-2">
                         <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-green-600" />
-                            Breakdown de Custos
+                            {language === 'en' ? 'Cost Breakdown' : 'Breakdown de Custos'}
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div className="text-slate-600 dark:text-slate-400">Custo Stack:</div>
+                            <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Stack Cost:' : 'Custo Stack:'}</div>
                             <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                                R$ {calculation.stackCost.toFixed(2)}
+                                {formatCurrency(calculation.stackCost, language, currency)}
                             </div>
 
-                            <div className="text-slate-600 dark:text-slate-400">Mão de Obra:</div>
+                            <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Labor:' : 'Mão de Obra:'}</div>
                             <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                                R$ {calculation.laborCost.toFixed(2)} ({calculation.hours}h × R$ {calculation.hourlyRate})
+                                {formatCurrency(calculation.laborCost, language, currency)} ({calculation.hours}h × {formatCurrency(calculation.hourlyRate, language, currency)})
                             </div>
 
-                            <div className="text-slate-600 dark:text-slate-400">Custo Total:</div>
+                            <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Total Cost:' : 'Custo Total:'}</div>
                             <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                                R$ {calculation.totalCost.toFixed(2)}
+                                {formatCurrency(calculation.totalCost, language, currency)}
                             </div>
 
-                            <div className="text-slate-600 dark:text-slate-400">Margem (35%):</div>
+                            <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Margin' : 'Margem'} ({(calculation.margin * 100)}%):</div>
                             <div className="font-mono font-semibold text-green-600">
-                                + R$ {(calculation.basePrice - calculation.totalCost).toFixed(2)}
+                                + {formatCurrency(calculation.basePrice - calculation.totalCost, language, currency)}
                             </div>
 
-                            <div className="text-slate-600 dark:text-slate-400">Impacto ({impact}):</div>
+                            <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Impact' : 'Impacto'} ({impact}):</div>
                             <div className="font-mono font-semibold text-blue-600">
                                 × {calculation.impactMultiplier}x
                             </div>
 
                             {isSocialPricing && (
                                 <>
-                                    <div className="text-slate-600 dark:text-slate-400">Desconto Social:</div>
+                                    <div className="text-slate-600 dark:text-slate-400">{language === 'en' ? 'Social Discount:' : 'Desconto Social:'}</div>
                                     <div className="font-mono font-semibold text-pink-600">
                                         - {(calculation.socialDiscount * 100)}%
                                     </div>
@@ -487,16 +533,16 @@ ${isSocialPricing ? `
                     <div className="pt-4 border-t border-green-200 dark:border-green-800">
                         <div className="flex items-center justify-between">
                             <span className="text-lg font-bold text-slate-900 dark:text-white">
-                                💵 Preço Final:
+                                💵 {language === 'en' ? 'Final Price:' : 'Preço Final:'}
                             </span>
                             <span className="text-3xl font-bold font-mono text-green-600">
-                                R$ {calculation.finalPrice.toFixed(2)}
+                                {formatCurrency(calculation.finalPrice, language, currency)}
                             </span>
                         </div>
                         {isSocialPricing && (
                             <p className="text-xs text-pink-600 dark:text-pink-400 mt-2 flex items-center gap-1">
                                 <Sparkles className="w-3 h-3" />
-                                Precificação Social aplicada - Impacto garantido!
+                                {language === 'en' ? 'Social Pricing applied - Guaranteed impact!' : 'Precificação Social aplicada - Impacto garantido!'}
                             </p>
                         )}
                     </div>
@@ -509,12 +555,12 @@ ${isSocialPricing ? `
                         {copied ? (
                             <>
                                 <CheckCircle className="w-4 h-4" />
-                                Copiado!
+                                {language === 'en' ? 'Copied!' : 'Copiado!'}
                             </>
                         ) : (
                             <>
                                 <Copy className="w-4 h-4" />
-                                Copiar Proposta
+                                {language === 'en' ? 'Copy Proposal' : 'Copiar Proposta'}
                             </>
                         )}
                     </button>

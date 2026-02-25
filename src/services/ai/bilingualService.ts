@@ -95,16 +95,23 @@ ${basePrompt}`;
 /**
  * Format currency based on language
  */
-export const formatCurrency = (value: number, language: Language): string => {
-    if (language === 'en') {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(value);
-    }
-    return new Intl.NumberFormat('pt-BR', {
+export const formatCurrency = (value: number, language: Language, currency: string = 'BRL'): string => {
+    const locale = language === 'en' ? 'en-US' : 'pt-BR';
+
+    // Map common codes to ensure validity
+    const currencyMap: Record<string, string> = {
+        'BRL': 'BRL',
+        'USD': 'USD',
+        'EUR': 'EUR',
+        'AUD': 'AUD',
+        'GBP': 'GBP'
+    };
+
+    const validCurrency = currencyMap[currency] || (language === 'en' ? 'USD' : 'BRL');
+
+    return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: 'BRL'
+        currency: validCurrency
     }).format(value);
 };
 

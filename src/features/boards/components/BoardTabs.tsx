@@ -8,8 +8,11 @@ interface BoardTabsProps {
     board: Board;
 }
 
+import { useLanguage } from '@/context/LanguageContext';
+
 export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
     const [activeTab, setActiveTab] = useState<'strategy' | 'insights'>('strategy');
+    const { t } = useLanguage();
 
     return (
         <div className="mb-4">
@@ -18,13 +21,13 @@ export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
                 <button
                     onClick={() => setActiveTab('strategy')}
                     className={`px-4 py-2 font-semibold text-sm transition-all relative ${activeTab === 'strategy'
-                            ? 'text-acai-900 dark:text-acai-400'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'text-acai-900 dark:text-acai-400'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                 >
                     <div className="flex items-center gap-2">
                         <Target className="w-4 h-4" />
-                        <span>Estratégia</span>
+                        <span>{t('strategy') || 'Strategy'}</span>
                     </div>
                     {activeTab === 'strategy' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-acai-900 dark:bg-acai-400" />
@@ -34,15 +37,15 @@ export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
                 <button
                     onClick={() => setActiveTab('insights')}
                     className={`px-4 py-2 font-semibold text-sm transition-all relative ${activeTab === 'insights'
-                            ? 'text-acai-900 dark:text-acai-400'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'text-acai-900 dark:text-acai-400'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                 >
                     <div className="flex items-center gap-2">
                         <Brain className="w-4 h-4" />
-                        <span>Insights (IA)</span>
+                        <span>Insights (AI)</span>
                         <span className="px-2 py-0.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white text-xs rounded-full font-bold">
-                            NOVO
+                            {t('new') || 'NEW'}
                         </span>
                     </div>
                     {activeTab === 'insights' && (

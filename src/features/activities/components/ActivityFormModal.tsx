@@ -37,7 +37,7 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
       <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
         <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
-            {editingActivity ? 'Editar Atividade' : 'Nova Atividade'}
+            {editingActivity ? t('editActivity') : t('newActivity')}
           </h2>
           <button
             onClick={onClose}

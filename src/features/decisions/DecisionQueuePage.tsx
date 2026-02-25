@@ -11,6 +11,12 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
+  Zap,
+  Loader2,
+  RefreshCw,
+  Trash2,
+  Inbox,
+  TrendingUp,
 } from 'lucide-react';
 import { DecisionCard } from './components/DecisionCard';
 import { useDecisionQueue } from './hooks/useDecisionQueue';
@@ -60,10 +66,10 @@ export const DecisionQueuePage: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Zap className="text-primary-500" size={28} />
-              Central de Decisões
+              {t('decisionsTitle')}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Decisões proativas para você tomar ação rapidamente
+              {t('decisionsSubtitle')}
             </p>
           </div>
 
@@ -78,14 +84,14 @@ export const DecisionQueuePage: React.FC = () => {
               ) : (
                 <RefreshCw size={16} />
               )}
-              Analisar Agora
+              {t('analyzeNow')}
             </button>
 
             {decisions.length > 0 && (
               <button
                 onClick={clearAll}
                 className="p-2 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                title="Limpar tudo"
+                title={t('clearAll')}
               >
                 <Trash2 size={18} />
               </button>
@@ -98,7 +104,7 @@ export const DecisionQueuePage: React.FC = () => {
           <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-1">
               <Inbox size={16} />
-              <span className="text-xs font-medium">Total</span>
+              <span className="text-xs font-medium">{t('total')}</span>
             </div>
             <div className="text-2xl font-bold text-slate-900 dark:text-white">
               {stats.total}
@@ -108,7 +114,7 @@ export const DecisionQueuePage: React.FC = () => {
           <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-red-500 mb-1">
               <AlertTriangle size={16} />
-              <span className="text-xs font-medium">Crítico</span>
+              <span className="text-xs font-medium">{t('critical')}</span>
             </div>
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {stats.critical}
@@ -118,7 +124,7 @@ export const DecisionQueuePage: React.FC = () => {
           <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-orange-500 mb-1">
               <TrendingUp size={16} />
-              <span className="text-xs font-medium">Importante</span>
+              <span className="text-xs font-medium">{t('important')}</span>
             </div>
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {stats.high}
@@ -128,7 +134,7 @@ export const DecisionQueuePage: React.FC = () => {
           <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-yellow-500 mb-1">
               <Clock size={16} />
-              <span className="text-xs font-medium">Moderado</span>
+              <span className="text-xs font-medium">{t('moderate')}</span>
             </div>
             <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {stats.medium}
@@ -138,7 +144,7 @@ export const DecisionQueuePage: React.FC = () => {
           <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-xl p-4">
             <div className="flex items-center gap-2 text-slate-400 mb-1">
               <CheckCircle2 size={16} />
-              <span className="text-xs font-medium">Baixo</span>
+              <span className="text-xs font-medium">{t('low')}</span>
             </div>
             <div className="text-2xl font-bold text-slate-600 dark:text-slate-400">
               {stats.low}
@@ -148,14 +154,14 @@ export const DecisionQueuePage: React.FC = () => {
 
         {/* Last analyzed info */}
         <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-          <span>Última análise: {formatLastAnalyzed()}</span>
+          <span>{t('lastAnalysis')}: {formatLastAnalyzed()}</span>
           {decisions.length > 0 && (
             <button
               onClick={approveAll}
               className="flex items-center gap-1 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
             >
               <CheckCircle2 size={14} />
-              Aprovar todas as sugeridas
+              {t('approveAll')}
             </button>
           )}
         </div>
@@ -170,8 +176,7 @@ export const DecisionQueuePage: React.FC = () => {
               {t('noDecisionsPending')}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
-              Clique em "Analisar Agora" para que a IA analise seu CRM e sugira ações
-              baseadas em deals parados, atividades atrasadas e oportunidades.
+              {t('clickAnalyzePrompt')}
             </p>
             <button
               onClick={runAnalyzers}
@@ -183,7 +188,7 @@ export const DecisionQueuePage: React.FC = () => {
               ) : (
                 <Sparkles size={18} />
               )}
-              Analisar Meu CRM
+              {t('analyzeMyCRM')}
             </button>
           </div>
         )}
@@ -193,7 +198,7 @@ export const DecisionQueuePage: React.FC = () => {
           <section>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400 mb-3">
               <AlertTriangle size={16} />
-              {PRIORITY_LABELS.critical.toUpperCase()} ({criticalDecisions.length})
+              {t('critical').toUpperCase()} ({criticalDecisions.length})
             </h2>
             <div className="space-y-3">
               {criticalDecisions.map(decision => (
@@ -214,7 +219,7 @@ export const DecisionQueuePage: React.FC = () => {
           <section>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-orange-600 dark:text-orange-400 mb-3">
               <TrendingUp size={16} />
-              {PRIORITY_LABELS.high.toUpperCase()} ({highDecisions.length})
+              {t('important').toUpperCase()} ({highDecisions.length})
             </h2>
             <div className="space-y-3">
               {highDecisions.map(decision => (
@@ -235,7 +240,7 @@ export const DecisionQueuePage: React.FC = () => {
           <section>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-yellow-600 dark:text-yellow-400 mb-3">
               <Clock size={16} />
-              {PRIORITY_LABELS.medium.toUpperCase()} ({mediumDecisions.length})
+              {t('moderate').toUpperCase()} ({mediumDecisions.length})
             </h2>
             <div className="space-y-3">
               {mediumDecisions.map(decision => (
@@ -256,7 +261,7 @@ export const DecisionQueuePage: React.FC = () => {
           <section>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3">
               <CheckCircle2 size={16} />
-              {PRIORITY_LABELS.low.toUpperCase()} ({lowDecisions.length})
+              {t('low').toUpperCase()} ({lowDecisions.length})
             </h2>
             <div className="space-y-3">
               {lowDecisions.map(decision => (

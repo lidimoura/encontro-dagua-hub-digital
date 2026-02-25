@@ -36,6 +36,27 @@ interface TechStackProduct {
     updated_at: string;
 }
 
+// --- INTELLIGENT STACK MANAGEMENT ---
+export interface TechStackMetadata {
+    ai_managed?: boolean;
+    credentials?: {
+        clientId?: string;
+        clientSecret?: string;
+        apiKey?: string;
+        [key: string]: any;
+    };
+    dev_program_status?: {
+        status: 'active' | 'inactive' | 'pending';
+        tier?: string;
+        renewal_date?: string;
+    };
+    [key: string]: any;
+}
+
+interface TechStackProduct extends Omit<TechStackProduct, 'metadata'> {
+    metadata: TechStackMetadata;
+}
+
 const CATEGORY_ICONS = {
     hosting: Server,
     database: Database,
@@ -444,6 +465,69 @@ export const TechStackPage: React.FC = () => {
                                     </select>
                                 </div>
                             </div>
+
+                            {/* --- INTELLIGENT STACK MANAGEMENT: KEY VALIDATOR --- */}
+                            {formData.stack_category === 'ai' && (
+                                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-white/10">
+                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                        <Brain size={16} className="text-fuchsia-500" />
+                                        Intelligent Stack Management
+                                    </h4>
+
+                                    <div className="mb-3">
+                                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                                            API Key / Service Account
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={formData.metadata?.credentials?.apiKey || ''}
+                                            onChange={(e) => {
+                                                const key = e.target.value;
+                                                // Heuristic: specific length or prefix check could go here
+                                                const looksLikeCloud = key.includes('"type": "service_account"') || (key.startsWith('AIza') && key.length > 50); // Just a heuristic example
+
+                                                setFormData({
+                                                    ...formData,
+                                                    metadata: {
+                                                        ...formData.metadata,
+                                                        credentials: { ...formData.metadata?.credentials, apiKey: key },
+                                                        // Auto-detect based on input pattern (Basic Heuristic)
+                                                        ai_detected_type: key.startsWith('AIza') ? 'ai_studio_free' : 'vertex_ai_cloud'
+                                                    }
+                                                });
+                                            }}
+                                            className="w-full px-3 py-2 rounded-lg text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-fuchsia-500"
+                                            placeholder="Paste API Key here..."
+                                        />
+                                    </div>
+
+                                    {/* ALERTA VERMELHO - CLOUD DETECTED */}
+                                    {formData.metadata?.ai_detected_type === 'vertex_ai_cloud' && (
+                                        <div className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
+                                            <div className="text-red-500 mt-0.5"><Zap size={16} /></div>
+                                            <div>
+                                                <p className="text-red-500 font-bold text-xs uppercase tracking-wide">Cuidado: Cobrança GCP Detectada</p>
+                                                <p className="text-red-400 text-xs mt-1">
+                                                    Esta chave parece ser do <strong>Vertex AI (Google Cloud)</strong>. O uso contínuo pode gerar cobranças no seu cartão de crédito vinculado ao GCP.
+                                                    <br /><br />
+                                                    <span className="text-red-300">Recomendação: Use o <strong>AI Studio Free Tier</strong> para segurança financeira.</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full ${formData.metadata?.ai_detected_type === 'ai_studio_free' ? 'bg-green-500' : 'bg-slate-500'}`}></div>
+                                        <span className="text-xs text-slate-500">
+                                            {formData.metadata?.ai_detected_type === 'ai_studio_free'
+                                                ? 'Free Tier (AI Studio) - Seguro'
+                                                : formData.metadata?.ai_detected_type === 'vertex_ai_cloud'
+                                                    ? 'Cloud Mode (Vertex AI) - Pago'
+                                                    : 'Aguardando validação...'}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
