@@ -43,7 +43,7 @@ const transformDeal = (db: DbDeal, items: DbDealItem[]): Deal => ({
   title: db.title,
   value: db.value || 0,
   probability: db.probability || 0,
-  status: db.status || db.stage_id || 'NEW',
+  status: db.stage_id || db.status || 'NEW',
   priority: (db.priority as Deal['priority']) || 'medium',
   boardId: db.board_id || '',
   contactId: db.contact_id || '',
@@ -74,7 +74,10 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
   if (deal.title !== undefined) db.title = deal.title;
   if (deal.value !== undefined) db.value = deal.value;
   if (deal.probability !== undefined) db.probability = deal.probability;
-  if (deal.status !== undefined) db.status = deal.status;
+  if (deal.status !== undefined) {
+    db.status = deal.status;
+    db.stage_id = deal.status; // Keep stage_id in sync for Kanban mapping
+  }
   if (deal.priority !== undefined) db.priority = deal.priority;
   if (deal.boardId !== undefined) db.board_id = deal.boardId || null;
   if (deal.contactId !== undefined) db.contact_id = deal.contactId || null;
@@ -89,9 +92,15 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
 };
 
 export const dealsService = {
-  async getAll(isDemoUser: boolean = false): Promise<{ data: Deal[] | null; error: Error | null }> {
+  async getAll(companyId: string, isDemoUser: boolean = false): Promise<{ data: Deal[] | null; error: Error | null }> {
     try {
+      if (!companyId && !isDemoUser) return { data: [], error: null };
+
       let dealsQuery = supabase.from('deals').select('*').order('created_at', { ascending: false });
+
+      if (companyId) {
+        dealsQuery = dealsQuery.eq('company_id', companyId);
+      }
 
       // Demo isolation: filter by is_demo_data flag
       if (isDemoUser) {

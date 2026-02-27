@@ -51,7 +51,7 @@ export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
         setDescription(editingBoard.description || '');
         setNextBoardId(editingBoard.nextBoardId || '');
         setLinkedLifecycleStage(editingBoard.linkedLifecycleStage || '');
-        setSelectedTemplate(editingBoard.template || '');
+        setSelectedTemplate((editingBoard.template as BoardTemplateType) || '');
         setStages(editingBoard.stages);
       } else {
         // Reset for new board

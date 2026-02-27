@@ -80,7 +80,7 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Fetch companies
   const fetchCompanies = useCallback(async () => {
-    if (!profile) {
+    if (!profile?.company_id) {
       setCompanies([]);
       setCompaniesLoading(false);
       return;
@@ -89,7 +89,7 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setCompaniesLoading(true);
     setCompaniesError(null);
 
-    const { data, error } = await companiesService.getAll();
+    const { data, error } = await companiesService.getAll(profile.company_id);
 
     if (error) {
       setCompaniesError(error.message);

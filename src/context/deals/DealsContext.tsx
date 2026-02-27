@@ -41,7 +41,7 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Fetch deals
   const fetchDeals = useCallback(async () => {
-    if (!profile) {
+    if (!profile?.company_id) {
       setRawDeals([]);
       setLoading(false);
       return;
@@ -50,7 +50,7 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await dealsService.getAll();
+    const { data, error: fetchError } = await dealsService.getAll(profile.company_id);
 
     if (fetchError) {
       setError(fetchError.message);

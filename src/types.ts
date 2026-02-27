@@ -3,6 +3,8 @@
 // ============================================
 
 export const DealStatus = {
+    NEW: 'NEW',
+    CONTACTED: 'CONTACTED',
     LEAD: 'LEAD',
     QUALIFIED: 'QUALIFIED',
     PROPOSAL: 'PROPOSAL',
@@ -33,6 +35,18 @@ export interface User {
     avatar: string;
 }
 
+export interface Profile {
+    id: string;
+    email: string;
+    full_name?: string;
+    phone?: string;
+    role: 'user' | 'admin' | 'super_admin' | 'equipe' | 'cliente' | 'cliente_restrito';
+    plan_type?: 'free' | 'monthly' | 'annual';
+    status?: 'active' | 'inactive' | 'suspended';
+    company_id?: string;
+    created_at?: string;
+}
+
 // ============================================
 // COMPANY
 // ============================================
@@ -40,6 +54,8 @@ export interface User {
 export interface Company {
     id: string;
     name: string;
+    industry?: string;
+    website?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -54,11 +70,17 @@ export interface Contact {
     name: string;
     email: string;
     phone: string;
-    role: string;
-    status: 'ACTIVE' | 'INACTIVE';
+    user_id?: string;
+    role?: string;
+    status: 'ACTIVE' | 'INACTIVE' | 'CHURNED';
     stage: string; // Lifecycle stage ID
     lastPurchaseDate?: string;
-    totalValue: number;
+    totalValue?: number;
+    avatar?: string;
+    source?: string;
+    notes?: string;
+    birthDate?: string;
+    lastInteraction?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -70,11 +92,13 @@ export interface Contact {
 export interface DealItem {
     id: string;
     productId: string;
-    productName: string;
+    productName?: string;
+    name?: string; // fallback
     quantity: number;
-    unitPrice: number;
-    discount: number;
-    total: number;
+    unitPrice?: number;
+    price?: number; // fallback
+    discount?: number;
+    total?: number;
 }
 
 // ============================================
@@ -99,7 +123,11 @@ export interface Deal {
     customFields: Record<string, unknown>;
     lastStageChangeDate?: string;
     lossReason?: string;
-    nextActivity?: string;
+    nextActivity?: {
+        type: string;
+        date: string;
+        isOverdue?: boolean;
+    };
     aiSummary?: string;
     closedAt?: string;
 }
@@ -112,6 +140,7 @@ export interface DealView extends Deal {
     companyName: string;
     contactName: string;
     contactEmail: string;
+    source?: string;
 }
 
 // ============================================
@@ -128,7 +157,7 @@ export interface Activity {
     date: string;
     user: User;
     completed: boolean;
-    createdAt: string;
+    createdAt?: string;
     completedAt?: string;
 }
 
@@ -140,20 +169,23 @@ export interface BoardStage {
     id: string;
     label: string;
     color: string;
-    order: number;
+    order?: number;
     linkedLifecycleStage?: string; // ID of lifecycle stage
 }
 
 export interface BoardGoal {
     description: string;
-    targetValue?: number;
-    type?: 'revenue' | 'deals' | 'custom';
+    targetValue?: number | string;
+    currentValue?: number | string;
+    type?: 'revenue' | 'deals' | 'custom' | 'number' | 'currency' | 'percentage';
+    kpi?: string;
 }
 
 export interface AgentPersona {
     name: string;
     role: string;
-    tone: string;
+    tone?: string;
+    behavior?: string;
 }
 
 export interface Board {
@@ -165,6 +197,10 @@ export interface Board {
     nextBoardId?: string; // For automation
     goal?: BoardGoal;
     agentPersona?: AgentPersona;
+    template?: string;
+    linkedLifecycleStage?: string;
+    entryTrigger?: string;
+    automationSuggestions?: string[];
     createdAt: string;
     updatedAt?: string;
 }
@@ -200,7 +236,12 @@ export interface Product {
     name: string;
     description?: string;
     basePrice: number;
+    price?: number; // fallback for backwards compatibility
     category?: string;
+    type?: string; // e.g. 'catalog', 'tech_stack', 'service'
+    unit?: string;
+    is_active?: boolean;
+    sku?: string;
     createdAt: string;
 }
 
@@ -212,10 +253,12 @@ export type CustomFieldType = 'text' | 'number' | 'date' | 'select' | 'boolean';
 
 export interface CustomFieldDefinition {
     id: string;
-    name: string;
+    name?: string;
+    label?: string;
+    key?: string;
     type: CustomFieldType;
     options?: string[]; // For select type
-    required: boolean;
+    required?: boolean;
 }
 
 // ============================================
@@ -223,11 +266,23 @@ export interface CustomFieldDefinition {
 // ============================================
 
 export interface JourneyDefinition {
+    schemaVersion?: string;
     name: string;
-    stages: Array<{
-        id: string;
+    description?: string;
+    icon?: string;
+    boards: Array<{
+        slug?: string;
         name: string;
-        description?: string;
+        columns: Array<{
+            name: string;
+            color?: string;
+            linkedLifecycleStage?: string;
+        }>;
+        strategy?: {
+            agentPersona?: any;
+            goal?: any;
+            entryTrigger?: string;
+        };
     }>;
     triggers?: Array<{
         event: string;
@@ -235,18 +290,20 @@ export interface JourneyDefinition {
     }>;
 }
 
+export interface RegistryTemplate {
+    id: string;
+    name: string;
+    path: string;
+    category?: string;
+    version?: string;
+    description?: string;
+    tags?: string[];
+    author?: string;
+}
+
 export interface RegistryIndex {
-    templates: Array<{
-        id: string;
-        name: string;
-        path: string;
-        category?: string;
-    }>;
-    journeys: Array<{
-        id: string;
-        name: string;
-        path: string;
-    }>;
+    templates: RegistryTemplate[];
+    journeys: RegistryTemplate[];
 }
 
 // ============================================
@@ -260,5 +317,7 @@ export interface Lead {
     companyName: string;
     role?: string;
     source: string;
+    status?: string | 'LEAD' | 'QUALIFIED' | 'CONTACTED' | 'NEW';
+    notes?: string;
     createdAt: string;
 }

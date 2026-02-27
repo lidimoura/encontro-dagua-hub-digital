@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DealView, DealStatus, BoardStage } from '@/types';
 import { DealCard } from './DealCard';
 import { isDealRotting, getActivityStatus } from '@/features/boards/hooks/useBoardsController';
-import { Settings } from 'lucide-react';
+import { Settings, Plus } from 'lucide-react';
 
 import { useCRM } from '@/context/CRMContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -71,12 +71,26 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               className={`p-3 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 shrink-0`}
             >
               <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-slate-700 dark:text-slate-200 font-display text-sm tracking-wide uppercase">
-                  {stage.label}
-                </span>
-                <span className="text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">
-                  {stageDeals.length}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-700 dark:text-slate-200 font-display text-sm tracking-wide uppercase">
+                    {stage.label}
+                  </span>
+                  <span className="text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">
+                    {stageDeals.length}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('openCreateDealModal', {
+                      detail: { stageId: stage.id }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                  className="p-1 text-slate-400 hover:text-primary-600 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
+                  title={t('addDeal')}
+                >
+                  <Plus size={16} />
+                </button>
               </div>
 
               {/* Automation Indicator - Always rendered for consistent height */}

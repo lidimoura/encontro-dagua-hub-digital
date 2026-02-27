@@ -247,7 +247,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                 </form>
             </div>
 
-            <style jsx>{`
+            <style dangerouslySetInnerHTML={{
+                __html: `
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -272,7 +273,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
         }
-      `}</style>
+      `}} />
         </div>
     );
 };

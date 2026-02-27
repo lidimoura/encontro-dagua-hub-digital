@@ -74,7 +74,7 @@ const NavItem = ({
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { profile, signOut, refreshProfile } = useAuth();
-  const { language, switchLanguage, t } = useTranslation();
+  const { language, setLanguage, t } = useTranslation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -335,7 +335,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Language Toggle Button - FORCED VISIBILITY */}
             <button
-              onClick={() => switchLanguage(language === 'pt' ? 'en' : 'pt')}
+              onClick={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
               className="p-2.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95 z-[70] relative ring-2 ring-slate-200 dark:ring-slate-700"
               title={language === 'pt' ? 'Switch to English' : 'Mudar para Português'}
               style={{ display: 'block', visibility: 'visible' }}
@@ -503,9 +503,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* Main Content Area - Mobile safe with padding-top */}
-        <main className="flex-1 w-full max-w-full overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe">
-          <div className="h-full">
+        {/* Main Content Area - Route-aware overflow handling */}
+        {/* Boards & AI Hub use overflow-hidden + h-full for Kanban/chat layouts */}
+        {/* All other pages use overflow-y-auto for normal scrolling */}
+        <main
+          className={`flex-1 w-full max-w-full overflow-x-hidden bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe
+            ${['/boards', '/ai'].some(p => location.pathname.startsWith(p))
+              ? 'overflow-hidden flex flex-col'
+              : 'overflow-y-auto'
+            }`}
+        >
+          <div className={['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 overflow-hidden flex flex-col h-full' : 'h-full'}>
             {children}
           </div>
         </main>

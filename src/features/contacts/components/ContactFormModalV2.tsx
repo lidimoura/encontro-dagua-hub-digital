@@ -6,6 +6,7 @@ import { Modal, ModalForm } from '@/components/ui/Modal';
 import { InputField, SubmitButton } from '@/components/ui/FormField';
 import { contactFormSchema } from '@/lib/validations/schemas';
 import type { ContactFormData } from '@/lib/validations/schemas';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const ContactFormModalV2: React.FC<ContactFormModalProps> = ({
   editingContact,
   defaultCompanyName = '',
 }) => {
+  const { t } = useTranslation();
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {

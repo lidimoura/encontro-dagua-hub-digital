@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Scale, FileText, Download, Eye, Copy, CheckCircle, Sparkles, AlertCircle, Loader2, Globe, MessageSquare, Send } from 'lucide-react';
+import { Scale, FileText, Download, Eye, Copy, CheckCircle, Sparkles, AlertCircle, Loader2, Globe, MessageSquare, Send, Save } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useDealContext } from '@/context/DealContext';
@@ -73,9 +73,19 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     }, [language, jurisdiction, generatedContract]);
 
     // Initialize AI Agent
-    const { messages, input, handleInputChange, handleSubmit, isLoading: isAILoading } = useCRMAgent({
+    const { messages, isLoading: isAILoading, sendMessage } = useCRMAgent({
         systemPrompt
     });
+
+    const [input, setInput] = useState('');
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!input.trim() || isAILoading) return;
+        const msg = input;
+        setInput('');
+        await sendMessage(msg);
+    };
 
     // Auto-scroll chat
     useEffect(() => {
@@ -102,6 +112,8 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
     const [exportingPDF, setExportingPDF] = useState(false);
+    const [savingToDeal, setSavingToDeal] = useState(false);
+    const [savedToDeal, setSavedToDeal] = useState(false);
 
     useEffect(() => {
         fetchContractTemplates();
@@ -173,6 +185,34 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         setCopied(true);
         addToast(t('contractExported'), 'success');
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const saveToDeal = async () => {
+        if (!dealId || !generatedContract) return;
+        setSavingToDeal(true);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const { error } = await supabase
+                .from('activities')
+                .insert({
+                    deal_id: dealId,
+                    type: 'NOTE',
+                    title: language === 'en' ? `Contract: ${selectedTemplate?.title ?? 'Draft'}` : `Contrato: ${selectedTemplate?.title ?? 'Rascunho'}`,
+                    description: generatedContract.substring(0, 8000),
+                    user_id: user?.id,
+                    date: new Date().toISOString(),
+                    completed: true,
+                });
+            if (error) throw error;
+            setSavedToDeal(true);
+            addToast(language === 'en' ? 'Contract saved to deal timeline!' : 'Contrato salvo na timeline do deal!', 'success');
+            setTimeout(() => setSavedToDeal(false), 3000);
+        } catch (err: any) {
+            console.error('Save to deal error:', err);
+            addToast(language === 'en' ? 'Failed to save contract.' : 'Erro ao salvar contrato.', 'error');
+        } finally {
+            setSavingToDeal(false);
+        }
     };
 
     const exportToPDF = async () => {
@@ -690,7 +730,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                                 <Eye className="w-5 h-5 text-purple-600" />
                                 {language === 'en' ? 'Contract Preview' : 'Preview do Contrato'}
                             </h4>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-wrap">
                                 <button
                                     onClick={copyToClipboard}
                                     className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
@@ -714,6 +754,25 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                                     <Download className="w-4 h-4" />
                                     {language === 'en' ? 'Export PDF' : 'Exportar PDF'}
                                 </button>
+                                {/* Salvar no Deal — only visible when inside a deal */}
+                                {dealId && (
+                                    <button
+                                        onClick={saveToDeal}
+                                        disabled={savingToDeal || savedToDeal}
+                                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 disabled:opacity-60"
+                                    >
+                                        {savingToDeal ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : savedToDeal ? (
+                                            <CheckCircle className="w-4 h-4" />
+                                        ) : (
+                                            <Save className="w-4 h-4" />
+                                        )}
+                                        {savedToDeal
+                                            ? (language === 'en' ? 'Saved!' : 'Salvo!')
+                                            : (language === 'en' ? 'Save to Deal' : 'Salvar no Deal')}
+                                    </button>
+                                )}
                             </div>
                         </div>
 

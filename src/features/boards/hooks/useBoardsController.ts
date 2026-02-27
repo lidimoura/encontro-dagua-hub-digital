@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { supabase } from '@/lib/supabase/client';
 import { DealView, DealStatus, Board, CustomFieldDefinition } from '@/types';
 import {
   useBoards,
@@ -10,7 +11,10 @@ import {
 import {
   useDealsByBoard,
   useUpdateDealStatus,
+  useUpdateDeal,
 } from '@/lib/query/hooks/useDealsQuery';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query/queryKeys';
 import { useCreateActivity } from '@/lib/query/hooks/useActivitiesQuery';
 import { usePersistedState } from '@/hooks/usePersistedState';
 import { useRealtimeSyncKanban } from '@/lib/realtime';
@@ -24,8 +28,15 @@ export const isDealRotting = (deal: DealView) => {
 
 export const getActivityStatus = (deal: DealView) => {
   if (!deal.nextActivity) return 'yellow';
-  if (deal.nextActivity.isOverdue) return 'red';
-  const activityDate = new Date(deal.nextActivity.date);
+  // Parse if it's stored as a JSON string
+  const activity = typeof deal.nextActivity === 'string'
+    ? (() => { try { return JSON.parse(deal.nextActivity); } catch { return {}; } })()
+    : deal.nextActivity;
+
+  if (activity.isOverdue) return 'red';
+  if (!activity.date) return 'gray';
+
+  const activityDate = new Date(activity.date);
   const today = new Date();
   if (activityDate.toDateString() === today.toDateString()) return 'green';
   return 'gray';
@@ -38,6 +49,7 @@ export const useBoardsController = () => {
   const createBoardMutation = useCreateBoard();
   const updateBoardMutation = useUpdateBoard();
   const deleteBoardMutation = useDeleteBoard();
+  const queryClient = useQueryClient();
 
   // Active board state (persisted)
   const [activeBoardId, setActiveBoardId] = usePersistedState<string | null>(
@@ -64,6 +76,7 @@ export const useBoardsController = () => {
   const { data: deals = [], isLoading: dealsLoading } = useDealsByBoard(activeBoardId || '');
 
   const updateDealStatusMutation = useUpdateDealStatus();
+  const updateDealMutation = useUpdateDeal();
   const createActivityMutation = useCreateActivity();
 
   // Enable realtime sync for Kanban
@@ -144,6 +157,51 @@ export const useBoardsController = () => {
     });
   }, [deals, searchTerm, ownerFilter, dateRange]);
 
+  // Helper to synchronously promote a ghost deal to a real deal
+  const promoteGhostDeal = async (ghostId: string): Promise<string> => {
+    if (!ghostId.startsWith('auto-')) return ghostId;
+    const contactId = ghostId.replace('auto-', '');
+    const autoDeal = deals.find(d => d.id === ghostId);
+
+    // Create real deal in Supabase
+    const { data, error } = await supabase.from('deals')
+      .insert({
+        title: autoDeal?.title || 'Novo Deal',
+        value: autoDeal?.value || 0,
+        contact_id: contactId,
+        board_id: activeBoardId,
+        stage_id: autoDeal?.status || activeBoard?.stages[0]?.id,
+        status: autoDeal?.status || activeBoard?.stages[0]?.id,
+        priority: 'medium',
+        probability: 10,
+      })
+      .select('id')
+      .single();
+
+    if (error || !data) {
+      console.error('Error promoting auto-deal:', error);
+      return ghostId;
+    }
+
+    queryClient.invalidateQueries({ queryKey: queryKeys.deals.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
+    return data.id;
+  };
+
+  // Safe Deal Selection (Handles clicks on ghost cards)
+  const handleSelectDeal = async (dealId: string | null) => {
+    if (!dealId) {
+      setSelectedDealId(null);
+      return;
+    }
+    if (dealId.startsWith('auto-')) {
+      const realId = await promoteGhostDeal(dealId);
+      setSelectedDealId(realId);
+    } else {
+      setSelectedDealId(dealId);
+    }
+  };
+
   // Drag & Drop Handlers
   const handleDragStart = (e: React.DragEvent, id: string) => {
     console.log('[DnD] Drag started:', id);
@@ -157,11 +215,17 @@ export const useBoardsController = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
+  const handleDrop = async (e: React.DragEvent, stageId: string) => {
     e.preventDefault();
-    const dealId = e.dataTransfer.getData('dealId') || lastMouseDownDealId.current;
-    console.log('[DnD] Drop:', { dealId, stageId });
+    let dealId = e.dataTransfer.getData('dealId') || lastMouseDownDealId.current;
+
     if (dealId) {
+      // Auto-promote before moving
+      if (dealId.startsWith('auto-')) {
+        dealId = await promoteGhostDeal(dealId);
+      }
+
+      console.log('[DnD] Drop:', { dealId, stageId });
       let lossReason = undefined;
       if (stageId === DealStatus.CLOSED_LOST) {
         const reason = window.prompt(
@@ -169,7 +233,54 @@ export const useBoardsController = () => {
         );
         if (reason) lossReason = reason;
       }
-      updateDealStatusMutation.mutate({ id: dealId, status: stageId, lossReason });
+
+      // Auto-transition logic check
+      let finalStatus = stageId;
+      let finalBoardId: string | undefined = undefined;
+
+      if (activeBoard && activeBoard.stages && activeBoard.stages.length > 0) {
+        const sortedStages = [...activeBoard.stages].sort((a, b) => a.order - b.order);
+        const lastStage = sortedStages[sortedStages.length - 1];
+
+        if (stageId === lastStage.id && activeBoard.nextBoardId) {
+          const nextBoard = boards.find(b => b.id === activeBoard.nextBoardId);
+          if (nextBoard && nextBoard.stages && nextBoard.stages.length > 0) {
+            const nextBoardSortedStages = [...nextBoard.stages].sort((a, b) => a.order - b.order);
+            const firstStageOfNextBoard = nextBoardSortedStages[0];
+
+            finalStatus = firstStageOfNextBoard.id;
+            finalBoardId = nextBoard.id;
+          }
+        }
+      }
+
+      if (finalBoardId) {
+        // Deal is moving to a new board! Using updateDeal to change boardId mapping
+        updateDealMutation.mutate({ id: dealId, updates: { boardId: finalBoardId, status: finalStatus, lossReason } });
+      } else {
+        // Regular status update within the same board
+        updateDealStatusMutation.mutate({ id: dealId, status: stageId, lossReason });
+      }
+
+      // Restore Stage Mapping (Contact status -> Board column)
+      const droppedDeal = deals.find(d => d.id === dealId);
+      const targetStage = activeBoard?.stages.find(s => s.id === stageId);
+
+      if (droppedDeal && droppedDeal.contactId && targetStage && targetStage.linkedLifecycleStage) {
+        const actualContactId = droppedDeal.contactId;
+        // Silent background update to sync contact stage
+        supabase.from('contacts')
+          .update({ stage: targetStage.linkedLifecycleStage })
+          .eq('id', actualContactId)
+          .then(({ error }) => {
+            if (error) {
+              console.error('Error updating contact stage:', error);
+            } else {
+              // Invalidate contacts query to refresh UI immediately
+              queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
+            }
+          });
+      }
     }
     setDraggingId(null);
   };
@@ -232,6 +343,11 @@ export const useBoardsController = () => {
           updates: {
             name: boardData.name,
             description: boardData.description,
+            stages: boardData.stages,
+            linkedLifecycleStage: boardData.linkedLifecycleStage,
+            nextBoardId: boardData.nextBoardId,
+            template: boardData.template,
+            isDefault: boardData.isDefault,
           },
         },
         {
@@ -288,7 +404,7 @@ export const useBoardsController = () => {
     setIsFilterOpen,
     draggingId,
     selectedDealId,
-    setSelectedDealId,
+    setSelectedDealId: handleSelectDeal,
     isCreateModalOpen,
     setIsCreateModalOpen,
     openActivityMenuId,

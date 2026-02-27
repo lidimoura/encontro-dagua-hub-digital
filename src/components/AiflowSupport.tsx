@@ -27,12 +27,12 @@ export const AiflowSupport: React.FC = () => {
 
         // 1. Create Task in CRM
         addActivity({
-            id: crypto.randomUUID(),
             title: `Feedback/Bug: ${bugDesc.slice(0, 30)}...`,
             type: 'TASK',
             description: bugDesc,
             date: new Date().toISOString(),
             completed: false,
+            dealId: 'system',
             dealTitle: 'Sistema',
             user: { name: 'User', avatar: '' }
         });

@@ -10,11 +10,10 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // Initialize from localStorage or default to 'en' (FORCED FOR INTERNATIONAL DEMO)
+    // Initialize from localStorage or default to 'pt' (PT-BR is the primary market)
     const [language, setLanguageState] = useState<Language>(() => {
         const saved = localStorage.getItem('app_language');
-        // Force English as default for international demo
-        return (saved === 'pt' || saved === 'en') ? saved : 'en';
+        return (saved === 'pt' || saved === 'en') ? saved : 'pt';
     });
 
     // Translation function
@@ -24,6 +23,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
         for (const k of keys) {
             value = value?.[k];
+        }
+
+        // Fallback to PT-BR if key is missing in selected language
+        if (typeof value !== 'string') {
+            value = translations['pt'];
+            for (const k of keys) {
+                value = value?.[k];
+            }
         }
 
         return typeof value === 'string' ? value : key;

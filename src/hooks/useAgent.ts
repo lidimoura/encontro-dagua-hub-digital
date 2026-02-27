@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { streamText } from 'ai';
-import { google } from '@ai-sdk/google';
+import { google, createGoogleGenerativeAI } from '@ai-sdk/google';
 import { anthropic } from '@ai-sdk/anthropic';
 import { getModel } from '@/services/ai/config';
 import { useCRM } from '@/context/CRMContext';
@@ -77,9 +77,14 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
       setMessages(prev => [...prev, userMsg]);
       setInput('');
 
+      let history: any[] = [];
+      let systemPrompt = system;
+      let providerOptions: Parameters<typeof streamText>[0]['providerOptions'] = {};
+      let tools: Parameters<typeof streamText>[0]['tools'] = undefined;
+
       try {
         // Convert internal messages to SDK message format
-        let history: any[] = await Promise.all(
+        history = await Promise.all(
           messages.map(async m => {
             interface TextPart {
               type: 'text';
@@ -214,7 +219,6 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
         history.push(newUserMessage);
 
         // Handle System Prompt Caching for Anthropic
-        let systemPrompt = system;
         if (aiProvider === 'anthropic' && aiAnthropicCaching && system) {
           // If caching is enabled, we move system prompt to messages array with cacheControl
           history = [
@@ -232,7 +236,6 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
 
         const model = getModel(aiProvider, aiApiKey, aiModel);
 
-        let providerOptions = {};
         if (aiProvider === 'google' && aiThinking) {
           if (aiModel.includes('gemini-3')) {
             providerOptions = {
@@ -255,7 +258,6 @@ export function useAgent({ initialMessages = [], system, onFinish, id }: UseAgen
           }
         }
 
-        let tools: Record<string, unknown> | undefined = undefined;
         if (aiSearch) {
           if (aiProvider === 'google') {
             tools = { google_search: google.tools.googleSearch({}) };

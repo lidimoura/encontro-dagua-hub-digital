@@ -84,13 +84,12 @@ export const KanbanList: React.FC<KanbanListProps> = ({
                 <td className="px-6 py-3 text-slate-600 dark:text-slate-300">{deal.companyName}</td>
                 <td className="px-6 py-3">
                   <span
-                    className={`text-xs font-bold px-2 py-1 rounded ${
-                      deal.status === DealStatus.CLOSED_WON
+                    className={`text-xs font-bold px-2 py-1 rounded ${deal.status === DealStatus.CLOSED_WON
                         ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
                         : deal.status === DealStatus.CLOSED_LOST
                           ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                    } `}
+                      } `}
                   >
                     {stages.find(s => s.id === deal.status)?.label || deal.status}
                   </span>
@@ -110,7 +109,7 @@ export const KanbanList: React.FC<KanbanListProps> = ({
                     key={field.id}
                     className="px-6 py-3 text-right text-slate-600 dark:text-slate-300 text-sm"
                   >
-                    {deal.customFields?.[field.key] || '-'}
+                    {String(deal.customFields?.[field.key] ?? '-')}
                   </td>
                 ))}
               </tr>

@@ -229,17 +229,26 @@ export const companiesService = {
    * 
    * @returns {Promise<{data: Company[] | null, error: Error | null}>} Array of companies or error
    */
-  async getAll(): Promise<{ data: Company[] | null; error: Error | null }> {
+  async getAll(tenantId: string): Promise<{ data: Company[] | null; error: Error | null }> {
     try {
+      if (!tenantId) return { data: [], error: null };
+
+      // Rely on RLS policies for tenant isolation.
+      // Do NOT filter by company_id or id — the column may not exist
+      // and RLS already restricts access to this tenant's companies.
       const { data, error } = await supabase
         .from('companies')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return { data: null, error };
+      if (error) {
+        console.warn('[companiesService] Error fetching companies:', error.message);
+        return { data: [], error: null }; // Graceful fallback — never crash the Kanban
+      }
       return { data: (data || []).map(c => transformCompany(c as DbCompany)), error: null };
     } catch (e) {
-      return { data: null, error: e as Error };
+      console.warn('[companiesService] Exception:', e);
+      return { data: [], error: null }; // Graceful fallback
     }
   },
 

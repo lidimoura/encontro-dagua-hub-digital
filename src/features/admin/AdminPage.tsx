@@ -6,8 +6,14 @@ import { supabase } from '@/lib/supabase/client';
 import { InviteGenerator } from './components/InviteGenerator';
 import CatalogTab from './CatalogTab';
 import { useAuth } from '@/context/AuthContext';
-import { EditModalProps, Profile } from '@/types';
+import { Profile } from '@/types';
 import { useToast } from '@/context/ToastContext';
+
+export interface EditModalProps {
+    profile: Profile;
+    onClose: () => void;
+    onSave: (data: Partial<Profile>) => Promise<void>;
+}
 
 function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
     const { t } = useTranslation();

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface CardLink {
     id: string;
@@ -32,6 +33,7 @@ const LINK_TYPES = [
 ];
 
 export const CardLinksEditor: React.FC<LinksEditorProps> = ({ links, onChange }) => {
+    const { t } = useTranslation();
     const addLink = () => {
         const newLink: CardLink = {
             id: crypto.randomUUID(),
