@@ -69,19 +69,19 @@ const ReportsPage: React.FC = () => {
             <div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('avgDays')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {avgSalesCycle} {t('days', { defaultValue: 'dias' })}
+                {avgSalesCycle} {t('days')}
               </p>
             </div>
             <div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('fastestDays')}</p>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {fastestDeal} {t('days', { defaultValue: 'dias' })}
+                {fastestDeal} {t('days')}
               </p>
             </div>
             <div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('slowestDays')}</p>
               <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                {slowestDeal} {t('days', { defaultValue: 'dias' })}
+                {slowestDeal} {t('days')}
               </p>
             </div>
           </div>

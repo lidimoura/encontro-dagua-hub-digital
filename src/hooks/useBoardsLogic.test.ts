@@ -195,6 +195,7 @@ describe('useBoardsLogic', () => {
       goal: { description: 'Convert 20% of leads', kpi: 'Conversion Rate', targetValue: '20%' },
       agentPersona: { name: 'Sales Agent', role: 'SDR', behavior: 'Proactive' },
       entryTrigger: 'New lead from website',
+      isDefault: false,
     };
 
     act(() => {
@@ -213,6 +214,7 @@ describe('useBoardsLogic', () => {
       name: 'Pre-Sales Board',
       stages: DEFAULT_BOARD_STAGES,
       nextBoardId: 'sales-board',
+      isDefault: false,
     };
 
     act(() => {
@@ -229,6 +231,7 @@ describe('useBoardsLogic', () => {
       name: 'Automated Board',
       stages: DEFAULT_BOARD_STAGES,
       automationSuggestions: ['Send welcome email on entry', 'Notify manager after 3 days idle'],
+      isDefault: false,
     };
 
     act(() => {

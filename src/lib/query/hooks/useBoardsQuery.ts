@@ -7,6 +7,7 @@
  * - Automatic cache invalidation
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
 import { queryKeys } from '../queryKeys';
 import { boardsService } from '@/lib/supabase';
 import type { Board, BoardStage } from '@/types';
@@ -17,10 +18,12 @@ import type { Board, BoardStage } from '@/types';
  * Hook to fetch all boards
  */
 export const useBoards = () => {
+  const { profile } = useAuth();
   return useQuery({
-    queryKey: queryKeys.boards.lists(),
+    queryKey: [...queryKeys.boards.lists(), profile?.company_id],
     queryFn: async () => {
-      const { data, error } = await boardsService.getAll();
+      if (!profile?.company_id) return [];
+      const { data, error } = await boardsService.getAll(profile.company_id);
       if (error) throw error;
       return data || [];
     },
@@ -32,14 +35,16 @@ export const useBoards = () => {
  * Hook to fetch a single board by ID
  */
 export const useBoard = (id: string | undefined) => {
+  const { profile } = useAuth();
   return useQuery({
-    queryKey: queryKeys.boards.detail(id || ''),
+    queryKey: [...queryKeys.boards.detail(id || ''), profile?.company_id],
     queryFn: async () => {
-      const { data, error } = await boardsService.getAll();
+      if (!profile?.company_id) return null;
+      const { data, error } = await boardsService.getAll(profile.company_id);
       if (error) throw error;
       return (data || []).find(b => b.id === id) || null;
     },
-    enabled: !!id,
+    enabled: !!id && !!profile?.company_id,
   });
 };
 
@@ -47,13 +52,16 @@ export const useBoard = (id: string | undefined) => {
  * Hook to get the default board
  */
 export const useDefaultBoard = () => {
+  const { profile } = useAuth();
   return useQuery({
-    queryKey: [...queryKeys.boards.all, 'default'] as const,
+    queryKey: [...queryKeys.boards.all, 'default', profile?.company_id] as const,
     queryFn: async () => {
-      const { data, error } = await boardsService.getAll();
+      if (!profile?.company_id) return null;
+      const { data, error } = await boardsService.getAll(profile.company_id);
       if (error) throw error;
       return (data || []).find(b => b.isDefault) || (data || [])[0] || null;
     },
+    enabled: !!profile?.company_id,
   });
 };
 
@@ -83,10 +91,11 @@ export const useCreateBoard = () => {
  */
 export const useUpdateBoard = () => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Board> }) => {
-      const { error } = await boardsService.update(id, updates);
+      const { error } = await boardsService.update(id, updates, profile?.company_id);
       if (error) throw error;
       return { id, updates };
     },

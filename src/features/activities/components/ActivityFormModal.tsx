@@ -21,6 +21,8 @@ interface ActivityFormModalProps {
   deals: Deal[];
 }
 
+import { useTranslation } from '@/hooks/useTranslation';
+
 export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
   isOpen,
   onClose,
@@ -30,6 +32,8 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
   editingActivity,
   deals,
 }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (

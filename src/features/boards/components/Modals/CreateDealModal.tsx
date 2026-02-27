@@ -10,6 +10,7 @@ import { useToast } from '@/context/ToastContext';
 interface CreateDealModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialStageId?: string;
 }
 
 interface DealItem {
@@ -18,7 +19,7 @@ interface DealItem {
     unitPrice: number;
 }
 
-export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClose }) => {
+export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClose, initialStageId }) => {
     const { addDeal, activeBoard, activeBoardId, products } = useCRM();
     const { profile } = useAuth();
     const { t } = useTranslation();
@@ -85,14 +86,31 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
             // 1. Create or find contact
             let contactId: string | null = null;
 
-            if (newDealData.email) {
-                // Check if contact exists
-                const { data: existingContact } = await supabase
-                    .from('contacts')
-                    .select('id')
-                    .eq('email', newDealData.email)
-                    .eq('company_id', profile.company_id)
-                    .single();
+            if (newDealData.email || newDealData.contactName) {
+                let existingContact = null;
+
+                // Try to find by email first
+                if (newDealData.email) {
+                    const { data } = await supabase
+                        .from('contacts')
+                        .select('id')
+                        .eq('email', newDealData.email)
+                        .eq('company_id', profile.company_id)
+                        .single();
+                    existingContact = data;
+                }
+
+                // If not found by email, try by exact name match
+                if (!existingContact && newDealData.contactName) {
+                    const { data } = await supabase
+                        .from('contacts')
+                        .select('id')
+                        .ilike('name', newDealData.contactName)
+                        .eq('company_id', profile.company_id)
+                        .limit(1)
+                        .maybeSingle();
+                    existingContact = data;
+                }
 
                 if (existingContact) {
                     contactId = existingContact.id;
@@ -101,14 +119,15 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     const { data: newContact, error: contactError } = await supabase
                         .from('contacts')
                         .insert({
-                            name: newDealData.contactName,
-                            email: newDealData.email,
-                            phone: newDealData.phone,
-                            company_name: newDealData.companyName,
+                            name: newDealData.contactName || 'Contato sem nome',
+                            email: newDealData.email || null,
+                            phone: newDealData.phone || null,
+                            company_name: newDealData.companyName || null,
                             company_id: profile.company_id,
                             owner_id: profile.id,
                             stage: 'LEAD',
-                            status: 'ACTIVE'
+                            status: 'ACTIVE',
+                            source: 'MANUAL'
                         })
                         .select('id')
                         .single();
@@ -119,28 +138,30 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
             }
 
             // 2. Get first stage of active board (Robust Fallback)
-            let finalStageId: string | null = null;
+            let finalStageId: string | null = initialStageId || null;
 
-            // Try to find the first stage of the current board
-            const { data: stages } = await supabase
-                .from('board_stages')
-                .select('id')
-                .eq('board_id', activeBoardId)
-                .order('position')
-                .limit(1);
-
-            if (stages && stages.length > 0) {
-                finalStageId = stages[0].id;
-            } else {
-                // Fallback: Check if there are ANY stages for this board
-                const { data: allStages } = await supabase
+            if (!finalStageId) {
+                // Try to find the first stage of the current board
+                const { data: stages } = await supabase
                     .from('board_stages')
                     .select('id')
                     .eq('board_id', activeBoardId)
+                    .order('order')
                     .limit(1);
 
-                if (allStages && allStages.length > 0) {
-                    finalStageId = allStages[0].id;
+                if (stages && stages.length > 0) {
+                    finalStageId = stages[0].id;
+                } else {
+                    // Fallback: Check if there are ANY stages for this board
+                    const { data: allStages } = await supabase
+                        .from('board_stages')
+                        .select('id')
+                        .eq('board_id', activeBoardId)
+                        .limit(1);
+
+                    if (allStages && allStages.length > 0) {
+                        finalStageId = allStages[0].id;
+                    }
                 }
             }
 
@@ -149,7 +170,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 throw new Error(t('noStagesFound') || 'No stages found for this board. Please add a stage first.');
             }
 
-            // 3. Create deal
+            // 3. Create deal — status MUST equal the stage ID for Kanban mapping
             const { data: newDeal, error: dealError } = await supabase
                 .from('deals')
                 .insert({
@@ -158,9 +179,9 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     contact_id: contactId,
                     board_id: activeBoardId,
                     stage_id: finalStageId,
+                    status: finalStageId, // Must match stage.id for Kanban column mapping
                     company_id: profile.company_id,
                     owner_id: profile.id,
-                    status: 'OPEN',
                     priority: 'medium',
                     probability: 10,
                     metadata: {

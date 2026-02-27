@@ -12,5 +12,6 @@ export function generateId(): string {
  * This ensures compatibility across all browsers and environments
  */
 if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+    // @ts-ignore
     crypto.randomUUID = generateId;
 }

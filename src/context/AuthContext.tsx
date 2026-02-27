@@ -6,7 +6,7 @@ interface Profile {
     id: string;
     email: string;
     company_id: string;
-    role: 'admin' | 'equipe' | 'cliente' | 'cliente_restrito';
+    role: 'admin' | 'equipe' | 'cliente' | 'cliente_restrito' | 'user' | 'super_admin';
     user_type?: 'team_member' | 'client';
     first_name?: string | null;
     last_name?: string | null;

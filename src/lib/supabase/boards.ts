@@ -92,7 +92,7 @@ const transformToDb = (board: Omit<Board, 'id' | 'createdAt'>, companyId?: strin
   next_board_id: board.nextBoardId || null,
   goal_description: board.goal?.description || null,
   goal_kpi: board.goal?.kpi || null,
-  goal_target_value: board.goal?.targetValue || null,
+  goal_target_value: board.goal?.targetValue?.toString() || null,
   goal_type: board.goal?.type || null,
   agent_name: board.agentPersona?.name || null,
   agent_role: board.agentPersona?.role || null,
@@ -104,6 +104,7 @@ const transformToDb = (board: Omit<Board, 'id' | 'createdAt'>, companyId?: strin
 
 // Transform App Stage -> DB Stage
 const transformStageToDb = (stage: BoardStage, boardId: string, orderNum: number, companyId?: string): Partial<DbBoardStage> => ({
+  id: stage.id,
   board_id: boardId,
   name: stage.label,
   label: stage.label,
@@ -114,17 +115,24 @@ const transformStageToDb = (stage: BoardStage, boardId: string, orderNum: number
 });
 
 export const boardsService = {
-  async getAll(): Promise<{ data: Board[] | null; error: Error | null }> {
+  async getAll(companyId: string): Promise<{ data: Board[] | null; error: Error | null }> {
     try {
+      if (!companyId) return { data: [], error: null };
+
+      let boardsQuery = supabase.from('boards').select('*').order('created_at', { ascending: true });
+      if (companyId) {
+        boardsQuery = boardsQuery.eq('company_id', companyId);
+      }
+
       const [boardsResult, stagesResult] = await Promise.all([
-        supabase.from('boards').select('*').order('created_at', { ascending: true }),
+        boardsQuery,
         supabase.from('board_stages').select('*').order('order', { ascending: true }),
       ]);
 
       if (boardsResult.error) return { data: null, error: boardsResult.error };
       if (stagesResult.error) return { data: null, error: stagesResult.error };
 
-      const boards = (boardsResult.data || []).map(b => 
+      const boards = (boardsResult.data || []).map(b =>
         transformBoard(b as DbBoard, stagesResult.data as DbBoardStage[])
       );
 
@@ -146,7 +154,7 @@ export const boardsService = {
       if (boardError) return { data: null, error: boardError };
 
       // 2. Create stages using transformStageToDb
-      const stagesToInsert = (board.stages || []).map((stage, index) => 
+      const stagesToInsert = (board.stages || []).map((stage, index) =>
         transformStageToDb(stage, newBoard.id, index, companyId)
       );
 
@@ -165,9 +173,9 @@ export const boardsService = {
         .eq('board_id', newBoard.id)
         .order('order');
 
-      return { 
-        data: transformBoard(newBoard as DbBoard, (stages || []) as DbBoardStage[]), 
-        error: null 
+      return {
+        data: transformBoard(newBoard as DbBoard, (stages || []) as DbBoardStage[]),
+        error: null
       };
     } catch (e) {
       return { data: null, error: e as Error };
@@ -177,7 +185,7 @@ export const boardsService = {
   async update(id: string, updates: Partial<Board>, companyId?: string): Promise<{ error: Error | null }> {
     try {
       const dbUpdates: Partial<DbBoard> = {};
-      
+
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.description !== undefined) dbUpdates.description = updates.description || null;
       if (updates.isDefault !== undefined) dbUpdates.is_default = updates.isDefault;
@@ -186,14 +194,14 @@ export const boardsService = {
       if (updates.nextBoardId !== undefined) dbUpdates.next_board_id = updates.nextBoardId || null;
       if (updates.entryTrigger !== undefined) dbUpdates.entry_trigger = updates.entryTrigger || null;
       if (updates.automationSuggestions !== undefined) dbUpdates.automation_suggestions = updates.automationSuggestions || null;
-      
+
       if (updates.goal !== undefined) {
         dbUpdates.goal_description = updates.goal?.description || null;
         dbUpdates.goal_kpi = updates.goal?.kpi || null;
-        dbUpdates.goal_target_value = updates.goal?.targetValue || null;
-        dbUpdates.goal_type = updates.goal?.type || null;
+        dbUpdates.goal_target_value = updates.goal?.targetValue?.toString() || null,
+          dbUpdates.goal_type = updates.goal?.type || null;
       }
-      
+
       if (updates.agentPersona !== undefined) {
         dbUpdates.agent_name = updates.agentPersona?.name || null;
         dbUpdates.agent_role = updates.agentPersona?.role || null;
@@ -211,20 +219,54 @@ export const boardsService = {
 
       // Update stages if provided
       if (updates.stages && companyId) {
-        // Delete existing stages
-        await supabase.from('board_stages').delete().eq('board_id', id);
-        
-        // Insert new stages using transformStageToDb
-        const stagesToInsert = updates.stages.map((stage, index) => 
+        // Find existing stages to determine which ones to delete
+        const { data: existingStages } = await supabase
+          .from('board_stages')
+          .select('id')
+          .eq('board_id', id);
+
+        // Upsert new/existing stages
+        const stagesToUpsert = updates.stages.map((stage, index) =>
           transformStageToDb(stage, id, index, companyId)
         );
 
-        if (stagesToInsert.length > 0) {
-          const { error: stagesError } = await supabase
+        if (stagesToUpsert.length > 0) {
+          const { error: upsertError } = await supabase
             .from('board_stages')
-            .insert(stagesToInsert);
+            .upsert(stagesToUpsert, { onConflict: 'id' });
 
-          if (stagesError) return { error: stagesError };
+          if (upsertError) return { error: upsertError };
+        }
+
+        // Delete stages that were removed
+        if (existingStages) {
+          const incomingIds = updates.stages.map(s => s.id);
+          const stagesToDelete = existingStages
+            .filter(s => !incomingIds.includes(s.id))
+            .map(s => s.id);
+
+          if (stagesToDelete.length > 0 && updates.stages.length > 0) {
+            // "Safe Delete": Move all deals in deleted stages to the first stage of the board to prevent 409 (Foreign Key Constraint)
+            const firstStageId = updates.stages[0].id;
+
+            const { error: moveError } = await supabase
+              .from('deals')
+              .update({ stage_id: firstStageId, status: firstStageId })
+              .in('stage_id', stagesToDelete);
+
+            if (moveError) {
+              console.error('Failed to move deals before stage deletion:', moveError);
+            } else {
+              const { error: deleteError } = await supabase
+                .from('board_stages')
+                .delete()
+                .in('id', stagesToDelete);
+
+              if (deleteError) {
+                console.error('Failed to delete some stages. They might still contain deals:', deleteError);
+              }
+            }
+          }
         }
       }
 
@@ -259,8 +301,8 @@ export const boardsService = {
         .order('order', { ascending: false })
         .limit(1);
 
-      const nextOrder = existingStages && existingStages.length > 0 
-        ? existingStages[0].order + 1 
+      const nextOrder = existingStages && existingStages.length > 0
+        ? existingStages[0].order + 1
         : 0;
 
       const { data, error } = await supabase
@@ -286,7 +328,7 @@ export const boardsService = {
   async updateStage(stageId: string, updates: Partial<BoardStage>): Promise<{ error: Error | null }> {
     try {
       const dbUpdates: Partial<DbBoardStage> = {};
-      
+
       if (updates.label !== undefined) dbUpdates.label = updates.label;
       if (updates.color !== undefined) dbUpdates.color = updates.color;
       if (updates.linkedLifecycleStage !== undefined) {

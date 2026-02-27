@@ -66,6 +66,7 @@ describe('useDealsLogic - Function Logic', () => {
       priority: 'high',
       owner: { name: 'Thales', avatar: '' },
       tags: ['enterprise'],
+      customFields: {},
       items: [],
     };
 

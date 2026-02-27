@@ -18,25 +18,6 @@ import {
     Filter
 } from 'lucide-react';
 
-interface TechStackProduct {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    product_type: string;
-    is_internal: boolean;
-    stack_category: string;
-    pricing_model: string;
-    pricing_tiers: any[];
-    external_url: string;
-    auto_update_pricing: boolean;
-    last_price_update: string | null;
-    metadata: any;
-    created_at: string;
-    updated_at: string;
-}
-
-// --- INTELLIGENT STACK MANAGEMENT ---
 export interface TechStackMetadata {
     ai_managed?: boolean;
     credentials?: {
@@ -50,11 +31,26 @@ export interface TechStackMetadata {
         tier?: string;
         renewal_date?: string;
     };
+    ai_detected_type?: string;
     [key: string]: any;
 }
 
-interface TechStackProduct extends Omit<TechStackProduct, 'metadata'> {
+export interface TechStackProduct {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    product_type: string;
+    is_internal: boolean;
+    stack_category: string;
+    pricing_model: string;
+    pricing_tiers: any[];
+    external_url: string;
+    auto_update_pricing: boolean;
+    last_price_update: string | null;
     metadata: TechStackMetadata;
+    created_at: string;
+    updated_at: string;
 }
 
 const CATEGORY_ICONS = {
@@ -92,7 +88,7 @@ export const TechStackPage: React.FC = () => {
         pricing_model: 'fixed',
         external_url: '',
         auto_update_pricing: false,
-        metadata: {},
+        metadata: {} as TechStackMetadata,
     });
 
     useEffect(() => {
@@ -198,7 +194,7 @@ export const TechStackPage: React.FC = () => {
             pricing_model: 'fixed',
             external_url: '',
             auto_update_pricing: false,
-            metadata: {},
+            metadata: {} as TechStackMetadata,
         });
     };
 

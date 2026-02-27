@@ -8,15 +8,17 @@
  * - Ready for Realtime integration
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
 import { queryKeys } from '../queryKeys';
 import { dealsService, contactsService, companiesService } from '@/lib/supabase';
-import type { Deal, DealView, DealStatus, DealItem } from '@/types';
+import type { Deal, DealView, DealItem, DealStatusType } from '@/types';
+import { DealStatus } from '@/types';
 
 // ============ QUERY HOOKS ============
 
 export interface DealsFilters {
   boardId?: string;
-  status?: DealStatus;
+  status?: DealStatusType;
   search?: string;
   minValue?: number;
   maxValue?: number;
@@ -26,12 +28,16 @@ export interface DealsFilters {
  * Hook to fetch all deals with optional filters
  */
 export const useDeals = (filters?: DealsFilters) => {
+  const { profile } = useAuth();
+
   return useQuery({
     queryKey: filters
-      ? queryKeys.deals.list(filters as Record<string, unknown>)
-      : queryKeys.deals.lists(),
+      ? queryKeys.deals.list({ ...filters, companyId: profile?.company_id } as Record<string, unknown>)
+      : [...queryKeys.deals.lists(), profile?.company_id],
     queryFn: async () => {
-      const { data, error } = await dealsService.getAll();
+      if (!profile?.company_id) return [];
+
+      const { data, error } = await dealsService.getAll(profile.company_id);
       if (error) throw error;
 
       let deals = data || [];
@@ -61,16 +67,20 @@ export const useDeals = (filters?: DealsFilters) => {
  * Hook to fetch all deals with enriched company/contact data (DealView)
  */
 export const useDealsView = (filters?: DealsFilters) => {
+  const { profile } = useAuth();
+
   return useQuery<DealView[]>({
     queryKey: filters
-      ? [...queryKeys.deals.list(filters as Record<string, unknown>), 'view']
-      : [...queryKeys.deals.lists(), 'view'],
+      ? [...queryKeys.deals.list({ ...filters, companyId: profile?.company_id } as Record<string, unknown>), 'view']
+      : [...queryKeys.deals.lists(), profile?.company_id, 'view'],
     queryFn: async () => {
+      if (!profile?.company_id) return [];
+
       // Fetch all data in parallel
       const [dealsResult, contactsResult, companiesResult] = await Promise.all([
-        dealsService.getAll(),
-        contactsService.getAll(),
-        companiesService.getAll(),
+        dealsService.getAll(profile.company_id),
+        contactsService.getAll(profile.company_id),
+        companiesService.getAll(profile.company_id),
       ]);
 
       if (dealsResult.error) throw dealsResult.error;
@@ -138,16 +148,30 @@ export const useDeal = (id: string | undefined) => {
 
 /**
  * Hook to fetch deals by board (for Kanban view) - Returns DealView[]
+ * Also auto-maps contacts without deals into the matching stage column
  */
 export const useDealsByBoard = (boardId: string) => {
+  const { profile } = useAuth();
   return useQuery<DealView[]>({
-    queryKey: queryKeys.deals.list({ boardId }),
+    queryKey: [...queryKeys.deals.list({ boardId }), profile?.company_id],
     queryFn: async () => {
-      // Fetch all data in parallel
-      const [dealsResult, contactsResult, companiesResult] = await Promise.all([
-        dealsService.getAll(),
-        contactsService.getAll(),
-        companiesService.getAll(),
+      if (!profile?.company_id) return [];
+
+      // Fetch all data in parallel — companies is non-critical
+      const [dealsResult, contactsResult, companiesResult, boardResult, lifecycleStagesResult] = await Promise.all([
+        dealsService.getAll(profile.company_id),
+        contactsService.getAll(profile.company_id),
+        companiesService.getAll(profile.company_id).catch(() => ({ data: [], error: null })),
+        // Fetch boards to resolve linkedLifecycleStage
+        (async () => {
+          const { data } = await import('@/lib/supabase').then(m => m.boardsService.getAll(profile!.company_id!));
+          return data || [];
+        })(),
+        // Fetch lifecycle stages
+        (async () => {
+          const { data } = await import('@/lib/supabase').then(m => m.lifecycleStagesService.getAll());
+          return data || [];
+        })(),
       ]);
 
       if (dealsResult.error) throw dealsResult.error;
@@ -155,6 +179,7 @@ export const useDealsByBoard = (boardId: string) => {
       const deals = (dealsResult.data || []).filter(d => d.boardId === boardId);
       const contacts = contactsResult.data || [];
       const companies = companiesResult.data || [];
+      const lifecycleStages = lifecycleStagesResult;
 
       // Create lookup maps
       const contactMap = new Map(contacts.map(c => [c.id, c]));
@@ -169,8 +194,84 @@ export const useDealsByBoard = (boardId: string) => {
           companyName: company?.name || 'Sem empresa',
           contactName: contact?.name || 'Sem contato',
           contactEmail: contact?.email || '',
+          source: contact?.source || 'Desconhecido',
         };
       });
+
+      // AUTO-MAPPING: Contacts with a lifecycle stage matching a board column
+      // that don't already have a deal → synthesize virtual DealView entries
+      const activeBoard = boardResult.find((b: any) => b.id === boardId);
+      if (activeBoard && activeBoard.stages) {
+        // Build a set of contactIds that already have deals on this board
+        const contactIdsWithDeals = new Set(deals.map(d => d.contactId).filter(Boolean));
+
+        // Build maps for stage resolution
+        const stageIdToBoardStageId = new Map<string, string>(); // LifecycleStage UUID -> BoardStage UUID
+        const stageNameToBoardStageId = new Map<string, string>(); // LifecycleStage Name (uppercase) -> BoardStage UUID
+
+        for (const stage of activeBoard.stages) {
+          if (stage.linkedLifecycleStage) {
+            stageIdToBoardStageId.set(stage.linkedLifecycleStage, stage.id);
+            // Also store the uppercase Name for legacy contacts
+            const matchedLs = lifecycleStages.find((ls: any) => ls.id === stage.linkedLifecycleStage);
+            if (matchedLs) {
+              stageNameToBoardStageId.set(matchedLs.name.toUpperCase(), stage.id);
+            }
+          }
+        }
+
+        // Find contacts who do not have a deal on this board
+        const orphanContacts = contacts.filter(c => !contactIdsWithDeals.has(c.id));
+
+        for (const contact of orphanContacts) {
+          const actualStageText = (contact.stage || '').toUpperCase();
+          const actualStatusText = (contact.status || '').toUpperCase();
+
+          // 1. Try to map by exact Stage UUID or Name
+          let matchedStageId = stageIdToBoardStageId.get(contact.stage) || stageNameToBoardStageId.get(actualStageText);
+
+          // 2. Smart Fallback: Respect board boundaries based on name/purpose
+          const boardNameUpper = (activeBoard.name || '').toUpperCase();
+
+          if (!matchedStageId) {
+            const isLead = actualStatusText === 'LEAD' || actualStatusText === 'NEW' || actualStageText === 'LEAD' || actualStageText === 'NEW';
+            const isCustomer = actualStatusText === 'CUSTOMER' || actualStatusText === 'WON' || actualStageText === 'CUSTOMER' || actualStageText === 'WON' || actualStageText === 'CLIENTE';
+
+            if (boardNameUpper.includes('SDR') || boardNameUpper.includes('INBOUND') || boardNameUpper.includes('VENDAS')) {
+              if (isLead) matchedStageId = activeBoard.stages[0]?.id;
+            } else if (boardNameUpper.includes('ONBOARDING') || boardNameUpper.includes('CUSTOMER') || boardNameUpper.includes('CLIENTE')) {
+              if (isCustomer) matchedStageId = activeBoard.stages[0]?.id;
+            } else {
+              // Closer / Pipeline boards DO NOT spawn ghost cards. Deals here must travel from previous boards.
+              matchedStageId = undefined;
+            }
+          }
+
+          if (matchedStageId) {
+            enrichedDeals.push({
+              id: `auto-${contact.id}`,
+              title: contact.name || contact.email || 'Novo Lead',
+              value: contact.totalValue || 0,
+              probability: 0,
+              status: matchedStageId,
+              priority: 'medium' as any,
+              boardId: boardId,
+              contactId: contact.id,
+              companyId: contact.companyId || '',
+              tags: [],
+              customFields: {},
+              createdAt: contact.createdAt,
+              updatedAt: contact.updatedAt || contact.createdAt,
+              items: [],
+              owner: { name: 'Auto', avatar: '' },
+              companyName: 'Sem empresa',
+              contactName: contact.name || 'Sem contato',
+              contactEmail: contact.email || '',
+              source: contact.source || 'Desconhecido',
+            });
+          }
+        }
+      }
 
       return enrichedDeals;
     },
@@ -197,7 +298,7 @@ export const useCreateDeal = () => {
         contactId: deal.contactId || undefined,
         companyId: deal.companyId || undefined,
         boardId: deal.boardId || undefined,
-        stageId: deal.stageId || undefined,
+        // Removed undefined stageId reference
         updatedAt: new Date().toISOString(),
       };
 

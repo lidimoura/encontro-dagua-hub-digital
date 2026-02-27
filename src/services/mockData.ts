@@ -50,20 +50,20 @@ export const INITIAL_BOARDS: Board[] = [
       { id: 'kickoff', label: 'Kickoff', color: 'bg-blue-500' },
       { id: 'setup', label: 'Configuração', color: 'bg-yellow-500' },
       { id: 'training', label: 'Treinamento', color: 'bg-purple-500' },
-      { id: 'live', label: 'Go Live', color: 'bg-green-500' }
     ],
     createdAt: daysAgo(25),
-    template: 'ONBOARDING'
+    template: 'ONBOARDING',
+    isDefault: false
   }
 ];
 
 // MOCK DATA: PRODUCTS (Catálogo)
 export const INITIAL_PRODUCTS: Product[] = [
-  { id: 'prod_1', name: 'Consultoria de Implantação', price: 5000, sku: 'SVC-IMP' },
-  { id: 'prod_2', name: 'Licença Enterprise (Seat)', price: 1200, sku: 'LIC-ENT' },
-  { id: 'prod_3', name: 'Licença Starter (Seat)', price: 500, sku: 'LIC-STA' },
-  { id: 'prod_4', name: 'Treinamento de Equipe', price: 3000, sku: 'SVC-TRA' },
-  { id: 'prod_5', name: 'Suporte Premium (Mensal)', price: 800, sku: 'SUB-SUP' },
+  { id: 'prod_1', name: 'Consultoria de Implantação', price: 5000, basePrice: 5000, sku: 'SVC-IMP', createdAt: '2023-01-01' },
+  { id: 'prod_2', name: 'Licença Enterprise (Seat)', price: 1200, basePrice: 1200, sku: 'LIC-ENT', createdAt: '2023-01-01' },
+  { id: 'prod_3', name: 'Licença Starter (Seat)', price: 500, basePrice: 500, sku: 'LIC-STA', createdAt: '2023-01-01' },
+  { id: 'prod_4', name: 'Treinamento de Equipe', price: 3000, basePrice: 3000, sku: 'SVC-TRA', createdAt: '2023-01-01' },
+  { id: 'prod_5', name: 'Suporte Premium (Mensal)', price: 800, basePrice: 800, sku: 'SUB-SUP', createdAt: '2023-01-01' },
 ];
 
 // MOCK DATA: CUSTOM FIELDS

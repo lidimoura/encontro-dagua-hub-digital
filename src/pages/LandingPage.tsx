@@ -19,7 +19,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTeamIndex, setActiveTeamIndex] = useState(0);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
@@ -287,15 +287,11 @@ Agora, gere o prompt perfeito:`;
 
             {/* Language Selector */}
             <button
-              onClick={() => {
-                const newLang = localStorage.getItem('language') === 'en' ? 'pt' : 'en';
-                localStorage.setItem('language', newLang);
-                window.location.reload();
-              }}
+              onClick={() => setLanguage(language === 'en' ? 'pt' : 'en')}
               className="p-2 text-slate-200 hover:text-amber-400 transition-all active:scale-95"
-              title={localStorage.getItem('language') === 'en' ? 'Mudar para Português' : 'Switch to English'}
+              title={language === 'en' ? 'Mudar para Português' : 'Switch to English'}
             >
-              <span className="text-base leading-none">{localStorage.getItem('language') === 'en' ? '🇺🇸' : '🇧🇷'}</span>
+              <span className="text-base leading-none">{language === 'en' ? '🇺🇸' : '🇧🇷'}</span>
             </button>
 
             {user ? (
@@ -367,6 +363,20 @@ Agora, gere o prompt perfeito:`;
                   >
                     {t('aboutUs')}
                   </a>
+
+                  <div className="border-t border-white/10 my-4" />
+
+                  {/* Mobile Language Selector */}
+                  <div className="flex items-center justify-between text-white px-2">
+                    <span className="text-sm font-medium">{t('language') || 'Idioma / Language'}</span>
+                    <button
+                      onClick={() => setLanguage(language === 'en' ? 'pt' : 'en')}
+                      className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                      title={language === 'en' ? 'Mudar para Português' : 'Switch to English'}
+                    >
+                      <span className="text-xl leading-none">{language === 'en' ? '🇺🇸' : '🇧🇷'}</span>
+                    </button>
+                  </div>
 
                   <div className="border-t border-white/10 my-4" />
 

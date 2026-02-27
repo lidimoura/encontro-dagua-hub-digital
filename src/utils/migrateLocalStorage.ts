@@ -12,7 +12,7 @@ export const migrateLocalStorage = () => {
     // 1. Migrar Leads para Contacts
     const storedLeads = localStorage.getItem('crm_leads');
     const storedContacts = localStorage.getItem('crm_contacts');
-    
+
     let leads: Lead[] = storedLeads ? JSON.parse(storedLeads) : [];
     let contacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [];
 
@@ -35,10 +35,10 @@ export const migrateLocalStorage = () => {
 
       // Adiciona aos contatos existentes
       contacts = [...contacts, ...newContactsFromLeads];
-      
+
       // Salva contatos atualizados
       localStorage.setItem('crm_contacts', JSON.stringify(contacts));
-      
+
       // Limpa leads antigos (opcional, pode manter por segurança)
       // localStorage.removeItem('crm_leads'); 
       console.log(`Migrados ${leads.length} leads para contatos.`);
@@ -51,7 +51,8 @@ export const migrateLocalStorage = () => {
         id: 'default-sales',
         name: 'Pipeline de Vendas',
         description: 'Funil principal de oportunidades',
-        linkedStage: ContactStage.PROSPECT,
+        template: 'CUSTOM',
+        linkedLifecycleStage: ContactStage.PROSPECT,
         stages: DEFAULT_BOARD_STAGES,
         isDefault: true,
         createdAt: new Date().toISOString()

@@ -101,6 +101,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
   const { updateDeal } = useCRM();
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
+  const [initialStageId, setInitialStageId] = useState<string | undefined>(undefined);
 
   // Detect mobile viewport
   useEffect(() => {
@@ -129,12 +130,17 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
 
   // Listen for quick-add deal event from empty columns
   React.useEffect(() => {
-    const handleOpenCreateDeal = () => {
+    const handleOpenCreateDeal = (e: any) => {
+      if (e.detail?.stageId) {
+        setInitialStageId(e.detail.stageId);
+      } else {
+        setInitialStageId(undefined);
+      }
       setIsCreateModalOpen(true);
     };
 
-    window.addEventListener('openCreateDealModal', handleOpenCreateDeal);
-    return () => window.removeEventListener('openCreateDealModal', handleOpenCreateDeal);
+    window.addEventListener('openCreateDealModal', handleOpenCreateDeal as EventListener);
+    return () => window.removeEventListener('openCreateDealModal', handleOpenCreateDeal as EventListener);
   }, [setIsCreateModalOpen]);
 
   if (isLoading) {
@@ -225,7 +231,14 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
         </>
       )}
 
-      <CreateDealModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <CreateDealModal
+        isOpen={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setInitialStageId(undefined);
+        }}
+        initialStageId={initialStageId}
+      />
 
       <DealDetailModal
         dealId={selectedDealId}

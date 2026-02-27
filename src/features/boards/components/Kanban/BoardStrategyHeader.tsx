@@ -97,7 +97,7 @@ export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board 
     if (!board.goal?.targetValue) return 0;
 
     // Parse Target
-    const targetStr = board.goal.targetValue.replace(/[^0-9.]/g, '');
+    const targetStr = String(board.goal.targetValue || '').replace(/[^0-9.]/g, '');
     const target = parseFloat(targetStr);
 
     // Use Raw Value

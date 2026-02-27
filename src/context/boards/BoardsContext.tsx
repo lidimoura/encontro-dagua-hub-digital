@@ -48,7 +48,7 @@ export const BoardsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   // Fetch boards on mount / user change
   const fetchBoards = useCallback(async () => {
-    if (!profile) {
+    if (!profile?.company_id) {
       setBoards([]);
       setLoading(false);
       return;
@@ -57,7 +57,7 @@ export const BoardsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await boardsService.getAll();
+    const { data, error: fetchError } = await boardsService.getAll(profile.company_id);
 
     if (fetchError) {
       setError(fetchError.message);

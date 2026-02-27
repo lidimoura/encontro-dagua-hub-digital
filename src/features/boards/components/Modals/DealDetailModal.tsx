@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { StageProgressBar } from '../StageProgressBar';
 import { ActivityRow } from '@/features/activities/components/ActivityRow';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // Utility to convert Blob to Base64
 const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -57,6 +58,7 @@ interface DealDetailModalProps {
 }
 
 export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen, onClose }) => {
+  const { t } = useTranslation();
   const {
     deals,
     contacts,
@@ -521,7 +523,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         </label>
                         {field.type === 'select' ? (
                           <select
-                            value={deal.customFields?.[field.key] || ''}
+                            value={String(deal.customFields?.[field.key] ?? '')}
                             onChange={e => updateCustomField(field.key, e.target.value)}
                             className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded px-2 py-1.5 text-sm dark:text-white focus:ring-1 focus:ring-primary-500 outline-none"
                           >
@@ -535,7 +537,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         ) : (
                           <input
                             type={field.type}
-                            value={deal.customFields?.[field.key] || ''}
+                            value={String(deal.customFields?.[field.key] ?? '')}
                             onChange={e => updateCustomField(field.key, e.target.value)}
                             className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded px-2 py-1.5 text-sm dark:text-white focus:ring-1 focus:ring-primary-500 outline-none"
                           />
@@ -643,13 +645,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     </h3>
                     <div className="flex gap-3">
                       <select
-                        className="flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
+                        className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
                         value={selectedProductId}
                         onChange={e => setSelectedProductId(e.target.value)}
                       >
-                        <option value="">Selecione um item...</option>
-                        {products.map(p => (
-                          <option key={p.id} value={p.id}>
+                        <option value="" className="text-slate-900">Selecione um item...</option>
+                        {products.filter(p => !p.type || p.type === 'catalog' || p.type === 'product').map(p => (
+                          <option key={p.id} value={p.id} className="text-slate-900">
                             {p.name} - ${p.price}
                           </option>
                         ))}

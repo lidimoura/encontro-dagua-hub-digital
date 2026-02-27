@@ -1,5 +1,5 @@
 import { Language } from '@/lib/translations';
-import { AIConfig } from './geminiService';
+import { generateBoardStructure } from '../geminiService';
 
 /**
  * Bilingual AI Service Wrapper

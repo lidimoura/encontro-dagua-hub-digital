@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { DealView, DealStatus } from '@/types';
-import { Building2, Hourglass } from 'lucide-react';
+import { Building2, Hourglass, QrCode, Scan } from 'lucide-react';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useClientQREngagement } from '@/lib/query/hooks/useContactsQuery';
 
 interface DealCardProps {
   deal: DealView;
@@ -36,8 +37,16 @@ export const DealCard: React.FC<DealCardProps> = ({
   const [localDragging, setLocalDragging] = useState(false);
   const { t } = useTranslation();
 
+  // Cross-app analytics: fetch QR engagement for this deal's contact email
+  const { data: qrEngagement } = useClientQREngagement(deal.contactEmail || undefined);
+
   const handleToggleMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // Auto-promote ghost cards instead of opening the quick-add menu
+    if (deal.id.startsWith('auto-')) {
+      onClick();
+      return;
+    }
     setOpenMenuId(openMenuId === deal.id ? null : deal.id);
   };
 
@@ -55,6 +64,8 @@ export const DealCard: React.FC<DealCardProps> = ({
   const handleDragEnd = () => {
     setLocalDragging(false);
   };
+
+  const hasEngagement = qrEngagement && qrEngagement.totalProjects > 0;
 
   return (
     <div
@@ -87,7 +98,12 @@ export const DealCard: React.FC<DealCardProps> = ({
         </div>
       )}
 
-      <div className="flex gap-1 mb-2 flex-wrap">
+      <div className="flex gap-1 mb-2 flex-wrap items-center">
+        {deal.source && deal.source.trim() !== '' && deal.source !== 'Desconhecido' && (
+          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 uppercase tracking-wide">
+            {deal.source}
+          </span>
+        )}
         {deal.tags.slice(0, 2).map(tag => (
           <span
             key={tag}
@@ -103,9 +119,31 @@ export const DealCard: React.FC<DealCardProps> = ({
       >
         {deal.title}
       </h4>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1">
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
         <Building2 size={10} /> {deal.companyName}
       </p>
+
+      {/* Cross-App QR Engagement Badge */}
+      {hasEngagement && (
+        <div
+          className="flex items-center gap-1.5 mb-2 px-2 py-1 rounded-md bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700/40"
+          title={`${qrEngagement!.qrCodesCount} projeto(s) CRM + ${qrEngagement!.qrLinksCount} projeto(s) Link D'Água`}
+        >
+          <QrCode size={10} className="text-purple-500 dark:text-purple-400 flex-shrink-0" />
+          <span className="text-[10px] font-semibold text-purple-700 dark:text-purple-300">
+            {qrEngagement!.totalProjects} projeto{qrEngagement!.totalProjects !== 1 ? 's' : ''}
+          </span>
+          {qrEngagement!.totalScans > 0 && (
+            <>
+              <span className="text-[10px] text-purple-400 dark:text-purple-500">·</span>
+              <Scan size={9} className="text-purple-500 dark:text-purple-400 flex-shrink-0" />
+              <span className="text-[10px] font-semibold text-purple-700 dark:text-purple-300">
+                {qrEngagement!.totalScans} scan{qrEngagement!.totalScans !== 1 ? 's' : ''}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-2">

@@ -323,10 +323,10 @@ export const translations = {
 
         // Form Fields
         qrType: "Tipo de QR Code",
-        typeLink: "Link Direto",
+        typeLink: "Link / QR Code",
         typeWhatsapp: "WhatsApp",
         typePix: "PIX",
-        typeBridge: "Bridge Page (Bio)",
+        typeBridge: "Cartão Digital",
 
         targetUrl: "URL de Destino",
         urlPlaceholder: "https://seunsite.com.br",
