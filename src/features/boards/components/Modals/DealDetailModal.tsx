@@ -132,7 +132,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [emailDraft, setEmailDraft] = useState<string | null>(null);
   const [newNote, setNewNote] = useState('');
   const [activeTab, setActiveTab] = useState<'timeline' | 'products' | 'info' | 'documents'>('timeline');
-
   // ── Conversion state ─────────────────────────────────────────
   const [isConverting, setIsConverting] = useState(false);
 
@@ -1210,92 +1209,144 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
               )}
 
               {/* ── DOCUMENTS TAB ───────────────────────────────────── */}
-              {activeTab === 'documents' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
-                      <QrCode size={18} />
+              {
+                activeTab === 'documents' && (
+                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                    {/* Link d'Água QR Projects Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                          <QrCode size={18} />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-900 dark:text-white">Projetos Link d'Água</h3>
+                          <p className="text-xs text-slate-500">
+                            {linkdaguaId
+                              ? `QR Codes vinculados a ${linkdaguaId.slice(0, 8)}…`
+                              : 'Nenhum linkdagua_user_id associado a este contato'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {!linkdaguaId && (
+                        <div className="text-center py-10 text-slate-400">
+                          <Folder size={32} className="mx-auto mb-3 opacity-30" />
+                          <p className="text-sm font-medium">Sem vínculo com Link d'Água</p>
+                          <p className="text-xs mt-1">Adicione o <code className="bg-slate-100 dark:bg-white/10 px-1 rounded">linkdagua_user_id</code> ao contato para ver os projetos QR aqui.</p>
+                        </div>
+                      )}
+
+                      {linkdaguaId && isLoadingDocs && (
+                        <div className="flex items-center justify-center py-12">
+                          <Loader2 size={28} className="animate-spin text-purple-500" />
+                        </div>
+                      )}
+
+                      {linkdaguaId && docsError && (
+                        <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-700/40 text-sm text-red-600 dark:text-red-400">
+                          Erro ao carregar projetos: {docsError}
+                        </div>
+                      )}
+
+                      {linkdaguaId && !isLoadingDocs && !docsError && qrLinks.length === 0 && (
+                        <div className="text-center py-10 text-slate-400">
+                          <QrCode size={32} className="mx-auto mb-3 opacity-30" />
+                          <p className="text-sm font-medium">Nenhum projeto QR encontrado</p>
+                          <p className="text-xs mt-1">O cliente ainda não criou projetos no Link d'Água.</p>
+                        </div>
+                      )}
+
+                      {linkdaguaId && !isLoadingDocs && qrLinks.length > 0 && (
+                        <div className="space-y-2">
+                          {qrLinks.map(qr => (
+                            <div
+                              key={qr.id}
+                              className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:border-purple-300 dark:hover:border-purple-500/40 transition-all group"
+                            >
+                              <div className="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                                <QrCode size={18} className="text-purple-500" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                  {qr.title || qr.slug}
+                                </p>
+                                <p className="text-xs text-slate-500 font-mono truncate">/{qr.slug}</p>
+                              </div>
+                              <div className="text-right shrink-0">
+                                {qr.scan_count != null && (
+                                  <p className="text-xs font-bold text-purple-600 dark:text-purple-400">
+                                    {qr.scan_count} scan{qr.scan_count !== 1 ? 's' : ''}
+                                  </p>
+                                )}
+                                <p className="text-[10px] text-slate-400">
+                                  {new Date(qr.created_at).toLocaleDateString('pt-BR')}
+                                </p>
+                              </div>
+                              {qr.destination_url && (
+                                <a
+                                  href={qr.destination_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-slate-300 dark:text-slate-600 hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
+                                >
+                                  <ExternalLink size={14} />
+                                </a>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 dark:text-white">Projetos Link d'Água</h3>
-                      <p className="text-xs text-slate-500">
-                        {linkdaguaId
-                          ? `QR Codes vinculados a ${linkdaguaId.slice(0, 8)}…`
-                          : 'Nenhum linkdagua_user_id associado a este contato'}
-                      </p>
+
+                    {/* Documents and Contracts Section (From Jury Agent) */}
+                    <div className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-6">
+                      <div className="flex items-center gap-3 mb-6 px-2">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
+                          <FileText size={20} />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-900 dark:text-white text-lg">Documentos e Contratos</h3>
+                          <p className="text-xs text-slate-500">Contratos gerados e notas importantes</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {dealActivities.filter(a => (a.type as string) === 'note' || (a.type as string) === 'NOTE').length === 0 ? (
+                          <div className="text-center py-10 text-slate-500 italic border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+                            Nenhum documento ou contrato salvo neste negócio.
+                          </div>
+                        ) : (
+                          dealActivities
+                            .filter(a => (a.type as string) === 'note' || (a.type as string) === 'NOTE')
+                            .map(doc => (
+                              <div key={doc.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-5 rounded-xl shadow-sm">
+                                <div className="flex justify-between items-start mb-3 border-b border-slate-100 dark:border-white/5 pb-3">
+                                  <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <FileText size={16} className="text-primary-500" />
+                                    {doc.title || 'Documento'}
+                                  </h4>
+                                  <span className="text-xs text-slate-400">
+                                    {new Date(doc.date).toLocaleString('pt-BR')}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-sans bg-slate-50 dark:bg-black/20 p-4 rounded-lg border border-slate-100 dark:border-white/5 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                  {doc.description}
+                                </div>
+                                <div className="mt-4 flex justify-end gap-2">
+                                  <button
+                                    onClick={() => deleteActivity(doc.id)}
+                                    className="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+                                  >
+                                    <Trash2 size={14} /> Excluir
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                        )}
+                      </div>
                     </div>
                   </div>
-
-                  {!linkdaguaId && (
-                    <div className="text-center py-10 text-slate-400">
-                      <Folder size={32} className="mx-auto mb-3 opacity-30" />
-                      <p className="text-sm font-medium">Sem vínculo com Link d'Água</p>
-                      <p className="text-xs mt-1">Adicione o <code className="bg-slate-100 dark:bg-white/10 px-1 rounded">linkdagua_user_id</code> ao contato para ver os projetos QR aqui.</p>
-                    </div>
-                  )}
-
-                  {linkdaguaId && isLoadingDocs && (
-                    <div className="flex items-center justify-center py-12">
-                      <Loader2 size={28} className="animate-spin text-purple-500" />
-                    </div>
-                  )}
-
-                  {linkdaguaId && docsError && (
-                    <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-700/40 text-sm text-red-600 dark:text-red-400">
-                      Erro ao carregar projetos: {docsError}
-                    </div>
-                  )}
-
-                  {linkdaguaId && !isLoadingDocs && !docsError && qrLinks.length === 0 && (
-                    <div className="text-center py-10 text-slate-400">
-                      <QrCode size={32} className="mx-auto mb-3 opacity-30" />
-                      <p className="text-sm font-medium">Nenhum projeto QR encontrado</p>
-                      <p className="text-xs mt-1">O cliente ainda não criou projetos no Link d'Água.</p>
-                    </div>
-                  )}
-
-                  {linkdaguaId && !isLoadingDocs && qrLinks.length > 0 && (
-                    <div className="space-y-2">
-                      {qrLinks.map(qr => (
-                        <div
-                          key={qr.id}
-                          className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:border-purple-300 dark:hover:border-purple-500/40 transition-all group"
-                        >
-                          <div className="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                            <QrCode size={18} className="text-purple-500" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                              {qr.title || qr.slug}
-                            </p>
-                            <p className="text-xs text-slate-500 font-mono truncate">/{qr.slug}</p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            {qr.scan_count != null && (
-                              <p className="text-xs font-bold text-purple-600 dark:text-purple-400">
-                                {qr.scan_count} scan{qr.scan_count !== 1 ? 's' : ''}
-                              </p>
-                            )}
-                            <p className="text-[10px] text-slate-400">
-                              {new Date(qr.created_at).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          {qr.destination_url && (
-                            <a
-                              href={qr.destination_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-slate-300 dark:text-slate-600 hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
-                            >
-                              <ExternalLink size={14} />
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -1313,3 +1364,4 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     </div>
   );
 };
+

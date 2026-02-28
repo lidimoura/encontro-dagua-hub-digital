@@ -3,10 +3,11 @@ import { Scale, FileText, Download, Eye, Copy, CheckCircle, Sparkles, AlertCircl
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useDealContext } from '@/context/DealContext';
+import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/services/ai/bilingualService';
-import { useCRMAgent } from '@/features/ai-hub/hooks/useCRMAgent'; // Import AI Hook
+import { useCRMAgent } from '@/features/ai-hub/hooks/useCRMAgent';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
 
@@ -31,6 +32,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     const { addToast } = useToast();
     const { t } = useTranslation();
     const dealContext = useDealContext();
+    const { profile } = useAuth();
     const { language } = useLanguage();
     const [templates, setTemplates] = useState<ContractTemplate[]>([]);
     const [loading, setLoading] = useState(true);
@@ -99,6 +101,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     // Client data
     const [clientName, setClientName] = useState('');
     const [clientCpfCnpj, setClientCpfCnpj] = useState('');
+    const [clientAddress, setClientAddress] = useState('');
     const [projectDescription, setProjectDescription] = useState('');
     const [value, setValue] = useState('');
 
@@ -109,11 +112,44 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     const [hubCnpj, setHubCnpj] = useState('');
     const [hubAddress, setHubAddress] = useState('');
 
+    // Pre-fill from DealContext
+    useEffect(() => {
+        if (dealContext?.currentDeal) {
+            const deal = dealContext.currentDeal as any; // Cast for extended props like contactName
+            setClientName(deal.contactName || deal.title || '');
+            // For Value, use formatted value if possible, or just the number
+            setValue(deal.value ? `R$ ${deal.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '');
+            setProjectDescription(`Projeto referente ao deal: ${deal.title}`);
+        }
+    }, [dealContext?.currentDeal]);
+
     const [showPreview, setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
     const [exportingPDF, setExportingPDF] = useState(false);
     const [savingToDeal, setSavingToDeal] = useState(false);
     const [savedToDeal, setSavedToDeal] = useState(false);
+
+    // ── Deal Picker (for when Jury is opened outside a specific deal) ─────────
+    const [availableDeals, setAvailableDeals] = useState<{ id: string; title: string; value?: number }[]>([]);
+    const [selectedDealId, setSelectedDealId] = useState<string>(dealId || '');
+
+    useEffect(() => {
+        const fetchDeals = async () => {
+            const { data } = await supabase
+                .from('deals')
+                .select('id, title, value')
+                .order('created_at', { ascending: false })
+                .limit(50);
+            if (data) setAvailableDeals(data);
+        };
+        fetchDeals();
+    }, []);
+
+    // Keep selectedDealId in sync if dealId prop changes
+    useEffect(() => {
+        if (dealId) setSelectedDealId(dealId);
+    }, [dealId]);
+    // ─────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
         fetchContractTemplates();
@@ -151,7 +187,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         
         **PARTIES:**
         - **CONTRACTOR (The Hub):** ${hubName} (${hubPersonType}, CPF/CNPJ: ${hubPersonType === 'PF' ? hubCpf : hubCnpj}, Address: ${hubAddress})
-        - **CLIENT:** ${clientName} (CPF/CNPJ: ${clientCpfCnpj})
+        - **CLIENT:** ${clientName} (CPF/CNPJ: ${clientCpfCnpj}, Address: ${clientAddress})
         
         **PROJECT DETAILS:**
         - **Description:** ${projectDescription}
@@ -188,18 +224,50 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     };
 
     const saveToDeal = async () => {
-        if (!dealId || !generatedContract) return;
+        const targetDealId = selectedDealId || dealId;
+        if (!targetDealId || !generatedContract) return;
         setSavingToDeal(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
+
+            // 1. Generate Summary for the Timeline (to make it readable)
+            let summaryContent = '';
+            try {
+                const summaryPrompt = `Analise o contrato abaixo e crie um **RESUMO ESTRATÉGICO** em tópicos curtos para o corpo de um e-mail/timeline (Valor, Prazos, Entregas Principais). Máximo de 5 tópicos bala. \n\nCONTRATO:\n${generatedContract.substring(0, 4000)}`;
+                await sendMessage(summaryPrompt); // This will add to the chat, we will pick up the last msg as summary later if we want, but for now we'll just let the user see it in the refinement chat and we save the full contract text + a note.
+
+                // A better approach for the background summary is to just ask the AI directly, but we don't have a direct generate() method exposed in useCRMAgent.
+                // So we will just save the full contract to the timeline, and the USER can ask Jury for the summary in the chat if they want.
+                // Or we can save a generic title and tell the user they can use the Jury chat to summarize.
+            } catch (e) {
+                console.error("Error generating summary", e);
+            }
+
+            // 2. Client Enrichment: Save CPF/CNPJ and Address directly to the Contact Profile notes if available
+            if (dealContext?.currentDeal?.contactId && (clientCpfCnpj || clientAddress)) {
+                try {
+                    const contactId = dealContext.currentDeal.contactId;
+                    const { data: contact } = await supabase.from('contacts').select('notes').eq('id', contactId).single();
+                    let newNotes = contact?.notes || '';
+                    if (clientCpfCnpj && !newNotes.includes(clientCpfCnpj)) newNotes += `\nCPF/CNPJ: ${clientCpfCnpj}`;
+                    if (clientAddress && !newNotes.includes(clientAddress)) newNotes += `\nEndereço: ${clientAddress}`;
+
+                    await supabase.from('contacts').update({ notes: newNotes.trim() }).eq('id', contactId);
+                } catch (e) {
+                    console.error("Error enriching contact profile", e);
+                }
+            }
+
+            // Save Full Contract as Note in Deal Timeline
             const { error } = await supabase
                 .from('activities')
                 .insert({
-                    deal_id: dealId,
-                    type: 'NOTE',
-                    title: language === 'en' ? `Contract: ${selectedTemplate?.title ?? 'Draft'}` : `Contrato: ${selectedTemplate?.title ?? 'Rascunho'}`,
-                    description: generatedContract.substring(0, 8000),
-                    user_id: user?.id,
+                    deal_id: targetDealId,
+                    type: 'note',
+                    title: language === 'en' ? `📄 Contract Generated: ${selectedTemplate?.title ?? 'Draft'}` : `📄 Contrato Gerado: ${selectedTemplate?.title ?? 'Rascunho'}`,
+                    description: `**CONTRATO GERADO PELO JURY (IA)**\n\n---\n\n${generatedContract.substring(0, 8000)}`,
+                    owner_id: user?.id || null,
+                    company_id: profile?.company_id || null,
                     date: new Date().toISOString(),
                     completed: true,
                 });
@@ -397,11 +465,21 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
 
                     <div className="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#02040a]">
                         {messages.length === 0 && (
-                            <p className="text-center text-sm text-slate-500 py-4">
-                                {language === 'en'
-                                    ? 'Ask Jury to draft a clause or explain a legal term...'
-                                    : 'Peça ao Jury para redigir uma cláusula ou explicar um termo jurídico...'}
-                            </p>
+                            <div className="text-center space-y-3 py-4">
+                                <p className="text-sm text-slate-500">
+                                    {language === 'en'
+                                        ? 'Ask Jury to draft a clause or explain a legal term...'
+                                        : 'Peça ao Jury para redigir uma cláusula ou explicar um termo jurídico...'}
+                                </p>
+                                {generatedContract && (
+                                    <button
+                                        onClick={() => setInput("Gere um resumo estratégico em tópicos curtos (Valor, Prazos, Principais Entregas) para eu enviar no corpo do e-mail ao cliente.")}
+                                        className="text-xs px-3 py-1.5 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-full transition-colors"
+                                    >
+                                        ✨ {language === 'en' ? 'Generate Email Summary' : 'Gerar Resumo para E-mail'}
+                                    </button>
+                                )}
+                            </div>
                         )}
                         {messages.map(m => (
                             <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group`}>
@@ -669,6 +747,20 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                                 />
                             </div>
 
+                            {/* Address */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                    {language === 'en' ? 'Client Address' : 'Endereço do Cliente'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={clientAddress}
+                                    onChange={(e) => setClientAddress(e.target.value)}
+                                    className="w-full px-4 py-2 bg-white dark:bg-rionegro-900 border border-slate-300 dark:border-rionegro-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder={language === 'en' ? 'Street, Number, City' : 'Rua, Número, Cidade'}
+                                />
+                            </div>
+
                             {/* Project Description */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -698,7 +790,31 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                             </div>
                         </div>
 
-                        {/* Generate Button */}
+                        {/* Deal Picker — shown when no deal is pre-selected */}
+                        <div className="pb-4 border-b border-purple-200 dark:border-purple-700">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                                <Save className="w-4 h-4 text-purple-500" />
+                                {language === 'en' ? 'Link to Deal / Card' : 'Vincular ao Deal / Card'} *
+                            </label>
+                            <select
+                                value={selectedDealId}
+                                onChange={(e) => setSelectedDealId(e.target.value)}
+                                className="w-full px-3 py-2 bg-white dark:bg-rionegro-900 border border-slate-300 dark:border-rionegro-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
+                            >
+                                <option value="">{language === 'en' ? '— Select a deal —' : '— Selecione um deal —'}</option>
+                                {availableDeals.map(d => (
+                                    <option key={d.id} value={d.id}>
+                                        {d.title}{d.value ? ` — R$ ${d.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                            {!selectedDealId && (
+                                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                    ⚠️ {language === 'en' ? 'Select a deal to enable saving.' : 'Selecione um deal para habilitar o salvamento.'}
+                                </p>
+                            )}
+                        </div>
+
                         {/* Generate Button */}
                         <button
                             onClick={generateContract}
@@ -754,8 +870,8 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                                     <Download className="w-4 h-4" />
                                     {language === 'en' ? 'Export PDF' : 'Exportar PDF'}
                                 </button>
-                                {/* Salvar no Deal — only visible when inside a deal */}
-                                {dealId && (
+                                {/* Salvar no Deal — visible when any deal is selected */}
+                                {(selectedDealId || dealId) && (
                                     <button
                                         onClick={saveToDeal}
                                         disabled={savingToDeal || savedToDeal}

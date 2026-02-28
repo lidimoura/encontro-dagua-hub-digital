@@ -17,6 +17,22 @@ O **Link d'Água** é o ponto de entrada da sua presença digital:
 - **QR Code vetorial (SVG)** gerado automaticamente — nítido na tela e em impressão profissional.
 - **Sem precisar de site** — funciona em qualquer celular.
 
+### 1.5. Equipe de IA (AI Team)
+- **Jury (Legal)**: Generates contracts adaptable to **Brazil** and **Australia**. Can be accessed directly inside the Deal Modal for concurrent contract drafting and CRM data viewing.
+    - **Clean Contracts**: Generates standardized, variable-free contracts ready for printing.
+    - **Refinement Chat**: Use the chat below the contract preview to ask for specific clause changes (e.g., "Add a confidentiality clause").
+    - **Timeline Export**: Save generated contracts directly to the Deal Timeline.
+- **Precy (Finance)**: Calculates pricing and ROI with multi-currency support (**BRL, USD, AUD**).
+    - **Social Pricing**: Toggle "Social Impact" to apply automatic discounts for non-profits.
+- **Amazô (CS/Sales - External)**: 24/7 diagnostic agent available on the Landing Page and via WhatsApp.
+- **Mazô (CS/Sales - Internal)**: Customer Success Strategist within the CRM. Monitors client health scores and suggests retention actions. Replaces the generic "Flow AI".
+
+### 1.6. CRM Features
+- **Boards**: Kanban-style project management. Access the **Equipe de IA** tab for strategic insights.
+- **Contacts**: Centralized contact management with RLS security (Admins see all).
+- **Prompt Lab**: Create and optimize AI prompts in English or Portuguese.
+- **QR D'água**: Generate dynamic QR codes, Bridge Pages, and Digital Cards with locked-down Iframe viewing capabilities.
+
 Para acessar: clique em "Ver Vitrine" na Landing Page ou acesse `/qrdagua` no painel.
 
 ### 2. Navegação & Suporte Bilíngue

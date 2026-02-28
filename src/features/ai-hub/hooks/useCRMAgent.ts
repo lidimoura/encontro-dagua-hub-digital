@@ -389,7 +389,7 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
       },
     }),
 
-    moveDeal: tool({
+    move_deal: tool({
       description: 'Move um deal para outro estágio do pipeline',
       parameters: z.object({
         dealId: z.string().describe('ID do deal'),
@@ -437,6 +437,43 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
           message: `Valor do deal "${deal.title}" atualizado de R$${oldValue.toLocaleString()} para R$${newValue.toLocaleString()}`,
         };
       },
+    }),
+
+    analyze_leads: tool({
+      description: 'Analisa o pipeline inteiro de deals para extrair métricas de leads e identificar gargalos',
+      parameters: z.object({}),
+      // @ts-ignore
+      execute: async () => {
+        if (!deals || deals.length === 0) {
+          return { success: false, message: 'Nenhum deal ativo no funil atual para analisar.' };
+        }
+
+        const totalValue = deals.reduce((sum, d) => sum + (d.value || 0), 0);
+
+        // Group by Status/Stage
+        const stages: Record<string, { count: number, value: number }> = {};
+        deals.forEach(d => {
+          if (!stages[d.status]) stages[d.status] = { count: 0, value: 0 };
+          stages[d.status].count++;
+          stages[d.status].value += d.value || 0;
+        });
+
+        // Get Top Deals
+        const topDeals = [...deals]
+          .filter(d => !['CLOSED_WON', 'CLOSED_LOST'].includes(d.status))
+          .sort((a, b) => (b.value || 0) - (a.value || 0))
+          .slice(0, 3)
+          .map(d => ({ title: d.title, value: d.value, status: d.status }));
+
+        return {
+          success: true,
+          totalLeads: deals.length,
+          totalFunnelValue: totalValue,
+          funnelBreakdown: stages,
+          topOpportunities: topDeals,
+          message: `Análise de ${deals.length} deals concluída. Total em pipeline: R$${totalValue.toLocaleString()}`
+        };
+      }
     }),
 
     createDeal: tool({

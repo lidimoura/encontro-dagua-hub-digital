@@ -36,6 +36,7 @@ export const BridgePage: React.FC = () => {
     const [notFound, setNotFound] = useState(false);
     const [copied, setCopied] = useState<'phone' | 'pix' | null>(null);
     const [showQRModal, setShowQRModal] = useState(false);
+    const [iframeOpen, setIframeOpen] = useState(false);
 
     const handleCopy = async (text: string, type: 'phone' | 'pix') => {
         try {
@@ -157,16 +158,20 @@ export const BridgePage: React.FC = () => {
 
         const isPro = data.profiles?.role === 'admin';
 
-        // If Direct Redirect is enabled AND user is PRO
-        if (isPro && data.direct_redirect) {
-            window.location.href = data.destination_url;
-            return; // Stop rendering
+        // Explicit redirect mode checks FIRST
+        if (data.redirect_mode === 'iframe' || data.redirect_mode === 'bridge') {
+            return;
         }
 
-        // Handle explicit redirect modes
         if (data.redirect_mode === 'direct') {
-            window.location.href = data.destination_url;
+            window.location.replace(data.destination_url);
             return;
+        }
+
+        // If Direct Redirect is enabled AND user is PRO
+        if (isPro && data.direct_redirect) {
+            window.location.replace(data.destination_url);
+            return; // Stop rendering
         }
     }, [data]);
 
@@ -216,295 +221,339 @@ export const BridgePage: React.FC = () => {
                     textShadow: '0 2px 4px rgba(0,0,0,0.3)',
                 }}
             >
-                PROVA D'ÁGUA
+                ✦ PROVA D’ÁGUA — ENCONTRO D’ÁGUA HUB ✦
             </span>
         </div>
     );
 
     const PremiumWatermarkBadge = () => (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none animate-in slide-in-from-top-4 duration-500 fade-in">
-            <div className="px-4 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg shadow-orange-500/30 border border-orange-400/40 backdrop-blur-md flex items-center gap-2">
+            <div className="px-4 py-1.5 bg-gradient-to-r from-[#FF5F1F] to-orange-600 rounded-full shadow-lg shadow-[#FF5F1F]/40 border border-[#FF5F1F]/50 backdrop-blur-md flex items-center gap-2">
                 <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
                 <span className="text-white text-xs font-bold tracking-wider uppercase drop-shadow-sm">
-                    Prova D'água
+                    ✦ PROVA D’ÁGUA — ENCONTRO D’ÁGUA HUB ✦
                 </span>
             </div>
         </div>
     );
 
-    // iframe mode: wrap destination in full-screen iframe
+    // iframe mode: full-screen masking — hides the real URL behind the Hub's domain
     if (data?.redirect_mode === 'iframe') {
         return (
-            <div className="fixed inset-0 w-full h-full">
-                {data.enable_watermark && <PremiumWatermarkBadge />}
+            <div className="fixed inset-0 w-full h-full bg-black">
+                {data.enable_watermark && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                        <div className="px-4 py-1.5 bg-gradient-to-r from-[#FF5F1F] to-orange-600 rounded-full shadow-lg shadow-[#FF5F1F]/40 border border-[#FF5F1F]/50 backdrop-blur-md flex items-center gap-2">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            <span className="text-white text-xs font-bold tracking-wider uppercase">
+                                ✦ PROVA D'ÁGUA ✦
+                            </span>
+                        </div>
+                    </div>
+                )}
                 <iframe
                     src={data.destination_url}
-                    className="w-full h-full border-0"
+                    className="absolute inset-0 w-full h-full border-0"
                     title={data.page_title || data.client_name}
-                    allow="fullscreen"
+                    allow="fullscreen; camera; microphone; clipboard-read; clipboard-write"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation allow-top-navigation-by-user-activation allow-downloads"
+                    referrerPolicy="no-referrer"
                 />
             </div>
         );
     }
 
-    // BRIDGE or CARD page rendering
+    // Bridge/Card mode — full page render
+    // iframeOpen: overlay that masks the real URL while showing the bridge card behind
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden" style={template?.font_family ? { fontFamily: template.font_family } : {}}>
-            {/* Background elements */}
-            <div className="absolute inset-0 bg-[#0B1120] -z-20" style={template?.bg_color ? { backgroundColor: template.bg_color } : {}}></div>
-
-            {/* Ambient gradients */}
-            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -z-10 mix-blend-screen mix-blend-color-dodge"></div>
-            <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -z-10 mix-blend-screen mix-blend-color-dodge"></div>
-
-            {/* Pattern overlay */}
-            <div className="absolute inset-0 opacity-10 -z-10 pointer-events-none" style={{ backgroundImage: `radial-gradient(${data.color || '#fff'} 1px, transparent 1px)`, backgroundSize: '40px 40px' }}></div>
-
-            {/* ——— NEW: Top-Centered Watermark Badge ——— */}
-            {data.enable_watermark && <PremiumWatermarkBadge />}
-
-            <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                {/* Glassmorphism Container - Dark Mode */}
-                <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden" style={template?.card_bg_color ? { backgroundColor: template.card_bg_color } : {}}>
-                    {/* Header Image */}
-                    {data.image_url && (
-                        <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative">
-                            <img
-                                src={data.image_url}
-                                alt={data.client_name}
-                                className="w-full max-h-[350px] object-contain opacity-90"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120]/80 via-transparent to-transparent"></div>
+        <>
+            {/* ── Iframe masking overlay (bridge → iframe) ─────────────────────── */}
+            {iframeOpen && data?.destination_url && (
+                <div className="fixed inset-0 z-[9999] bg-black">
+                    {/* Watermark always on top */}
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[10001] pointer-events-none">
+                        <div className="px-4 py-1.5 bg-gradient-to-r from-[#FF5F1F] to-orange-600 rounded-full shadow-lg border border-[#FF5F1F]/50 backdrop-blur-md flex items-center gap-2">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            <span className="text-white text-xs font-bold tracking-wider uppercase">✦ PROVA D'ÁGUA ✦</span>
                         </div>
-                    )}
+                    </div>
+                    {/* Close — returns to bridge card */}
+                    <button
+                        onClick={() => setIframeOpen(false)}
+                        className="absolute top-4 right-4 z-[10001] p-2 bg-black/60 hover:bg-black/80 rounded-full text-white transition-colors"
+                        title="Voltar"
+                    >
+                        <X size={20} />
+                    </button>
+                    <iframe
+                        src={data.destination_url}
+                        className="absolute inset-0 w-full h-full border-0"
+                        title={data.page_title || data.client_name}
+                        allow="fullscreen; camera; microphone; clipboard-read; clipboard-write"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation allow-top-navigation-by-user-activation allow-downloads"
+                        referrerPolicy="no-referrer"
+                    />
+                </div>
+            )}
+            <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden" style={template?.font_family ? { fontFamily: template.font_family } : {}}>
+                {/* Background elements */}
+                <div className="absolute inset-0 bg-[#0B1120] -z-20" style={template?.bg_color ? { backgroundColor: template.bg_color } : {}}></div>
 
-                    {/* Content */}
-                    <div className="p-8 md:p-12">
-                        {/* Social Bar - Top */}
-                        {(data.whatsapp || data.instagram || data.pix_key) && (
-                            <div className="flex justify-center gap-3 mb-8 flex-wrap">
-                                {data.whatsapp && (
-                                    <a
-                                        href={`https://wa.me/${data.whatsapp.replace(/\D/g, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-full text-green-300 hover:text-green-200 transition-all"
-                                        title="WhatsApp"
-                                    >
-                                        <Phone size={18} />
-                                        <span className="text-sm font-medium">WhatsApp</span>
-                                    </a>
-                                )}
-                                {data.instagram && (
-                                    <a
-                                        href={`https://instagram.com/${data.instagram.replace('@', '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-4 py-2 bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 rounded-full text-pink-300 hover:text-pink-200 transition-all"
-                                        title="Instagram"
-                                    >
-                                        <Instagram size={18} />
-                                        <span className="text-sm font-medium">Instagram</span>
-                                    </a>
-                                )}
-                                {data.pix_key && (
-                                    <button
-                                        onClick={() => handleCopy(data.pix_key!, 'pix')}
-                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-full text-purple-300 hover:text-purple-200 transition-all"
-                                        title="Copiar Chave Pix"
-                                    >
-                                        {copied === 'pix' ? <Check size={18} /> : <Copy size={18} />}
-                                        <span className="text-sm font-medium">
-                                            {copied === 'pix' ? 'Copiado!' : 'Pix'}
-                                        </span>
-                                    </button>
-                                )}
+                {/* Ambient gradients */}
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -z-10 mix-blend-screen mix-blend-color-dodge"></div>
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -z-10 mix-blend-screen mix-blend-color-dodge"></div>
+
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 opacity-10 -z-10 pointer-events-none" style={{ backgroundImage: `radial-gradient(${data.color || '#fff'} 1px, transparent 1px)`, backgroundSize: '40px 40px' }}></div>
+
+                {/* ——— NEW: Top-Centered Watermark Badge ——— */}
+                {data.enable_watermark && <PremiumWatermarkBadge />}
+
+                <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    {/* Glassmorphism Container - Dark Mode */}
+                    <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden" style={template?.card_bg_color ? { backgroundColor: template.card_bg_color } : {}}>
+                        {/* Header Image */}
+                        {data.image_url && (
+                            <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative">
+                                <img
+                                    src={data.image_url}
+                                    alt={data.client_name}
+                                    className="w-full max-h-[350px] object-contain opacity-90"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120]/80 via-transparent to-transparent"></div>
                             </div>
                         )}
 
-                        {/* QR Code with Premium Dark Glassmorphism - CLICKABLE */}
-                        {data.qr_logo_url && (
-                            <div className="flex justify-center mb-8">
-                                <div className="text-center">
-                                    {data.qr_text_top && (
-                                        <p className="text-sm text-slate-300 font-medium mb-4">
-                                            {data.qr_text_top}
-                                        </p>
-                                    )}
-
-                                    {/* Dark Glassmorphism QR Container - CLICKABLE */}
-                                    <div
-                                        className="relative group inline-block cursor-pointer"
-                                        onClick={() => setShowQRModal(true)}
-                                        title="Clique para ampliar"
-                                    >
-                                        {/* Purple Glow Effect */}
-                                        <div className="absolute -inset-6 bg-gradient-to-br from-purple-500/20 via-violet-500/20 to-fuchsia-500/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
-
-                                        {/* Dark Glass QR Container */}
-                                        <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10 group-hover:border-purple-400/40 transition-all">
-                                            {/* Decorative Corners - Purple Accent */}
-                                            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-purple-400/60 rounded-tl-lg"></div>
-                                            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-purple-400/60 rounded-tr-lg"></div>
-                                            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-purple-400/60 rounded-bl-lg"></div>
-                                            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-purple-400/60 rounded-br-lg"></div>
-
-                                            {/* QR Code - Styled with Dots */}
-                                            <div id="qr-code-styled" className="bg-white/95 p-4 rounded-xl">
-                                                <QRCode
-                                                    value={`${window.location.origin}/#/v/${data.slug}`}
-                                                    size={200}
-                                                    ecLevel="H"
-                                                    fgColor={data.color || '#7c3aed'}
-                                                    bgColor="transparent"
-                                                    qrStyle="dots"
-                                                    eyeRadius={10}
-                                                    logoImage={data.qr_logo_url || ''}
-                                                    logoWidth={40}
-                                                    logoHeight={40}
-                                                    removeQrCodeBehindLogo={true}
-                                                />
-                                            </div>
-
-                                            {/* Hover hint */}
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-2xl">
-                                                <span className="text-white text-sm font-medium">Clique para ampliar</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {data.qr_text_bottom && (
-                                        <p className="text-xs text-slate-400 mt-4">
-                                            {data.qr_text_bottom}
-                                        </p>
-                                    )}
-
-                                    {/* QR Action Buttons */}
-                                    <div className="flex gap-2 justify-center mt-4">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleDownloadQR(); }}
-                                            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all text-sm"
-                                            title="Baixar QR Code"
-                                        >
-                                            <Download size={16} />
-                                            Baixar
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleShareWhatsApp(); }}
-                                            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all text-sm"
-                                            title="Compartilhar no WhatsApp"
-                                        >
-                                            <Share2 size={16} />
-                                            Enviar Link
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Title with Gradient */}
-                        <h1
-                            className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-300 via-white to-purple-300 bg-clip-text text-transparent"
-                            style={template?.text_color ? { color: template.text_color, WebkitTextFillColor: template.text_color } : {}}
-                        >
-                            {data.page_title || data.client_name}
-                        </h1>
-
-                        {/* Description */}
-                        {data.description && (
-                            <p className="text-lg text-slate-300 text-center mb-10 leading-relaxed" style={template?.text_color ? { color: template.text_color } : {}}>
-                                {data.description}
-                            </p>
-                        )}
-
-                        {/* CTA Buttons - Wide, Premium, Dark Mode */}
-                        <div className="flex flex-col gap-4">
-                            {/* Render Custom Links Array for TypeBridge (CARD project) */}
-                            {data.links_array && Array.isArray(data.links_array) && data.links_array.length > 0 ? (
-                                data.links_array.filter((link: any) => link.active).map((link: any) => (
-                                    <a
-                                        key={link.id}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
-                                        style={{
-                                            background: link.type === 'whatsapp' ? '#25D366' : (template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`),
-                                            color: template?.button_text_color || '#ffffff',
-                                            boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`
-                                        }}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-                                        <span className="relative z-10 text-lg">{link.icon} {link.label || 'Acessar'}</span>
-                                    </a>
-                                ))
-                            ) : (
-                                <>
-                                    {/* Default behavior if no links_array is present */}
-                                    {data.destination_url && (
-                                        <a
-                                            href={data.destination_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
-                                            style={{
-                                                background: template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`,
-                                                boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`,
-                                                color: template?.button_text_color || '#ffffff'
-                                            }}
-                                        >
-                                            {/* Shine Effect on Hover */}
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-                                            <ExternalLink size={22} className="relative z-10" />
-                                            <span className="relative z-10 text-lg">{data.button_text || 'Acessar'}</span>
-                                        </a>
-                                    )}
-
-                                    {/* WhatsApp Button - Premium Dark Style */}
+                        {/* Content */}
+                        <div className="p-8 md:p-12">
+                            {/* Social Bar - Top */}
+                            {(data.whatsapp || data.instagram || data.pix_key) && (
+                                <div className="flex justify-center gap-3 mb-8 flex-wrap">
                                     {data.whatsapp && (
                                         <a
                                             href={`https://wa.me/${data.whatsapp.replace(/\D/g, '')}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="group relative flex items-center justify-center gap-3 px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold text-white shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden"
-                                            style={{ boxShadow: '0 10px 40px rgba(34, 197, 94, 0.3)' }}
+                                            className="flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-full text-green-300 hover:text-green-200 transition-all"
+                                            title="WhatsApp"
                                         >
-                                            {/* Shine Effect */}
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-                                            <Phone size={22} className="relative z-10" />
-                                            <span className="relative z-10 text-lg">Falar no WhatsApp</span>
+                                            <Phone size={18} />
+                                            <span className="text-sm font-medium">WhatsApp</span>
                                         </a>
                                     )}
-                                </>
-                            )}
-
-                            {/* Copy Number Button (if whatsapp exists) */}
-                            {data.whatsapp && (!data.links_array || data.links_array.length === 0) && (
-                                <button
-                                    onClick={() => handleCopy(data.whatsapp!, 'phone')}
-                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 hover:text-white transition-all"
-                                >
-                                    {copied === 'phone' ? (
-                                        <>
-                                            <Check size={18} className="text-green-400" />
-                                            <span className="text-sm font-medium text-green-400">Número Copiado!</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Copy size={18} />
-                                            <span className="text-sm font-medium">Copiar Número</span>
-                                        </>
+                                    {data.instagram && (
+                                        <a
+                                            href={`https://instagram.com/${data.instagram.replace('@', '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 px-4 py-2 bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 rounded-full text-pink-300 hover:text-pink-200 transition-all"
+                                            title="Instagram"
+                                        >
+                                            <Instagram size={18} />
+                                            <span className="text-sm font-medium">Instagram</span>
+                                        </a>
                                     )}
-                                </button>
+                                    {data.pix_key && (
+                                        <button
+                                            onClick={() => handleCopy(data.pix_key!, 'pix')}
+                                            className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-full text-purple-300 hover:text-purple-200 transition-all"
+                                            title="Copiar Chave Pix"
+                                        >
+                                            {copied === 'pix' ? <Check size={18} /> : <Copy size={18} />}
+                                            <span className="text-sm font-medium">
+                                                {copied === 'pix' ? 'Copiado!' : 'Pix'}
+                                            </span>
+                                        </button>
+                                    )}
+                                </div>
                             )}
-                        </div>
 
-                        {/* Footer - Conditional "Powered by" */}
-                        <div className="mt-12 pt-6 border-t border-white/5 text-center">
-                            {data.profiles?.role !== 'admin' && ( // Show only for FREE users
+                            {/* QR Code with Premium Dark Glassmorphism - CLICKABLE */}
+                            {data.qr_logo_url && (
+                                <div className="flex justify-center mb-8">
+                                    <div className="text-center">
+                                        {data.qr_text_top && (
+                                            <p className="text-sm text-slate-300 font-medium mb-4">
+                                                {data.qr_text_top}
+                                            </p>
+                                        )}
+
+                                        {/* Dark Glassmorphism QR Container - CLICKABLE */}
+                                        <div
+                                            className="relative group inline-block cursor-pointer"
+                                            onClick={() => setShowQRModal(true)}
+                                            title="Clique para ampliar"
+                                        >
+                                            {/* Purple Glow Effect */}
+                                            <div className="absolute -inset-6 bg-gradient-to-br from-purple-500/20 via-violet-500/20 to-fuchsia-500/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
+
+                                            {/* Dark Glass QR Container */}
+                                            <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10 group-hover:border-purple-400/40 transition-all">
+                                                {/* Decorative Corners - Purple Accent */}
+                                                <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-purple-400/60 rounded-tl-lg"></div>
+                                                <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-purple-400/60 rounded-tr-lg"></div>
+                                                <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-purple-400/60 rounded-bl-lg"></div>
+                                                <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-purple-400/60 rounded-br-lg"></div>
+
+                                                {/* QR Code - Styled with Dots */}
+                                                <div id="qr-code-styled" className="bg-white/95 p-4 rounded-xl">
+                                                    <QRCode
+                                                        value={`${window.location.origin}/#/v/${data.slug}`}
+                                                        size={200}
+                                                        ecLevel="H"
+                                                        fgColor={data.color || '#7c3aed'}
+                                                        bgColor="transparent"
+                                                        qrStyle="dots"
+                                                        eyeRadius={10}
+                                                        logoImage={data.qr_logo_url || ''}
+                                                        logoWidth={40}
+                                                        logoHeight={40}
+                                                        removeQrCodeBehindLogo={true}
+                                                    />
+                                                </div>
+
+                                                {/* Hover hint */}
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-2xl">
+                                                    <span className="text-white text-sm font-medium">Clique para ampliar</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {data.qr_text_bottom && (
+                                            <p className="text-xs text-slate-400 mt-4">
+                                                {data.qr_text_bottom}
+                                            </p>
+                                        )}
+
+                                        {/* QR Action Buttons */}
+                                        <div className="flex gap-2 justify-center mt-4">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleDownloadQR(); }}
+                                                className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all text-sm"
+                                                title="Baixar QR Code"
+                                            >
+                                                <Download size={16} />
+                                                Baixar
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleShareWhatsApp(); }}
+                                                className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-slate-300 hover:text-white transition-all text-sm"
+                                                title="Compartilhar no WhatsApp"
+                                            >
+                                                <Share2 size={16} />
+                                                Enviar Link
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Title with Gradient */}
+                            <h1
+                                className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-300 via-white to-purple-300 bg-clip-text text-transparent"
+                                style={template?.text_color ? { color: template.text_color, WebkitTextFillColor: template.text_color } : {}}
+                            >
+                                {data.page_title || data.client_name}
+                            </h1>
+
+                            {/* Description */}
+                            {data.description && (
+                                <p className="text-lg text-slate-300 text-center mb-10 leading-relaxed" style={template?.text_color ? { color: template.text_color } : {}}>
+                                    {data.description}
+                                </p>
+                            )}
+
+                            {/* CTA Buttons - Wide, Premium, Dark Mode */}
+                            <div className="flex flex-col gap-4">
+                                {/* Render Custom Links Array for TypeBridge (CARD project) */}
+                                {data.links_array && Array.isArray(data.links_array) && data.links_array.length > 0 ? (
+                                    data.links_array.filter((link: any) => link.active).map((link: any) => (
+                                        <a
+                                            key={link.id}
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                            style={{
+                                                background: link.type === 'whatsapp' ? '#25D366' : (template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`),
+                                                color: template?.button_text_color || '#ffffff',
+                                                boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`
+                                            }}
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                                            <span className="relative z-10 text-lg">{link.icon} {link.label || 'Acessar'}</span>
+                                        </a>
+                                    ))
+                                ) : (
+                                    <>
+                                        {/* Default behavior if no links_array is present */}
+                                        {data.destination_url && (
+                                            <button
+                                                onClick={() => setIframeOpen(true)}
+                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden w-full"
+                                                style={{
+                                                    background: template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`,
+                                                    boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`,
+                                                    color: template?.button_text_color || '#ffffff'
+                                                }}
+                                            >
+                                                {/* Shine Effect on Hover */}
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                                                <ExternalLink size={22} className="relative z-10" />
+                                                <span className="relative z-10 text-lg">{data.button_text || 'Acessar'}</span>
+                                            </button>
+                                        )}
+
+                                        {/* WhatsApp Button - Premium Dark Style */}
+                                        {data.whatsapp && (
+                                            <a
+                                                href={`https://wa.me/${data.whatsapp.replace(/\D/g, '')}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold text-white shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                                style={{ boxShadow: '0 10px 40px rgba(34, 197, 94, 0.3)' }}
+                                            >
+                                                {/* Shine Effect */}
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                                                <Phone size={22} className="relative z-10" />
+                                                <span className="relative z-10 text-lg">Falar no WhatsApp</span>
+                                            </a>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* Copy Number Button (if whatsapp exists) */}
+                                {data.whatsapp && (!data.links_array || data.links_array.length === 0) && (
+                                    <button
+                                        onClick={() => handleCopy(data.whatsapp!, 'phone')}
+                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 hover:text-white transition-all"
+                                    >
+                                        {copied === 'phone' ? (
+                                            <>
+                                                <Check size={18} className="text-green-400" />
+                                                <span className="text-sm font-medium text-green-400">Número Copiado!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy size={18} />
+                                                <span className="text-sm font-medium">Copiar Número</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Footer - Global "Powered by" */}
+                            <div className="mt-12 pt-6 border-t border-white/5 text-center pb-8">
                                 <p className="text-sm text-slate-500">
                                     Powered by{' '}
                                     <a
@@ -513,73 +562,68 @@ export const BridgePage: React.FC = () => {
                                         rel="noopener noreferrer"
                                         className="font-semibold text-purple-400 hover:text-purple-300 transition-colors"
                                     >
-                                        Hub d'Água
+                                        Encontro d'água Hub
                                     </a>
                                 </p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* QR Code Full-Screen Modal */}
-                {showQRModal && (
-                    <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-                        onClick={() => setShowQRModal(false)}
-                    >
-                        <div className="relative max-w-2xl w-full">
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setShowQRModal(false)}
-                                className="absolute -top-12 right-0 p-2 text-white hover:text-purple-400 transition-colors"
-                                title="Fechar"
-                            >
-                                <X size={32} />
-                            </button>
-
-                            {/* QR Code Container */}
-                            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/20">
-                                <div className="bg-white p-8 rounded-2xl">
-                                    <QRCode
-                                        value={`${window.location.origin}/#/v/${data.slug}`}
-                                        size={200}
-                                        ecLevel="H"
-                                        fgColor={data.color || '#7c3aed'}
-                                        bgColor="transparent"
-                                        qrStyle="dots"
-                                        eyeRadius={10}
-                                        removeQrCodeBehindLogo={true}
-                                        logoImage={data.image_url}
-                                        logoWidth={50}
-                                        logoHeight={50}
-                                        logoPadding={5}
-                                        logoPaddingStyle="circle"
-
-                                    />
-                                </div>
-
-                                {/* Action Buttons in Modal */}
-                                <div className="flex gap-3 justify-center mt-6">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleDownloadQR(); }}
-                                        className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium transition-all"
-                                    >
-                                        <Download size={20} />
-                                        Baixar HD
-                                    </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleShareWhatsApp(); }}
-                                        className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl text-white font-medium transition-all"
-                                    >
-                                        <Share2 size={20} />
-                                        Compartilhar
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
-                )}
+
+                    {/* QR Code Full-Screen Modal */}
+                    {showQRModal && (
+                        <div
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+                            onClick={() => setShowQRModal(false)}
+                        >
+                            <div className="relative max-w-2xl w-full">
+                                {/* Close Button */}
+                                <button
+                                    onClick={() => setShowQRModal(false)}
+                                    className="absolute -top-12 right-0 p-2 text-white hover:text-purple-400 transition-colors"
+                                    title="Fechar"
+                                >
+                                    <X size={32} />
+                                </button>
+
+                                {/* QR Code Container */}
+                                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/20">
+                                    <div className="bg-white p-8 rounded-2xl">
+                                        <QRCode
+                                            value={`${window.location.origin}/#/v/${data.slug}`}
+                                            size={200}
+                                            ecLevel="H"
+                                            fgColor={data.color || '#7c3aed'}
+                                            bgColor="transparent"
+                                            qrStyle="dots"
+                                            eyeRadius={10}
+                                            removeQrCodeBehindLogo={true}
+                                        />
+                                    </div>
+
+                                    {/* Action Buttons in Modal */}
+                                    <div className="flex gap-3 justify-center mt-6">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDownloadQR(); }}
+                                            className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium transition-all"
+                                        >
+                                            <Download size={20} />
+                                            Baixar HD
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleShareWhatsApp(); }}
+                                            className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl text-white font-medium transition-all"
+                                        >
+                                            <Share2 size={20} />
+                                            Compartilhar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div >
+        </>
     );
 };
+

@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { sendNexusAlert } from '@/lib/nexusWebhook';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { CRMProvider } from '@/context/CRMContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -101,6 +102,18 @@ const App: React.FC = () => {
       localStorage.setItem('app_language', 'en');
       if (saved === 'pt') window.location.reload();
     }
+
+    // ── NEXUS BRIDGE: Heartbeat ─────────────────────────────────────────────
+    // Fires within 2s of app load — confirms the Agility OS bridge is ALIVE.
+    sendNexusAlert({
+      error_message: 'NEXUS_HEARTBEAT',
+      component_context: 'App.tsx boot',
+      app_state: {
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+      },
+    });
+    // ───────────────────────────────────────────────────────────────────────
   }, []);
 
   // ── Service Worker & Push Notification registration ──────────

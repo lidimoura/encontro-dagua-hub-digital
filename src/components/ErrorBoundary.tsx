@@ -3,6 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { sendNexusAlert } from '@/lib/nexusWebhook';
 
 interface Props {
     children: ReactNode;
@@ -67,8 +68,20 @@ export class ErrorBoundary extends Component<Props, State> {
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
 
-        // Log to Supabase
+        // Log to Supabase (existing)
         this.logErrorToSupabase(error, errorInfo);
+
+        // ── NEXUS BRIDGE: Fire debug payload to Agility OS ──
+        sendNexusAlert({
+            error_message: error.message,
+            stack_trace: error.stack,
+            component_context: `ErrorBoundary → componentStack: ${errorInfo.componentStack?.slice(0, 500) ?? 'unknown'}`,
+            app_state: {
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+            },
+        });
     }
 
     private async logErrorToSupabase(error: Error, errorInfo: ErrorInfo) {
