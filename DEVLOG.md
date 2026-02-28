@@ -1,6 +1,14 @@
-﻿# DEVLOG - CRM Encontro d'├ígua hub
+﻿# DEVLOG - CRM Encontro d'água hub
 
-Este arquivo registra todas as mudan├ºas significativas no projeto, organizadas por data e categoria.
+Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
+
+---
+## [02/27/2026] - Finalização de Sprint: Correções Críticas no CRM e Integração Nexus/Jury
+
+- **Resolução do Erro 409 (Delete em Cascata de Contatos)**: A deleção de contatos duplicados gerava *409 Conflict* no Supabase devido à falta de `ON DELETE CASCADE` dependente. Implementamos a deleção em cascata direta via `contactsService.delete(...)`. A função agora exclui proativamente os `deals` e as `activities` antes da raiz. Cards fantasmas também foram removidos via filtro inteligente no Kanban e Realtime reativado para as tabelas essenciais.
+- **Fix do Erro 400 (Save to Deal - Jury AI)**: O payload para salvar contratos falhava pois passava `user_id` em vez de `owner_id`, omitia o requerido `company_id` da query, e quebrava o enum enviando "NOTE" maiúsculo. O payload no JuryAgent foi corrigido extraindo profile via auth e tipando corretamente os enums, destravando a vinculação de artefatos da IA aos clientes.
+- **Nova Estrutura de Abas nos Cards (Aba Documentos)**: Contratos salvos sumiam na Timeline, poluindo-a. Instanciamos a tab estática **"Documentos e Contratos"** no `DealDetailModal.tsx`. Todas as atividades tipo nota agora têm um repositório fixo, scrollável e isolado para leitura focada, organizando a topologia UI do Card do Cliente.
+- **Bridge / Iframe Masking Restore (Camuflagem QRdAgua)**: Restaurado o `<iframe src>` nativo com os sandboxes injetados e `referrerPolicy="no-referrer"` na `BridgePage.tsx`. O wrapper volta a emular URLs blindadas (ex: lovable e google scripts) por baixo da UI principal do hub d'água sem ser bloqueado pela política de frame-ancestors.
 
 ---
 ## [02/26/2026] - Layout, UX & Integração AI
