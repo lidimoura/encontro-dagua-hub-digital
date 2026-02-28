@@ -156,5 +156,6 @@ export function useRealtimeSyncAll(options: UseRealtimeSyncOptions = {}) {
  * Optimized for the boards page
  */
 export function useRealtimeSyncKanban(options: UseRealtimeSyncOptions = {}) {
-  return useRealtimeSync(['deals', 'board_stages'], options);
+  // Add contacts and activities so the board UI updates instantly when a contact is deleted or activity added
+  return useRealtimeSync(['deals', 'board_stages', 'contacts', 'activities'], options);
 }

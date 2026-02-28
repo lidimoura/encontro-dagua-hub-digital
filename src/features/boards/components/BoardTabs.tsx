@@ -43,7 +43,7 @@ export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
                 >
                     <div className="flex items-center gap-2">
                         <Brain className="w-4 h-4" />
-                        <span>Insights (AI)</span>
+                        <span>Equipe de IA</span>
                         <span className="px-2 py-0.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white text-xs rounded-full font-bold">
                             {t('new') || 'NEW'}
                         </span>

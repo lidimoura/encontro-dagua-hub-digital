@@ -226,7 +226,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-dark-bg bg-dots">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-dark-bg bg-dots">
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
         <>
@@ -507,13 +507,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Boards & AI Hub use overflow-hidden + h-full for Kanban/chat layouts */}
         {/* All other pages use overflow-y-auto for normal scrolling */}
         <main
-          className={`flex-1 min-h-0 w-full max-w-full overflow-x-hidden bg-slate-50 dark:bg-dark-bg pt-16 md:pt-0 pb-safe
+          className={`flex-1 min-h-0 w-full max-w-full overflow-x-hidden pt-16 md:pt-0 pb-safe
             ${['/boards', '/ai'].some(p => location.pathname.startsWith(p))
-              ? 'overflow-hidden flex flex-col'
-              : 'overflow-y-auto'
+              ? 'overflow-hidden flex flex-col bg-slate-50 dark:bg-dark-bg'
+              : 'overflow-y-auto bg-slate-50 dark:bg-dark-bg'
             }`}
         >
-          <div className={['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-hidden flex flex-col h-full' : 'h-full'}>
+          <div className={['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-hidden flex flex-col h-full' : 'h-full p-4 md:p-6'}>
             {children}
           </div>
         </main>

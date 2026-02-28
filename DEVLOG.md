@@ -3,6 +3,15 @@
 Este arquivo registra todas as mudan├ºas significativas no projeto, organizadas por data e categoria.
 
 ---
+## [02/26/2026] - Layout, UX & Integração AI
+
+- **Surgical CSS Layout Architecture**: Resolvido loop infinito de design eliminando o `overflow-hidden` global na root do `Layout.tsx` e substituindo por `min-h-screen`. Nas rotas dedicadas (`/boards` e `/ai`), aplicamos isoladamente `height: calc(100vh - 64px)` no `<main>` para alocar exatamente a viewport sem sumir com a Kanban Top Bar ou com as mensagens no Hub IA.
+- **Pipeline Strict Segregation**: Implementado o filtro rigoroso no `useDealsByBoard.ts`. O board 'SDR' retira rigorosamente contatos `CUSTOMER` e `WON`, e o board de 'Onboarding' exige estritamente a ocorrência desses status subjacentes, evitando fantasmas do funil de vendas reaparecendo no pós-venda.
+- **Client Enrichment no Jury**: JuryAgent agora possui input e state para Endereço, e ao "Salvar no Deal", a aplicação faz enrichment atualizando o campo `notes` nativo do CRM no perfil do Contato correspondente associando de forma definitiva seu CPF/CNPJ e Endereço digitados.
+- **Correção Crítica de Layout Mobile-First**: `Layout.tsx` completamente reestruturado para suportar flexbox dinâmico (`min-h-0 overflow-hidden`), garantindo que o Kanban Top Bar apareça e que roteamento de páginas (AI Hub, Dashboard) tenham scroll isolado adequado via `PageScroll`.
+- **Aiflow Native Core Restaurado**: Recaptura das native tools da IA (`analyze_leads`, `move_deal`, `list_contacts`). Tratamento de erros de tipagem no Supabase hooks para evitar 400 Bad Request em queries de contatos/empresas.
+- **Jury-Deal Integration**: O agente Jury agora detecta o Deal atual via `DealContext` para *auto-preenchimento* de Nome do Cliente e Valores. Adicionada feature para inserir o contrato diretamente na Timeline do Deal ("Salvar na Conta"), e uma action extra no chat para a IA resumir o contrato para envio por e-mail.
+- **Branding Sync & Iframe Lockdown**: Atualização da marca d'água para "✦ PROVA D’ÁGUA — ENCONTRO D’ÁGUA HUB ✦" e ajustes no footer de propriedades dos websites gerados pela URL destino para exibir link direto ao Hub d'Água. Corrigido vazamento de redirecionamento global no modo Iframe na `BridgePage`, travando o preview dentro do viewer para o template do site original. Renomeada a Tab "Insights (AI)" no layout de BoardTabs para "Equipe de IA" consolidando as personas de IA.
 
 ## [06/03/2026] — Sprint Lançamento: Briefing UI + WA IA + Import Histórico
 

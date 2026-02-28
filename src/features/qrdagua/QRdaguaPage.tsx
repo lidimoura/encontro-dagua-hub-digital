@@ -128,14 +128,14 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                 <div className="absolute inset-2 rounded-[2.5rem] bg-white dark:bg-slate-950 overflow-hidden relative">
                     {/* Watermark Overlay */}
                     {enableWatermark && (
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none animate-in slide-in-from-top-4 duration-500 fade-in w-max">
-                            <div className="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full shadow-lg shadow-emerald-500/25 border border-emerald-400/30 backdrop-blur-md flex items-center gap-1.5">
+                        <div className="absolute top-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
+                            <div className="px-3 py-1 bg-gradient-to-r from-[#FF5F1F] to-orange-600 rounded-full shadow-lg shadow-[#FF5F1F]/40 border border-[#FF5F1F]/50 backdrop-blur-md flex items-center gap-1.5">
                                 <span className="flex h-1.5 w-1.5 relative">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                                 </span>
-                                <span className="text-white text-[9px] font-bold tracking-wider uppercase">
-                                    Prova D'água
+                                <span className="text-white text-[8px] font-bold tracking-wider uppercase">
+                                    ✦ PROVA D’ÁGUA — ENCONTRO D’ÁGUA HUB ✦
                                 </span>
                             </div>
                         </div>
@@ -1300,14 +1300,14 @@ export const QRdaguaPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Preview - 1 column */}
-                        <div className="lg:col-span-1">
+                        {/* Preview - 1 column — mobile-safe, never overlaps form */}
+                        <div className="lg:col-span-1 mt-6 lg:mt-0">
                             <div className="sticky top-6">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 text-center lg:text-left">
                                     📱 Preview
                                 </h3>
-                                <div className="flex justify-center items-start overflow-hidden">
-                                    <div className="transform scale-75 origin-top">
+                                <div className="flex justify-center items-start overflow-hidden rounded-2xl">
+                                    <div className="transform scale-75 origin-top" style={{ maxWidth: '280px', minHeight: '420px' }}>
                                         <PhoneMockup formData={formData} templates={bridgeTemplates} />
                                     </div>
                                 </div>
@@ -1338,12 +1338,12 @@ export const QRdaguaPage: React.FC = () => {
                                 {projects.map((project) => (
                                     <div
                                         key={project.id}
-                                        className="bg-white dark:bg-rionegro-900 rounded-xl shadow-lg border border-solimoes-400/20 dark:border-solimoes-400/10 p-4 hover:shadow-xl transition-shadow"
+                                        className="bg-white dark:bg-rionegro-900 rounded-xl shadow-lg border border-solimoes-400/20 dark:border-solimoes-400/10 p-4 hover:shadow-xl transition-shadow overflow-hidden min-w-0"
                                     >
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex-1">
+                                        <div className="flex items-start justify-between mb-3 gap-2">
+                                            <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <h3 className="font-bold text-slate-900 dark:text-white">
+                                                    <h3 className="font-bold text-slate-900 dark:text-white truncate">
                                                         {project.client_name}
                                                     </h3>
                                                     {project.project_type && (
@@ -1356,7 +1356,7 @@ export const QRdaguaPage: React.FC = () => {
                                                     /{project.slug}
                                                 </p>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex flex-wrap gap-1 flex-shrink-0">
                                                 <button
                                                     onClick={async () => {
                                                         try {
@@ -1426,9 +1426,6 @@ export const QRdaguaPage: React.FC = () => {
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={handleCancelEdit} className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                                    {t('cancelEdit')}
-                                                </button>
                                                 <button
                                                     onClick={() => handleDelete(project.id)}
                                                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 rounded-lg transition-colors"
@@ -1455,7 +1452,7 @@ export const QRdaguaPage: React.FC = () => {
                                             />
                                         </div>
 
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 break-all">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 break-all truncate">
                                             {project.destination_url}
                                         </p>
                                     </div>

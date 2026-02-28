@@ -206,6 +206,23 @@ export const contactsService = {
    */
   async delete(id: string): Promise<{ error: Error | null }> {
     try {
+      // ── Cascade-safe delete ──────────────────────────────────────────────────
+      // Supabase returns 409 Conflict when FK references still exist.
+      // We nullify those references first, then delete the contact.
+
+      // 1. Nullify contact_id in deals (if the deals table references contacts)
+      await supabase
+        .from('deals')
+        .update({ contact_id: null })
+        .eq('contact_id', id);
+
+      // 2. Nullify contact_id in activities
+      await supabase
+        .from('activities')
+        .update({ contact_id: null })
+        .eq('contact_id', id);
+
+      // 3. Now delete the contact — FK constraints are cleared
       const { error } = await supabase
         .from('contacts')
         .delete()
