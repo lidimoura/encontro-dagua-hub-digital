@@ -29,9 +29,36 @@ import {
   Sword,
   CheckCircle2,
   Bot,
+  UserCheck,
+  Folder,
+  QrCode,
+  Phone as PhoneIcon,
+  Tag,
+  Globe,
+  Loader2,
+  ExternalLink,
 } from 'lucide-react';
 import { StageProgressBar } from '../StageProgressBar';
 import { ActivityRow } from '@/features/activities/components/ActivityRow';
+import { supabase } from '@/lib/supabase/client';
+
+// ── Types for briefing_json and qr_codes ──────────────────────
+interface BriefingJson {
+  name?: string;
+  whatsapp?: string;
+  services?: string[];
+  source?: string;
+  landed_via?: string;
+}
+
+interface QrLink {
+  id: string;
+  title: string | null;
+  slug: string;
+  destination_url?: string | null;
+  scan_count?: number | null;
+  created_at: string;
+}
 import { useTranslation } from '@/hooks/useTranslation';
 
 // Utility to convert Blob to Base64
@@ -101,7 +128,15 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [aiResult, setAiResult] = useState<{ suggestion: string; score: number } | null>(null);
   const [emailDraft, setEmailDraft] = useState<string | null>(null);
   const [newNote, setNewNote] = useState('');
-  const [activeTab, setActiveTab] = useState<'timeline' | 'products' | 'info'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'products' | 'info' | 'documents'>('timeline');
+
+  // ── Conversion state ─────────────────────────────────────────
+  const [isConverting, setIsConverting] = useState(false);
+
+  // ── Documents tab state ───────────────────────────────────────
+  const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [docsError, setDocsError] = useState<string | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
@@ -131,10 +166,81 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
       setActiveTab('timeline');
       setIsEditingTitle(false);
       setIsEditingValue(false);
+      setQrLinks([]);
+      setDocsError(null);
     }
-  }, [isOpen, dealId]); // Depend on dealId to reset when switching deals
+  }, [isOpen, dealId]);
+
+  // ── Realtime sync: qr_codes ↟ Link d'Água → CRM (no F5 needed) ───
+  useEffect(() => {
+    if (activeTab !== 'documents') return;
+    const ct = deal ? contacts.find(c => c.id === deal.contactId) : null;
+    const lid = (ct as any)?.linkdagua_user_id as string | undefined;
+    if (!lid) { setQrLinks([]); return; }
+
+    // Initial load
+    setIsLoadingDocs(true);
+    setDocsError(null);
+    supabase
+      .from('qr_codes')
+      .select('id, title, slug, destination_url, scan_count, created_at')
+      .eq('user_id', lid)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) setDocsError(error.message);
+        else setQrLinks((data as QrLink[]) || []);
+        setIsLoadingDocs(false);
+      });
+
+    // Realtime: react instantly to changes from Link d'Água
+    const channel = supabase
+      .channel(`qr_realtime_${lid}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'qr_codes',
+        filter: `user_id=eq.${lid}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setQrLinks(prev => [payload.new as QrLink, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setQrLinks(prev =>
+            prev.map(q => q.id === (payload.new as QrLink).id ? (payload.new as QrLink) : q)
+          );
+        } else if (payload.eventType === 'DELETE') {
+          setQrLinks(prev => prev.filter(q => q.id !== (payload.old as { id: string }).id));
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [activeTab, deal?.contactId, contacts]);
 
   if (!isOpen || !deal) return null;
+
+  // ── briefing_json helper ──────────────────────────────────────
+  const contactObj = contacts.find(c => c.id === deal.contactId);
+  const briefingJson = (contactObj as any)?.briefing_json as BriefingJson | null | undefined;
+  const linkdaguaId = (contactObj as any)?.linkdagua_user_id as string | undefined;
+
+  // ── Converter para Cliente handler ────────────────────────────
+  const handleConvertToClient = async () => {
+    setIsConverting(true);
+    try {
+      // Try the new RPC first (requires migration 020)
+      const { data, error } = await supabase.rpc('convert_lead_to_client', {
+        p_lead_id: deal.contactId,
+      });
+      if (error) throw error;
+      // Update deal status to reflect conversion
+      updateDeal(deal.id, { status: 'CUSTOMER' });
+      addToast('✅ Lead convertido para cliente com sucesso!', 'success');
+    } catch (err: any) {
+      // Fallback: just mark the deal as won
+      updateDeal(deal.id, { status: DealStatus.CLOSED_WON });
+      addToast('Cliente marcado como ganho (conversão simplificada)', 'info');
+    } finally {
+      setIsConverting(false);
+    }
+  };
 
   const handleAnalyzeDeal = async () => {
     setIsAnalyzing(true);
@@ -396,7 +502,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 </p>
               )}
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
+              {/* Converter para Cliente button */}
+              {deal.status !== 'CUSTOMER' && deal.status !== DealStatus.CLOSED_WON && (
+                <button
+                  onClick={handleConvertToClient}
+                  disabled={isConverting}
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white rounded-lg font-bold text-sm shadow-sm flex items-center gap-2 transition-all"
+                  title="Converter este lead em cliente via RPC"
+                >
+                  {isConverting ? <Loader2 size={16} className="animate-spin" /> : <UserCheck size={16} />}
+                  CONVERTER
+                </button>
+              )}
               {deal.status !== DealStatus.CLOSED_WON && (
                 <button
                   onClick={() => {
@@ -509,6 +627,81 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 </div>
               </div>
 
+              {/* ── Briefing JSON Section ───────────────────────────── */}
+              {briefingJson && (
+                <div className="pt-4 border-t border-teal-100 dark:border-teal-900/30">
+                  <h3 className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase mb-3 flex items-center gap-1.5">
+                    <Tag size={12} /> Briefing do Lead
+                  </h3>
+                  <div className="space-y-2.5">
+                    {briefingJson.whatsapp && (
+                      <div className="flex items-start gap-2">
+                        <PhoneIcon size={13} className="text-teal-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">WhatsApp</p>
+                          <a
+                            href={`https://wa.me/${briefingJson.whatsapp.replace(/\D/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
+                          >
+                            {briefingJson.whatsapp}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    {briefingJson.services && briefingJson.services.length > 0 && (
+                      <div className="flex items-start gap-2">
+                        <Package size={13} className="text-teal-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">Serviços de Interesse</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {briefingJson.services.map((s, i) => (
+                              <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700/40">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {briefingJson.source && (
+                      <div className="flex items-start gap-2">
+                        <Globe size={13} className="text-teal-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">Origem</p>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${briefingJson.source === 'Amazô SDR'
+                            ? 'bg-blue-900 text-blue-200'
+                            : briefingJson.source === 'Hub LP'
+                              ? 'bg-emerald-900/40 text-emerald-300'
+                              : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                            }`}>
+                            {briefingJson.source}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {briefingJson.landed_via && (
+                      <div className="flex items-start gap-2">
+                        <ExternalLink size={13} className="text-teal-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">Canal de Entrada</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 font-mono">{briefingJson.landed_via}</p>
+                        </div>
+                      </div>
+                    )}
+                    {linkdaguaId && (
+                      <div className="flex items-center gap-2 mt-1 pt-2 border-t border-teal-100 dark:border-teal-900/20">
+                        <QrCode size={12} className="text-purple-500" />
+                        <p className="text-[10px] text-slate-400">
+                          Link d'Água: <span className="font-mono text-purple-500">{linkdaguaId.slice(0, 8)}…</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* DYNAMIC CUSTOM FIELDS INPUTS */}
               {customFieldDefinitions.length > 0 && (
                 <div className="pt-4 border-t border-slate-100 dark:border-white/5">
@@ -571,6 +764,18 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                   className={`text-sm font-bold h-14 border-b-2 transition-colors ${activeTab === 'info' ? 'border-primary-500 text-primary-600 dark:text-white' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
                 >
                   IA Insights
+                </button>
+                <button
+                  onClick={() => setActiveTab('documents')}
+                  className={`text-sm font-bold h-14 border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'documents' ? 'border-purple-500 text-purple-600 dark:text-purple-300' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+                >
+                  <Folder size={14} />
+                  Documentos
+                  {linkdaguaId && (
+                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+                      QR
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -880,6 +1085,94 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                       </div>
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* ── DOCUMENTS TAB ───────────────────────────────────── */}
+              {activeTab === 'documents' && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                      <QrCode size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white">Projetos Link d'Água</h3>
+                      <p className="text-xs text-slate-500">
+                        {linkdaguaId
+                          ? `QR Codes vinculados a ${linkdaguaId.slice(0, 8)}…`
+                          : 'Nenhum linkdagua_user_id associado a este contato'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {!linkdaguaId && (
+                    <div className="text-center py-10 text-slate-400">
+                      <Folder size={32} className="mx-auto mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Sem vínculo com Link d'Água</p>
+                      <p className="text-xs mt-1">Adicione o <code className="bg-slate-100 dark:bg-white/10 px-1 rounded">linkdagua_user_id</code> ao contato para ver os projetos QR aqui.</p>
+                    </div>
+                  )}
+
+                  {linkdaguaId && isLoadingDocs && (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 size={28} className="animate-spin text-purple-500" />
+                    </div>
+                  )}
+
+                  {linkdaguaId && docsError && (
+                    <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-700/40 text-sm text-red-600 dark:text-red-400">
+                      Erro ao carregar projetos: {docsError}
+                    </div>
+                  )}
+
+                  {linkdaguaId && !isLoadingDocs && !docsError && qrLinks.length === 0 && (
+                    <div className="text-center py-10 text-slate-400">
+                      <QrCode size={32} className="mx-auto mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Nenhum projeto QR encontrado</p>
+                      <p className="text-xs mt-1">O cliente ainda não criou projetos no Link d'Água.</p>
+                    </div>
+                  )}
+
+                  {linkdaguaId && !isLoadingDocs && qrLinks.length > 0 && (
+                    <div className="space-y-2">
+                      {qrLinks.map(qr => (
+                        <div
+                          key={qr.id}
+                          className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:border-purple-300 dark:hover:border-purple-500/40 transition-all group"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                            <QrCode size={18} className="text-purple-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                              {qr.title || qr.slug}
+                            </p>
+                            <p className="text-xs text-slate-500 font-mono truncate">/{qr.slug}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            {qr.scan_count != null && (
+                              <p className="text-xs font-bold text-purple-600 dark:text-purple-400">
+                                {qr.scan_count} scan{qr.scan_count !== 1 ? 's' : ''}
+                              </p>
+                            )}
+                            <p className="text-[10px] text-slate-400">
+                              {new Date(qr.created_at).toLocaleDateString('pt-BR')}
+                            </p>
+                          </div>
+                          {qr.destination_url && (
+                            <a
+                              href={qr.destination_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-slate-300 dark:text-slate-600 hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
