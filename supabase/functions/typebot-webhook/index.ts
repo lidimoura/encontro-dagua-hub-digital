@@ -1,133 +1,152 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+// ─────────────────────────────────────────────────────────
+// Typebot Webhook — Amazô SDR
+// Receives leads from the Typebot chatbot and inserts them
+// into `contacts` with source='Amazô SDR' + briefing_json.
+// ─────────────────────────────────────────────────────────
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
-    // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
     }
 
     try {
-        // Initialize Supabase client
         const supabaseClient = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-            {
-                auth: {
-                    autoRefreshToken: false,
-                    persistSession: false,
-                },
-            }
+            { auth: { autoRefreshToken: false, persistSession: false } }
         );
 
-        // Parse request body
         const payload = await req.json();
-        console.log('Received Typebot webhook:', JSON.stringify(payload, null, 2));
+        console.log('[typebot-webhook] Received:', JSON.stringify(payload, null, 2));
 
-        // Extract lead data from Typebot payload
-        // Adjust these field names based on your Typebot configuration
-        const leadData = {
-            name: payload.name || payload.fullName || payload.Nome || '',
-            whatsapp: payload.whatsapp || payload.phone || payload.telefone || '',
-            email: payload.email || payload.Email || null,
-            businessType: payload.businessType || payload.tipoNegocio || null,
-            referralSource: payload.referralSource || payload.origem || 'typebot',
-            message: payload.message || payload.mensagem || null,
-        };
+        // ── Extract fields (Typebot variable naming conventions) ──────────
+        const name = payload.name || payload.Nome || payload.fullName || '';
+        const whatsapp = payload.whatsapp || payload.phone || payload.telefone || '';
+        const email = payload.email || payload.Email || null;
+        const services = payload.services || payload.servicos || null;  // array or string
+        const landedVia = payload.landedVia || payload.origem_url || 'typebot';
+        const message = payload.message || payload.mensagem || null;
+        const businessType = payload.businessType || payload.tipoNegocio || null;
 
-        // Validate required fields
-        if (!leadData.name || !leadData.whatsapp) {
-            console.error('Missing required fields:', leadData);
+        // Validate required
+        if (!name || !whatsapp) {
             return new Response(
-                JSON.stringify({ error: 'Missing required fields: name and whatsapp' }),
-                {
-                    status: 400,
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                }
+                JSON.stringify({ error: 'Campos obrigatórios ausentes: name e whatsapp' }),
+                { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
 
-        // 1. Add to waitlist
-        const { data: waitlistData, error: waitlistError } = await supabaseClient
-            .from('waitlist')
-            .insert([
-                {
-                    name: leadData.name,
-                    whatsapp: leadData.whatsapp,
-                    email: leadData.email,
-                    referred_by: leadData.referralSource,
-                    status: 'PENDING',
-                    metadata: {
-                        businessType: leadData.businessType,
-                        message: leadData.message,
-                        source: 'typebot_webhook',
-                        timestamp: new Date().toISOString(),
-                        rawPayload: payload,
-                    },
-                },
-            ])
-            .select();
+        // Normalize services into array
+        const servicesArray: string[] = Array.isArray(services)
+            ? services
+            : typeof services === 'string' && services.trim()
+                ? services.split(',').map((s: string) => s.trim())
+                : businessType
+                    ? [businessType]
+                    : [];
 
-        if (waitlistError) {
-            console.error('Waitlist insertion error:', waitlistError);
-            throw waitlistError;
-        }
+        // ── briefing_json: structured payload for CRM display ─────────────
+        const briefingJson = {
+            name,
+            whatsapp,
+            services: servicesArray,
+            source: 'Amazô SDR',
+            landed_via: landedVia,
+            message: message || undefined,
+            capture_time: new Date().toISOString(),
+        };
 
-        console.log('Waitlist entry created:', waitlistData);
-
-        // 2. Create contact as LEAD
+        // ── 1. Insert into contacts with source='Amazô SDR' ──────────────
         const { data: contactData, error: contactError } = await supabaseClient
             .from('contacts')
-            .insert([
-                {
-                    name: leadData.name,
-                    phone: leadData.whatsapp,
-                    email: leadData.email || `${leadData.whatsapp.replace(/\D/g, '')}@temp.typebot.com`,
-                    status: 'ACTIVE',
-                    stage: 'LEAD',
-                    source: 'WEBSITE',
-                    notes: `Lead capturado via Typebot\nTipo de Negócio: ${leadData.businessType || 'Não informado'}\nMensagem: ${leadData.message || 'Nenhuma'}\nOrigem: ${leadData.referralSource}`,
-                    company_id: null, // Will be created by admin
-                },
-            ])
-            .select();
+            .insert([{
+                name,
+                phone: whatsapp,
+                email: email || `${whatsapp.replace(/\D/g, '')}@sdr.amazo.bot`,
+                status: 'ACTIVE',
+                stage: 'LEAD',
+                source: 'Amazô SDR',       // ← critical for AnalyticsSourceCard
+                briefing_json: briefingJson,     // ← critical for CRM sidebar display
+                notes: `Lead via Amazô SDR\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}\nMensagem: ${message || 'n/a'}`,
+                company_id: null,
+            }])
+            .select('id, name')
+            .single();
 
         if (contactError) {
-            // Log but don't fail if contact already exists
-            console.warn('Contact creation warning (may already exist):', contactError);
-        } else {
-            console.log('Contact created:', contactData);
+            // Handle duplicate (upsert by whatsapp if needed)
+            if (contactError.code === '23505') {
+                console.warn('[typebot-webhook] Duplicate contact, fetching existing...');
+                const { data: existing } = await supabaseClient
+                    .from('contacts')
+                    .select('id, name')
+                    .eq('phone', whatsapp)
+                    .single();
+                console.log('[typebot-webhook] Existing contact:', existing);
+            } else {
+                console.error('[typebot-webhook] Contact error:', contactError);
+                throw contactError;
+            }
         }
 
-        // Return success response
+        console.log('[typebot-webhook] Contact created:', contactData);
+
+        // ── 2. Also add to waitlist for backward compat ──────────────────
+        await supabaseClient
+            .from('waitlist')
+            .insert([{
+                name,
+                whatsapp,
+                email,
+                referred_by: 'Amazô SDR',
+                status: 'PENDING',
+                metadata: { ...briefingJson, rawPayload: payload },
+            }])
+            .select()
+            .then(({ error }) => {
+                if (error) console.warn('[typebot-webhook] Waitlist insert warning:', error.message);
+            });
+
+        // ── 3. Fire push notification for Lidi ──────────────────────────
+        // Non-blocking: push is best-effort
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+        fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceKey}`,
+            },
+            body: JSON.stringify({
+                title: '🤖 Novo Lead SDR!',
+                notifBody: `${name} entrou pelo Amazô SDR`,
+                url: '/boards',
+                lead_id: contactData?.id,
+            }),
+        }).catch(e => console.warn('[typebot-webhook] Push notification failed:', e.message));
+
         return new Response(
             JSON.stringify({
                 success: true,
-                message: 'Lead captured successfully',
-                waitlistId: waitlistData?.[0]?.id,
-                contactId: contactData?.[0]?.id,
+                message: 'Lead SDR capturado com briefing_json',
+                contactId: contactData?.id,
+                source: 'Amazô SDR',
             }),
-            {
-                status: 200,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     } catch (error) {
-        console.error('Webhook error:', error);
+        console.error('[typebot-webhook] Error:', error);
         return new Response(
-            JSON.stringify({
-                error: error.message || 'Internal server error',
-                details: error.toString(),
-            }),
-            {
-                status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            }
+            JSON.stringify({ error: error.message || 'Internal server error' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     }
 });

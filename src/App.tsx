@@ -1,4 +1,5 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { supabase } from '@/lib/supabase/client';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { CRMProvider } from '@/context/CRMContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -81,17 +82,76 @@ const ProtectedLayout: React.FC = () => (
   </ProtectedRoute>
 );
 
+// ── Web Push helper ─────────────────────────────────────────────
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const buf = new ArrayBuffer(rawData.length);
+  const arr = new Uint8Array(buf);
+  for (let i = 0; i < rawData.length; i++) arr[i] = rawData.charCodeAt(i);
+  return arr;
+}
+
 const App: React.FC = () => {
   // STRICT ENFORCEMENT: Force English for International Demo
   React.useEffect(() => {
     const saved = localStorage.getItem('app_language');
     if (saved !== 'en') {
       localStorage.setItem('app_language', 'en');
-      // Only reload if we actually changed something to avoid loops
-      if (saved === 'pt') {
-        window.location.reload();
-      }
+      if (saved === 'pt') window.location.reload();
     }
+  }, []);
+
+  // ── Service Worker & Push Notification registration ──────────
+  useEffect(() => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+    // Register SW
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(async (registration) => {
+        console.log('[SW] Registered:', registration.scope);
+
+        // Only prompt for push if user is logged in and hasn't subscribed yet
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const permission = Notification.permission;
+        if (permission === 'denied') return;
+
+        // Check if already subscribed
+        const existing = await registration.pushManager.getSubscription();
+        if (existing) return;
+
+        // Request permission
+        const granted = permission === 'granted'
+          ? 'granted'
+          : await Notification.requestPermission();
+        if (granted !== 'granted') return;
+
+        // Subscribe
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+        if (!vapidPublicKey) {
+          console.warn('[Push] VITE_VAPID_PUBLIC_KEY not set in .env');
+          return;
+        }
+
+        const sub = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+        });
+
+        const subJson = sub.toJSON();
+        await supabase.from('push_subscriptions').upsert({
+          endpoint: subJson.endpoint,
+          p256dh: (subJson.keys as any)?.p256dh,
+          auth: (subJson.keys as any)?.auth,
+          user_id: session.user.id,
+        }, { onConflict: 'endpoint' });
+
+        console.log('[Push] Subscribed and saved to push_subscriptions');
+      })
+      .catch(err => console.warn('[SW] Registration failed:', err));
   }, []);
 
   return (
