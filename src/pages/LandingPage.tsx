@@ -465,6 +465,85 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
+        {/* ────────────────────────────────────────────────── */}
+        {/* SOLUÇÃO #1 — LINK D'ÁGUA (DESTAQUE PRINCIPAL)     */}
+        {/* ────────────────────────────────────────────────── */}
+        <section className="py-20 px-6 bg-gradient-to-br from-[#02040a] via-[#05021a] to-[#02040a] border-y border-teal-500/10">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              {/* Left: copy */}
+              <div className="flex-1 text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-black uppercase tracking-wider mb-6">
+                  <Globe className="w-3 h-3" /> Produto Principal
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+                  Link d'Água
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400">
+                    Sua vitrine digital
+                  </span>
+                </h2>
+                <p className="text-xl text-slate-300 mb-4 max-w-xl">
+                  Uma página profissional com <strong className="text-white">todos os seus links, serviços e contatos</strong> em um único endereço compartilhável.
+                </p>
+                <ul className="space-y-3 mb-10">
+                  {[
+                    '📱 Link único que vai no WhatsApp, Instagram e cartão',
+                    '🛍️ Vitrine de produtos e serviços com fotos',
+                    '📊 Analytics de cliques em tempo real',
+                    '🔗 QR Code gerado automaticamente',
+                    '✅ Sem precisar de site — funciona em qualquer celular',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-slate-300 text-sm">
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a
+                    href="https://link.encontrodagua.com/vitrine"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-black font-black rounded-2xl hover:from-teal-400 hover:to-cyan-400 transition-all shadow-2xl shadow-teal-500/30 text-center flex items-center justify-center gap-2 text-lg"
+                  >
+                    <Globe size={20} /> Ver Vitrine
+                  </a>
+                  <button
+                    onClick={() => setIsApplicationModalOpen(true)}
+                    className="px-8 py-4 bg-white/5 border border-teal-500/30 text-teal-300 font-bold rounded-2xl hover:bg-white/10 transition-all text-center"
+                  >
+                    Quero o meu
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: live preview card */}
+              <div className="flex-shrink-0 w-full max-w-xs">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-teal-500/10 rounded-3xl blur-xl" />
+                  <div className="relative bg-[#0a1a1a] border border-teal-500/20 rounded-3xl p-6 shadow-2xl">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-600 flex items-center justify-center text-lg font-black text-black">L</div>
+                      <div>
+                        <p className="font-bold text-white text-sm">Lidi Moura</p>
+                        <p className="text-xs text-teal-400">link.encontrodagua.com/lidi</p>
+                      </div>
+                    </div>
+                    {['WhatsApp', 'Instagram', 'Portfólio', 'Agendamento'].map((link) => (
+                      <div key={link} className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0">
+                        <span className="text-sm text-slate-300">{link}</span>
+                        <ArrowRight size={14} className="text-teal-400" />
+                      </div>
+                    ))}
+                    <div className="mt-4 pt-4 border-t border-white/5 text-center">
+                      <p className="text-[10px] text-teal-500 font-mono">247 cliques esta semana ↑</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* PROMPT LAB (INTERATIVO) - Solução #1 */}
         <section className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-4xl mx-auto">
@@ -552,17 +631,29 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* QR D'ÁGUA - Solução #2 */}
-        <section className="py-20 px-6 bg-[#02040a]">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> QR D'água
+        {/* QR D'ÁGUA — ferramenta interna do Hub (não promovida externamente) */}
+        <section className="py-12 px-6 bg-[#02040a]">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center gap-4 p-5 rounded-2xl bg-white/3 border border-white/5">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="p-2 bg-purple-500/10 rounded-xl">
+                  <QrCode className="w-6 h-6 text-purple-400" />
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <p className="text-white font-bold text-sm">QR d'Água</p>
+                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-700 text-slate-400 uppercase tracking-wider">Ferramenta Interna</span>
+                  </div>
+                  <p className="text-xs text-slate-500">Geração de QR Codes personalizados para clientes Hub — acessível pelo painel de gestão.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsApplicationModalOpen(true)}
+                className="text-xs font-bold text-purple-400 hover:text-purple-300 whitespace-nowrap border border-purple-500/20 px-4 py-2 rounded-xl hover:bg-purple-500/10 transition-all"
+              >
+                Sou cliente → acessar
+              </button>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('qrWaterTitle')}</h2>
-            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              {t('qrDesc')}
-            </p>
-            <PhoneSimulator className="mx-auto" />
           </div>
         </section>
 
