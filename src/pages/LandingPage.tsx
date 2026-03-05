@@ -700,19 +700,18 @@ Agora, gere o prompt perfeito:`;
                       className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start cursor-pointer group"
                     >
                       <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl p-2.5 flex items-center justify-center group-hover:scale-105 transition-transform shadow-xl" style={{ boxShadow: `0 4px 24px 0 ${(project.color || '#1a1a2e')}44` }}>
-                        <QRCode
+                        <QRCodeSVG
                           value={`${window.location.origin}/#/v/${project.slug}`}
                           size={116}
-                          ecLevel="M"
+                          level="M"
                           fgColor="#111111"
                           bgColor="#FFFFFF"
-                          qrStyle="squares"
-                          eyeRadius={4}
-                          renderAs="svg"
-                          logoImage={project.qr_logo_url || ''}
-                          logoWidth={project.qr_logo_url ? 24 : 0}
-                          logoHeight={project.qr_logo_url ? 24 : 0}
-                          removeQrCodeBehindLogo={true}
+                          imageSettings={project.qr_logo_url ? {
+                            src: project.qr_logo_url,
+                            width: 24,
+                            height: 24,
+                            excavate: true,
+                          } : undefined}
                         />
                       </div>
                       <h3 className="font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">{project.client_name}</h3>
@@ -730,15 +729,12 @@ Agora, gere o prompt perfeito:`;
                     ].map((mock) => (
                       <div key={mock.slug} className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start">
                         <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl p-2.5 flex items-center justify-center shadow-xl" style={{ boxShadow: `0 4px 24px 0 ${mock.color}44` }}>
-                          <QRCode
+                          <QRCodeSVG
                             value={`https://link.encontrodagua.com/${mock.slug}`}
                             size={116}
-                            ecLevel="M"
+                            level="M"
                             fgColor="#111111"
                             bgColor="#FFFFFF"
-                            qrStyle="squares"
-                            eyeRadius={4}
-                            renderAs="svg"
                           />
                         </div>
                         <h3 className="font-bold text-white mb-1">{mock.name}</h3>
