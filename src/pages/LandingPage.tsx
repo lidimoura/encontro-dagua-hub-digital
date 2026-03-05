@@ -472,7 +472,7 @@ Agora, gere o prompt perfeito:`;
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center gap-16">
               {/* Left: copy */}
-              <div className="flex-1 text-left">
+              <div className="flex-1 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-black uppercase tracking-wider mb-6">
                   <Globe className="w-3 h-3" /> Produto Principal
                 </div>
@@ -482,7 +482,7 @@ Agora, gere o prompt perfeito:`;
                     Sua vitrine digital
                   </span>
                 </h2>
-                <p className="text-xl text-slate-300 mb-4 max-w-xl">
+                <p className="text-xl text-slate-300 mb-4 max-w-xl mx-auto lg:mx-0">
                   Uma página profissional com <strong className="text-white">todos os seus links, serviços e contatos</strong> em um único endereço compartilhável.
                 </p>
                 <ul className="space-y-3 mb-10">
@@ -493,12 +493,12 @@ Agora, gere o prompt perfeito:`;
                     '🔗 QR Code gerado automaticamente',
                     '✅ Sem precisar de site — funciona em qualquer celular',
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-slate-300 text-sm">
+                    <li key={item} className="flex items-start justify-center lg:justify-start gap-3 text-slate-300 text-sm">
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <a
                     href="https://link.encontrodagua.com/vitrine"
                     target="_blank"
@@ -699,18 +699,19 @@ Agora, gere o prompt perfeito:`;
                       rel="noopener noreferrer"
                       className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start cursor-pointer group"
                     >
-                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                      <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl p-2.5 flex items-center justify-center group-hover:scale-105 transition-transform shadow-xl" style={{ boxShadow: `0 4px 24px 0 ${(project.color || '#1a1a2e')}44` }}>
                         <QRCode
                           value={`${window.location.origin}/#/v/${project.slug}`}
-                          size={112}
-                          ecLevel="H"
-                          fgColor={project.color || '#620939'}
-                          bgColor="transparent"
-                          qrStyle="dots"
-                          eyeRadius={10}
+                          size={116}
+                          ecLevel="M"
+                          fgColor="#111111"
+                          bgColor="#FFFFFF"
+                          qrStyle="squares"
+                          eyeRadius={4}
+                          renderAs="svg"
                           logoImage={project.qr_logo_url || ''}
-                          logoWidth={project.qr_logo_url ? 28 : 0}
-                          logoHeight={project.qr_logo_url ? 28 : 0}
+                          logoWidth={project.qr_logo_url ? 24 : 0}
+                          logoHeight={project.qr_logo_url ? 24 : 0}
                           removeQrCodeBehindLogo={true}
                         />
                       </div>
@@ -722,32 +723,29 @@ Agora, gere o prompt perfeito:`;
                 ) : (
                   // Fallback mockups when no real data
                   <>
-                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start">
-                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                        <QrCode className="w-full h-full text-slate-900" />
+                    {[
+                      { name: 'Dra. Ana Silva', type: 'Advogada • Direito da Família', desc: 'Cartão Digital com links para WhatsApp, Instagram e agendamento', slug: 'ana-silva', color: '#0ea5e9' },
+                      { name: 'Restaurante Amazônia', type: 'Gastronomia Regional', desc: 'QR Code no cardápio para pedidos direto no WhatsApp', slug: 'restaurante-amazonia', color: '#f59e0b' },
+                      { name: 'João Consultor', type: 'Consultoria de Negócios', desc: 'Link único para portfólio e redes sociais', slug: 'joao-consultor', color: '#a855f7' },
+                    ].map((mock) => (
+                      <div key={mock.slug} className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start">
+                        <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl p-2.5 flex items-center justify-center shadow-xl" style={{ boxShadow: `0 4px 24px 0 ${mock.color}44` }}>
+                          <QRCode
+                            value={`https://link.encontrodagua.com/${mock.slug}`}
+                            size={116}
+                            ecLevel="M"
+                            fgColor="#111111"
+                            bgColor="#FFFFFF"
+                            qrStyle="squares"
+                            eyeRadius={4}
+                            renderAs="svg"
+                          />
+                        </div>
+                        <h3 className="font-bold text-white mb-1">{mock.name}</h3>
+                        <p className="text-xs text-slate-400 mb-3">{mock.type}</p>
+                        <p className="text-xs text-slate-500">{mock.desc}</p>
                       </div>
-                      <h3 className="font-bold text-white mb-1">Dra. Ana Silva</h3>
-                      <p className="text-xs text-slate-400 mb-3">Advogada • Direito da Família</p>
-                      <p className="text-xs text-slate-500">Cartão Digital com links para WhatsApp, Instagram e agendamento</p>
-                    </div>
-
-                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/50 transition snap-start">
-                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                        <QrCode className="w-full h-full text-slate-900" />
-                      </div>
-                      <h3 className="font-bold text-white mb-1">Restaurante Amazônia</h3>
-                      <p className="text-xs text-slate-400 mb-3">Gastronomia Regional</p>
-                      <p className="text-xs text-slate-500">QR Code no cardápio para pedidos direto no WhatsApp</p>
-                    </div>
-
-                    <div className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-fuchsia-500/50 transition snap-start">
-                      <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-xl p-3 flex items-center justify-center">
-                        <QrCode className="w-full h-full text-slate-900" />
-                      </div>
-                      <h3 className="font-bold text-white mb-1">João Consultor</h3>
-                      <p className="text-xs text-slate-400 mb-3">Consultoria de Negócios</p>
-                      <p className="text-xs text-slate-500">Link único para portfólio e redes sociais</p>
-                    </div>
+                    ))}
                   </>
                 )}
               </div>
