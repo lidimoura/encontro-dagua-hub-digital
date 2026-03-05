@@ -43,3 +43,16 @@ tmp/
 # Misc dev files
 *.local
 vercel_logs.txt
+
+# Scripts de diagnóstico / descartáveis (NUNCA subir ao Git)
+# Estes scripts frequentemente contêm chaves de API para testes locais
+scripts/
+
+# Segurança — padrões de arquivos com chaves
+*.pem
+*.key
+*.secret
+secrets.json
+.secrets
+supabase/.env
+.env.supabase
