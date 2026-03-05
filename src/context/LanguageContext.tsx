@@ -12,7 +12,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // Initialize from localStorage or default to 'pt' (PT-BR is the primary market)
     const [language, setLanguageState] = useState<Language>(() => {
-        const saved = localStorage.getItem('app_language');
+        const saved = localStorage.getItem('app_language_v2');
         return (saved === 'pt' || saved === 'en') ? saved : 'pt';
     });
 
@@ -39,7 +39,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     // Update localStorage when language changes
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
-        localStorage.setItem('app_language', lang);
+        localStorage.setItem('app_language_v2', lang);
     };
 
     useEffect(() => {
