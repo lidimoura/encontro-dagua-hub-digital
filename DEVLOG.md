@@ -4,7 +4,54 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 
 ---
 
-## [02/12/2025] - Mobile UX
+## [05/03/2026] - Landing Page Polish & QR Gallery Fix
+
+### 🎯 UX — Landing Page
+
+**Centralização da Seção Link d'Água**
+- **Problema**: A seção "Link d'Água" na LP estava com conteúdo alinhado à esquerda em mobile, quebrando a consistência visual.
+- **Fix**: `text-center lg:text-left` na coluna de copy; `justify-center lg:justify-start` nos botões e lista de features; `mx-auto lg:mx-0` no parágrafo descritivo.
+- **Arquivo**: `src/pages/LandingPage.tsx`
+
+### 🖼️ Fix — Galeria de Clientes (QR Codes)
+
+**Problema crítico identificado**: Os QR Codes exibidos na galeria pública da LP eram ilegíveis e não escaneáveis pelos seguintes motivos:
+1. `bgColor="transparent"` — fundo transparente tornava o código invisível
+2. `fgColor={project.color}` — cor customizada (ex: `#620939`) sem contraste suficiente
+3. `ecLevel="H"` + `qrStyle="dots"` + logo — combinação que reduzia a densidade legível
+4. Renderização em **canvas** (padrão) — pixelado em telas retina e ao imprimir
+
+**Solução aplicada**:
+- `bgColor="#FFFFFF"` + `fgColor="#111111"` → máximo contraste, sempre escaneável
+- `ecLevel="M"` → menos redundância, módulos maiores e mais legíveis
+- `qrStyle="squares"` → estilo padrão, compatível com todos os leitores
+- `eyeRadius={4}` → leve arredondamento elegante sem comprometer leitura
+- **`renderAs="svg"`** → renderização vetorial: nítido em qualquer resolução (retina/4K) e pronto para impressão profissional HD
+- Container aumentado de `w-32` para `w-36`, sombra colorida temática por projeto
+- Fallback mockups: substituídos ícones genéricos por QRCodes reais com URLs de demonstração
+
+**Arquivos**: `src/pages/LandingPage.tsx`
+
+### 🌐 I18n — PT-BR como Idioma Principal
+
+**Confirmado**: `LanguageContext.tsx` já tinha `'pt'` como default correto (linha 16).
+**Ação**: Documentação completa traduzida e priorizada em PT-BR:
+- `README.md` — reescrito em PT-BR, Link d'Água destacado como produto principal
+- `HUB_SHOWCASE.md` — traduzido, história da fundadora em PT-BR, seção da galeria atualizada
+- `USER_GUIDE.md` — traduzido, Link d'Água na seção 1 como produto principal
+
+### 📊 Métricas da Sprint
+
+| Métrica | Valor |
+|---------|-------|
+| Arquivos modificados | 4 |
+| QR Codes corrigidos | 2 instâncias (real + fallback) |
+| Docs atualizados | 3 (README, HUB_SHOWCASE, USER_GUIDE) |
+| Bugs visuais corrigidos | 3 (alinhamento LP, QR ilegível, pixelado) |
+
+---
+
+
 
 - **Implementado bot├úo Hamb├║rguer**: Adicionado menu mobile responsivo no Layout.tsx
 - **Estado isMobileMenuOpen**: Gerenciamento de estado para controle do menu mobile
