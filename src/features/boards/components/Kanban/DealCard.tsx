@@ -99,11 +99,20 @@ export const DealCard: React.FC<DealCardProps> = ({
       )}
 
       <div className="flex gap-1 mb-2 flex-wrap items-center">
-        {deal.source && deal.source.trim() !== '' && deal.source !== 'Desconhecido' && (
-          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 uppercase tracking-wide">
-            {deal.source}
-          </span>
-        )}
+        {deal.source && deal.source.trim() !== '' && deal.source !== 'Desconhecido' && (() => {
+          const isSdr = deal.source === 'Amazô SDR';
+          const isHub = deal.source === 'Hub LP';
+          return (
+            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm uppercase tracking-wide border ${isSdr
+                ? 'bg-blue-900/80 text-blue-200 border-blue-700/60'
+                : isHub
+                  ? 'bg-emerald-800/60 text-emerald-200 border-emerald-700/50'
+                  : 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/50'
+              }`}>
+              {isSdr ? '🤖 SDR' : isHub ? '🌐 LP' : deal.source}
+            </span>
+          );
+        })()}
         {deal.tags.slice(0, 2).map(tag => (
           <span
             key={tag}

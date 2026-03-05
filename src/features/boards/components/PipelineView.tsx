@@ -11,6 +11,7 @@ import { MobileKanbanView } from './Mobile/MobileKanbanView';
 import { DealView, CustomFieldDefinition, DealStatus, Board, BoardStage } from '@/types';
 import { useCRM } from '@/context/CRMContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { AnalyticsSourceCard } from './AnalyticsSourceCard';
 
 interface PipelineViewProps {
   // Boards
@@ -190,6 +191,11 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
           />
 
           <BoardTabs board={activeBoard} />
+
+          {/* Analytics Source — live counters SDR vs LP */}
+          <div className="px-4 pt-2 pb-1">
+            <AnalyticsSourceCard />
+          </div>
 
           <div className="flex-1 overflow-hidden">
             {isMobile ? (
