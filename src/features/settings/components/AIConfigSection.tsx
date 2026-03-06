@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCRM } from '@/context/CRMContext';
-import { Bot, Key, Cpu, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bot, Key, Cpu, CheckCircle, AlertCircle, Save } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
 
 export const AIConfigSection: React.FC = () => {
     const {
@@ -9,8 +10,12 @@ export const AIConfigSection: React.FC = () => {
         aiModel, setAiModel,
         aiThinking, setAiThinking,
         aiSearch, setAiSearch,
-        aiAnthropicCaching, setAiAnthropicCaching
+        aiAnthropicCaching, setAiAnthropicCaching,
+        saveAISettings
     } = useCRM();
+
+    const { addToast } = useToast();
+    const [isSaving, setIsSaving] = useState(false);
 
     const providers = [
         {
@@ -55,6 +60,20 @@ export const AIConfigSection: React.FC = () => {
             // Prefer models with "Recomendado" in description, else first one
             const recommended = providerData.models.find(m => m.description.includes('Recomendado')) || providerData.models[0];
             setAiModel(recommended.id);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const { error } = await saveAISettings();
+            if (error) throw error;
+            addToast('success', 'Configurações de IA', 'Suas chaves e preferências foram salvas com sucesso.');
+        } catch (error) {
+            console.error('Failed to save AI settings:', error);
+            addToast('error', 'Erro ao salvar', 'Não foi possível salvar as configurações de IA.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -254,6 +273,26 @@ export const AIConfigSection: React.FC = () => {
                     </div>
                 </div>
 
+            </div>
+
+            <div className="mt-6 flex justify-end">
+                <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-lg shadow-purple-600/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    {isSaving ? (
+                        <>
+                            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                            Salvando...
+                        </>
+                    ) : (
+                        <>
+                            <Save size={18} />
+                            Salvar Configurações de IA
+                        </>
+                    )}
+                </button>
             </div>
         </div>
     );

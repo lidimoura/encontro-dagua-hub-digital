@@ -82,6 +82,9 @@ interface SettingsContextType {
 
   // Refresh
   refresh: () => Promise<void>;
+
+  // Save Settings
+  saveAISettings: () => Promise<{ error: Error | null }>;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -229,50 +232,55 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const setAiProvider = useCallback(
     async (provider: AIConfig['provider']) => {
       setAiProviderState(provider);
-      await updateSettings({ ai_provider: provider });
     },
-    [updateSettings]
+    []
   );
 
   const setAiApiKey = useCallback(
     async (key: string) => {
       setAiApiKeyState(key);
-      await updateSettings({ ai_api_key: key });
     },
-    [updateSettings]
+    []
   );
 
   const setAiModel = useCallback(
     async (model: string) => {
       setAiModelState(model);
-      await updateSettings({ ai_model: model });
     },
-    [updateSettings]
+    []
   );
 
   const setAiThinking = useCallback(
     async (enabled: boolean) => {
       setAiThinkingState(enabled);
-      await updateSettings({ ai_thinking: enabled });
     },
-    [updateSettings]
+    []
   );
 
   const setAiSearch = useCallback(
     async (enabled: boolean) => {
       setAiSearchState(enabled);
-      await updateSettings({ ai_search: enabled });
     },
-    [updateSettings]
+    []
   );
 
   const setAiAnthropicCaching = useCallback(
     async (enabled: boolean) => {
       setAiAnthropicCachingState(enabled);
-      await updateSettings({ ai_anthropic_caching: enabled });
     },
-    [updateSettings]
+    []
   );
+
+  const saveAISettings = useCallback(async () => {
+    return await updateSettings({
+      aiProvider: aiProvider,
+      aiApiKey: aiApiKey,
+      aiModel: aiModel,
+      aiThinking: aiThinking,
+      aiSearch: aiSearch,
+      aiAnthropicCaching: aiAnthropicCaching
+    });
+  }, [aiProvider, aiApiKey, aiModel, aiThinking, aiSearch, aiAnthropicCaching, updateSettings]);
 
   // Custom Fields (local state for now)
   const addCustomField = useCallback((field: Omit<CustomFieldDefinition, 'id'>) => {
@@ -349,6 +357,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       updateLead,
       discardLead,
       refresh: fetchSettings,
+      saveAISettings,
     }),
     [
       loading,
@@ -385,6 +394,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       updateLead,
       discardLead,
       fetchSettings,
+      saveAISettings,
     ]
   );
 

@@ -541,6 +541,18 @@ Agora, gere o prompt perfeito:`;
                 </div>
               </div>
             </div>
+
+            {/* VIDEO PLACEHOLDER 1: QR Code Animation */}
+            <div className="w-full mt-16 max-w-3xl mx-auto">
+              <div className="aspect-video bg-[#05021a]/80 border border-teal-500/20 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-cyan-500/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div className="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 text-black rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(20,184,166,0.3)] group-hover:scale-110 transition-transform z-10">
+                  <Play className="w-8 h-8 ml-1" fill="currentColor" />
+                </div>
+                <p className="text-teal-400 font-bold tracking-wider uppercase text-sm z-10">Animação em breve</p>
+                <p className="text-teal-500/60 font-mono text-xs mt-2 z-10">Gerado por Veo / Gemini</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -861,6 +873,28 @@ Agora, gere o prompt perfeito:`;
             </div>
 
             <button onClick={() => setActiveTeamIndex((p) => p === TEAM_MEMBERS.length - 1 ? 0 : p + 1)} className="absolute right-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronRight /></button>
+          </div>
+        </section>
+
+        {/* VIDEO PLACEHOLDER 2: Amazô Chat Demo */}
+        <section className="py-20 px-6 bg-[#05020a] border-t border-white/5 relative z-10 text-center">
+          <div className="max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <MessageCircle className="w-3 h-3" /> Amazô em Ação
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-8">Veja como funciona</h2>
+            <div className="aspect-video bg-slate-900/40 border border-fuchsia-500/20 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group shadow-2xl mx-auto max-w-3xl cursor-pointer">
+              {/* Mockup visual de chat de fundo */}
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#05020a] to-transparent pointer-events-none z-0"></div>
+              <div className="absolute left-8 bottom-16 w-64 h-20 bg-white/5 rounded-2xl rounded-bl-none border border-white/10 opacity-30"></div>
+              <div className="absolute right-8 bottom-40 w-56 h-16 bg-fuchsia-600/20 rounded-2xl rounded-br-none border border-fuchsia-500/30 opacity-40"></div>
+
+              <div className="w-16 h-16 bg-gradient-to-br from-fuchsia-600 to-purple-600 text-white rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(192,38,211,0.4)] group-hover:scale-110 transition-transform z-10">
+                <Play className="w-8 h-8 ml-1" fill="currentColor" />
+              </div>
+              <p className="text-fuchsia-400 font-bold tracking-wider uppercase text-sm z-10">Vídeo de Demonstração em Breve</p>
+              <p className="text-fuchsia-500/60 font-mono text-xs mt-2 z-10">Gravação do fluxo de atendimento</p>
+            </div>
           </div>
         </section>
 
