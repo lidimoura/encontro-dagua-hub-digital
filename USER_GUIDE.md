@@ -33,13 +33,30 @@ Para acessar: clique em "Ver Vitrine" na Landing Page ou acesse `/qrdagua` no pa
 - **Precy (Financeiro)**: Calcula precificação e ROI com suporte multicurrency (**BRL, USD, AUD**).
     - **Precificação Social**: Ative "Impacto Social" para descontos automáticos em ONGs.
 
-### 4. CRM (O Core)
-- **Boards**: Gestão de projetos estilo Kanban.
-- **Contatos**: Gestão centralizada com segurança RLS (Admins veem todos).
-- **Prompt Lab**: Crie e otimize prompts de IA em português ou inglês.
-- **QR D'água**: Gere QR Codes dinâmicos, Bridge Pages e Cartões Digitais.
+### 4. CRM — Trabalhando com Leads do Amazô SDR
+
+Quando o Amazô captura um lead, o CRM recebe um `briefing_json` com todos os dados do contato.
+Abra o card do lead no Kanban e você verá:
+
+#### Aba Produtos
+Um bloco **"Interesse declarado pelo Lead"** mostra, como badges coloridos, os serviços que o lead pediu
+(ex: "Link d'Água", "QR Code", "Consultoria"). Use isso para adicionar os produtos corretos abaixo.
+
+#### Aba Timeline
+Um card **"Briefing Automático — Amazô SDR"** aparece no topo com a mensagem original que o lead digitou
+no chatbot, incluindo data/hora de captura e canal de entrada.
+
+#### WhatsApp + IA (Sidebar — Contato Principal)
+1. Clique em **"📲 WhatsApp + Msg IA"** na sidebar do card.
+2. Aguarde 3-5 segundos — a IA (Gemini) gera uma mensagem personalizada com nome, serviços e contexto do lead.
+3. Revise/edite o texto no campo que aparecer.
+4. Clique em **"Abrir no WhatsApp"** — o WhatsApp Web abre com a mensagem já inserida, pronta para enviar.
+5. Se quiser uma versão diferente, clique em **"refazer"**.
+
+> 💡 **Dica**: Você sempre pode editar a mensagem antes de enviar. A IA oferece um ponto de partida excelente, mas o toque humano final é seu.
 
 ### 5. Ferramentas Admin
+
 - **Tech Stack**: Gerencie custos e assinaturas de ferramentas.
 - **Biblioteca**: Gerencie templates de contratos e assets.
 - **Decisões**: Insights de IA sobre deals estagnados.

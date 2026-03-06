@@ -8,6 +8,7 @@ import {
   generateEmailDraft,
   generateObjectionResponse,
   processAudioNote,
+  generateWAOutreach,
 } from '@/services/geminiService';
 import {
   BrainCircuit,
@@ -49,6 +50,8 @@ interface BriefingJson {
   services?: string[];
   source?: string;
   landed_via?: string;
+  message?: string;
+  capture_time?: string;
 }
 
 interface QrLink {
@@ -152,6 +155,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  // ── WA Outreach AI state ──────────────────────────────────────
+  const [waMessage, setWaMessage] = useState<string | null>(null);
+  const [isGeneratingWA, setIsGeneratingWA] = useState(false);
+
   // Helper functions removed as they are now handled by ActivityRow component
 
   // Reset state when deal changes or modal opens
@@ -239,6 +246,36 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
       addToast('Cliente marcado como ganho (conversão simplificada)', 'info');
     } finally {
       setIsConverting(false);
+    }
+  };
+
+  // ── WA Outreach handler ───────────────────────────────────────
+  const handleGenerateWAMessage = async () => {
+    setIsGeneratingWA(true);
+    setWaMessage(null);
+    try {
+      const msg = await generateWAOutreach(
+        deal,
+        briefingJson ? {
+          name: briefingJson.name,
+          services: briefingJson.services,
+          message: briefingJson.message,
+          whatsapp: briefingJson.whatsapp,
+        } : undefined,
+        {
+          provider: aiProvider,
+          apiKey: aiApiKey,
+          model: aiModel,
+          thinking: aiThinking,
+          search: aiSearch,
+          anthropicCaching: aiAnthropicCaching,
+        }
+      );
+      setWaMessage(msg);
+    } catch (err) {
+      setWaMessage('Erro ao gerar mensagem.');
+    } finally {
+      setIsGeneratingWA(false);
     }
   };
 
@@ -585,12 +622,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         (() => {
                           const stage = lifecycleStages.find(s => s.id === contact.stage);
                           if (!stage) return null;
-
-                          // Extract base color name (e.g. 'blue' from 'bg-blue-500')
-                          const colorClass = stage.color; // e.g. bg-blue-500
-                          // We need to construct text and ring classes dynamically or just use inline styles/safe list
-                          // For now, let's just use the background color provided and white text
-
+                          const colorClass = stage.color;
                           return (
                             <span
                               className={`text-[10px] font-black px-2 py-0.5 rounded shadow-sm uppercase tracking-wider flex items-center gap-1 text-white ${colorClass}`}
@@ -603,6 +635,52 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     <p className="text-slate-500 text-xs">{deal.contactEmail}</p>
                   </div>
                 </div>
+                {/* WhatsApp AI Outreach */}
+                {(briefingJson?.whatsapp || contact?.phone) && (
+                  <div className="mt-3 space-y-2">
+                    {!waMessage ? (
+                      <button
+                        onClick={handleGenerateWAMessage}
+                        disabled={isGeneratingWA}
+                        className="flex items-center gap-2 w-full justify-center px-3 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                      >
+                        {isGeneratingWA ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <PhoneIcon size={13} />
+                        )}
+                        {isGeneratingWA ? 'Gerando msg IA...' : '📲 WhatsApp + Msg IA'}
+                      </button>
+                    ) : (
+                      <div className="space-y-2 animate-in fade-in">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider flex items-center gap-1">
+                            <Bot size={10} /> Mensagem gerada pela IA
+                          </span>
+                          <button
+                            onClick={() => setWaMessage(null)}
+                            className="text-[10px] text-slate-400 hover:text-slate-600 underline"
+                          >
+                            refazer
+                          </button>
+                        </div>
+                        <textarea
+                          className="w-full text-xs text-slate-800 dark:text-slate-100 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/40 rounded-lg p-2 resize-none outline-none focus:ring-1 focus:ring-green-500 leading-relaxed min-h-[80px]"
+                          value={waMessage}
+                          onChange={e => setWaMessage(e.target.value)}
+                        />
+                        <a
+                          href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(waMessage)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 w-full justify-center px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                        >
+                          <PhoneIcon size={13} /> Abrir no WhatsApp
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-slate-100 dark:border-white/5">
@@ -783,6 +861,29 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
             <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30 dark:bg-black/10">
               {activeTab === 'timeline' && (
                 <div className="space-y-6">
+                  {/* Pinned Briefing Auto-Note */}
+                  {briefingJson?.message && (
+                    <div className="flex gap-3 animate-in fade-in">
+                      <div className="mt-1 w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shrink-0 shadow">
+                        <Bot size={14} className="text-white" />
+                      </div>
+                      <div className="flex-1 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-700/40 rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400">Briefing Automático — Amazô SDR</span>
+                          {briefingJson.capture_time && (
+                            <span className="text-[10px] text-slate-400 ml-auto">
+                              {new Date(briefingJson.capture_time).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">{briefingJson.message}</p>
+                        {briefingJson.landed_via && (
+                          <p className="mt-2 text-[10px] text-slate-400 font-mono">via {briefingJson.landed_via}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm">
                     <textarea
                       className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none min-h-[80px]"
@@ -844,6 +945,26 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
               {activeTab === 'products' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                  {/* Briefing: Serviços de Interesse */}
+                  {briefingJson?.services && briefingJson.services.length > 0 && (
+                    <div className="p-4 rounded-xl border border-teal-200 dark:border-teal-700/40 bg-teal-50/60 dark:bg-teal-900/10">
+                      <h3 className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <Bot size={13} /> Interesse declarado pelo Lead
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {briefingJson.services.map((s, i) => (
+                          <span
+                            key={i}
+                            className="text-xs font-semibold px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-800/40 text-teal-800 dark:text-teal-200 border border-teal-300 dark:border-teal-600/50"
+                          >
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-[10px] text-slate-400 italic">Estes serviços foram informados pelo lead no briefing. Adicione os produtos correspondentes abaixo.</p>
+                    </div>
+                  )}
+
                   <div className="bg-slate-50 dark:bg-black/20 p-4 rounded-xl border border-slate-200 dark:border-white/10">
                     <h3 className="text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                       <Package size={16} /> Adicionar Produto/Serviço
