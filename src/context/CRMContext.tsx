@@ -120,6 +120,9 @@ interface CRMContextType {
 
   // Refresh
   refresh: () => Promise<void>;
+
+  // Save Settings
+  saveAISettings: () => Promise<{ error: Error | null }>;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -224,6 +227,7 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     updateLead,
     discardLead,
     refresh: refreshSettings,
+    saveAISettings,
   } = useSettings();
 
   // Aggregate loading and error states
@@ -668,6 +672,7 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       aiAnthropicCaching,
       setAiAnthropicCaching,
       refresh,
+      saveAISettings,
     }),
     [
       loading,
@@ -737,6 +742,7 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       aiAnthropicCaching,
       setAiAnthropicCaching,
       refresh,
+      saveAISettings,
     ]
   );
 
