@@ -6,7 +6,7 @@
 O **Encontro D'água Hub** é um SaaS Enterprise Bilíngue que integra Estratégia Humana com Eficiência de IA.
 Mais do que um CRM, é um **Nexus** — o ponto central onde Leads, Negócios e Agentes de IA se encontram.
 
-[![Status](https://img.shields.io/badge/Status-Stable%20Beta-green)](HUB_SHOWCASE.md)
+[![Status](https://img.shields.io/badge/Status-Lançamento%20Beta-brightgreen)](HUB_SHOWCASE.md)
 [![Stack](https://img.shields.io/badge/Stack-React%20%7C%20Supabase%20%7C%20Gemini-blue)](package.json)
 [![Idioma Principal](https://img.shields.io/badge/Idioma-PT--BR-yellow)](src/context/LanguageContext.tsx)
 
@@ -39,8 +39,11 @@ Uma poderosa "Link in Bio" e geradora de QR Codes que alimenta diretamente o CRM
 
 ### 3. CRM Enterprise (O Core)
 - **Kanban Board:** Gestão drag-and-drop com indicadores de "Rotting".
+- **Briefing do Lead:** `briefing_json` do SDR exibido na aba Produtos (serviços de interesse), Timeline (nota automática do bot) e sidebar (botão WhatsApp direto).
+- **WhatsApp + IA:** Botão que gera mensagem personalizada via Gemini e abre `wa.me?text=` pré-preenchida — editável antes de enviar.
 - **Proteção Ghost Deal:** Verificações robustas de integridade de dados.
 - **Interface Bilíngue:** PT-BR como idioma principal, EN como alternativa.
+
 
 ---
 

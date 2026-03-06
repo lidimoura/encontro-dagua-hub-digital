@@ -4,7 +4,86 @@ Este arquivo registra todas as mudan├ºas significativas no projeto, organizad
 
 ---
 
-## [05/03/2026] - Landing Page Polish & QR Gallery Fix
+## [06/03/2026] — Sprint Lançamento: Briefing UI + WA IA + Import Histórico
+
+### 🎯 Feature — CRM: Renderização Completa do Briefing no Card do Lead
+
+O `briefing_json` capturado pelo Amazô SDR agora é exibido em **todas as abas** do `DealDetailModal`,
+eliminando a necessidade de abrir o banco para ver o contexto do lead.
+
+#### Aba Produtos (`activeTab === 'products'`)
+- **Novo**: Bloco "Interesse declarado pelo Lead" exibe os serviços de `briefing_json.services[]`
+  como chips/badges teal no topo da aba, antes do formulário de adicionar produto.
+- Instrução orientativa: "Estes serviços foram informados pelo lead no briefing. Adicione os produtos correspondentes abaixo."
+
+#### Aba Timeline (`activeTab === 'timeline'`)
+- **Novo**: Card "Briefing Automático — Amazô SDR" pintado em teal, fixado no topo da timeline.
+- Exibe `briefing_json.message` com data/hora de captura (`capture_time`) e canal de entrada (`landed_via`).
+- Ícone Bot diferencia visualmente da nota manual.
+
+#### Contato Principal (sidebar)
+- **Novo**: Botão/fluxo AI de WhatsApp descrito abaixo.
+
+#### Interface `BriefingJson` — campo `message` e `capture_time` adicionados ao tipo.
+
+---
+
+### 🤖 Feature — IA: Gerador de Mensagem WhatsApp (Primeiro Contato)
+
+Flow completo de abertura de conversa no WhatsApp com mensagem personalizada pela IA:
+
+1. **Botão "📲 WhatsApp + Msg IA"** aparece no bloco Contato Principal sempre que `briefing_json.whatsapp` ou `contact.phone` existir.
+2. Ao clicar, chama `generateWAOutreach()` (novo em `geminiService.ts`) via Gemini com contexto:
+   - Nome do lead, serviços de interesse, mensagem original do briefing, deal no CRM.
+3. IA gera mensagem personalizada, calorosa, direta — máx. 4 linhas, terminando com pergunta aberta.
+4. Mensagem aparece em `<textarea>` editável (SDR pode revisar/ajustar antes de enviar).
+5. Botão "Abrir no WhatsApp" abre `https://wa.me/{numero}?text={mensagemEncoded}` com a mensagem pré-preenchida.
+6. Link "refazer" descarta e gera nova versão.
+
+```typescript
+// geminiService.ts
+export const generateWAOutreach = async (
+  deal: Deal | DealView,
+  briefingData?: { name?, services?, message?, whatsapp? },
+  config?: AIConfig
+): Promise<string>
+```
+
+---
+
+### 🛠️ Script — Importação de Leads Históricos
+
+**Arquivo**: `scripts/import-leads.mjs` (Node.js ESM, zero dependências extras)
+
+- Lê `.env` automaticamente na raiz do projeto.
+- Busca todos os `contacts` no Supabase.
+- Identifica quais ainda **não têm um `deal`** associado no Kanban.
+- Cria deals em lotes de 50 no board padrão (etapa inicial), com `source`, `briefing_json` e tags.
+- Modo `--dry-run` para relatório seguro antes de tocar no banco.
+
+```powershell
+# Relatório sem criar dados:
+node scripts/import-leads.mjs --dry-run
+
+# Importação real:
+node scripts/import-leads.mjs
+```
+
+---
+
+### 📊 Métricas da Sprint
+
+| Métrica | Valor |
+|---------|-------|
+| Arquivos modificados | 3 (`DealDetailModal.tsx`, `geminiService.ts`, `scripts/import-leads.mjs`) |
+| Novas funções de serviço | 1 (`generateWAOutreach`) |
+| Novas features UI | 4 (badges Produtos, auto-note Timeline, botão WA, modal WA IA) |
+| Script de importação | ✅ Com --dry-run |
+| Docs atualizadas | 4 (DEVLOG, README, USER_GUIDE, HUB_SHOWCASE) |
+
+---
+
+
 
 ### 🎯 UX — Landing Page
 

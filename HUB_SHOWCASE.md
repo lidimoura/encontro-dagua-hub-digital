@@ -37,6 +37,13 @@ Percebendo que todo negócio precisa de um "Ponto de Entrada", transformamos o g
 - Não é apenas um link; é um funil completo.
 - **Galeria Pública:** Projetos reais de clientes exibidos na Landing Page com QR Codes SVG — nítidos para tela e impressão profissional.
 
+### O Ciclo Fechado: briefing_json → CRM → WhatsApp IA
+O Sprint de Lançamento (Mar 2026) fechou o loop SDR→CRM→Vendedor:
+1. Amazô captura lead → `briefing_json` salvo no Supabase.
+2. CRM exibe `services[]` como badges na aba Produtos, `message` como nota automática na Timeline.
+3. SDR clica em "📲 WhatsApp + Msg IA" → Gemini gera mensagem personalizada → wa.me abre pré-preenchido.
+4. **Tempo médio da Amazo capturar ao SDR iniciar conversa: < 2 minutos.**
+
 ---
 
 ## 🤖 O ESQUADRÃO: AGENTES DE IA
@@ -47,6 +54,7 @@ Evoluímos de "Chatbots" para "Agentes". Eles não apenas conversam; eles *agem*
 *Papel: Customer Success & Vendas — externo.*
 - **Origem:** Nomeada em homenagem ao Rio Amazonas.
 - **Função:** Primeiro contato 24/7 na Landing Page e via WhatsApp. Qualifica leads e os encaminha para o Hub.
+- **Integração Direta:** Cada conversa gera um `briefing_json` no Kanban com serviços, mensagem e número de WhatsApp.
 
 ### 2. Mazô (O Guardião Interno)
 *Papel: Customer Success Estratégico — interno ao CRM.*
@@ -71,6 +79,10 @@ A jornada continua. O "Nexus Protocol" está estável.
 - ✅ **Concluído:** Landing Page bilíngue com PT-BR como idioma principal.
 - ✅ **Concluído:** Galeria de clientes com QR Codes SVG vetoriais e escaneáveis.
 - ✅ **Concluído:** Link d'Água posicionado como produto principal da agência.
-- 🔜 **Próximo:** Deploy contínuo e aquisição dos primeiros clientes pagos.
+- ✅ **Concluído:** Briefing SDR renderizado no card do CRM (Produtos, Timeline, WhatsApp).
+- ✅ **Concluído:** Gerador de mensagem WA com IA — primeiro contato pré-preenchido em 1 clique.
+- ✅ **Concluído:** Script de importação de leads históricos (`import-leads.mjs`).
+- 🔜 **Próximo:** Aquisição dos primeiros clientes pagos e expansão do funil de onboarding.
 
 > **"O encontro das águas não é o fim dos rios, é o começo do mar."**
+

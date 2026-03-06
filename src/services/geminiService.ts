@@ -118,6 +118,65 @@ export const generateEmailDraft = async (
   }
 };
 
+// ── WhatsApp First-Contact Outreach Generator ───────────────────────────────
+// Uses briefing_json to craft a warm, personalized first message.
+// Different from generateRescueMessage (which is for stalled deals).
+export const generateWAOutreach = async (
+  deal: Deal | DealView,
+  briefingData?: {
+    name?: string;
+    services?: string[];
+    message?: string;
+    whatsapp?: string;
+  },
+  config?: AIConfig
+): Promise<string> => {
+  const provider = config?.provider || 'google';
+  const apiKey = config?.apiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
+  const modelId = config?.model || 'gemini-2.5-flash';
+
+  if (!apiKey) return 'Erro: API Key não configurada.';
+
+  const model = getModel(provider, apiKey, modelId);
+
+  const servicesStr = briefingData?.services?.length
+    ? briefingData.services.join(', ')
+    : 'Serviços não especificados';
+
+  const originalMsg = briefingData?.message
+    ? `\n    Mensagem original do lead: "${briefingData.message}"`
+    : '';
+
+  const prompt = `
+    Você é um(a) consultor(a) de vendas caloroso(a) e consultivo(a) do Encontro d'Água Hub Digital.
+    
+    Um novo lead acabou de se cadastrar e você vai mandar a PRIMEIRA mensagem no WhatsApp.
+    
+    Dados do Lead:
+    - Nome: ${briefingData?.name || ('contactName' in deal ? deal.contactName : 'Cliente')}
+    - Serviços de interesse: ${servicesStr}${originalMsg}
+    - Negócio no CRM: ${deal.title}
+    
+    REGRAS:
+    1. Seja pessoal, caloroso(a) e direto(a). Máx. 4 linhas.
+    2. Mencione especificamente os serviços que eles pediram.
+    3. Termine com uma pergunta aberta que gere resposta (ex: "Posso te contar mais?", "Quando fica bom pra conversar?").
+    4. Use 1-2 emojis naturais, não exagerado.
+    5. NÃO use saudações genéricas como "Olá! Como vai?". Vá direto ao ponto.
+    6. Tom: amigável, humano, consultivo.
+    
+    Retorne APENAS o texto da mensagem, sem aspas externas.
+  `;
+
+  try {
+    const result = await generateTextWithFallback({ model, prompt }, provider, modelId, apiKey);
+    return result.text.trim();
+  } catch (error) {
+    console.error('Error generating WA outreach:', error);
+    return 'Erro ao gerar mensagem.';
+  }
+};
+
 export const generateObjectionResponse = async (
   deal: Deal | DealView,
   objection: string,
