@@ -643,29 +643,37 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* QR D'ÁGUA — ferramenta interna do Hub (não promovida externamente) */}
-        <section className="py-12 px-6 bg-[#02040a]">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-4 p-5 rounded-2xl bg-white/3 border border-white/5">
-              <div className="flex items-center gap-3 flex-1">
-                <div className="p-2 bg-purple-500/10 rounded-xl">
-                  <QrCode className="w-6 h-6 text-purple-400" />
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-2">
-                    <p className="text-white font-bold text-sm">QR d'Água</p>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-700 text-slate-400 uppercase tracking-wider">Ferramenta Interna</span>
-                  </div>
-                  <p className="text-xs text-slate-500">Geração de QR Codes personalizados para clientes Hub — acessível pelo painel de gestão.</p>
+        {/* LINK D'ÁGUA - Solução #2 */}
+        <section className="py-20 px-6 bg-[#02040a]">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <Sparkles className="w-3 h-3" /> {t('qrTag')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('qrWaterTitle')}</h2>
+            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
+              {t('qrDesc')}
+            </p>
+
+            {/* VÍDEO PLACEHOLDER LINK D'ÁGUA */}
+            <div className="w-full max-w-4xl mx-auto mb-16 relative rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(168,85,247,0.15)] bg-slate-900 aspect-video group">
+              <video
+                src="/assets/videos/link-dagua-demo.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+              ></video>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent opacity-80 pointer-events-none"></div>
+              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between pointer-events-none">
+                <div>
+                  <h3 className="text-white font-bold text-xl drop-shadow-lg">Demo Link d'Água</h3>
+                  <p className="text-slate-300 text-sm">Preview da Experiência</p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsApplicationModalOpen(true)}
-                className="text-xs font-bold text-purple-400 hover:text-purple-300 whitespace-nowrap border border-purple-500/20 px-4 py-2 rounded-xl hover:bg-purple-500/10 transition-all"
-              >
-                Sou cliente → acessar
-              </button>
             </div>
+
+            <PhoneSimulator className="mx-auto" />
           </div>
         </section>
 
@@ -673,7 +681,7 @@ Agora, gere o prompt perfeito:`;
         <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-6xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> Galeria de Clientes
+              <Sparkles className="w-3 h-3" /> {t('galleryTag')}
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('clientGallery')}</h2>
             <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
@@ -780,34 +788,7 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* AMAZÔ IA - Solução #3 */}
-        <section className="py-20 px-6 bg-[#02040a] border-t border-white/5 text-center">
-          <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Bot className="w-3 h-3" /> {t('amazoTag')}
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('amazoTitle')}</h2>
-            <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-              {t('amazoDesc')}
-            </p>
-
-            <div className="bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 p-8 rounded-3xl border border-fuchsia-500/20 max-w-2xl mx-auto">
-              <div className="w-20 h-20 bg-fuchsia-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bot className="w-10 h-10 text-fuchsia-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">{t('talkToAmazo')}</h3>
-              <p className="text-slate-300 text-sm mb-6">
-                {t('talkToAmazoDesc')}
-              </p>
-              <button
-                onClick={openAmazoChat}
-                className="px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg flex items-center justify-center gap-2 mx-auto"
-              >
-                <MessageCircle size={20} /> {t('chatWithAmazo')}
-              </button>
-            </div>
-          </div>
-        </section>
+        {/* AMAZÔ IA BLOCK REMOVED AS CHAT BUBBLE IS ACTIVE */}
 
         {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
