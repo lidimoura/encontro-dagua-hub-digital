@@ -48,7 +48,7 @@ export async function sendNexusAlert(payload: NexusAlertPayload): Promise<void> 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-nexus-key': 'REDACTED',
+                'x-nexus-key': apiKey || '',
             },
             body: JSON.stringify(enrichedPayload),
             // Don't block the page — fire and forget
