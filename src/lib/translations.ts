@@ -178,20 +178,38 @@ export const translations = {
         promptLabBenefits: "Agentes de IA & Personalização de LLMs",
         subscribePro: "Assinar Pro Mensal (R$ 3,00)",
 
-        // QR Section
-        qrTitle: "QR D'água",
-        qrWaterTitle: "QR D'água: O Portal Phygital",
-        qrTag: "QR D'água",
+        // Link d'Água Section
+        qrTitle: "Link d'Água",
+        qrWaterTitle: "Link d'Água: O Portal Phygital",
+        qrTag: "Link d'Água",
         qrHeadline: "Gerador de Identidade Digital",
         qrDesc: "Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.",
+        linkDaguaBadge: "Produto Principal",
+        linkDaguaTitle: "Link d'Água",
+        linkDaguaSubtitle: "Sua vitrine digital",
+        linkDaguaDesc: "Uma página profissional com <strong className=\"text-white\">todos os seus links, serviços e contatos</strong> em um único endereço compartilhável.",
+        feat1: "📱 Link único que vai no WhatsApp, Instagram e cartão",
+        feat2: "🛍️ Vitrine de produtos e serviços com fotos",
+        feat3: "📊 Analytics de cliques em tempo real",
+        feat4: "🔗 QR Code automático e link personalizado",
+        feat5: "✅ Sem precisar de site — funciona no celular",
+        viewShowcase: "Ver Vitrine",
+        getMine: "Quero o meu",
+        linksTitle: "Lidi Moura",
+        linksSubtitle: "link.encontrodagua.com/lidi",
+        link1: "WhatsApp",
+        link2: "Instagram",
+        link3: "Portfólio",
+        link4: "Agendamento",
+        linkStats: "247 cliques esta semana ↑",
 
         // Gallery Section
         galleryTitle: "Galeria de Clientes",
         clientGallery: "Galeria de Clientes do Hub",
-        clientGalleryDesc: "Veja como empreendedores estão usando o QR D'água para conectar com seus clientes",
+        clientGalleryDesc: "Veja como empreendedores estão usando o Link d'Água para conectar com seus clientes",
         galleryTag: "Galeria de Clientes",
         galleryHeadline: "Galeria de Clientes do Hub",
-        galleryDesc: "Veja como empreendedores estão usando o QR d'água para se conectar com seus clientes",
+        galleryDesc: "Veja como empreendedores estão usando o Link d'Água para se conectar com seus clientes",
 
 
         // Amazo Section
@@ -220,7 +238,7 @@ export const translations = {
         csRole: "CS & Vendas",
         devRole: "Dev",
         founderPitch: "Formada em Psicologia pela UFAM (onde seu avô, professor de Matemática, dá nome a um bloco acadêmico), Lidi traz uma bagagem única. Como artista viajante e nômade, aprendeu a se adaptar; da mãe professora de inglês herdou a habilidade de comunicação e do pai técnico de informática, a lógica. Hoje, atua como criadora de soluções digitais e fundadora do hub. Trabalha no modo heutagógico, aprendendo e fazendo com suporte estratégico de IAs. Sua missão é integrar essa herança criativa e técnica para oferecer autonomia e prosperidade real para todos.",
-        precyPitch: "Guardiã da estabilidade. Precy monitora a infraestrutura do Hub 24/7, garantindo que seu QR D'água e automações funcionem com segurança máxima e zero latência.",
+        precyPitch: "Guardiã da estabilidade. Precy monitora a infraestrutura do Hub 24/7, garantindo que seu Link d'Água e automações funcionem com segurança máxima e zero latência.",
         amazoPitch: "Especialista em escuta ativa. A Amazô realiza o diagnóstico inicial do seu negócio e guia você para a solução ideal, disponível a qualquer hora do dia.",
         antigravityPitch: "Arquiteto de soluções. Transforma ideias complexas em código limpo e funcional, expandindo as fronteiras do que o Hub pode oferecer.",
 
@@ -313,8 +331,8 @@ export const translations = {
         mazoDesc: "Focada em retenção, empatia e saúde do cliente. Previne churn proativamente.",
         juryDesc: "Gera contratos usando templates da biblioteca. Garante compliance e segurança.",
 
-        // --- MÓDULO QR D'ÁGUA --- (Merged)
-        qrPageTitle: "Gerador de QR D'água",
+        // --- MÓDULO LINK D'ÁGUA --- (Merged)
+        qrPageTitle: "Gerador de Link d'Água",
         qrPageSubtitle: "Crie pontes entre o físico e o digital.",
         configTab: "Configuração",
         designTab: "Design",
@@ -322,8 +340,8 @@ export const translations = {
         previewTab: "Visualização",
 
         // Form Fields
-        qrType: "Tipo de QR Code",
-        typeLink: "Link / QR Code",
+        qrType: "Tipo de Link",
+        typeLink: "Link / Código Externo",
         typeWhatsapp: "WhatsApp",
         typePix: "PIX",
         typeBridge: "Cartão Digital",
@@ -357,7 +375,7 @@ export const translations = {
         logoPlaceholder: "https://...",
 
         // Actions
-        generateQR: "Gerar QR Code",
+        generateQR: "Gerar Link",
         downloadQR: "Baixar PNG",
         saveProject: "Salvar Projeto",
         updateProject: "Atualizar Projeto",
@@ -588,8 +606,8 @@ export const translations = {
         tourBoardsDesc: "Crie estratégias completas com IA em segundos usando nossos templates especializados.",
         tourAiflowTitle: "AI Hub - Suporte Inteligente 🤖",
         tourAiflowDesc: "Precisa de ajuda? O AI Hub é sua central de inteligência para te guiar pelo sistema.",
-        tourQrTitle: "QR D'água: O Portal Phygital 📱",
-        tourQrDesc: "Crie seu primeiro cartão digital agora. QR Codes dinâmicos conectando negócios no mundo digital.",
+        tourQrTitle: "Link d'Água: O Portal Phygital 📱",
+        tourQrDesc: "Crie seu primeiro cartão digital agora. Links e Códigos dinâmicos conectando negócios no mundo digital.",
         skipTour: "Pular tour",
         previous: "Anterior",
         next: "Próximo",
@@ -618,7 +636,7 @@ export const translations = {
         proposalSent: "Proposta enviada",
         activeSince: "Ativo desde Jan/2025",
         convertedSuccess: "Convertida com sucesso!",
-        interestQr: "Interesse em QR D'água",
+        interestQr: "Interesse em Link d'Água",
         consultingCrm: "Consultoria CRM",
         wonLabel: "Ganho",
 
@@ -895,6 +913,24 @@ export const translations = {
         qrHeadline: "Digital Identity Generator",
         qrWaterTitle: "Link d'Água: The Phygital Experience",
         qrDesc: "Connect your business through Physical Code (Printed QR) or Digital Link (WhatsApp/Bio). Total fidelity: what you see is what your customers get.",
+        linkDaguaBadge: "Main Product",
+        linkDaguaTitle: "Link d'Água",
+        linkDaguaSubtitle: "Your digital showcase",
+        linkDaguaDesc: "A professional page with <strong className=\"text-white\">all your links, services, and contacts</strong> in a single shareable address.",
+        feat1: "📱 Single link for WhatsApp, Instagram, and bio",
+        feat2: "🛍️ Showcase products and services with photos",
+        feat3: "📊 Real-time click analytics",
+        feat4: "🔗 Automatic QR Code and custom link",
+        feat5: "✅ No website needed — works directly on mobile",
+        viewShowcase: "View Showcase",
+        getMine: "Get Mine",
+        linksTitle: "Lidi Moura",
+        linksSubtitle: "link.encontrodagua.com/lidi",
+        link1: "WhatsApp",
+        link2: "Instagram",
+        link3: "Portfolio",
+        link4: "Scheduling",
+        linkStats: "247 clicks this week ↑",
 
         // Gallery Section
         galleryTitle: "Client Gallery",
@@ -1018,10 +1054,9 @@ export const translations = {
         perfectCreateBoard: "✅ Perfect! Create Board",
         boardName: "Board Name",
 
-        // --- QR MODULE ---
-
-        createQR: "Create New QR",
-        downloadQR: "Download QR",
+        // --- MÓDULO LINK D'ÁGUA ---
+        createQR: "Create New Link",
+        downloadQR: "Download Link",
 
         // --- PROMPTLAB MODULE ---
         promptTitle: "Prompt Laboratory",
@@ -1135,7 +1170,7 @@ export const translations = {
         proposalSent: "Proposal sent",
         activeSince: "Active since Jan/2025",
         convertedSuccess: "Successfully converted!",
-        interestQr: "Interested in QR Water",
+        interestQr: "Interested in Link d'Água",
         consultingCrm: "CRM Consulting",
         wonLabel: "Won",
 
@@ -1278,8 +1313,8 @@ export const translations = {
         tourBoardsDesc: "Create complete AI strategies in seconds using our specialized templates.",
         tourAiflowTitle: "AI Hub - Smart Support 🤖",
         tourAiflowDesc: "Need help? AI Hub is your intelligence center to guide you through the system.",
-        tourQrTitle: "QR Water: The Phygital Portal 📱",
-        tourQrDesc: "Create your first digital card now. Dynamic QR Codes connecting business in the digital world.",
+        tourQrTitle: "Link d'Água: The Phygital Portal 📱",
+        tourQrDesc: "Create your first digital card now. Dynamic Links and Codes connecting business in the digital world.",
         skipTour: "Skip tour",
         previous: "Previous",
         next: "Next",
