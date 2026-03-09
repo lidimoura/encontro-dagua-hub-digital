@@ -474,24 +474,22 @@ Agora, gere o prompt perfeito:`;
               {/* Left: copy */}
               <div className="flex-1 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-black uppercase tracking-wider mb-6">
-                  <Globe className="w-3 h-3" /> Produto Principal
+                  <Globe className="w-3 h-3" /> {t('linkDaguaBadge')}
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-                  Link d'Água
+                  {t('linkDaguaTitle')}
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400">
-                    Sua vitrine digital
+                    {t('linkDaguaSubtitle')}
                   </span>
                 </h2>
-                <p className="text-xl text-slate-300 mb-4 max-w-xl mx-auto lg:mx-0">
-                  Uma página profissional com <strong className="text-white">todos os seus links, serviços e contatos</strong> em um único endereço compartilhável.
-                </p>
+                <p className="text-xl text-slate-300 mb-4 max-w-xl mx-auto lg:mx-0" dangerouslySetInnerHTML={{ __html: t('linkDaguaDesc') }} />
                 <ul className="space-y-3 mb-10">
                   {[
-                    '📱 Link único que vai no WhatsApp, Instagram e cartão',
-                    '🛍️ Vitrine de produtos e serviços com fotos',
-                    '📊 Analytics de cliques em tempo real',
-                    '🔗 QR Code gerado automaticamente',
-                    '✅ Sem precisar de site — funciona em qualquer celular',
+                    t('feat1'),
+                    t('feat2'),
+                    t('feat3'),
+                    t('feat4'),
+                    t('feat5'),
                   ].map((item) => (
                     <li key={item} className="flex items-start justify-center lg:justify-start gap-3 text-slate-300 text-sm">
                       <span>{item}</span>
@@ -505,13 +503,13 @@ Agora, gere o prompt perfeito:`;
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-black font-black rounded-2xl hover:from-teal-400 hover:to-cyan-400 transition-all shadow-2xl shadow-teal-500/30 text-center flex items-center justify-center gap-2 text-lg"
                   >
-                    <Globe size={20} /> Ver Vitrine
+                    <Globe size={20} /> {t('viewShowcase')}
                   </a>
                   <button
                     onClick={() => setIsApplicationModalOpen(true)}
                     className="px-8 py-4 bg-white/5 border border-teal-500/30 text-teal-300 font-bold rounded-2xl hover:bg-white/10 transition-all text-center"
                   >
-                    Quero o meu
+                    {t('getMine')}
                   </button>
                 </div>
               </div>
@@ -524,33 +522,40 @@ Agora, gere o prompt perfeito:`;
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-600 flex items-center justify-center text-lg font-black text-black">L</div>
                       <div>
-                        <p className="font-bold text-white text-sm">Lidi Moura</p>
-                        <p className="text-xs text-teal-400">link.encontrodagua.com/lidi</p>
+                        <p className="font-bold text-white text-sm">{t('linksTitle')}</p>
+                        <p className="text-xs text-teal-400">{t('linksSubtitle')}</p>
                       </div>
                     </div>
-                    {['WhatsApp', 'Instagram', 'Portfólio', 'Agendamento'].map((link) => (
+                    {[t('link1'), t('link2'), t('link3'), t('link4')].map((link, index) => (
                       <div key={link} className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0">
                         <span className="text-sm text-slate-300">{link}</span>
                         <ArrowRight size={14} className="text-teal-400" />
                       </div>
                     ))}
                     <div className="mt-4 pt-4 border-t border-white/5 text-center">
-                      <p className="text-[10px] text-teal-500 font-mono">247 cliques esta semana ↑</p>
+                      <p className="text-[10px] text-teal-500 font-mono">{t('linkStats')}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* VIDEO PLACEHOLDER 1: QR Code Animation */}
-            <div className="w-full mt-16 max-w-3xl mx-auto">
-              <div className="aspect-video bg-[#05021a]/80 border border-teal-500/20 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-cyan-500/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <div className="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 text-black rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(20,184,166,0.3)] group-hover:scale-110 transition-transform z-10">
-                  <Play className="w-8 h-8 ml-1" fill="currentColor" />
+            {/* VÍDEO LINK D'ÁGUA DEMO */}
+            <div className="w-full mt-16 max-w-4xl mx-auto relative rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(20,184,166,0.15)] bg-slate-900 aspect-video group">
+              <video
+                src="/assets/videos/link-dagua-demo.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+              ></video>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent opacity-80 pointer-events-none"></div>
+              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between pointer-events-none">
+                <div>
+                  <h3 className="text-white font-bold text-xl drop-shadow-lg">Demo Link d'Água</h3>
+                  <p className="text-slate-300 text-sm">Preview da Experiência</p>
                 </div>
-                <p className="text-teal-400 font-bold tracking-wider uppercase text-sm z-10">Animação em breve</p>
-                <p className="text-teal-500/60 font-mono text-xs mt-2 z-10">Gerado por Veo / Gemini</p>
               </div>
             </div>
           </div>
@@ -643,39 +648,7 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* LINK D'ÁGUA - Solução #2 */}
-        <section className="py-20 px-6 bg-[#02040a]">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> {t('qrTag')}
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('qrWaterTitle')}</h2>
-            <p className="text-slate-400 mb-12 max-w-2xl mx-auto">
-              {t('qrDesc')}
-            </p>
-
-            {/* VÍDEO PLACEHOLDER LINK D'ÁGUA */}
-            <div className="w-full max-w-4xl mx-auto mb-16 relative rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(168,85,247,0.15)] bg-slate-900 aspect-video group">
-              <video
-                src="/assets/videos/link-dagua-demo.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-              ></video>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent opacity-80 pointer-events-none"></div>
-              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between pointer-events-none">
-                <div>
-                  <h3 className="text-white font-bold text-xl drop-shadow-lg">Demo Link d'Água</h3>
-                  <p className="text-slate-300 text-sm">Preview da Experiência</p>
-                </div>
-              </div>
-            </div>
-
-            <PhoneSimulator className="mx-auto" />
-          </div>
-        </section>
+        {/* OLD QR SECTION REMOVED */}
 
         {/* GALERIA DE CLIENTES DO HUB */}
         <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
