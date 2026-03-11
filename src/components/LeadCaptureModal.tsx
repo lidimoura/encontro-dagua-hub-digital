@@ -37,17 +37,21 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         try {
             // ── 1. Use the RPC that bypasses RLS and creates the lead + deal ──
             // This avoids 401/403 from RLS on the contacts table
+            // Build params dynamically to avoid sending explicit nulls which can break Supabase RPC routing
+            const rpcParams: Record<string, any> = {
+                p_name: formData.name,
+                p_email: formData.email,
+                p_interest: formData.interest,
+                p_source: source,
+                p_metadata: prefilledData || {},
+            };
+            
+            if (formData.phone?.trim()) rpcParams.p_phone = formData.phone.trim();
+            if (formData.company?.trim()) rpcParams.p_company = formData.company.trim();
+
             const { data: rpcResult, error: rpcError } = await supabase.rpc(
                 'capture_hub_lead',
-                {
-                    p_name: formData.name,
-                    p_email: formData.email,
-                    p_phone: formData.phone || null,
-                    p_company: formData.company || null,
-                    p_interest: formData.interest,
-                    p_source: source,
-                    p_metadata: JSON.stringify(prefilledData || {}),
-                }
+                rpcParams
             );
 
             // ── 2. Fallback: If RPC doesn't exist, directly insert lead ──

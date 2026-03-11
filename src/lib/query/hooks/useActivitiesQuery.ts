@@ -119,7 +119,7 @@ export const useCreateActivity = () => {
   return useMutation({
     mutationFn: async (activity: Omit<Activity, 'id' | 'createdAt'>) => {
       // company_id will be auto-set by trigger
-      const { data, error } = await activitiesService.create(activity, '');
+      const { data, error } = await activitiesService.create(activity);
       if (error) throw error;
       return data!;
     },
