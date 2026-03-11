@@ -81,15 +81,14 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Negócio Relacionado
+                Negócio / Lead <span className="text-slate-400 font-normal normal-case">(opcional)</span>
               </label>
               <select
-                required={!editingActivity}
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                 value={formData.dealId}
                 onChange={e => setFormData({ ...formData, dealId: e.target.value })}
               >
-                <option value="">Selecione...</option>
+                <option value="">Nenhum (atividade geral)</option>
                 {deals.map(deal => (
                   <option key={deal.id} value={deal.id}>
                     {deal.title}
