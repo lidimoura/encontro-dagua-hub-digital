@@ -120,7 +120,7 @@ export const useActivitiesController = () => {
             type: formData.type,
             description: formData.description,
             date: date.toISOString(),
-            dealId: formData.dealId || '',
+            dealId: formData.dealId || null,
           },
         },
         {
@@ -137,7 +137,7 @@ export const useActivitiesController = () => {
           type: formData.type,
           description: formData.description,
           date: date.toISOString(),
-          dealId: formData.dealId || '',
+          dealId: formData.dealId || null,
           dealTitle: selectedDeal?.title || '',
           completed: false,
           user: { name: 'Eu', avatar: '' },

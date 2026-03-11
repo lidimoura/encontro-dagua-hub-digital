@@ -634,8 +634,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     <p className="text-slate-500 text-xs">{deal.contactEmail}</p>
                   </div>
                 </div>
-                {/* WhatsApp AI Outreach */}
-                {(briefingJson?.whatsapp || contact?.phone) && (
+                {/* WhatsApp AI Outreach — visible whenever any phone/contact exists */}
+                {(briefingJson?.whatsapp || contact?.phone || deal.contactEmail) && (
                   <div className="mt-3 space-y-2">
                     {!waMessage ? (
                       <button
@@ -975,7 +975,18 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         onChange={e => setSelectedProductId(e.target.value)}
                       >
                         <option value="" className="text-slate-900">Selecione um item...</option>
-                        {products.filter(p => !p.type || p.type === 'catalog' || p.type === 'product').map(p => (
+                        {products.filter(p => 
+                          // Exclude tech stack and infrastructure items
+                          p.type !== 'tech_stack' &&
+                          p.type !== 'infra' &&
+                          p.type !== 'api_cost' &&
+                          !p.name?.toLowerCase().includes('openai') &&
+                          !p.name?.toLowerCase().includes('vercel') &&
+                          !p.name?.toLowerCase().includes('supabase') &&
+                          !p.name?.toLowerCase().includes('gemini') &&
+                          !p.name?.toLowerCase().includes('deno') &&
+                          !p.name?.toLowerCase().includes('anthropic')
+                        ).map(p => (
                           <option key={p.id} value={p.id} className="text-slate-900">
                             {p.name} - ${p.price}
                           </option>

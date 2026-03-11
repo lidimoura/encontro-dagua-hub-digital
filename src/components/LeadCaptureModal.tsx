@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Mail, Building2, Target } from 'lucide-react';
+import { X, Sparkles, Mail, Building2, Target, Phone } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface LeadCaptureModalProps {
@@ -22,53 +22,80 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         name: '',
         email: '',
         company: '',
+        phone: '',
         interest: 'hub_completo',
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError(null);
 
         try {
-            // Save to waitlist
-            const { error: waitlistError } = await supabase
-                .from('waitlist')
-                .insert([{
-                    email: formData.email,
-                    name: formData.name,
-                    source: source,
-                    interest: formData.interest,
-                    metadata: prefilledData || {},
-                }]);
+            // ── 1. Use the RPC that bypasses RLS and creates the lead + deal ──
+            // This avoids 401/403 from RLS on the contacts table
+            const { data: rpcResult, error: rpcError } = await supabase.rpc(
+                'capture_hub_lead',
+                {
+                    p_name: formData.name,
+                    p_email: formData.email,
+                    p_phone: formData.phone || null,
+                    p_company: formData.company || null,
+                    p_interest: formData.interest,
+                    p_source: source,
+                    p_metadata: JSON.stringify(prefilledData || {}),
+                }
+            );
 
-            if (waitlistError) throw waitlistError;
+            // ── 2. Fallback: If RPC doesn't exist, directly insert lead ──
+            if (rpcError && rpcError.code === 'PGRST202') {
+                // RPC not found — use direct INSERT with anon policy
+                const { error: insertError } = await supabase
+                    .from('contacts')
+                    .insert([{
+                        name: formData.name,
+                        email: formData.email,
+                        phone: formData.phone || null,
+                        company_name: formData.company || null,
+                        status: 'ACTIVE',
+                        stage: 'LEAD',
+                        source: source === 'cta' ? 'Hub LP' : source,
+                        notes: `Lead capturado via LP Hub. Interesse: ${formData.interest}. ${prefilledData?.userInput ? `Mensagem: ${prefilledData.userInput}` : ''}`.trim(),
+                        // company_id is intentionally omitted — RLS policy "Public Enable Insert" allows anon inserts
+                        // The admin sees these as unassigned leads in the contacts panel
+                    }]);
 
-            // Save to contacts as LEAD_QUENTE
-            const { error: contactError } = await supabase
-                .from('contacts')
-                .insert([{
-                    name: formData.name,
-                    email: formData.email,
-                    company_name: formData.company || null,
-                    status: 'ACTIVE',
-                    stage: 'LEAD',
-                    source: source,
-                    notes: `Lead capturado via ${source}. Interesse: ${formData.interest}`,
-                }]);
+                if (insertError) {
+                    // Last resort: save to waitlist (always public)
+                    const { error: waitlistError } = await supabase
+                        .from('waitlist')
+                        .insert([{
+                            email: formData.email,
+                            name: formData.name,
+                            source: source,
+                            interest: formData.interest,
+                            metadata: { ...prefilledData, company: formData.company, phone: formData.phone },
+                        }]);
 
-            if (contactError) throw contactError;
+                    if (waitlistError) throw new Error(`Erro ao salvar: ${waitlistError.message}`);
+                    // Waitlist OK — still show success
+                }
+            } else if (rpcError) {
+                throw new Error(rpcError.message);
+            }
 
             setSuccess(true);
             setTimeout(() => {
                 onClose();
                 setSuccess(false);
-                setFormData({ name: '', email: '', company: '', interest: 'hub_completo' });
-            }, 2000);
-        } catch (error: any) {
-            console.error('Error saving lead:', error);
-            alert(`Erro: ${error.message}`);
+                setFormData({ name: '', email: '', company: '', phone: '', interest: 'hub_completo' });
+            }, 2500);
+        } catch (err: any) {
+            console.error('[LeadCapture] Error saving lead:', err);
+            setError(err.message || 'Erro desconhecido. Tente novamente.');
         } finally {
             setLoading(false);
         }
@@ -78,17 +105,17 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-rionegro-900 rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 dark:border-white/10">
                 {success ? (
                     <div className="text-center py-8">
                         <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Sparkles className="w-8 h-8 text-green-600 dark:text-green-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                            Obrigado!
+                            Recebido! 🎉
                         </h2>
                         <p className="text-slate-600 dark:text-slate-400">
-                            Entraremos em contato em breve.
+                            Seu acesso está sendo processado. Entraremos em contato em breve!
                         </p>
                     </div>
                 ) : (
@@ -100,20 +127,26 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                             </h2>
                             <button
                                 onClick={onClose}
-                                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+                                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                            Preencha os dados abaixo para receber acesso ao Hub
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
+                            Preencha os dados abaixo e nossa equipe entrará em contato.
                         </p>
+
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 rounded-lg text-sm text-red-600 dark:text-red-400">
+                                {error}
+                            </div>
+                        )}
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Name */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                     Nome Completo *
                                 </label>
                                 <input
@@ -121,41 +154,58 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent"
-                                    placeholder="Seu nome"
+                                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
+                                    placeholder="Seu nome completo"
                                 />
                             </div>
 
                             {/* Email */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                     Email *
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input
                                         type="email"
                                         required
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
                                         placeholder="seu@email.com"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Phone */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    WhatsApp (opcional)
+                                </label>
+                                <div className="relative">
+                                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
+                                        placeholder="(00) 00000-0000"
                                     />
                                 </div>
                             </div>
 
                             {/* Company */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                     Empresa (opcional)
                                 </label>
                                 <div className="relative">
-                                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input
                                         type="text"
                                         value={formData.company}
                                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
                                         placeholder="Nome da empresa"
                                     />
                                 </div>
@@ -163,19 +213,21 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
 
                             {/* Interest */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                     Interesse *
                                 </label>
                                 <div className="relative">
-                                    <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <select
                                         value={formData.interest}
                                         onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-rionegro-950 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
                                     >
-                                        <option value="qr_dagua">QR D'água</option>
+                                        <option value="hub_completo">Hub Completo (CRM + IA + Link d'Água)</option>
+                                        <option value="linkdagua">Link d'Água (Sites e QR Codes)</option>
+                                        <option value="crm_only">CRM com IA</option>
                                         <option value="prompt_lab">Prompt Lab</option>
-                                        <option value="hub_completo">Hub Completo</option>
+                                        <option value="qr_dagua">QR D'água</option>
                                     </select>
                                 </div>
                             </div>
@@ -184,9 +236,9 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-gradient-to-r from-acai-900 to-acai-700 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg shadow-primary-600/20 transition-all mt-2"
                             >
-                                {loading ? 'Enviando...' : 'Aplicar Agora'}
+                                {loading ? 'Enviando...' : '🚀 Aplicar Agora'}
                             </button>
                         </form>
 
