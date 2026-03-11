@@ -234,7 +234,9 @@ const App: React.FC = () => {
                           } />
                           <Route path="ai" element={
                             <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
-                              <AIHubPage />
+                              <ErrorBoundary context="AI Hub">
+                                <AIHubPage />
+                              </ErrorBoundary>
                             </RoleBasedRoute>
                           } />
                           <Route path="decisions" element={
