@@ -231,18 +231,20 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const handleConvertToClient = async () => {
     setIsConverting(true);
     try {
-      // Try the new RPC first (requires migration 020)
       const { data, error } = await supabase.rpc('convert_lead_to_client', {
-        p_lead_id: deal.contactId,
+        p_deal_id:    deal.id,
+        p_contact_id: deal.contactId || null,
       });
       if (error) throw error;
-      // Update deal status to reflect conversion
-      updateDeal(deal.id, { status: 'CUSTOMER' });
+      const result = data as { success: boolean; error?: string };
+      if (!result.success) throw new Error(result.error || 'Falha na conversão');
       addToast('✅ Lead convertido para cliente com sucesso!', 'success');
+      onClose();
     } catch (err: any) {
-      // Fallback: just mark the deal as won
-      updateDeal(deal.id, { status: DealStatus.CLOSED_WON });
-      addToast('Cliente marcado como ganho (conversão simplificada)', 'info');
+      // Graceful fallback: mark deal as won in the UI
+      moveDeal(deal.id, DealStatus.CLOSED_WON);
+      addToast('Lead marcado como GANHO. Execute migration 025 para conversão completa.', 'info');
+      onClose();
     } finally {
       setIsConverting(false);
     }
@@ -635,7 +637,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                   </div>
                 </div>
                 {/* WhatsApp AI Outreach — visible whenever any phone/contact exists */}
-                {(briefingJson?.whatsapp || contact?.phone || deal.contactEmail) && (
+                {(!!contact?.phone || !!deal?.contactEmail || !!briefingJson?.whatsapp) && (
                   <div className="mt-3 space-y-2">
                     {!waMessage ? (
                       <button

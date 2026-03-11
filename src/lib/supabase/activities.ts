@@ -60,7 +60,7 @@ export const activitiesService = {
     }
   },
 
-  async create(activity: Omit<Activity, 'id' | 'createdAt'>, companyId: string): Promise<{ data: Activity | null; error: Error | null }> {
+  async create(activity: Omit<Activity, 'id' | 'createdAt'>): Promise<{ data: Activity | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
         .from('activities')
@@ -71,7 +71,8 @@ export const activitiesService = {
           date: activity.date,
           completed: activity.completed || false,
           deal_id: activity.dealId || null,
-          company_id: companyId,
+          // company_id is auto-set by the auto_set_company_id trigger
+          // owner_id is auto-set by Supabase RLS via jwt claim
         })
         .select()
         .single();

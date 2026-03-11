@@ -57,13 +57,28 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         return (
           <div
             key={stage.id}
-            // ... (keep existing props)
             className={`min-w-[20rem] flex-1 flex flex-col rounded-xl border-2 overflow-visible h-full max-h-full transition-all duration-200
                             ${isOver
                 ? 'border-green-500 bg-green-100/20 dark:bg-green-900/30 scale-[1.02] shadow-xl shadow-green-500/30'
                 : 'border-slate-200/50 dark:border-white/10 glass'
               }
                         `}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragOverStage !== stage.id) setDragOverStage(stage.id);
+            }}
+            onDragLeave={(e) => {
+              // Only clear if leaving the stage column itself, not a child
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setDragOverStage(null);
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOverStage(null);
+              handleDrop(e, stage.id);
+            }}
           >
             <div className={`h-1.5 w-full ${stage.color}`}></div>
 
