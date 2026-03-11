@@ -975,18 +975,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         onChange={e => setSelectedProductId(e.target.value)}
                       >
                         <option value="" className="text-slate-900">Selecione um item...</option>
-                        {products.filter(p => 
-                          // Exclude tech stack and infrastructure items
-                          p.type !== 'tech_stack' &&
-                          p.type !== 'infra' &&
-                          p.type !== 'api_cost' &&
-                          !p.name?.toLowerCase().includes('openai') &&
-                          !p.name?.toLowerCase().includes('vercel') &&
-                          !p.name?.toLowerCase().includes('supabase') &&
-                          !p.name?.toLowerCase().includes('gemini') &&
-                          !p.name?.toLowerCase().includes('deno') &&
-                          !p.name?.toLowerCase().includes('anthropic')
-                        ).map(p => (
+                        {products.filter(p => {
+                          // PRIMARY: exclude by type (works after migration 024)
+                          const blockedTypes = ['tech_stack', 'infra', 'api_cost'];
+                          if (blockedTypes.includes(p.type as string)) return false;
+                          // SECONDARY: exclude by name (safety net before migration runs)
+                          const n = (p.name || '').toLowerCase();
+                          const blockedNames = [
+                            'openai', 'anthropic', 'claude', 'gemini', 'gpt',
+                            'vercel', 'supabase', 'firebase', 'n8n', 'zapier',
+                            'make', 'deno', 'stripe', 'twilio', 'sendgrid',
+                            'cloudflare', 'aws ', 'azure', 'gcp '
+                          ];
+                          if (blockedNames.some(blocked => n.includes(blocked))) return false;
+                          return true;
+                        }).map(p => (
                           <option key={p.id} value={p.id} className="text-slate-900">
                             {p.name} - ${p.price}
                           </option>
