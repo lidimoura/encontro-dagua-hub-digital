@@ -6,26 +6,41 @@ export const productsService = {
      * Get all active catalog products (excludes tech_stack, infra and api_cost entries)
      * Used by the Deal products tab — Tech Stack has its own separate view.
      */
+    /**
+     * Get all active catalog products via strict Database RPC (excludes tech_stack, infra)
+     * Used by the Deal products tab.
+     */
     async getAll(options?: { timestamp?: number }) {
-        const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
         const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure'];
 
-        let query = supabase
-            .from('products')
-            .select('*')
-            .eq('is_active', true)
-            .not('type', 'in', `(${BLOCKED_TYPES.join(',')})`);
-
-        // Cache buster for production
-        if (options?.timestamp) {
-            query = query.neq('created_at', new Date(options.timestamp).toISOString());
+        // Core fix: Use RPC to guarantee DB-level strict filtering and bypass Edge caching
+        let query = supabase.rpc('get_crm_catalog_products');
+        
+        const { data, error } = await query;
+        
+        // Fallback for local dev if RPC hasn't been pushed yet
+        if (error) {
+            console.warn('RPC failed, falling back to standard query', error);
+            const fallbackQuery = supabase
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .not('type', 'in', '("tech_stack", "infra", "api_cost")')
+                .order('name');
+            
+            const fallbackRes = await fallbackQuery;
+            if (fallbackRes.error || !fallbackRes.data) return fallbackRes;
+            
+            const filteredFallback = fallbackRes.data.filter((p: any) => {
+                const nameLower = (p.name || '').toLowerCase();
+                return !BLOCKED_NAMES.some(b => nameLower.includes(b));
+            });
+            return { data: filteredFallback, error: null };
         }
 
-        const { data, error } = await query.order('name');
+        if (!data) return { data: [], error: null };
 
-        if (error || !data) return { data, error };
-
-        // Secondary safety filter: block by name for NULL-type legacy tech records
+        // Even with RPC, keep the safety JS filter just to be 100% immune
         const filtered = data.filter((p: any) => {
             const nameLower = (p.name || '').toLowerCase();
             return !BLOCKED_NAMES.some(b => nameLower.includes(b));

@@ -241,6 +241,12 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const briefingJson = (contactObj as any)?.briefing_json as BriefingJson | null | undefined;
   const linkdaguaId = (contactObj as any)?.linkdagua_user_id as string | undefined;
 
+  // ROBUST WHATSAPP CONDITIONAL
+  // Extract phone securely from any possible source (contact, briefing, deal)
+  const safePhone = contactObj?.phone || briefingJson?.whatsapp || (deal as any)?.contactPhone || '';
+  const hasPhoneForWA = !!safePhone && safePhone.replace(/\D/g, '').length >= 8;
+  const displayPhone = safePhone || 'Sem telefone';
+
   // ── Converter para Cliente handler ────────────────────────────
   const handleConvertToClient = async () => {
     if (!deal.contactId) {
@@ -757,8 +763,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 )}
 
 
-                {/* WhatsApp AI Outreach — visible whenever phone/email exists in contact OR briefing */}
-                {(!!contact?.phone || !!contact?.email || !!briefingJson?.whatsapp || !!deal.contactEmail) && (
+                {/* WhatsApp AI Outreach — visible whenever a valid phone exists */}
+                {hasPhoneForWA && (
                   <div className="mt-3 space-y-2">
                     {!waMessage ? (
                       <button
@@ -792,7 +798,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                           onChange={e => setWaMessage(e.target.value)}
                         />
                         <a
-                          href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent(waMessage)}`}
+                          href={`https://wa.me/${safePhone.replace(/\D/g, '')}?text=${encodeURIComponent(waMessage)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 w-full justify-center px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
@@ -1024,16 +1030,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         </div>
                       )}
 
-                      {/* Direct WA action — pulls real phone number priority: briefing > contact.phone */}
-                      {(briefingJson?.whatsapp || contact?.phone) && (
+                      {/* Direct WA action — pulls real phone number securely */}
+                      {hasPhoneForWA && (
                         <a
-                          href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}`}
+                          href={`https://wa.me/${safePhone.replace(/\D/g, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="mt-1 flex items-center justify-center gap-2 w-full py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
                         >
                           <PhoneIcon size={13} />
-                          Chamar no WhatsApp — {(briefingJson?.whatsapp || contact?.phone)}
+                          Chamar no WhatsApp — {displayPhone}
                         </a>
                       )}
 
