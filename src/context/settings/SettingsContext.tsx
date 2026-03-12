@@ -141,7 +141,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       // Fetch products from Supabase
-      const { data: productsData } = await productsService.getAll();
+      // Force cache-busting for production by passing a timestamp (handled in service)
+      const { data: productsData } = await productsService.getAll({ timestamp: Date.now() });
       if (productsData) {
         setProducts(productsData);
       }

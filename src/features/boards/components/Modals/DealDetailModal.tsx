@@ -834,22 +834,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     <Tag size={12} /> Briefing
                   </h3>
                   <div className="space-y-2.5">
-                    {/* Phone / WA quick-link */}
-                    {(briefingJson?.whatsapp || contact?.phone) && (
-                      <div className="flex items-start gap-2">
-                        <PhoneIcon size={13} className="text-teal-500 mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">WhatsApp</p>
-                          <a
-                            href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}`}
-                            target="_blank" rel="noopener noreferrer"
-                            className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
-                          >
-                            {briefingJson?.whatsapp || contact?.phone}
-                          </a>
-                        </div>
-                      </div>
-                    )}
+
                     {/* Services as prominent badges */}
                     {briefingJson?.services && briefingJson.services.length > 0 && (
                       <div className="flex items-start gap-2">

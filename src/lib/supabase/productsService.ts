@@ -6,16 +6,22 @@ export const productsService = {
      * Get all active catalog products (excludes tech_stack, infra and api_cost entries)
      * Used by the Deal products tab — Tech Stack has its own separate view.
      */
-    async getAll() {
+    async getAll(options?: { timestamp?: number }) {
         const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
         const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure'];
 
-        const { data, error } = await supabase
+        let query = supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
-            .not('type', 'in', `(${BLOCKED_TYPES.join(',')})`)
-            .order('name');
+            .not('type', 'in', `(${BLOCKED_TYPES.join(',')})`);
+
+        // Cache buster for production
+        if (options?.timestamp) {
+            query = query.neq('created_at', new Date(options.timestamp).toISOString());
+        }
+
+        const { data, error } = await query.order('name');
 
         if (error || !data) return { data, error };
 
