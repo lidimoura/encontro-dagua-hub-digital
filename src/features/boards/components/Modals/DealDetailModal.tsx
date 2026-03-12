@@ -229,21 +229,43 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
   // ── Converter para Cliente handler ────────────────────────────
   const handleConvertToClient = async () => {
+    if (!deal.contactId) {
+      addToast('⚠️ Vincule um contato antes de converter', 'error');
+      return;
+    }
     setIsConverting(true);
     try {
       const { data, error } = await supabase.rpc('convert_lead_to_client', {
         p_deal_id:    deal.id,
-        p_contact_id: deal.contactId || null,
+        p_contact_id: deal.contactId,
       });
       if (error) throw error;
       const result = data as { success: boolean; error?: string };
       if (!result.success) throw new Error(result.error || 'Falha na conversão');
-      addToast('✅ Lead convertido para cliente com sucesso!', 'success');
+
+      // ── Move deal to Onboarding board so it doesn't ghost-duplicate ──
+      // Find the onboarding board (name contains ONBOARDING, CUSTOMER, or CLIENTE)
+      const onboardingBoard = boards.find(b =>
+        ['ONBOARDING', 'CUSTOMER', 'CLIENTE'].some(kw =>
+          (b.name || '').toUpperCase().includes(kw)
+        )
+      );
+      if (onboardingBoard && onboardingBoard.stages?.length > 0) {
+        const firstStage = [...onboardingBoard.stages].sort((a, b) => a.order - b.order)[0];
+        updateDeal(deal.id, {
+          boardId: onboardingBoard.id,
+          status: firstStage.id,
+        });
+      } else {
+        moveDeal(deal.id, DealStatus.CLOSED_WON);
+      }
+
+      addToast('✅ Lead convertido e movido para Onboarding!', 'success');
       onClose();
     } catch (err: any) {
-      // Graceful fallback: mark deal as won in the UI
+      // Graceful fallback: mark deal as won but don't duplicate board
       moveDeal(deal.id, DealStatus.CLOSED_WON);
-      addToast('Lead marcado como GANHO. Execute migration 025 para conversão completa.', 'info');
+      addToast('Migration 025 pendente — deal marcado como GANHO.', 'info');
       onClose();
     } finally {
       setIsConverting(false);
@@ -633,11 +655,34 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                           );
                         })()}
                     </p>
-                    <p className="text-slate-500 text-xs">{deal.contactEmail}</p>
+                    <p className="text-slate-500 text-xs">{contact?.email || deal.contactEmail}</p>
+                    {contact?.phone && (
+                      <p className="text-slate-500 text-xs flex items-center gap-1"><PhoneIcon size={10} />{contact.phone}</p>
+                    )}
                   </div>
                 </div>
-                {/* WhatsApp AI Outreach — visible whenever any phone/contact exists */}
-                {(!!contact?.phone || !!deal?.contactEmail || !!briefingJson?.whatsapp) && (
+                {/* Orphan deal: no contact linked — show contact linker */}
+                {!deal.contactId && (
+                  <div className="mt-2">
+                    <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider mb-1">Nenhum contato vinculado</p>
+                    <select
+                      className="w-full text-xs bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-amber-400"
+                      defaultValue=""
+                      onChange={async (e) => {
+                        if (!e.target.value) return;
+                        updateDeal(deal.id, { contactId: e.target.value });
+                        addToast('✅ Contato vinculado!', 'success');
+                      }}
+                    >
+                      <option value="">Vincular a um contato existente...</option>
+                      {contacts.map(c => (
+                        <option key={c.id} value={c.id}>{c.name} {c.email ? `— ${c.email}` : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {/* WhatsApp AI Outreach — visible whenever phone/email exists in contact OR briefing */}
+                {(!!contact?.phone || !!contact?.email || !!briefingJson?.whatsapp || !!deal.contactEmail) && (
                   <div className="mt-3 space-y-2">
                     {!waMessage ? (
                       <button
@@ -978,16 +1023,20 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                       >
                         <option value="" className="text-slate-900">Selecione um item...</option>
                         {products.filter(p => {
-                          // PRIMARY: exclude by type (works after migration 024)
-                          const blockedTypes = ['tech_stack', 'infra', 'api_cost'];
-                          if (blockedTypes.includes(p.type as string)) return false;
-                          // SECONDARY: exclude by name (safety net before migration runs)
+                          // Block tech-stack / infra items by type
+                          const blockedTypes = ['tech_stack', 'infra', 'api_cost', 'infrastructure'];
+                          if (blockedTypes.includes((p.type || '').toLowerCase())) return false;
+                          // Block by category
+                          const blockedCategories = ['tech_stack', 'infra', 'api', 'infrastructure', 'technology'];
+                          if (blockedCategories.includes((p.category || '').toLowerCase())) return false;
+                          // Block by name (safety net)
                           const n = (p.name || '').toLowerCase();
                           const blockedNames = [
                             'openai', 'anthropic', 'claude', 'gemini', 'gpt',
                             'vercel', 'supabase', 'firebase', 'n8n', 'zapier',
                             'make', 'deno', 'stripe', 'twilio', 'sendgrid',
-                            'cloudflare', 'aws ', 'azure', 'gcp '
+                            'cloudflare', 'aws ', 'azure', 'gcp ', 'godaddy',
+                            'digital ocean', 'render', 'railway', 'netlify'
                           ];
                           if (blockedNames.some(blocked => n.includes(blocked))) return false;
                           return true;

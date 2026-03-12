@@ -109,6 +109,9 @@ export const useBoardsController = () => {
     lastMouseDownDealId.current = id;
   };
 
+  // Optimistic reorder: tracks deal order during drag before server confirms
+  const [draggingOverStage, setDraggingOverStage] = React.useState<string | null>(null);
+
   // Combined loading state
   const isLoading = boardsLoading || dealsLoading;
 
@@ -210,9 +213,12 @@ export const useBoardsController = () => {
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, stageId?: string) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    if (stageId && stageId !== draggingOverStage) {
+      setDraggingOverStage(stageId);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent, stageId: string) => {
@@ -283,6 +289,7 @@ export const useBoardsController = () => {
       }
     }
     setDraggingId(null);
+    setDraggingOverStage(null);
   };
 
   const handleQuickAddActivity = (
