@@ -197,7 +197,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
             <AnalyticsSourceCard />
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-auto">
             {isMobile ? (
               // Mobile View - List with status change buttons
               <MobileKanbanView

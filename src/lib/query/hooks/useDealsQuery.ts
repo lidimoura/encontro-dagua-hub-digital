@@ -273,48 +273,18 @@ export const useDealsByBoard = (boardId: string) => {
         }
       } // Restored missing brace for if (activeBoard && activeBoard.stages)
 
-      // STRICT PIPELINE SEGREGATION & ORPHAN CLEANUP: 
-      // Stop contacts from duplicating across boards if their status doesn't match the board's intent,
-      // and remove orphan deals (contact deleted) that appear as ghosts.
-      let finalDeals = enrichedDeals.filter(deal => {
-        // Orphan Cleanup: if contact was deleted, contact_id is null or contactName fallback triggers
-        if (!deal.contactId || deal.contactName === 'Sem contato') {
+      // ORPHAN CLEANUP: Only remove auto-ghost cards whose contact no longer exists.
+      // Real deals (with a valid contactId from the DB) must NEVER be filtered out here.
+      const finalDeals = enrichedDeals.filter(deal => {
+        // Only filter ghost (auto-) cards if the underlying contact is gone
+        if (deal.id.startsWith('auto-') && (!deal.contactId || deal.contactName === 'Sem contato')) {
           return false;
         }
         return true;
       });
 
-      if (activeBoard) {
-        const boardNameUpper = (activeBoard.name || '').toUpperCase();
-
-        if (boardNameUpper.includes('SDR') || boardNameUpper.includes('INBOUND') || boardNameUpper.includes('VENDAS')) {
-          finalDeals = enrichedDeals.filter(deal => {
-            // Find underlying contact status
-            const contact = contactMap.get(deal.contactId) as any;
-            if (!contact) return true; // keep if no contact
-
-            const statusUpper = (contact.status || '').toUpperCase();
-            const stageUpper = (contact.stage || '').toUpperCase();
-            const isCustomer = statusUpper === 'CUSTOMER' || statusUpper === 'WON' || stageUpper === 'CUSTOMER' || stageUpper === 'WON' || stageUpper === 'CLIENTE';
-
-            return !isCustomer; // Ensure SDR board only has non-customers (Leads, etc.)
-          });
-        }
-        else if (boardNameUpper.includes('ONBOARDING') || boardNameUpper.includes('CUSTOMER') || boardNameUpper.includes('CLIENTE')) {
-          finalDeals = enrichedDeals.filter(deal => {
-            const contact = contactMap.get(deal.contactId) as any;
-            if (!contact) return false; // Onboarding strict: requires contact
-
-            const statusUpper = (contact.status || '').toUpperCase();
-            const stageUpper = (contact.stage || '').toUpperCase();
-            const isCustomer = statusUpper === 'CUSTOMER' || statusUpper === 'WON' || stageUpper === 'CUSTOMER' || stageUpper === 'WON' || stageUpper === 'CLIENTE';
-
-            return isCustomer; // Ensure Onboarding board ONLY has customers
-          });
-        }
-      }
-
       return finalDeals;
+
     },
     staleTime: 1 * 60 * 1000, // 1 minute for kanban (more interactive)
   });

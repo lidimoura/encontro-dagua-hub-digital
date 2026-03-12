@@ -35,7 +35,8 @@ export const DealCard: React.FC<DealCardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const [localDragging, setLocalDragging] = useState(false);
-  const [didDrag, setDidDrag] = useState(false);
+  const pointerDownPos = React.useRef<{ x: number; y: number } | null>(null);
+  const wasDragged = React.useRef(false);
   const { t } = useTranslation();
 
   // Cross-app analytics: fetch QR engagement for this deal's contact email
@@ -57,7 +58,6 @@ export const DealCard: React.FC<DealCardProps> = ({
 
   const handleDragStart = (e: React.DragEvent) => {
     setLocalDragging(true);
-    setDidDrag(true);
     e.dataTransfer.setData('dealId', deal.id);
     e.dataTransfer.effectAllowed = 'move';
     onDragStart(e, deal.id);
@@ -65,8 +65,7 @@ export const DealCard: React.FC<DealCardProps> = ({
 
   const handleDragEnd = () => {
     setLocalDragging(false);
-    // Give React one tick before allowing clicks again
-    setTimeout(() => setDidDrag(false), 100);
+    // Keep wasDragged=true for this action cycle — it will be reset on the next pointerdown
   };
 
   const hasEngagement = qrEngagement && qrEngagement.totalProjects > 0;
@@ -77,11 +76,28 @@ export const DealCard: React.FC<DealCardProps> = ({
       draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onMouseDown={() => setLastMouseDownDealId(deal.id)}
+      onPointerDown={e => {
+        pointerDownPos.current = { x: e.clientX, y: e.clientY };
+        wasDragged.current = false;
+        setLastMouseDownDealId(deal.id);
+      }}
+      onPointerMove={e => {
+        if (pointerDownPos.current) {
+          const dx = e.clientX - pointerDownPos.current.x;
+          const dy = e.clientY - pointerDownPos.current.y;
+          if (Math.sqrt(dx * dx + dy * dy) > 5) {
+            wasDragged.current = true;
+          }
+        }
+      }}
       onClick={e => {
         if ((e.target as HTMLElement).closest('button')) return;
-        // Guard: do NOT open modal if we just finished a drag
-        if (localDragging || didDrag) return;
+        // If we actually dragged (moved > 5px), do NOT open modal
+        if (localDragging || wasDragged.current) {
+          wasDragged.current = false;
+          return;
+        }
+        pointerDownPos.current = null;
         onClick();
       }}
       className={`
