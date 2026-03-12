@@ -51,7 +51,7 @@ const MessageBubble: React.FC<{ role: string; content: string; isStreaming?: boo
   if (isSystem) return null;
 
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-4`}>
+    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-4 min-w-0`}>
       {/* Avatar */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm
         ${isUser ? 'bg-primary-500 text-white' : 'bg-gradient-to-br from-violet-500 to-purple-600 text-white'}`}>
@@ -60,15 +60,15 @@ const MessageBubble: React.FC<{ role: string; content: string; isStreaming?: boo
 
       {/* Bubble */}
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ring-1
+        className={`max-w-[80%] min-w-0 overflow-hidden rounded-2xl px-4 py-3 shadow-sm ring-1
           ${isUser
             ? 'bg-primary-600 text-white rounded-br-sm ring-primary-500/30'
             : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-sm ring-slate-200/60 dark:ring-white/10'}`}
       >
         {isUser ? (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</p>
         ) : (
-          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-li:my-0.5 prose-pre:bg-black/10 dark:prose-pre:bg-white/5 prose-pre:text-xs prose-code:text-purple-600 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-900/20 prose-code:px-1 prose-code:rounded">
+          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden prose-p:my-1 prose-headings:my-2 prose-li:my-0.5 prose-pre:overflow-x-auto prose-pre:bg-black/10 dark:prose-pre:bg-white/5 prose-pre:text-xs prose-code:text-purple-600 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-900/20 prose-code:px-1 prose-code:rounded">
             <ReactMarkdown>{content}</ReactMarkdown>
             {isStreaming && (
               <span className="inline-block w-2 h-4 bg-violet-500 animate-pulse rounded-sm ml-1 align-middle" />

@@ -491,12 +491,22 @@ export const useDeleteDeal = () => {
       return id;
     },
     onMutate: async id => {
+      // Cancel ALL deal queries to prevent race conditions
       await queryClient.cancelQueries({ queryKey: queryKeys.deals.all });
 
+      // Snapshot ALL deal caches (lists + board-specific)
       const previousDeals = queryClient.getQueryData<Deal[]>(queryKeys.deals.lists());
 
-      queryClient.setQueryData<Deal[]>(queryKeys.deals.lists(), (old = []) =>
-        old.filter(deal => deal.id !== id)
+      // Optimistically remove from every deal cache entry
+      queryClient.setQueriesData<Deal[]>(
+        { queryKey: queryKeys.deals.all, exact: false },
+        (old) => (old || []).filter(deal => deal.id !== id)
+      );
+
+      // Also remove from DealView caches (board view uses DealView[])
+      queryClient.setQueriesData<{ id: string }[]>(
+        { queryKey: queryKeys.deals.all, exact: false },
+        (old) => (old || []).filter((deal: any) => deal.id !== id)
       );
 
       return { previousDeals };
@@ -507,6 +517,7 @@ export const useDeleteDeal = () => {
       }
     },
     onSettled: () => {
+      // Invalidate ALL related queries to fetch fresh data
       queryClient.invalidateQueries({ queryKey: queryKeys.deals.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },

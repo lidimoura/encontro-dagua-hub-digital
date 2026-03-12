@@ -544,13 +544,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
               {/* Converter para Cliente button */}
               {deal.status !== 'CUSTOMER' && deal.status !== DealStatus.CLOSED_WON && (
                 <button
-                  onClick={handleConvertToClient}
-                  disabled={isConverting}
-                  className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white rounded-lg font-bold text-sm shadow-sm flex items-center gap-2 transition-all"
-                  title="Converter este lead em cliente via RPC"
+                  onClick={!deal.contactId ? undefined : handleConvertToClient}
+                  disabled={isConverting || !deal.contactId}
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg font-bold text-sm shadow-sm flex items-center gap-2 transition-all"
+                  title={!deal.contactId ? '⚠️ Vincule um contato antes de converter' : 'Converter este lead em cliente'}
                 >
                   {isConverting ? <Loader2 size={16} className="animate-spin" /> : <UserCheck size={16} />}
-                  CONVERTER
+                  {!deal.contactId ? 'SEM CONTATO' : 'CONVERTER'}
                 </button>
               )}
               {deal.status !== DealStatus.CLOSED_WON && (
