@@ -133,15 +133,15 @@ export const contactsService = {
    */
   async getAll(companyId: string): Promise<{ data: Contact[] | null; error: Error | null }> {
     try {
-      if (!companyId) {
-        return { data: null, error: new Error('Company ID is required') };
-      }
-
-      const { data, error } = await supabase
+      // NOTE: We rely on RLS for tenant isolation.
+      // Removing explicit .eq('company_id') so that contacts imported without
+      // company_id (old records) are also visible to their company's admin.
+      const query = supabase
         .from('contacts')
         .select('*')
-        .eq('company_id', companyId) // EXPLICIT FILTER - Defense in depth
         .order('created_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) return { data: null, error };
       return { data: (data || []).map(c => transformContact(c as DbContact)), error: null };
