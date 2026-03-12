@@ -751,37 +751,38 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 </div>
               </div>
 
-              {/* ── Briefing JSON Section ───────────────────────────── */}
-              {briefingJson && (
+              {/* ── Briefing / Context Section ─────────────────────────────── */}
+              {(briefingJson || (contactObj as any)?.description) && (
                 <div className="pt-4 border-t border-teal-100 dark:border-teal-900/30">
                   <h3 className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase mb-3 flex items-center gap-1.5">
-                    <Tag size={12} /> Briefing do Lead
+                    <Tag size={12} /> Briefing
                   </h3>
                   <div className="space-y-2.5">
-                    {briefingJson.whatsapp && (
+                    {/* Phone / WA quick-link */}
+                    {(briefingJson?.whatsapp || contact?.phone) && (
                       <div className="flex items-start gap-2">
                         <PhoneIcon size={13} className="text-teal-500 mt-0.5 shrink-0" />
                         <div>
                           <p className="text-[10px] text-slate-400 uppercase tracking-wider">WhatsApp</p>
                           <a
-                            href={`https://wa.me/${briefingJson.whatsapp.replace(/\D/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}`}
+                            target="_blank" rel="noopener noreferrer"
                             className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
                           >
-                            {briefingJson.whatsapp}
+                            {briefingJson?.whatsapp || contact?.phone}
                           </a>
                         </div>
                       </div>
                     )}
-                    {briefingJson.services && briefingJson.services.length > 0 && (
+                    {/* Services as prominent badges */}
+                    {briefingJson?.services && briefingJson.services.length > 0 && (
                       <div className="flex items-start gap-2">
                         <Package size={13} className="text-teal-500 mt-0.5 shrink-0" />
                         <div>
                           <p className="text-[10px] text-slate-400 uppercase tracking-wider">Serviços de Interesse</p>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {briefingJson.services.map((s, i) => (
-                              <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700/40">
+                              <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700/40">
                                 {s}
                               </span>
                             ))}
@@ -789,23 +790,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         </div>
                       </div>
                     )}
-                    {briefingJson.source && (
+                    {/* Source origin */}
+                    {briefingJson?.source && (
                       <div className="flex items-start gap-2">
                         <Globe size={13} className="text-teal-500 mt-0.5 shrink-0" />
                         <div>
                           <p className="text-[10px] text-slate-400 uppercase tracking-wider">Origem</p>
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${briefingJson.source === 'Amazô SDR'
-                            ? 'bg-blue-900 text-blue-200'
-                            : briefingJson.source === 'Hub LP'
-                              ? 'bg-emerald-900/40 text-emerald-300'
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                            briefingJson.source === 'Amazô SDR' ? 'bg-blue-900 text-blue-200'
+                              : briefingJson.source === 'Hub LP' ? 'bg-emerald-900/40 text-emerald-300'
                               : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
-                            }`}>
-                            {briefingJson.source}
-                          </span>
+                          }`}>{briefingJson.source}</span>
                         </div>
                       </div>
                     )}
-                    {briefingJson.landed_via && (
+                    {briefingJson?.landed_via && (
                       <div className="flex items-start gap-2">
                         <ExternalLink size={13} className="text-teal-500 mt-0.5 shrink-0" />
                         <div>
@@ -907,26 +906,80 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
             <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30 dark:bg-black/10">
               {activeTab === 'timeline' && (
                 <div className="space-y-6">
-                  {/* Pinned Briefing Auto-Note */}
-                  {briefingJson?.message && (
-                    <div className="flex gap-3 animate-in fade-in">
-                      <div className="mt-1 w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shrink-0 shadow">
-                        <Bot size={14} className="text-white" />
-                      </div>
-                      <div className="flex-1 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-700/40 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400">Briefing Automático — Amazô SDR</span>
-                          {briefingJson.capture_time && (
-                            <span className="text-[10px] text-slate-400 ml-auto">
-                              {new Date(briefingJson.capture_time).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                  {/* ══════════════════════════════════════════════════════════
+                      CONTEXTO INICIAL DO LEAD — pinned at top of timeline
+                      Visible for ALL sources: Hub LP, Amazô SDR, manual leads
+                  ══════════════════════════════════════════════════════════ */}
+                  {(briefingJson?.message || briefingJson?.services?.length || contact?.phone || briefingJson?.whatsapp) && (
+                    <div className="rounded-2xl border-2 border-teal-300 dark:border-teal-700/60 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/10 p-4 shadow-sm animate-in fade-in">
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow">
+                            <Bot size={12} className="text-white" />
+                          </div>
+                          <span className="text-xs font-black uppercase tracking-widest text-teal-700 dark:text-teal-300">
+                            Contexto Inicial do Lead
+                          </span>
+                          {briefingJson?.source && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              briefingJson.source === 'Amazô SDR' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                              : briefingJson.source === 'Hub LP' ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                            }`}>
+                              {briefingJson.source}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">{briefingJson.message}</p>
-                        {briefingJson.landed_via && (
-                          <p className="mt-2 text-[10px] text-slate-400 font-mono">via {briefingJson.landed_via}</p>
+                        {briefingJson?.capture_time && (
+                          <span className="text-[10px] text-slate-400">
+                            {new Date(briefingJson.capture_time).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                          </span>
                         )}
                       </div>
+
+                      {/* What the lead wrote / typed */}
+                      {briefingJson?.message && (
+                        <div className="mb-3 p-3 bg-white/60 dark:bg-white/5 rounded-xl border border-teal-200 dark:border-teal-700/30">
+                          <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">O que o lead escreveu:</p>
+                          <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap leading-relaxed">{briefingJson.message}</p>
+                        </div>
+                      )}
+
+                      {/* Services as large prominent badges */}
+                      {briefingJson?.services && briefingJson.services.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-2">Serviços de Interesse:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {briefingJson.services.map((s, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-teal-600 dark:bg-teal-500 text-white shadow-sm"
+                              >
+                                <Package size={10} />{s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Direct WA action — pulls real phone number priority: briefing > contact.phone */}
+                      {(briefingJson?.whatsapp || contact?.phone) && (
+                        <a
+                          href={`https://wa.me/${(briefingJson?.whatsapp || contact?.phone || '').replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 flex items-center justify-center gap-2 w-full py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+                        >
+                          <PhoneIcon size={13} />
+                          Chamar no WhatsApp — {(briefingJson?.whatsapp || contact?.phone)}
+                        </a>
+                      )}
+
+                      {/* Channel info */}
+                      {briefingJson?.landed_via && (
+                        <p className="mt-2 text-[10px] text-slate-400 font-mono text-center">via {briefingJson.landed_via}</p>
+                      )}
                     </div>
                   )}
 
