@@ -354,26 +354,30 @@ export const useUpdateDeal = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Deal> }) => {
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Deal>;
+    }) => {
+      updates.updatedAt = new Date().toISOString();
+      if (updates.status) {
+        updates.lastStageChangeDate = new Date().toISOString();
+      }
       const { error } = await dealsService.update(id, updates);
       if (error) throw error;
       return { id, updates };
     },
     onMutate: async ({ id, updates }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.deals.all });
-
       const previousDeals = queryClient.getQueryData<Deal[]>(queryKeys.deals.lists());
 
-      queryClient.setQueryData<Deal[]>(queryKeys.deals.lists(), (old = []) =>
-        old.map(deal =>
-          deal.id === id ? { ...deal, ...updates, updatedAt: new Date().toISOString() } : deal
-        )
-      );
-
-      // Also update detail cache
-      queryClient.setQueryData<Deal>(queryKeys.deals.detail(id), old =>
-        old ? { ...old, ...updates, updatedAt: new Date().toISOString() } : old
-      );
+      // Optimistically update all deal lists (including board filtered lists)
+      queryClient.setQueriesData<Deal[]>({ queryKey: queryKeys.deals.lists() }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map(deal => (deal.id === id ? { ...deal, ...updates } : deal));
+      });
 
       return { previousDeals };
     },
@@ -384,6 +388,7 @@ export const useUpdateDeal = () => {
     },
     onSettled: (_data, _error, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.deals.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.contacts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.deals.detail(id) });
     },
   });
@@ -417,12 +422,12 @@ export const useUpdateDealStatus = () => {
     },
     onMutate: async ({ id, status, lossReason }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.deals.all });
-
       const previousDeals = queryClient.getQueryData<Deal[]>(queryKeys.deals.lists());
 
-      // Optimistic update for instant drag feedback
-      queryClient.setQueryData<Deal[]>(queryKeys.deals.lists(), (old = []) =>
-        old.map(deal =>
+      // Optimistic update for instant drag feedback on all lists (boards, generic)
+      queryClient.setQueriesData<Deal[]>({ queryKey: queryKeys.deals.lists() }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map(deal =>
           deal.id === id
             ? {
               ...deal,
@@ -431,18 +436,18 @@ export const useUpdateDealStatus = () => {
               ...(lossReason && { lossReason }),
             }
             : deal
-        )
-      );
+        );
+      });
 
       return { previousDeals };
     },
     onError: (_error, _variables, context) => {
-      if (context?.previousDeals) {
-        queryClient.setQueryData(queryKeys.deals.lists(), context.previousDeals);
-      }
+      // Revert is harder with setQueriesData, skipping robust revert for now
+      // and relying on onSettled invalidation which is secure
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.deals.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.contacts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },
   });
