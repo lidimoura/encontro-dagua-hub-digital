@@ -20,6 +20,7 @@ export interface DbContact {
   role: string | null;
   company_name: string | null;
   crm_company_id: string | null;
+  company_id: string | null;
   avatar: string | null;
   notes: string | null;
   status: string;
@@ -32,6 +33,10 @@ export interface DbContact {
   created_at: string;
   updated_at: string;
   owner_id: string | null;
+  // Rich context fields — MUST be passed through, never sanitised
+  briefing_json: Record<string, unknown> | null;
+  linkdagua_user_id: string | null;
+  description: string | null;
 }
 
 /**
@@ -71,6 +76,10 @@ const transformContact = (db: DbContact): Contact => ({
   lastPurchaseDate: db.last_purchase_date || undefined,
   totalValue: db.total_value || 0,
   createdAt: db.created_at,
+  // --- Rich context passthrough (REQUIRED for DealDetailModal briefing card) ---
+  briefing_json: db.briefing_json ?? null,
+  linkdagua_user_id: db.linkdagua_user_id ?? null,
+  description: db.description ?? null,
 });
 
 /**

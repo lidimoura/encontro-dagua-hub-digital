@@ -83,6 +83,10 @@ export interface Contact {
     lastInteraction?: string;
     createdAt: string;
     updatedAt?: string;
+    // Rich context fields from leads/briefings — must NOT be stripped
+    briefing_json?: Record<string, unknown> | null;
+    linkdagua_user_id?: string | null;
+    description?: string | null;
 }
 
 // ============================================
