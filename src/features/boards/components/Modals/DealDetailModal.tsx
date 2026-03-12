@@ -158,6 +158,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [waMessage, setWaMessage] = useState<string | null>(null);
   const [isGeneratingWA, setIsGeneratingWA] = useState(false);
 
+  // ── Create Contact inline state (for orphan deals) ─────────────
+  const [showCreateContact, setShowCreateContact] = useState(false);
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactEmail, setNewContactEmail] = useState('');
+  const [newContactPhone, setNewContactPhone] = useState('');
+  const [creatingContact, setCreatingContact] = useState(false);
+
   // Helper functions removed as they are now handled by ActivityRow component
 
   // Reset state when deal changes or modal opens
@@ -174,8 +181,14 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
       setIsEditingValue(false);
       setQrLinks([]);
       setDocsError(null);
+      // Reset Create Contact inline form
+      setShowCreateContact(false);
+      setNewContactName('');
+      setNewContactEmail('');
+      setNewContactPhone('');
     }
   }, [isOpen, dealId]);
+
 
   // ── Realtime sync: qr_codes ↟ Link d'Água → CRM (no F5 needed) ───
   useEffect(() => {
@@ -666,7 +679,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                   <div className="mt-2">
                     <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider mb-1">Nenhum contato vinculado</p>
                     <select
-                      className="w-full text-xs bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-amber-400"
+                      className="w-full text-xs bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-amber-400 mb-2"
                       defaultValue=""
                       onChange={async (e) => {
                         if (!e.target.value) return;
@@ -679,8 +692,70 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         <option key={c.id} value={c.id}>{c.name} {c.email ? `— ${c.email}` : ''}</option>
                       ))}
                     </select>
+                    <button
+                      onClick={() => setShowCreateContact(v => !v)}
+                      className="w-full text-xs text-amber-600 dark:text-amber-400 border border-dashed border-amber-300 dark:border-amber-700 rounded-lg py-1.5 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                    >
+                      {showCreateContact ? '✕ Cancelar' : '+ Criar novo contato'}
+                    </button>
+                    {showCreateContact && (
+                      <div className="mt-2 space-y-1.5 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+                        <input
+                          type="text" placeholder="Nome *"
+                          value={newContactName}
+                          onChange={e => setNewContactName(e.target.value)}
+                          className="w-full text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-amber-400"
+                        />
+                        <input
+                          type="email" placeholder="Email"
+                          value={newContactEmail}
+                          onChange={e => setNewContactEmail(e.target.value)}
+                          className="w-full text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-amber-400"
+                        />
+                        <input
+                          type="tel" placeholder="WhatsApp (ex: +5592...)"
+                          value={newContactPhone}
+                          onChange={e => setNewContactPhone(e.target.value)}
+                          className="w-full text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-amber-400"
+                        />
+                        <button
+                          disabled={!newContactName.trim() || creatingContact}
+                          onClick={async () => {
+                            if (!newContactName.trim()) return;
+                            setCreatingContact(true);
+                            try {
+                              const { data: nc, error } = await supabase
+                                .from('contacts')
+                                .insert({
+                                  name: newContactName.trim(),
+                                  email: newContactEmail.trim() || null,
+                                  phone: newContactPhone.trim() || null,
+                                  status: 'ACTIVE',
+                                  stage: 'LEAD',
+                                })
+                                .select('id')
+                                .single();
+                              if (!error && nc?.id) {
+                                updateDeal(deal.id, { contactId: nc.id });
+                                addToast('✅ Contato criado e vinculado!', 'success');
+                                setShowCreateContact(false);
+                              } else {
+                                addToast('❌ Erro ao criar contato', 'error');
+                              }
+                            } finally {
+                              setCreatingContact(false);
+                            }
+                          }}
+                          className="w-full text-xs bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-bold rounded-lg py-2 transition-colors"
+                        >
+                          {creatingContact ? 'Criando...' : 'Criar e Vincular'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
+
+
                 {/* WhatsApp AI Outreach — visible whenever phone/email exists in contact OR briefing */}
                 {(!!contact?.phone || !!contact?.email || !!briefingJson?.whatsapp || !!deal.contactEmail) && (
                   <div className="mt-3 space-y-2">

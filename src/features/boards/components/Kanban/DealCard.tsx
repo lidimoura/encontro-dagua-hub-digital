@@ -35,6 +35,7 @@ export const DealCard: React.FC<DealCardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const [localDragging, setLocalDragging] = useState(false);
+  const [didDrag, setDidDrag] = useState(false);
   const { t } = useTranslation();
 
   // Cross-app analytics: fetch QR engagement for this deal's contact email
@@ -56,6 +57,7 @@ export const DealCard: React.FC<DealCardProps> = ({
 
   const handleDragStart = (e: React.DragEvent) => {
     setLocalDragging(true);
+    setDidDrag(true);
     e.dataTransfer.setData('dealId', deal.id);
     e.dataTransfer.effectAllowed = 'move';
     onDragStart(e, deal.id);
@@ -63,6 +65,8 @@ export const DealCard: React.FC<DealCardProps> = ({
 
   const handleDragEnd = () => {
     setLocalDragging(false);
+    // Give React one tick before allowing clicks again
+    setTimeout(() => setDidDrag(false), 100);
   };
 
   const hasEngagement = qrEngagement && qrEngagement.totalProjects > 0;
@@ -76,6 +80,8 @@ export const DealCard: React.FC<DealCardProps> = ({
       onMouseDown={() => setLastMouseDownDealId(deal.id)}
       onClick={e => {
         if ((e.target as HTMLElement).closest('button')) return;
+        // Guard: do NOT open modal if we just finished a drag
+        if (localDragging || didDrag) return;
         onClick();
       }}
       className={`
