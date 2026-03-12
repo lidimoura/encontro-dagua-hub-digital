@@ -7,9 +7,10 @@ import { ApiKeysSection } from './components/ApiKeysSection';
 import { WebhooksSection } from './components/WebhooksSection';
 import { AIConfigSection } from './components/AIConfigSection';
 import { DataStorageSettings } from './components/DataStorageSettings';
+import { NotificationsSection } from './components/NotificationsSection';
 import { UsersPage } from './UsersPage';
 import { useAuth } from '@/context/AuthContext';
-import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle } from 'lucide-react';
+import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -156,10 +157,11 @@ const SettingsPage: React.FC = () => {
   // Simple tab rendering logic
   const renderContent = () => {
     switch (activeTab) {
-      case 'general': return <GeneralSettings />;
-      case 'data': return <DataStorageSettings />;
-      case 'team': return isAdmin ? <UsersPage /> : <Navigate to="/settings" />;
-      default: return <GeneralSettings />;
+      case 'general':       return <GeneralSettings />;
+      case 'data':          return <DataStorageSettings />;
+      case 'notifications': return <NotificationsSection />;
+      case 'team':          return isAdmin ? <UsersPage /> : <Navigate to="/settings" />;
+      default:              return <GeneralSettings />;
     }
   };
 
@@ -206,6 +208,19 @@ const SettingsPage: React.FC = () => {
               {t('team')}
             </button>
           )}
+
+          {/* Notifications tab */}
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+              activeTab === 'notifications'
+                ? 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
+            }`}
+          >
+            <Bell size={18} />
+            Notificações
+          </button>
         </nav>
 
         {/* Content Area */}
