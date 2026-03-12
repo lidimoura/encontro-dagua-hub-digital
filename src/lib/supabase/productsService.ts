@@ -3,14 +3,29 @@ import { Product } from '@/types';
 
 export const productsService = {
     /**
-     * Get all active products for the current user's company
+     * Get all active catalog products (excludes tech_stack, infra and api_cost entries)
+     * Used by the Deal products tab — Tech Stack has its own separate view.
      */
     async getAll() {
-        return await supabase
+        const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
+        const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure'];
+
+        const { data, error } = await supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
+            .not('type', 'in', `(${BLOCKED_TYPES.join(',')})`)
             .order('name');
+
+        if (error || !data) return { data, error };
+
+        // Secondary safety filter: block by name for NULL-type legacy tech records
+        const filtered = data.filter((p: any) => {
+            const nameLower = (p.name || '').toLowerCase();
+            return !BLOCKED_NAMES.some(b => nameLower.includes(b));
+        });
+
+        return { data: filtered, error: null };
     },
 
     /**

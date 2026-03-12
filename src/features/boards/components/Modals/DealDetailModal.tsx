@@ -121,6 +121,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   // Determine the correct board for this deal
   const dealBoard = deal ? boards.find(b => b.id === deal.boardId) || activeBoard : activeBoard;
 
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingValue, setIsEditingValue] = useState(false);
   const [editTitle, setEditTitle] = useState('');
