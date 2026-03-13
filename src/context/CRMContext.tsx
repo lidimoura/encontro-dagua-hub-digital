@@ -111,6 +111,10 @@ interface CRMContextType {
   setAiApiKey: (key: string) => Promise<void>;
   aiApiKeySecondary: string;
   setAiApiKeySecondary: (key: string) => Promise<void>;
+  aiApiKeyNote: string;
+  setAiApiKeyNote: (note: string) => void;
+  aiApiKeySecondaryNote: string;
+  setAiApiKeySecondaryNote: (note: string) => void;
   aiModel: string;
   setAiModel: (model: string) => Promise<void>;
   aiThinking: boolean;
@@ -215,6 +219,10 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setAiApiKey,
     aiApiKeySecondary,
     setAiApiKeySecondary,
+    aiApiKeyNote,
+    setAiApiKeyNote,
+    aiApiKeySecondaryNote,
+    setAiApiKeySecondaryNote,
     aiModel,
     setAiModel,
     aiThinking,
@@ -669,6 +677,10 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setAiApiKey,
       aiApiKeySecondary,
       setAiApiKeySecondary,
+      aiApiKeyNote,
+      setAiApiKeyNote,
+      aiApiKeySecondaryNote,
+      setAiApiKeySecondaryNote,
       aiModel,
       setAiModel,
       aiThinking,

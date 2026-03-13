@@ -24,6 +24,8 @@ interface AIConfig {
   provider: 'google' | 'openai' | 'anthropic';
   apiKey: string;
   apiKeySecondary: string;
+  apiKeyNote: string;
+  apiKeySecondaryNote: string;
   model: string;
   thinking: boolean;
   search: boolean;
@@ -63,6 +65,10 @@ interface SettingsContextType {
   setAiApiKey: (key: string) => Promise<void>;
   aiApiKeySecondary: string;
   setAiApiKeySecondary: (key: string) => Promise<void>;
+  aiApiKeyNote: string;
+  setAiApiKeyNote: (note: string) => void;
+  aiApiKeySecondaryNote: string;
+  setAiApiKeySecondaryNote: (note: string) => void;
   aiModel: string;
   setAiModel: (model: string) => Promise<void>;
   aiThinking: boolean;
@@ -108,6 +114,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [aiProvider, setAiProviderState] = useState<AIConfig['provider']>('google');
   const [aiApiKey, setAiApiKeyState] = useState<string>(import.meta.env.VITE_GEMINI_API_KEY || '');
   const [aiApiKeySecondary, setAiApiKeySecondaryState] = useState<string>(import.meta.env.VITE_GEMINI_API_KEY_SECONDARY || '');
+  const [aiApiKeyNote, setAiApiKeyNoteState] = useState<string>('');
+  const [aiApiKeySecondaryNote, setAiApiKeySecondaryNoteState] = useState<string>('');
   const [aiModel, setAiModelState] = useState<string>('gemini-2.5-flash');
   const [aiThinking, setAiThinkingState] = useState<boolean>(true);
   const [aiSearch, setAiSearchState] = useState<boolean>(true);
@@ -133,6 +141,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setAiProviderState(settings.aiProvider);
         setAiApiKeyState(settings.aiApiKey);
         if (settings.aiApiKeySecondary) setAiApiKeySecondaryState(settings.aiApiKeySecondary);
+        if (settings.aiApiKeyNote) setAiApiKeyNoteState(settings.aiApiKeyNote);
+        if (settings.aiApiKeySecondaryNote) setAiApiKeySecondaryNoteState(settings.aiApiKeySecondaryNote);
         setAiModelState(settings.aiModel);
         setAiThinkingState(settings.aiThinking);
         setAiSearchState(settings.aiSearch);
@@ -256,6 +266,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     []
   );
 
+  const setAiApiKeyNote = useCallback((note: string) => {
+    setAiApiKeyNoteState(note);
+  }, []);
+
+  const setAiApiKeySecondaryNote = useCallback((note: string) => {
+    setAiApiKeySecondaryNoteState(note);
+  }, []);
+
   const setAiModel = useCallback(
     async (model: string) => {
       setAiModelState(model);
@@ -289,12 +307,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       aiProvider: aiProvider,
       aiApiKey: aiApiKey,
       aiApiKeySecondary: aiApiKeySecondary,
+      aiApiKeyNote: aiApiKeyNote,
+      aiApiKeySecondaryNote: aiApiKeySecondaryNote,
       aiModel: aiModel,
       aiThinking: aiThinking,
       aiSearch: aiSearch,
       aiAnthropicCaching: aiAnthropicCaching
     });
-  }, [aiProvider, aiApiKey, aiApiKeySecondary, aiModel, aiThinking, aiSearch, aiAnthropicCaching, updateSettings]);
+  }, [aiProvider, aiApiKey, aiApiKeySecondary, aiApiKeyNote, aiApiKeySecondaryNote, aiModel, aiThinking, aiSearch, aiAnthropicCaching, updateSettings]);
 
   // Custom Fields (local state for now)
   const addCustomField = useCallback((field: Omit<CustomFieldDefinition, 'id'>) => {
@@ -357,6 +377,10 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       setAiApiKey,
       aiApiKeySecondary,
       setAiApiKeySecondary,
+      aiApiKeyNote,
+      setAiApiKeyNote,
+      aiApiKeySecondaryNote,
+      setAiApiKeySecondaryNote,
       aiModel,
       setAiModel,
       aiThinking,
