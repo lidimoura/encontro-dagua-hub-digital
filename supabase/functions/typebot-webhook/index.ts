@@ -99,6 +99,55 @@ serve(async (req) => {
 
         console.log('[typebot-webhook] Contact created:', contactData);
 
+        // ── 2. Create a Deal in the SDR board ────────────────────────────
+        // Resolve contact ID — use newly created or existing
+        const resolvedContactId: string | null = contactData?.id ?? (() => {
+            // If duplicate, fetch again
+            return null; // will be resolved below
+        })();
+
+        // Lookup the SDR board (or first board)
+        const { data: sdrBoard } = await supabaseClient
+            .from('boards')
+            .select('id')
+            .ilike('name', '%SDR%')
+            .limit(1)
+            .single();
+
+        const { data: fallbackBoard } = !sdrBoard ? await supabaseClient
+            .from('boards')
+            .select('id')
+            .limit(1)
+            .single() : { data: null };
+
+        const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
+
+        if (targetBoardId && resolvedContactId) {
+            const { error: dealError } = await supabaseClient
+                .from('deals')
+                .insert([{
+                    title: `Lead SDR: ${name}`,
+                    status: 'LEAD',
+                    value: 0,
+                    board_id: targetBoardId,
+                    contact_id: resolvedContactId,
+                    source: 'Amazô SDR',
+                    briefing_json: briefingJson,
+                    notes: `Lead automático capturado via Amazô SDR\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
+                    probability: 20,
+                    priority: 'medium',
+                }]);
+
+            if (dealError) {
+                console.warn('[typebot-webhook] Deal creation warning:', dealError.message);
+            } else {
+                console.log('[typebot-webhook] Deal created in board:', targetBoardId);
+            }
+        } else {
+            console.warn('[typebot-webhook] Skipping deal creation: no board or contact id');
+        }
+
+
         // ── 2. Also add to waitlist for backward compat ──────────────────
         await supabaseClient
             .from('waitlist')

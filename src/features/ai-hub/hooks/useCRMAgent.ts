@@ -41,6 +41,7 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
     addDeal,
     activeBoard,
     aiApiKey,
+    aiApiKeySecondary,
   } = useCRM();
 
   const queryClient = useQueryClient();
@@ -660,7 +661,8 @@ export function useCRMAgent(options: UseCRMAgentOptions = {}) {
         );
 
         if (isQuotaError) {
-          const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
+          // Prefer Supabase-stored secondary key, fall back to env var
+          const secondaryKey = aiApiKeySecondary || import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
           if (secondaryKey) {
             console.warn('⚠️ Primary API Key Quota Exceeded - Switching to Secondary Key');
             // TENTATIVA 2: Secondary Key
