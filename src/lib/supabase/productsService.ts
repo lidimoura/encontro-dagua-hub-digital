@@ -11,42 +11,34 @@ export const productsService = {
      * Used by the Deal products tab.
      */
     async getAll(options?: { timestamp?: number }) {
-        const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure'];
+        const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
+        const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure', 'antigravity'];
 
-        // Core fix: Use RPC to guarantee DB-level strict filtering and bypass Edge caching
-        let query = supabase.rpc('get_crm_catalog_products');
-        
-        const { data, error } = await query;
-        
-        // Fallback for local dev if RPC hasn't been pushed yet
-        if (error) {
-            console.warn('RPC failed, falling back to standard query', error);
-            const fallbackQuery = supabase
-                .from('products')
-                .select('*')
-                .eq('is_active', true)
-                .not('type', 'in', '("tech_stack", "infra", "api_cost")')
-                .order('name');
-            
-            const fallbackRes = await fallbackQuery;
-            if (fallbackRes.error || !fallbackRes.data) return fallbackRes;
-            
-            const filteredFallback = fallbackRes.data.filter((p: any) => {
-                const nameLower = (p.name || '').toLowerCase();
-                return !BLOCKED_NAMES.some(b => nameLower.includes(b));
+        const applyNameFilter = (data: any[]) =>
+            data.filter((p: any) => {
+                const n = (p.name || '').toLowerCase();
+                return !BLOCKED_NAMES.some(b => n.includes(b));
             });
-            return { data: filteredFallback, error: null };
+
+        // Primary: Use RPC for strict DB-level filtering (bypasses CDN cache)
+        const { data: rpcData, error: rpcError } = await supabase.rpc('get_crm_catalog_products');
+
+        if (!rpcError && rpcData) {
+            return { data: applyNameFilter(rpcData), error: null };
         }
 
-        if (!data) return { data: [], error: null };
+        // Fallback: strict multi-column query when RPC not deployed
+        console.warn('[productsService] RPC unavailable, using fallback:', rpcError?.message);
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .eq('is_internal', false)
+            .not('product_type', 'in', `(${BLOCKED_TYPES.map(t => `"${t}"`).join(',')})`)
+            .order('name');
 
-        // Even with RPC, keep the safety JS filter just to be 100% immune
-        const filtered = data.filter((p: any) => {
-            const nameLower = (p.name || '').toLowerCase();
-            return !BLOCKED_NAMES.some(b => nameLower.includes(b));
-        });
-
-        return { data: filtered, error: null };
+        if (error) return { data: [], error };
+        return { data: applyNameFilter(data || []), error: null };
     },
 
     /**

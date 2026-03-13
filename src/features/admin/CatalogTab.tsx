@@ -194,15 +194,28 @@ export default function CatalogTab() {
     const fetchProducts = async () => {
         try {
             setLoading(true);
+
+            // STRICT FILTER: Exclude tech_stack, internal infra, and known vendor names
+            const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
+            const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure', 'antigravity'];
+
             const { data, error } = await supabase
                 .from('products')
                 .select('*')
-                .or('product_type.neq.tech_stack,is_internal.eq.false')
+                .eq('is_active', true)
+                .eq('is_internal', false)
+                .not('product_type', 'in', `(${BLOCKED_TYPES.map(t => `"${t}"`).join(',')})`)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
-            setProducts(data || []);
+            // Second JS-layer defense: filter out any vendor name leakage
+            const clean = (data || []).filter((p: any) => {
+                const n = (p.name || '').toLowerCase();
+                return !BLOCKED_NAMES.some(b => n.includes(b));
+            });
+
+            setProducts(clean);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {

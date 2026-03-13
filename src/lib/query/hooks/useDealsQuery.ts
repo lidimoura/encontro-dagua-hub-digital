@@ -224,6 +224,9 @@ export const useDealsByBoard = (boardId: string) => {
         const orphanContacts = contacts.filter(c => !contactIdsWithAnyDeal.has(c.id));
 
         for (const contact of orphanContacts) {
+          // Skip contacts with no usable identity (neither name nor email)
+          if (!contact.name && !contact.email) continue;
+
           const actualStageText = (contact.stage || '').toUpperCase();
 
           // STRICT: only map via explicit linkedLifecycleStage — no board-name heuristics
@@ -255,15 +258,21 @@ export const useDealsByBoard = (boardId: string) => {
         }
       }
 
-      // Remove any ghost cards where the contact has no valid name (truly orphaned)
-      const finalDeals = enrichedDeals.filter(deal => {
-        if (deal.id.startsWith('auto-') && (!deal.contactId || deal.contactName === 'Sem contato')) {
-          return false;
-        }
+      // DEDUPLICATION: remove any deal that appears more than once by id
+      // (guards against contacts appearing twice in the DB — a real-world anomaly)
+      const seenIds = new Set<string>();
+      const dedupedDeals = enrichedDeals.filter(deal => {
+        // Drop ghost cards for contacts with no name identifier
+        if (deal.id.startsWith('auto-') && !deal.contactId) return false;
+        // Drop real deals with no valid status (would cause Kanban column crash)
+        if (!deal.status) return false;
+        // Dedup by id
+        if (seenIds.has(deal.id)) return false;
+        seenIds.add(deal.id);
         return true;
       });
 
-      return finalDeals;
+      return dedupedDeals;
 
     },
     staleTime: 0, // Always refetch after mutations — no stale data on Kanban
