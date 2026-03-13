@@ -198,21 +198,21 @@ export const useDealsByBoard = (boardId: string) => {
         };
       });
 
-      // AUTO-MAPPING: Contacts with a lifecycle stage matching a board column
-      // that don't already have a deal → synthesize virtual DealView entries
+      // AUTO-MAPPING: Only create ghost cards for contacts that have NO real deal anywhere in the CRM.
+      // This prevents duplication when a contact is moved from one board to another.
       const activeBoard = boardResult.find((b: any) => b.id === boardId);
       if (activeBoard && activeBoard.stages) {
-        // Build a set of contactIds that already have deals on this board
-        const contactIdsWithDeals = new Set(deals.map(d => d.contactId).filter(Boolean));
+        // Critical fix: use ALL deals from ALL boards to exclude contacts that already have a real deal
+        const allDeals = dealsResult.data || [];
+        const contactIdsWithAnyDeal = new Set(allDeals.map((d: any) => d.contactId).filter(Boolean));
 
-        // Build maps for stage resolution
-        const stageIdToBoardStageId = new Map<string, string>(); // LifecycleStage UUID -> BoardStage UUID
-        const stageNameToBoardStageId = new Map<string, string>(); // LifecycleStage Name (uppercase) -> BoardStage UUID
+        // Build a map for strict linkedLifecycleStage resolution ONLY
+        const stageIdToBoardStageId = new Map<string, string>();
+        const stageNameToBoardStageId = new Map<string, string>();
 
         for (const stage of activeBoard.stages) {
           if (stage.linkedLifecycleStage) {
             stageIdToBoardStageId.set(stage.linkedLifecycleStage, stage.id);
-            // Also store the uppercase Name for legacy contacts
             const matchedLs = lifecycleStages.find((ls: any) => ls.id === stage.linkedLifecycleStage);
             if (matchedLs) {
               stageNameToBoardStageId.set(matchedLs.name.toUpperCase(), stage.id);
@@ -220,32 +220,14 @@ export const useDealsByBoard = (boardId: string) => {
           }
         }
 
-        // Find contacts who do not have a deal on this board
-        const orphanContacts = contacts.filter(c => !contactIdsWithDeals.has(c.id));
+        // Only create ghost cards for contacts without ANY real deal AND with explicit stage mapping
+        const orphanContacts = contacts.filter(c => !contactIdsWithAnyDeal.has(c.id));
 
         for (const contact of orphanContacts) {
           const actualStageText = (contact.stage || '').toUpperCase();
-          const actualStatusText = (contact.status || '').toUpperCase();
 
-          // 1. Try to map by exact Stage UUID or Name
-          let matchedStageId = stageIdToBoardStageId.get(contact.stage) || stageNameToBoardStageId.get(actualStageText);
-
-          // 2. Smart Fallback: Respect board boundaries based on name/purpose
-          const boardNameUpper = (activeBoard.name || '').toUpperCase();
-
-          if (!matchedStageId) {
-            const isLead = actualStatusText === 'LEAD' || actualStatusText === 'NEW' || actualStageText === 'LEAD' || actualStageText === 'NEW';
-            const isCustomer = actualStatusText === 'CUSTOMER' || actualStatusText === 'WON' || actualStageText === 'CUSTOMER' || actualStageText === 'WON' || actualStageText === 'CLIENTE';
-
-            if (boardNameUpper.includes('SDR') || boardNameUpper.includes('INBOUND') || boardNameUpper.includes('VENDAS')) {
-              if (isLead) matchedStageId = activeBoard.stages[0]?.id;
-            } else if (boardNameUpper.includes('ONBOARDING') || boardNameUpper.includes('CUSTOMER') || boardNameUpper.includes('CLIENTE')) {
-              if (isCustomer) matchedStageId = activeBoard.stages[0]?.id;
-            } else {
-              // Closer / Pipeline boards DO NOT spawn ghost cards. Deals here must travel from previous boards.
-              matchedStageId = undefined;
-            }
-          }
+          // STRICT: only map via explicit linkedLifecycleStage — no board-name heuristics
+          const matchedStageId = stageIdToBoardStageId.get(contact.stage) || stageNameToBoardStageId.get(actualStageText);
 
           if (matchedStageId) {
             enrichedDeals.push({
@@ -271,12 +253,10 @@ export const useDealsByBoard = (boardId: string) => {
             });
           }
         }
-      } // Restored missing brace for if (activeBoard && activeBoard.stages)
+      }
 
-      // ORPHAN CLEANUP: Only remove auto-ghost cards whose contact no longer exists.
-      // Real deals (with a valid contactId from the DB) must NEVER be filtered out here.
+      // Remove any ghost cards where the contact has no valid name (truly orphaned)
       const finalDeals = enrichedDeals.filter(deal => {
-        // Only filter ghost (auto-) cards if the underlying contact is gone
         if (deal.id.startsWith('auto-') && (!deal.contactId || deal.contactName === 'Sem contato')) {
           return false;
         }
@@ -286,7 +266,7 @@ export const useDealsByBoard = (boardId: string) => {
       return finalDeals;
 
     },
-    staleTime: 1 * 60 * 1000, // 1 minute for kanban (more interactive)
+    staleTime: 0, // Always refetch after mutations — no stale data on Kanban
   });
 };
 
