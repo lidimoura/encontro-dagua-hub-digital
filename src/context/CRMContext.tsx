@@ -109,6 +109,8 @@ interface CRMContextType {
   setAiProvider: (provider: 'google' | 'openai' | 'anthropic') => Promise<void>;
   aiApiKey: string;
   setAiApiKey: (key: string) => Promise<void>;
+  aiApiKeySecondary: string;
+  setAiApiKeySecondary: (key: string) => Promise<void>;
   aiModel: string;
   setAiModel: (model: string) => Promise<void>;
   aiThinking: boolean;
@@ -122,7 +124,7 @@ interface CRMContextType {
   refresh: () => Promise<void>;
 
   // Save Settings
-  saveAISettings: () => Promise<{ error: Error | null }>;
+  saveAISettings: () => Promise<{ error: Error | null } | void>;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -211,6 +213,8 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setAiProvider,
     aiApiKey,
     setAiApiKey,
+    aiApiKeySecondary,
+    setAiApiKeySecondary,
     aiModel,
     setAiModel,
     aiThinking,
@@ -663,6 +667,8 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setAiProvider,
       aiApiKey,
       setAiApiKey,
+      aiApiKeySecondary,
+      setAiApiKeySecondary,
       aiModel,
       setAiModel,
       aiThinking,

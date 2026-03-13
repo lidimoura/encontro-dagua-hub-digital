@@ -1,8 +1,47 @@
-﻿# DEVLOG - CRM Encontro d'água hub
+# DEVLOG - CRM Encontro d'água hub
 
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
 ---
+## [13/03/2026] — Sprint Estabiliz. Internacional: IA Keys, Precy FX, Jury LatAm, Docs
+
+### 🔑 Feature — Gestão de IA sem .env (UI No-Code)
+- **`AIConfigSection.tsx`**: adicionado campo **Chave Reserva (Failover 429)** com badge "Rodízio Automático"
+- **`SettingsContext.tsx`**: novo estado `aiApiKeySecondary` com getter/setter; salvo via `saveAISettings()`
+- **`CRMContext.tsx`**: proxied `aiApiKeySecondary`/`setAiApiKeySecondary` para toda a app
+- **`settings.ts`**: `DbUserSettings`, `UserSettings` e `transformSettings` atualizados com campo `ai_api_key_secondary`
+- **SQL necessário**: `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS ai_api_key_secondary text;`
+- Ambas as chaves são persistidas no Supabase — zero dependência de `.env`/Vercel
+
+### 💱 Fix — Precy: FX Inteligente + Fix 409
+- **`PrecyAgent.tsx`**: adicionado mapa estático de câmbio (`FX_RATES`) com 10 moedas (BRL base): BRL, USD, EUR, AUD, COP, PEN, ARS, MXN, CLP, UYU
+- `convertPrice()`: converte o preço final de BRL para a moeda selecionada antes de salvar
+- **Fix 409**: substituído `.insert()` por `.upsert({ onConflict: 'name' })` — evita conflito quando produto de mesmo nome já existe no catálogo
+- Metadata salva `price_brl` original para rastreabilidade
+- Seletor de moeda migrado de 4 botões para `<select>` compacto com emojis de bandeira
+
+### ⚖️ Feature — Jury: LatAm, Auto-Open, Saídas Separadas
+- **Jurisdições expandidas**: CO (Ley 1581), PE (Ley 29733), AR (Ley 25.326), MX (LFPDPPP), CL (Ley 19.628), UY (Ley 18.331) — somando às existentes BR/US/AU/EU
+- **Chat auto-aberto**: `isRefinementOpen` agora começa `true` — Jury inicia pronta
+- **Separação de saídas**: `contractGenerated` flag separada — chat para diálogo/resumos, área de contrato apenas para documento formal
+- **Container fixo**: `h-72 min-h-0 overflow-y-auto` com `contain:strict` — elimina layout jump durante streaming da IA
+- System prompt reformulado: Jury age como consultora (faz perguntas antes de gerar)
+
+### 📚 Documentação
+- **`UserGuide.md`** (NOVO): manual completo com todas as funcionalidades nativas e features — Kanban, botão `+`, agentes IA, ciclo de vida, catálogo, configuração de IA, LP→SDR, e nota de SQL
+- **`DEVLOG.md`**: esta entrada adicionada
+
+### 📊 Métricas da Sprint
+| Métrica | Valor |
+|---|---|
+| Arquivos de código modificados | 7 |
+| Novas features UI | 3 (secondary key, Precy select, Jury LatAm flags) |
+| Bugs corrigidos | 2 (409 Precy, addToast args) |
+| Documentação | 1 arquivo novo, 1 atualizado |
+| Build TypeScript | ✅ 0 erros |
+
+---
+
 ## [02/27/2026] - Finalização de Sprint: Correções Críticas no CRM e Integração Nexus/Jury
 
 - **Resolução do Erro 409 (Delete em Cascata de Contatos)**: A deleção de contatos duplicados gerava *409 Conflict* no Supabase devido à falta de `ON DELETE CASCADE` dependente. Implementamos a deleção em cascata direta via `contactsService.delete(...)`. A função agora exclui proativamente os `deals` e as `activities` antes da raiz. Cards fantasmas também foram removidos via filtro inteligente no Kanban e Realtime reativado para as tabelas essenciais.

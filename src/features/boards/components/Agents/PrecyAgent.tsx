@@ -73,6 +73,26 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
 
     const SOCIAL_DISCOUNT = 0.60; // 60% discount for social pricing
 
+    // Static FX rates relative to BRL (updated manually or via AI-powered refresh)
+    const FX_RATES: Record<string, number> = {
+        BRL: 1.0,
+        USD: 0.185,   // 1 BRL ≈ 0.185 USD
+        EUR: 0.170,   // 1 BRL ≈ 0.170 EUR
+        AUD: 0.290,   // 1 BRL ≈ 0.290 AUD
+        COP: 750,     // 1 BRL ≈ 750 COP
+        PEN: 0.68,    // 1 BRL ≈ 0.68 PEN
+        ARS: 180,     // 1 BRL ≈ 180 ARS
+        MXN: 3.20,    // 1 BRL ≈ 3.20 MXN
+        CLP: 175,     // 1 BRL ≈ 175 CLP
+        UYU: 7.3,     // 1 BRL ≈ 7.3 UYU
+    };
+
+    // Convert a BRL price to the selected currency for display / catalog save
+    const convertPrice = (priceBRL: number): number => {
+        const rate = FX_RATES[currency] ?? 1;
+        return Math.round(priceBRL * rate * 100) / 100;
+    };
+
     const impactMultipliers = {
         low: 1.0,
         medium: 1.2,
@@ -157,16 +177,18 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     // FIXED: Save the priced product to the products table for use in Deals
+    // Uses upsert to prevent 409 Conflict when name already exists.
     const handleSaveProduct = async () => {
         if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
+        const priceInSelectedCurrency = convertPrice(calculation.finalPrice);
         try {
             const { error } = await supabase
                 .from('products')
-                .insert([{
+                .upsert([{
                     name: productName.trim(),
-                    description: `Precificado pela Precy — ${impact.toUpperCase()} impact × ${calculation.impactMultiplier}x`,
-                    price: Math.round(calculation.finalPrice * 100) / 100,
+                    description: `Precificado pela Precy — ${impact.toUpperCase()} impact × ${calculation.impactMultiplier}x (${currency})`,
+                    price: priceInSelectedCurrency,
                     product_type: 'crm_service',
                     is_internal: false,
                     is_active: true,
@@ -183,11 +205,12 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
                         impact_multiplier: calculation.impactMultiplier,
                         is_social_pricing: isSocialPricing,
                         currency,
+                        price_brl: calculation.finalPrice,
                     },
-                }]);
+                }], { onConflict: 'name', ignoreDuplicates: false });
 
             if (error) throw error;
-            addToast(t('productSaved') || `"${productName}" salvo no catálogo!`, 'success');
+            addToast(t('productSaved') || `"${productName}" salvo no catálogo (${currency})!`, 'success');
             setProductName('');
         } catch (error: any) {
             console.error('[Precy] Error saving product:', error);

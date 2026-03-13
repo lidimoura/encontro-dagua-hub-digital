@@ -10,6 +10,7 @@ export interface DbUserSettings {
   user_id: string;
   ai_provider: string;
   ai_api_key: string | null;
+  ai_api_key_secondary: string | null;
   ai_model: string;
   ai_thinking: boolean;
   ai_search: boolean;
@@ -35,6 +36,7 @@ export interface DbLifecycleStage {
 export interface UserSettings {
   aiProvider: 'google' | 'openai' | 'anthropic';
   aiApiKey: string;
+  aiApiKeySecondary: string;
   aiModel: string;
   aiThinking: boolean;
   aiSearch: boolean;
@@ -50,6 +52,7 @@ export interface UserSettings {
 const transformSettings = (db: DbUserSettings): UserSettings => ({
   aiProvider: db.ai_provider as UserSettings['aiProvider'],
   aiApiKey: db.ai_api_key || '',
+  aiApiKeySecondary: db.ai_api_key_secondary || '',
   aiModel: db.ai_model,
   aiThinking: db.ai_thinking,
   aiSearch: db.ai_search,
@@ -146,6 +149,7 @@ export const settingsService = {
       
       if (updates.aiProvider !== undefined) dbUpdates.ai_provider = updates.aiProvider;
       if (updates.aiApiKey !== undefined) dbUpdates.ai_api_key = updates.aiApiKey || null;
+      if (updates.aiApiKeySecondary !== undefined) dbUpdates.ai_api_key_secondary = updates.aiApiKeySecondary || null;
       if (updates.aiModel !== undefined) dbUpdates.ai_model = updates.aiModel;
       if (updates.aiThinking !== undefined) dbUpdates.ai_thinking = updates.aiThinking;
       if (updates.aiSearch !== undefined) dbUpdates.ai_search = updates.aiSearch;
