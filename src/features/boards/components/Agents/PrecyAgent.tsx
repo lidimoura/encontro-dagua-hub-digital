@@ -61,10 +61,17 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { profile } = useAuth();
     const [currency, setCurrency] = useState('BRL');
 
-    // Reset calculation when currency changes (values are currency-specific)
+    // Convert hourlyRate from selected currency to BRL for internal calculation
+    const toInternalBRL = (amountInCurrency: number): number => {
+        const rate = FX_RATES[currency] ?? 1;
+        return rate === 0 ? amountInCurrency : amountInCurrency / rate;
+    };
+
+    // Reset calculation when currency changes but keep hourlyRate as-is
+    // (user will update it to match the new currency if needed)
     const handleCurrencyChange = (newCurrency: string) => {
         setCurrency(newCurrency);
-        setCalculation(null); // Force fresh calculation in new currency
+        setCalculation(null); // Force fresh calculation after currency switch
     };
 
     // Quote-to-Product
@@ -133,17 +140,19 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     const calculatePrice = () => {
-        const laborCost = hours * hourlyRate;
-        const totalCost = stackCost + laborCost;
+        // hourlyRate is in the selected currency — convert to BRL for internal math
+        const hourlyRateBRL = toInternalBRL(hourlyRate);
+        const laborCost = hours * hourlyRateBRL;        // in BRL
+        const totalCost = stackCost + laborCost;        // stackCost already BRL (from products table)
         const basePrice = totalCost * (1 + margin);
         const impactMultiplier = impactMultipliers[impact];
-        const finalPrice = basePrice * impactMultiplier;
+        const finalPrice = basePrice * impactMultiplier; // BRL
         const socialPrice = finalPrice * (1 - SOCIAL_DISCOUNT);
 
         const calc: PricingCalculation = {
             stackCost,
             hours,
-            hourlyRate,
+            hourlyRate: hourlyRateBRL,   // stored in BRL internally
             laborCost,
             totalCost,
             margin,
@@ -152,7 +161,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
             socialPrice,
             impact,
             impactMultiplier,
-            finalPrice: isSocialPricing ? socialPrice : finalPrice,
+            finalPrice: isSocialPricing ? socialPrice : finalPrice,  // always BRL
         };
 
         setCalculation(calc);
