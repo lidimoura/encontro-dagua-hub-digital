@@ -35,8 +35,6 @@ export const DealCard: React.FC<DealCardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const [localDragging, setLocalDragging] = useState(false);
-  const pointerDownPos = React.useRef<{ x: number; y: number } | null>(null);
-  const wasDragged = React.useRef(false);
   const { t } = useTranslation();
 
   // Cross-app analytics: fetch QR engagement for this deal's contact email
@@ -60,12 +58,13 @@ export const DealCard: React.FC<DealCardProps> = ({
     setLocalDragging(true);
     e.dataTransfer.setData('dealId', deal.id);
     e.dataTransfer.effectAllowed = 'move';
+    setLastMouseDownDealId(deal.id);
     onDragStart(e, deal.id);
   };
 
   const handleDragEnd = () => {
     setLocalDragging(false);
-    // Keep wasDragged=true for this action cycle — it will be reset on the next pointerdown
+    setLastMouseDownDealId(null);
   };
 
   const hasEngagement = qrEngagement && qrEngagement.totalProjects > 0;
@@ -76,28 +75,11 @@ export const DealCard: React.FC<DealCardProps> = ({
       draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onPointerDown={e => {
-        pointerDownPos.current = { x: e.clientX, y: e.clientY };
-        wasDragged.current = false;
-        setLastMouseDownDealId(deal.id);
-      }}
-      onPointerMove={e => {
-        if (pointerDownPos.current) {
-          const dx = e.clientX - pointerDownPos.current.x;
-          const dy = e.clientY - pointerDownPos.current.y;
-          if (Math.sqrt(dx * dx + dy * dy) > 5) {
-            wasDragged.current = true;
-          }
-        }
-      }}
       onClick={e => {
+        // Ignore clicks that bubbled from buttons (quick add menu triggers)
         if ((e.target as HTMLElement).closest('button')) return;
-        // If we actually dragged (moved > 5px), do NOT open modal
-        if (localDragging || wasDragged.current) {
-          wasDragged.current = false;
-          return;
-        }
-        pointerDownPos.current = null;
+        // Do not open modal if we are in the middle of a drag
+        if (localDragging) return;
         onClick();
       }}
       className={`
