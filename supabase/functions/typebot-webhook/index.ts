@@ -82,43 +82,44 @@ serve(async (req) => {
             .single();
 
         if (contactError) {
-            // Handle duplicate (upsert by whatsapp if needed)
+            // Handle duplicate — fetch the existing contact and use its ID for the Deal
             if (contactError.code === '23505') {
-                console.warn('[typebot-webhook] Duplicate contact, fetching existing...');
+                console.warn('[typebot-webhook] Duplicate contact, fetching existing ID...');
                 const { data: existing } = await supabaseClient
                     .from('contacts')
                     .select('id, name')
                     .eq('phone', whatsapp)
                     .single();
-                console.log('[typebot-webhook] Existing contact:', existing);
+                if (existing) {
+                    // Inject existing id so Deal creation proceeds correctly
+                    (contactData as any) = existing;
+                    console.log('[typebot-webhook] Resolved existing contact:', existing.id);
+                }
             } else {
                 console.error('[typebot-webhook] Contact error:', contactError);
                 throw contactError;
             }
         }
 
-        console.log('[typebot-webhook] Contact created:', contactData);
+        console.log('[typebot-webhook] Contact resolved:', contactData);
 
         // ── 2. Create a Deal in the SDR board ────────────────────────────
-        // Resolve contact ID — use newly created or existing
-        const resolvedContactId: string | null = contactData?.id ?? (() => {
-            // If duplicate, fetch again
-            return null; // will be resolved below
-        })();
+        // resolvedContactId uses the newly created OR existing contact ID
+        const resolvedContactId: string | null = contactData?.id ?? null;
 
-        // Lookup the SDR board (or first board)
+        // Lookup the SDR board (or first board as fallback)
         const { data: sdrBoard } = await supabaseClient
             .from('boards')
             .select('id')
             .ilike('name', '%SDR%')
             .limit(1)
-            .single();
+            .maybeSingle();
 
         const { data: fallbackBoard } = !sdrBoard ? await supabaseClient
             .from('boards')
             .select('id')
             .limit(1)
-            .single() : { data: null };
+            .maybeSingle() : { data: null };
 
         const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
 
@@ -141,10 +142,10 @@ serve(async (req) => {
             if (dealError) {
                 console.warn('[typebot-webhook] Deal creation warning:', dealError.message);
             } else {
-                console.log('[typebot-webhook] Deal created in board:', targetBoardId);
+                console.log('[typebot-webhook] ✅ Deal created in board:', targetBoardId, 'for contact:', resolvedContactId);
             }
         } else {
-            console.warn('[typebot-webhook] Skipping deal creation: no board or contact id');
+            console.warn('[typebot-webhook] Skipping deal creation — board:', targetBoardId, 'contact:', resolvedContactId);
         }
 
 

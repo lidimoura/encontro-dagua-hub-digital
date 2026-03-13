@@ -41,8 +41,8 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     // Jurisdiction State
     const [jurisdiction, setJurisdiction] = useState<Jurisdiction>('BR');
 
-    // AI Refinement State — open by default so Jury is ready to advise on load
-    const [isRefinementOpen, setIsRefinementOpen] = useState(true);
+    // AI Refinement Chat — CLOSED by default, opened via header toggle button
+    const [isRefinementOpen, setIsRefinementOpen] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     // AI System Prompt - DYNAMICALLY UPDATED
@@ -427,10 +427,11 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                 {/* Refinement Chat Toggle */}
                 <button
                     onClick={() => setIsRefinementOpen(!isRefinementOpen)}
-                    className={`p-2 rounded-full transition-all ${isRefinementOpen ? 'bg-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-purple-100'}`}
-                    title={t('openLegalChat')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${isRefinementOpen ? 'bg-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
+                    title={isRefinementOpen ? 'Fechar Chat Jury' : 'Abrir Chat Jury'}
                 >
-                    <MessageSquare className="w-5 h-5" />
+                    <MessageSquare className="w-4 h-4" />
+                    {isRefinementOpen ? 'Fechar Chat' : 'Abrir Chat Jury'}
                 </button>
             </div>
 
@@ -474,20 +475,30 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                 </p>
             </div>
 
-            {/* AI Refinement Chat Panel */}
+            {/* AI Refinement Chat — Fixed Overlay (bottom-right, does NOT push layout) */}
             {isRefinementOpen && (
-                <div className="mb-6 bg-white dark:bg-rionegro-900 border-2 border-purple-500/50 rounded-xl overflow-hidden shadow-xl animate-fade-in-up">
-                    <div className="bg-purple-50 dark:bg-purple-900/30 p-3 border-b border-purple-100 dark:border-purple-800 flex justify-between items-center">
+                <div className="fixed bottom-4 right-4 w-96 max-w-[calc(100vw-2rem)] z-50 bg-white dark:bg-slate-900 border-2 border-purple-500/60 rounded-xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+                    <div className="bg-purple-50 dark:bg-purple-900/30 px-4 py-3 border-b border-purple-100 dark:border-purple-800 flex justify-between items-center">
                         <h4 className="text-sm font-bold text-purple-800 dark:text-purple-200 flex items-center gap-2">
                             <Sparkles className="w-4 h-4" />
                             {language === 'en' ? 'Jury AI Assistant' : 'Assistente Jury IA'}
                         </h4>
-                        <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded-full">
-                            {jurisdiction} Law
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded-full">
+                                {jurisdiction} Law
+                            </span>
+                            {/* X close button */}
+                            <button
+                                onClick={() => setIsRefinementOpen(false)}
+                                className="p-1 rounded-full text-purple-600 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
+                                title="Fechar"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="h-72 min-h-0 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#02040a]" style={{contain:'strict'}}>
+                    <div className="h-72 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#02040a]">
                         {messages.length === 0 && (
                             <div className="text-center space-y-3 py-4">
                                 <p className="text-sm text-slate-500">
@@ -537,7 +548,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                         <div ref={chatEndRef} />
                     </div>
 
-                    <div className="p-3 bg-white dark:bg-rionegro-900 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                    <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex gap-2">
                         <input
                             value={input}
                             onChange={handleInputChange}
