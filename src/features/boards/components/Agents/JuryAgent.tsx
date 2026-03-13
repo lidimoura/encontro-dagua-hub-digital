@@ -25,7 +25,7 @@ interface ContractTemplate {
     tags: string[];
 }
 
-type Jurisdiction = 'BR' | 'US' | 'AU' | 'EU';
+type Jurisdiction = 'BR' | 'US' | 'AU' | 'EU' | 'CO' | 'PE' | 'AR' | 'MX' | 'CL' | 'UY';
 
 export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     const [generatedContract, setGeneratedContract] = useState('');
@@ -41,8 +41,8 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
     // Jurisdiction State
     const [jurisdiction, setJurisdiction] = useState<Jurisdiction>('BR');
 
-    // AI Refinement State
-    const [isRefinementOpen, setIsRefinementOpen] = useState(false);
+    // AI Refinement State — open by default so Jury is ready to advise on load
+    const [isRefinementOpen, setIsRefinementOpen] = useState(true);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     // AI System Prompt - DYNAMICALLY UPDATED
@@ -51,12 +51,19 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
             ? 'Respond in English.'
             : 'Responda em Português.';
 
-        const jurisdictionInstruction = {
-            'BR': 'Focus on Brazilian Law (LGPD, Código Civil, CLT/PJ).',
-            'US': 'Focus on US Law (Common Law, UCC).',
-            'AU': 'Focus on Australian Law (Consumer Law, Privacy Act).',
-            'EU': 'Focus on EU Law (GDPR, EU Directives).',
-        }[jurisdiction];
+        const jurisdictionInstruction: Record<string, string> = {
+            'BR': 'Focus on Brazilian Law (LGPD, Código Civil Brasileiro, CLT/PJ, Lei 9.609/98 para software).',
+            'US': 'Focus on US Law (Common Law, UCC, CCPA for privacy, IP law for digital services).',
+            'AU': 'Focus on Australian Consumer Law (ACL), Privacy Act 1988, and Digital Services contracts.',
+            'EU': 'Focus on EU Law (GDPR, EU Directives on Digital Services, DSA, DMA).',
+            'CO': 'Focus on Colombian Law (Ley 1581 for data protection, Código Civil, Digital Services regulations).',
+            'PE': 'Focus on Peruvian Law (Ley 29733 for data protection, Código Civil Peruano).',
+            'AR': 'Focus on Argentine Law (Ley 25.326 for data protection, Código Civil y Comercial).',
+            'MX': 'Focus on Mexican Law (LFPDPPP data protection, Código Civil Federal, digital services).',
+            'CL': 'Focus on Chilean Law (Ley 19.628 data protection, Código Civil Chileno).',
+            'UY': 'Focus on Uruguayan Law (Ley 18.331 data protection, Código Civil Uruguayo).',
+        };
+        const instrText = jurisdictionInstruction[jurisdiction] || jurisdictionInstruction['BR'];
 
         // Include current contract context if available
         const contractContext = generatedContract
@@ -65,12 +72,14 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
 
         return `You are Jury, an expert Legal AI Agent specialized in contracts and commercial law.
         ${langInstruction}
-        ${jurisdictionInstruction}
-        Your goal is to help the user refine contract clauses, explain legal terms, and ensure compliance.
-        Be precise, formal, but accessible. Always prioritize the user's protection.
-        If asked to draft a clause, provide it clearly.
-        IMPORTANT: Format your response using Markdown. Use ## for titles, **bold** for emphasis, and > for quoting clauses. Structure it like a professional legal document.
-        OUTPUT FORMAT: You must write the contract using Markdown. Use # for Titles, ## for Clauses, **bold** for variables. DO NOT output code blocks. Output raw markdown text.
+        ${instrText}
+        ROLE: You are a LEGAL CONSULTANT FIRST. Before generating any contract:
+        1. Ask clarifying questions to understand the deal scope, parties, jurisdiction nuances.
+        2. Flag potential legal risks specific to the chosen jurisdiction.
+        3. Only generate the formal document when the user confirms readiness.
+        CHAT OUTPUT: Use this chat for dialogue, legal Q&A, risk analysis, and email summaries.
+        CONTRACT AREA (below): ONLY formal contract text goes there — no greetings, no analysis, pure document.
+        IMPORTANT: Format using Markdown. Use ## for clauses, **bold** for variables.
         ${contractContext}`;
     }, [language, jurisdiction, generatedContract]);
 
@@ -203,18 +212,23 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         Generate the FULL contract text now.
         `;
 
-        // Send to AI
+        // Send to AI then mark that next response is a contract
+        setContractGenerated(true);
         await sendMessage(prompt);
         setShowPreview(true);
     };
 
-    // Effect: Update generatedContract when AI responds
+    // Contract-specific generation: separate from chat dialogue
+    // Only update generatedContract when triggered by generateContract() (formal prompt)
+    const [contractGenerated, setContractGenerated] = useState(false);
     useEffect(() => {
+        if (!contractGenerated) return;
         const lastMessage = messages[messages.length - 1];
         if (lastMessage && lastMessage.role === 'assistant') {
             setGeneratedContract(lastMessage.content);
+            setContractGenerated(false);
         }
-    }, [messages]);
+    }, [messages, contractGenerated]);
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(generatedContract);
@@ -429,17 +443,27 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                     </label>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                    {(['BR', 'US', 'AU', 'EU'] as Jurisdiction[]).map((region) => (
+                    {([
+                        { code: 'BR', flag: '🇧🇷', label: 'Brasil' },
+                        { code: 'US', flag: '🇺🇸', label: 'USA' },
+                        { code: 'AU', flag: '🇦🇺', label: 'Australia' },
+                        { code: 'EU', flag: '🇪🇺', label: 'Europe' },
+                        { code: 'CO', flag: '🇨🇴', label: 'Colombia' },
+                        { code: 'PE', flag: '🇵🇪', label: 'Peru' },
+                        { code: 'AR', flag: '🇦🇷', label: 'Argentina' },
+                        { code: 'MX', flag: '🇲🇽', label: 'México' },
+                        { code: 'CL', flag: '🇨🇱', label: 'Chile' },
+                        { code: 'UY', flag: '🇺🇾', label: 'Uruguay' },
+                    ] as { code: Jurisdiction; flag: string; label: string }[]).map(({ code, flag, label }) => (
                         <button
-                            key={region}
-                            onClick={() => setJurisdiction(region)}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${jurisdiction === region
+                            key={code}
+                            onClick={() => setJurisdiction(code)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${jurisdiction === code
                                 ? 'bg-purple-600 text-white shadow-lg scale-105'
                                 : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-purple-400'
                                 }`}
                         >
-                            <span>{region === 'BR' ? '🇧🇷' : region === 'US' ? '🇺🇸' : region === 'AU' ? '🇦🇺' : '🇪🇺'}</span>
-                            {region === 'BR' ? 'Brasil' : region === 'US' ? 'USA' : region === 'AU' ? 'Australia' : 'Europe'}
+                            <span>{flag}</span>{label}
                         </button>
                     ))}
                 </div>
@@ -463,7 +487,7 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
                         </span>
                     </div>
 
-                    <div className="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#02040a]">
+                    <div className="h-72 min-h-0 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#02040a]" style={{contain:'strict'}}>
                         {messages.length === 0 && (
                             <div className="text-center space-y-3 py-4">
                                 <p className="text-sm text-slate-500">

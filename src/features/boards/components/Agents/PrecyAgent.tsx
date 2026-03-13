@@ -61,6 +61,12 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { profile } = useAuth();
     const [currency, setCurrency] = useState('BRL');
 
+    // Reset calculation when currency changes (values are currency-specific)
+    const handleCurrencyChange = (newCurrency: string) => {
+        setCurrency(newCurrency);
+        setCalculation(null); // Force fresh calculation in new currency
+    };
+
     // Quote-to-Product
     const [productName, setProductName] = useState('');
     const [savingProduct, setSavingProduct] = useState(false);
@@ -247,19 +253,24 @@ ${isSocialPricing ? `
                 </div>
 
                 {/* Currency Selector */}
-                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg flex gap-1">
-                    {['BRL', 'USD', 'EUR', 'AUD'].map((c) => (
-                        <button
-                            key={c}
-                            onClick={() => setCurrency(c)}
-                            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${currency === c
-                                ? 'bg-green-600 text-white shadow'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`}
-                        >
-                            {c}
-                        </button>
-                    ))}
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase">Moeda</label>
+                    <select
+                        value={currency}
+                        onChange={(e) => handleCurrencyChange(e.target.value)}
+                        className="px-2 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+                    >
+                        <option value="BRL">🇧🇷 BRL</option>
+                        <option value="USD">🇺🇸 USD</option>
+                        <option value="EUR">🇪🇺 EUR</option>
+                        <option value="AUD">🇦🇺 AUD</option>
+                        <option value="COP">🇨🇴 COP</option>
+                        <option value="PEN">🇵🇪 PEN</option>
+                        <option value="ARS">🇦🇷 ARS</option>
+                        <option value="MXN">🇲🇽 MXN</option>
+                        <option value="CLP">🇨🇱 CLP</option>
+                        <option value="UYU">🇺🇾 UYU</option>
+                    </select>
                 </div>
             </div>
 
