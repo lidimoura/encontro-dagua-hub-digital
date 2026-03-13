@@ -150,14 +150,45 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         };
     };
 
-    // FIXED: Added missing handler to prevent crash
-    const handleSaveProduct = () => {
+    // FIXED: Save the priced product to the products table for use in Deals
+    const handleSaveProduct = async () => {
+        if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const { error } = await supabase
+                .from('products')
+                .insert([{
+                    name: productName.trim(),
+                    description: `Precificado pela Precy — ${impact.toUpperCase()} impact × ${calculation.impactMultiplier}x`,
+                    price: Math.round(calculation.finalPrice * 100) / 100,
+                    product_type: 'crm_service',
+                    is_internal: false,
+                    is_active: true,
+                    pricing_model: 'fixed',
+                    stack_category: null,
+                    metadata: {
+                        generated_by: 'precy',
+                        stack_cost: calculation.stackCost,
+                        labor_cost: calculation.laborCost,
+                        hours: calculation.hours,
+                        hourly_rate: calculation.hourlyRate,
+                        margin: calculation.margin,
+                        impact,
+                        impact_multiplier: calculation.impactMultiplier,
+                        is_social_pricing: isSocialPricing,
+                        currency,
+                    },
+                }]);
+
+            if (error) throw error;
+            addToast(t('productSaved') || `"${productName}" salvo no catálogo!`, 'success');
+            setProductName('');
+        } catch (error: any) {
+            console.error('[Precy] Error saving product:', error);
+            addToast('Erro ao salvar produto. Tente novamente.', 'error');
+        } finally {
             setSavingProduct(false);
-            addToast(t('featureInDev'), 'info');
-        }, 1000);
+        }
     };
 
     const handleExportPdf = () => {
