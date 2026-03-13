@@ -7,6 +7,7 @@ export const AIConfigSection: React.FC = () => {
     const {
         aiProvider, setAiProvider,
         aiApiKey, setAiApiKey,
+        aiApiKeySecondary, setAiApiKeySecondary,
         aiModel, setAiModel,
         aiThinking, setAiThinking,
         aiSearch, setAiSearch,
@@ -68,10 +69,10 @@ export const AIConfigSection: React.FC = () => {
         try {
             const { error } = await saveAISettings();
             if (error) throw error;
-            addToast('success', 'Configurações de IA', 'Suas chaves e preferências foram salvas com sucesso.');
+            addToast('✅ Configurações de IA salvas com sucesso!', 'success');
         } catch (error) {
             console.error('Failed to save AI settings:', error);
-            addToast('error', 'Erro ao salvar', 'Não foi possível salvar as configurações de IA.');
+            addToast('❌ Não foi possível salvar. Tente novamente.', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -234,10 +235,10 @@ export const AIConfigSection: React.FC = () => {
                     </div>
                 )}
 
-                {/* API Key */}
+                {/* API Key — Primary */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                        <Key size={14} /> Chave de API ({providers.find(p => p.id === aiProvider)?.name})
+                        <Key size={14} /> Chave de API Principal ({providers.find(p => p.id === aiProvider)?.name})
                     </label>
                     <div className="relative">
                         <input
@@ -255,8 +256,33 @@ export const AIConfigSection: React.FC = () => {
                             )}
                         </div>
                     </div>
+                </div>
+
+                {/* API Key — Secondary (Fallback / Rodízio) */}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                        <Key size={14} className="text-amber-500" />
+                        Chave Reserva (Failover 429)
+                        <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-normal">Rodízio Automático</span>
+                    </label>
+                    <div className="relative">
+                        <input
+                            type="password"
+                            value={aiApiKeySecondary}
+                            onChange={(e) => setAiApiKeySecondary(e.target.value)}
+                            placeholder={`Chave de reserva (assume se a principal atingir quota)`}
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-amber-200 dark:border-amber-800/40 rounded-lg px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 outline-none transition-all font-mono"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {aiApiKeySecondary ? (
+                                <CheckCircle size={16} className="text-green-500" />
+                            ) : (
+                                <AlertCircle size={16} className="text-slate-400" />
+                            )}
+                        </div>
+                    </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Sua chave é salva apenas no navegador (LocalStorage). Nunca compartilhamos com ninguém.
+                        Se a chave principal retornar erro 429 (quota), o sistema muda automaticamente para esta. Salve ambas no botão abaixo.
                     </p>
                 </div>
 
