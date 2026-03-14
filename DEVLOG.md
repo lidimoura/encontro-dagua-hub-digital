@@ -88,6 +88,13 @@ eliminando a necessidade de abrir o banco para ver o contexto do lead.
 
 Flow completo de abertura de conversa no WhatsApp com mensagem personalizada pela IA:
 
+## 8. Leads da Landing Page → SDR Automático
+
+1. Lead preenche o formulário no site (LP)
+2. Webhook Supabase (amazo-sdr) cria automaticamente: **Contato** + **Deal** no board SDR
+3. O `briefing_json` captura: nome, e-mail, WhatsApp, serviços de interesse, mensagem
+4. Deal aparece na coluna inicial do board SDR
+5. SDR vê o briefing na aba **Briefing** do card — e usa o botão WA IA para o primeiro contato
 1. **Botão "📲 WhatsApp + Msg IA"** aparece no bloco Contato Principal sempre que `briefing_json.whatsapp` ou `contact.phone` existir.
 2. Ao clicar, chama `generateWAOutreach()` (novo em `geminiService.ts`) via Gemini com contexto:
    - Nome do lead, serviços de interesse, mensagem original do briefing, deal no CRM.
