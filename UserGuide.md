@@ -157,46 +157,34 @@ LEAD → MQL → PROSPECT → CUSTOMER
 - Acessa dados via tools: lista de deals, contatos, atividades pendentes
 - Histórico persistido na sessão
 
-## 8. Automações de Lead — Como Funciona por Completo
+## 8. Automações de Lead e Real-Time (Sem F5)
 
-### Fluxo Completo (LP → Kanban)
-```
-[Lead preenche LP] → [Typebot coleta dados] → [typebot-webhook (Edge Function)]
-         ↓
-[Cria Contato no Supabase]  →  [Cria Deal no board SDR]
-         ↓
-[Kanban atualiza em Real-Time automaticamente — sem F5]
-```
+O CRM suporta **3 portas de entrada principais** de Leads, e todas disparam a atualização em tempo real do Kanban (sem necessidade de dar F5):
 
-### Edge Function: `typebot-webhook`
-- **Localização no código**: `supabase/functions/typebot-webhook/index.ts`
-- **Localização no painel**: Supabase Dashboard → Edge Functions → `typebot-webhook`
-- **O que ela faz**:
-  1. Recebe o payload do Typebot (nome, e-mail, WhatsApp, serviços, mensagem)
-  2. Cria/encontra o `Contato` (se phone já existir, reutiliza o ID — sem duplicata)
-  3. Cria um `Deal` no board SDR com status `LEAD`
-  4. Adiciona à `waitlist` para compatibilidade retroativa
-- **Para redesployar após mudanças**: Supabase → Edge Functions → typebot-webhook → **Redeploy**
+### 1. Link d'Água (NFC / QR Code)
+- **Fluxo:** O visitante escaneia o cartão NFC/QR Code → Acessa o perfil Bridge → Clica no botão de WhatsApp / Ação.
+- **Automação:** Se configurado via N8N/Webhook externo, a captura dos dados da interação cria o Lead no CRM.
 
-### Automações configuráveis na UI dos Boards
-- Em **Boards → Configurações do Board** você pode configurar:
-  - **Gatilhos de etapa**: ao mover para determinada coluna, o sistema pode criar uma atividade automática
-  - **Notificações**: ao entrar em determinada etapa, o owner recebe notificação push
-  - **Tarefas automáticas**: agenda follow-up com X dias de prazo ao entrar na etapa
-- Essas automações **não interferem** no fluxo do webhook — são independentes
-- O webhook cria o Deal diretamente com `status: 'LEAD'` (primeira coluna do SDR)
+### 2. Amazô-SDR (Landing Page)
+- **Fluxo:** O visitante preenche o formulário conversacional / Typebot na LP → Os dados são enviados para o Supabase.
+- **Automação:** A Edge Function `amazo-sdr` (ou `process-lead`) processa o payload, localiza/cria o `Contato` (evitando duplicatas se o telefone já existir) e cria um `Deal` automático na primeira etapa do board configurado (status `LEAD`).
+- **Briefing:** Os dados informados (nome, serviços, empresa, telefone) são salvos na aba **Briefing** do modal, permitindo que o atendimento humano ou a IA iniciem a conversa (Via botão de WhatsApp IA) com contexto completo.
 
-### Real-Time Kanban (sem F5)
-- `DealsContext` mantém uma conexão `supabase.channel('postgres_changes')` ativa
-- Qualquer `INSERT` ou `UPDATE` na tabela `deals` dispara `fetchDeals()` automaticamente
-- Isso significa: quando o webhook cria o Deal do Ben Jor, o card aparece no Kanban **em segundos**, sem recarregar
-- A conexão é por `company_id` (isolamento multi-tenant)
+### 3. Criação Manual (Kanban UI)
+- **Fluxo:** O usuário clica no **Botão `+`** localizado no cabeçalho de qualquer coluna do Kanban.
+- **Ação:** Abre o formulário rápido para cadastrar Nome do Lead, Valor e selecionar um Contato existente (ou criar um na hora).
 
-### Configurações de IA — Dual Key
-- **Chave Principal**: usada em todas as chamadas normais
-- **Nota da Chave**: campo de texto livre para identificar de qual conta/e-mail veio
-- **Chave Reserva**: assume automaticamente quando a principal retorna erro 429 (quota)
-- **Persistência**: salvas no Supabase (`user_settings`) — não dependem de `.env` ou Vercel
+### ⚡ O "Cérebro" do Real-Time Kanban
+- Independentemente de qual das 3 rotas acima cria o Lead, você **não precisa recarregar a aba**.
+- O sistema mantém uma conexão WebSockets ativa (`postgres_changes`) ouvindo a tabela `deals`.
+- O Kanban recarrega automaticamente os cards visuais na etapa correta (em cerca de 1 a 2 segundos) assim que a inserção ocorre no banco de dados.
+
+### Configurações de IA — Dual Key (Failover)
+- **Chave Principal**: usada em todas as chamadas normais de IA.
+- **Nota da Chave**: campo de texto livre para identificar a origem (ex: "Conta Pessoal Google").
+- **Chave Reserva**: assume automaticamente se a chave principal estourar o limite de uso (erro de cota 429).
+- **Segurança e Banco**: As chaves são salvas no próprio Supabase (`user_settings`) e possuem botão "Olhinho" para visualizar na UI.
+
 
 ---
 
