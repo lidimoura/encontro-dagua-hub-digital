@@ -8,6 +8,7 @@ import { useToast } from '@/context/ToastContext';
 interface WebhookEndpoint {
   id: string;
   url: string;
+  method: 'GET' | 'POST';
   events: string[];
   is_active: boolean;
   created_at: string;
@@ -32,6 +33,7 @@ export const WebhooksSection: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newUrl, setNewUrl] = useState('');
+  const [newMethod, setNewMethod] = useState<'GET' | 'POST'>('POST');
   const [newEvents, setNewEvents] = useState<string[]>(['lead.created', 'deal.won']);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export const WebhooksSection: React.FC = () => {
     try {
       const { error } = await supabase.from('webhook_endpoints').insert({
         url: newUrl.trim(),
+        method: newMethod,
         events: newEvents,
         is_active: true,
         company_id: profile.company_id,
@@ -80,6 +83,7 @@ export const WebhooksSection: React.FC = () => {
       addToast('✅ Endpoint adicionado com sucesso!', 'success');
       setShowAddForm(false);
       setNewUrl('');
+      setNewMethod('POST');
       setNewEvents(['lead.created', 'deal.won']);
       await fetchEndpoints();
     } catch (err: any) {
@@ -143,10 +147,15 @@ export const WebhooksSection: React.FC = () => {
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${ep.is_active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-slate-300 dark:bg-slate-600'}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white font-mono truncate flex items-center gap-1.5">
-                      <Globe size={12} className="text-slate-400 shrink-0" />
-                      {ep.url}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${ep.method === 'POST' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'}`}>
+                        {ep.method || 'POST'}
+                      </span>
+                      <p className="text-sm font-medium text-slate-900 dark:text-white font-mono truncate flex items-center gap-1.5">
+                        <Globe size={12} className="text-slate-400 shrink-0" />
+                        {ep.url}
+                      </p>
+                    </div>
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {ep.events?.map(ev => (
                         <span key={ev} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 uppercase tracking-wide">
@@ -187,14 +196,24 @@ export const WebhooksSection: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">URL do Endpoint *</label>
-            <input
-              type="url"
-              value={newUrl}
-              onChange={e => setNewUrl(e.target.value)}
-              placeholder="https://sua-aplicacao.com/webhooks/crm"
-              className="w-full px-3 py-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
-              autoFocus
-            />
+            <div className="flex gap-2">
+              <select
+                value={newMethod}
+                onChange={e => setNewMethod(e.target.value as 'GET' | 'POST')}
+                className="w-24 px-3 py-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="POST">POST</option>
+                <option value="GET">GET</option>
+              </select>
+              <input
+                type="url"
+                value={newUrl}
+                onChange={e => setNewUrl(e.target.value)}
+                placeholder="https://sua-aplicacao.com/webhooks/crm"
+                className="flex-1 px-3 py-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
+                autoFocus
+              />
+            </div>
           </div>
 
           <div>

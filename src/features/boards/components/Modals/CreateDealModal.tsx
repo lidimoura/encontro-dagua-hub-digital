@@ -6,6 +6,7 @@ import { X, Plus, Trash2, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
+import { dispatchWebhookEvent } from '@/services/n8nService';
 
 interface CreateDealModalProps {
     isOpen: boolean;
@@ -193,6 +194,11 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 .single();
 
             if (dealError) throw dealError;
+
+            // Trigger deal.created webhook
+            if (profile?.company_id) {
+                dispatchWebhookEvent('deal.created', newDeal, profile.company_id);
+            }
 
             addToast(t('dealCreated' as any) || 'Deal created successfully!', 'success');
             onClose();

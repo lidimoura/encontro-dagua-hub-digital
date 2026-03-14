@@ -2,9 +2,9 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // ─────────────────────────────────────────────────────────
-// Typebot Webhook — Amazô SDR
-// Receives leads from the Typebot chatbot and inserts them
-// into `contacts` with source='Amazô SDR' + briefing_json.
+// Webhook — Form LP Lead (Cérebro Único)
+// Receives leads from LP, Link d'Água or Typebot and inserts them
+// into `contacts` with the declared source + briefing_json.
 // ─────────────────────────────────────────────────────────
 
 const corsHeaders = {
@@ -25,16 +25,24 @@ serve(async (req) => {
         );
 
         const payload = await req.json();
-        console.log('[typebot-webhook] Received:', JSON.stringify(payload, null, 2));
+        console.log('[form-lp-lead] Received:', JSON.stringify(payload, null, 2));
 
         // ── Extract fields (Typebot variable naming conventions) ──────────
         const name = payload.name || payload.Nome || payload.fullName || '';
         const whatsapp = payload.whatsapp || payload.phone || payload.telefone || '';
         const email = payload.email || payload.Email || null;
         const services = payload.services || payload.servicos || null;  // array or string
-        const landedVia = payload.landedVia || payload.origem_url || 'typebot';
+        const landedVia = payload.landedVia || payload.origem_url || 'webhook';
         const message = payload.message || payload.mensagem || null;
         const businessType = payload.businessType || payload.tipoNegocio || null;
+        // The source can be 'Amazô SDR', 'Link d\'Água', or 'LP do Hub'. Fallback to Webhook.
+        let source = payload.source || payload.origem || 'LP do Hub';
+        if (source.toLowerCase() === 'new' || source.toLowerCase() === 'lead') {
+            source = 'LP do Hub';
+        }
+        if (payload.landedVia?.toLowerCase().includes('linkdagua') || payload.landedVia?.toLowerCase().includes('link d\'água')) {
+             source = 'Link d\'Água';
+        }
 
         // Validate required
         if (!name || !whatsapp) {
@@ -58,24 +66,25 @@ serve(async (req) => {
             name,
             whatsapp,
             services: servicesArray,
-            source: 'Amazô SDR',
+            source: source,
             landed_via: landedVia,
             message: message || undefined,
             capture_time: new Date().toISOString(),
         };
 
-        // ── 1. Insert into contacts with source='Amazô SDR' ──────────────
+        // ── 1. Insert into contacts with dynamic source ──────────────
+        let resolvedContactId: string | null = null;
         const { data: contactData, error: contactError } = await supabaseClient
             .from('contacts')
             .insert([{
                 name,
                 phone: whatsapp,
-                email: email || `${whatsapp.replace(/\D/g, '')}@sdr.amazo.bot`,
+                email: email || `${whatsapp.replace(/\D/g, '')}@sdr.webhook`,
                 status: 'ACTIVE',
                 stage: 'LEAD',
-                source: 'Amazô SDR',       // ← critical for AnalyticsSourceCard
+                source: source,                  // ← critical for AnalyticsSourceCard
                 briefing_json: briefingJson,     // ← critical for CRM sidebar display
-                notes: `Lead via Amazô SDR\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}\nMensagem: ${message || 'n/a'}`,
+                notes: `Lead via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}\nMensagem: ${message || 'n/a'}`,
                 company_id: null,
             }])
             .select('id, name')
@@ -84,28 +93,36 @@ serve(async (req) => {
         if (contactError) {
             // Handle duplicate — fetch the existing contact and use its ID for the Deal
             if (contactError.code === '23505') {
-                console.warn('[typebot-webhook] Duplicate contact, fetching existing ID...');
+                console.warn('[form-lp-lead] Duplicate contact, fetching existing ID...');
                 const { data: existing } = await supabaseClient
                     .from('contacts')
                     .select('id, name')
                     .eq('phone', whatsapp)
                     .single();
                 if (existing) {
-                    // Inject existing id so Deal creation proceeds correctly
-                    (contactData as any) = existing;
-                    console.log('[typebot-webhook] Resolved existing contact:', existing.id);
+                    resolvedContactId = existing.id;
+                    
+                    // TRANSPLANTE VITAL: Atualiza o contato existente para não perder o novo briefing e origem
+                    await supabaseClient
+                        .from('contacts')
+                        .update({ 
+                            briefing_json: briefingJson,
+                            source: source,
+                        })
+                        .eq('id', existing.id);
+                        
+                    console.log('[form-lp-lead] Resolved and updated existing contact:', existing.id);
                 }
             } else {
-                console.error('[typebot-webhook] Contact error:', contactError);
+                console.error('[form-lp-lead] Contact error:', contactError);
                 throw contactError;
             }
+        } else {
+            resolvedContactId = contactData?.id;
+            console.log('[form-lp-lead] Contact created:', contactData);
         }
 
-        console.log('[typebot-webhook] Contact resolved:', contactData);
-
         // ── 2. Create a Deal in the SDR board ────────────────────────────
-        // resolvedContactId uses the newly created OR existing contact ID
-        const resolvedContactId: string | null = contactData?.id ?? null;
 
         // Lookup the SDR board (or first board as fallback)
         const { data: sdrBoard } = await supabaseClient
@@ -122,30 +139,43 @@ serve(async (req) => {
             .maybeSingle() : { data: null };
 
         const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
+        let targetStageId = null;
+
+        if (targetBoardId) {
+             const { data: firstStage } = await supabaseClient
+                 .from('board_stages')
+                 .select('id')
+                 .eq('board_id', targetBoardId)
+                 .order('order', { ascending: true })
+                 .limit(1)
+                 .maybeSingle();
+             targetStageId = firstStage?.id ?? 'LEAD';
+        }
 
         if (targetBoardId && resolvedContactId) {
             const { error: dealError } = await supabaseClient
                 .from('deals')
                 .insert([{
-                    title: `Lead SDR: ${name}`,
-                    status: 'LEAD',
+                    title: `Lead: ${name} (${source})`,
+                    status: targetStageId,
+                    stage_id: targetStageId,
                     value: 0,
                     board_id: targetBoardId,
                     contact_id: resolvedContactId,
-                    source: 'Amazô SDR',
+                    source: source,
                     briefing_json: briefingJson,
-                    notes: `Lead automático capturado via Amazô SDR\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
+                    notes: `Lead automático capturado via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
                     probability: 20,
                     priority: 'medium',
                 }]);
 
             if (dealError) {
-                console.warn('[typebot-webhook] Deal creation warning:', dealError.message);
+                console.warn('[form-lp-lead] Deal creation warning:', dealError.message);
             } else {
-                console.log('[typebot-webhook] ✅ Deal created in board:', targetBoardId, 'for contact:', resolvedContactId);
+                console.log('[form-lp-lead] ✅ Deal created in board:', targetBoardId, 'for contact:', resolvedContactId);
             }
         } else {
-            console.warn('[typebot-webhook] Skipping deal creation — board:', targetBoardId, 'contact:', resolvedContactId);
+            console.warn('[form-lp-lead] Skipping deal creation — board:', targetBoardId, 'contact:', resolvedContactId);
         }
 
 
@@ -156,13 +186,13 @@ serve(async (req) => {
                 name,
                 whatsapp,
                 email,
-                referred_by: 'Amazô SDR',
+                referred_by: source,
                 status: 'PENDING',
                 metadata: { ...briefingJson, rawPayload: payload },
             }])
             .select()
             .then(({ error }) => {
-                if (error) console.warn('[typebot-webhook] Waitlist insert warning:', error.message);
+                if (error) console.warn('[form-lp-lead] Waitlist insert warning:', error.message);
             });
 
         // ── 3. Fire push notification for Lidi ──────────────────────────
@@ -176,24 +206,24 @@ serve(async (req) => {
                 'Authorization': `Bearer ${serviceKey}`,
             },
             body: JSON.stringify({
-                title: '🤖 Novo Lead SDR!',
-                notifBody: `${name} entrou pelo Amazô SDR`,
+                title: '🤖 Novo Lead Recebido!',
+                notifBody: `${name} entrou por ${source}`,
                 url: '/boards',
                 lead_id: contactData?.id,
             }),
-        }).catch(e => console.warn('[typebot-webhook] Push notification failed:', e.message));
+        }).catch(e => console.warn('[form-lp-lead] Push notification failed:', e.message));
 
         return new Response(
             JSON.stringify({
                 success: true,
-                message: 'Lead SDR capturado com briefing_json',
+                message: 'Lead capturado com briefing_json',
                 contactId: contactData?.id,
-                source: 'Amazô SDR',
+                source: source,
             }),
             { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     } catch (error) {
-        console.error('[typebot-webhook] Error:', error);
+        console.error('[form-lp-lead] Error:', error);
         return new Response(
             JSON.stringify({ error: error.message || 'Internal server error' }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
