@@ -35,60 +35,30 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         setError(null);
 
         try {
-            // ── 1. Use the RPC that bypasses RLS and creates the lead + deal ──
-            // This avoids 401/403 from RLS on the contacts table
-            // Build params dynamically to avoid sending explicit nulls which can break Supabase RPC routing
-            const rpcParams: Record<string, any> = {
-                p_name: formData.name,
-                p_email: formData.email,
-                p_interest: formData.interest,
-                p_source: source,
-                p_metadata: prefilledData || {},
-            };
+            // ── Disparar para o "Cérebro Único" (Edge Function form-lp-lead) ──
+            // Isso garante formatação do briefing_json e notificação push, unificando a entrada
+            const { data: { session } } = await supabase.auth.getSession();
             
-            if (formData.phone?.trim()) rpcParams.p_phone = formData.phone.trim();
-            if (formData.company?.trim()) rpcParams.p_company = formData.company.trim();
+            // Build the payload mapping our form to the typebot/webhook expectations
+            const payload = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || '',
+                businessType: formData.interest,
+                services: [formData.interest],
+                landedVia: 'Hub LP',
+                source: source === 'cta' ? 'Hub LP' : source,
+                message: formData.company ? `Empresa: ${formData.company}` : '',
+                ...prefilledData
+            };
 
-            const { data: rpcResult, error: rpcError } = await supabase.rpc(
-                'capture_hub_lead',
-                rpcParams
-            );
+            const { data, error: functionError } = await supabase.functions.invoke('form-lp-lead', {
+                body: payload,
+            });
 
-            // ── 2. Fallback: If RPC doesn't exist, directly insert lead ──
-            if (rpcError && rpcError.code === 'PGRST202') {
-                // RPC not found — use direct INSERT with anon policy
-                const { error: insertError } = await supabase
-                    .from('contacts')
-                    .insert([{
-                        name: formData.name,
-                        email: formData.email,
-                        phone: formData.phone || null,
-                        company_name: formData.company || null,
-                        status: 'ACTIVE',
-                        stage: 'LEAD',
-                        source: source === 'cta' ? 'Hub LP' : source,
-                        notes: `Lead capturado via LP Hub. Interesse: ${formData.interest}. ${prefilledData?.userInput ? `Mensagem: ${prefilledData.userInput}` : ''}`.trim(),
-                        // company_id is intentionally omitted — RLS policy "Public Enable Insert" allows anon inserts
-                        // The admin sees these as unassigned leads in the contacts panel
-                    }]);
-
-                if (insertError) {
-                    // Last resort: save to waitlist (always public)
-                    const { error: waitlistError } = await supabase
-                        .from('waitlist')
-                        .insert([{
-                            email: formData.email,
-                            name: formData.name,
-                            source: source,
-                            interest: formData.interest,
-                            metadata: { ...prefilledData, company: formData.company, phone: formData.phone },
-                        }]);
-
-                    if (waitlistError) throw new Error(`Erro ao salvar: ${waitlistError.message}`);
-                    // Waitlist OK — still show success
-                }
-            } else if (rpcError) {
-                throw new Error(rpcError.message);
+            if (functionError) {
+                console.error('[LeadCapture] Edge function error, trying fallback:', functionError);
+                throw new Error('Falha ao processar o lead. ' + functionError.message);
             }
 
             setSuccess(true);

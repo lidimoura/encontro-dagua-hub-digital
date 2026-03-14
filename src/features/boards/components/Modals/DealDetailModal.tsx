@@ -763,8 +763,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 )}
 
 
-                {/* WhatsApp AI Outreach — visible whenever a valid phone exists */}
-                {hasPhoneForWA && (
+                {/* WhatsApp AI Outreach — visible whenever phone/email exists in contact OR briefing */}
+                {(!!contact?.phone || !!contact?.email || !!briefingJson?.whatsapp || !!deal.contactEmail) && (
                   <div className="mt-3 space-y-2">
                     {!waMessage ? (
                       <button

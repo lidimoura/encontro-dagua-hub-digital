@@ -1,3 +1,5 @@
+import { supabase } from '@/lib/supabase/client';
+
 /**
  * N8N Webhook Integration Service
  * 
@@ -44,7 +46,8 @@ export interface LegalConsultData {
  */
 export async function sendToN8nWebhook(
   webhookUrl: string,
-  payload: any
+  payload: any,
+  method: 'GET' | 'POST' = 'POST'
 ): Promise<N8nWebhookResponse> {
   try {
     // Validação básica da URL
@@ -52,14 +55,30 @@ export async function sendToN8nWebhook(
       throw new Error('URL do webhook inválida');
     }
 
-    // Envio do POST para o webhook
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
+    let fetchUrl = webhookUrl;
+    let fetchOptions: RequestInit = {
+      method,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
-    });
+    };
+
+    if (method === 'GET') {
+      // Convert payload to query params for GET requests
+      const url = new URL(webhookUrl);
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+        }
+      });
+      fetchUrl = url.toString();
+    } else {
+      // POST requests send payload in body
+      fetchOptions.body = JSON.stringify(payload);
+    }
+
+    // Envio para o webhook
+    const response = await fetch(fetchUrl, fetchOptions);
 
     // Verificação do status da resposta
     if (!response.ok) {
@@ -164,7 +183,8 @@ export async function consultLegalAgent(
  * @returns Promise com resultado do teste
  */
 export async function testWebhookConnection(
-  webhookUrl: string
+  webhookUrl: string,
+  method: 'GET' | 'POST' = 'POST'
 ): Promise<N8nWebhookResponse> {
   const testPayload = {
     test: true,
@@ -172,5 +192,49 @@ export async function testWebhookConnection(
     message: 'Teste de conectividade do CRM Encontro D\'Água Hub',
   };
 
-  return sendToN8nWebhook(webhookUrl, testPayload);
+  return sendToN8nWebhook(webhookUrl, testPayload, method);
+}
+
+/**
+ * Dispatch an event to all dynamic webhooks registered in the database
+ * 
+ * @param eventName O nome do evento configurado (ex: lead.created, deal.won)
+ * @param payload Os dados a serem disparados
+ * @param companyId O ID da companhia atual (para consultar os webhooks corretos)
+ */
+export async function dispatchWebhookEvent(
+  eventName: string,
+  payload: any,
+  companyId: string
+): Promise<void> {
+  try {
+    // 1. Fetch active webhooks for this event
+    const { data: endpoints, error } = await supabase
+      .from('webhook_endpoints')
+      .select('id, url, method, events')
+      .eq('is_active', true)
+      .eq('company_id', companyId);
+
+    if (error || !endpoints || endpoints.length === 0) return;
+
+    // 2. Filter webhooks that listen to this specific event
+    const matchedEndpoints = endpoints.filter(ep => ep.events && ep.events.includes(eventName));
+    
+    // 3. Dispatch to all matched asynchronously
+    for (const ep of matchedEndpoints) {
+      sendToN8nWebhook(ep.url, { ...payload, event: eventName }, ep.method as 'GET' | 'POST')
+        .then(() => {
+          // Update last_triggered_at
+          supabase
+            .from('webhook_endpoints')
+            .update({ last_triggered_at: new Date().toISOString() })
+            .eq('id', ep.id)
+            .then();
+        })
+        .catch(err => console.warn(`[Webhook Dispatch] Error calling ${ep.url}:`, err));
+    }
+
+  } catch (err) {
+    console.warn('[Webhook Dispatch] Failed to dispatch event:', err);
+  }
 }

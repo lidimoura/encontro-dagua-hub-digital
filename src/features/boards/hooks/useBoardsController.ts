@@ -18,6 +18,8 @@ import { queryKeys } from '@/lib/query/queryKeys';
 import { useCreateActivity } from '@/lib/query/hooks/useActivitiesQuery';
 import { usePersistedState } from '@/hooks/usePersistedState';
 import { useRealtimeSyncKanban } from '@/lib/realtime';
+import { dispatchWebhookEvent } from '@/services/n8nService';
+import { useAuth } from '@/context/AuthContext';
 
 export const isDealRotting = (deal: DealView) => {
   const dateToCheck = deal.lastStageChangeDate || deal.updatedAt;
@@ -50,6 +52,7 @@ export const useBoardsController = () => {
   const updateBoardMutation = useUpdateBoard();
   const deleteBoardMutation = useDeleteBoard();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   // Active board state (persisted)
   const [activeBoardId, setActiveBoardId] = usePersistedState<string | null>(
@@ -266,6 +269,22 @@ export const useBoardsController = () => {
       } else {
         // Regular status update within the same board
         updateDealStatusMutation.mutate({ id: dealId, status: stageId, lossReason });
+      }
+
+      // Webhook Dispatch Event Logic
+      if (profile?.company_id) {
+        const payload = {
+          dealId,
+          stageId,
+          boardId: finalBoardId || activeBoardId,
+          lossReason
+        };
+        
+        let eventName = 'deal.moved';
+        if (stageId === DealStatus.CLOSED_WON) eventName = 'deal.won';
+        if (stageId === DealStatus.CLOSED_LOST) eventName = 'deal.lost';
+
+        dispatchWebhookEvent(eventName, payload, profile.company_id);
       }
 
       // Restore Stage Mapping (Contact status -> Board column)

@@ -3,6 +3,22 @@
 Este arquivo registra todas as mudanças significativas no projeto, organizadas por data e categoria.
 
 ---
+## [14/03/2026] — Sprint Resgate Webhook & Autonomia No-Code
+
+### 🚨 Post-Mortem: Regressão na Captura de Leads (Perda de Inteligência)
+- **O Problema**: Notou-se uma regressão grave capturando leads da Landing Page. O lead antigo ('Gamer pc') possuía um detalhado `briefing_json` e a tag correta 'Amazô SDR'. O novo lead ('Ben Jor') entrou sem formatação, sem o JSON e com a tag genérica 'lead'.
+- **Causa Raiz**: Ontem, a Edge Function `typebot-webhook` foi indevidamente tratada como "código morto" e suas ocorrências foram removidas. Isso desativou a lógica central que capturava o payload complexo (nome, telefone, empresa, interesse) e o transformava no objeto rico de `briefing_json`, delegando a inserção para as funções de fallback diretas ao banco.
+- **A Resolução**: O backup do histórico Git e DevLog locais foi investigado, identificando a lógica exata de parsing do `typebot-webhook`. Essa inteligência de captura e notificação push foi totalmente restaurada e **renomeada para `form-lp-lead`**.
+- **Unificação**: A `form-lp-lead` atua agora como o "Cérebro Único" de captura. O `LeadCaptureModal` da LP do Hub mudou sua lógica para realizar fetch dessa função na Borda, garantindo que independente da origem (Link d'Água ou Hub LP), o `briefing_json`, as anotações do deal, o source name, a formatação descritiva (`message`), e os canais corretos sejam unificados de forma determinística antes da inserção no Supabase.
+
+### ⚙️ Feature — Autonomia No-Code UI (Integrações e Webhooks)
+- Atendendo ao pedido para desacoplar hardcodes de serviços como o `n8n`.
+- **`WebhooksSection.tsx`**: Reformulada para ter controle granular sobre onde despachar eventos em tempo real (`lead.created`, `deal.won`, `deal.moved`, etc).
+- **Opção GET/POST**: Migração SQL `031` adicionou a coluna `method` à tabela `webhook_endpoints`. Agora o gestor escolhe livremente o verbo HTTP na UI.
+- **Ecossistema N8n Integrado**: A função `sendToN8nWebhook` e nova `dispatchWebhookEvent` (no `n8nService`) agora pesquisam webhooks em tempo-real na tabela. Eventuais movimentações de card no Kanban (via `useBoardsController`) e criação direta de Deals (`CreateDealModal`) realizam o disparo (ex: payloads virando query string em verbos GET ou body em POST). O CRM agora é um disparador no-code autônomo.
+- **Olcultar IA Keys**: Validado com sucesso que as chaves Gemini AI (configuradas no seu componente respectivo de IA) mantém as funções "Eye" (olhinho para ocultar) e save imperturbáveis e isoladas.
+
+---
 ## [13/03/2026] — Sprint Estabiliz. Internacional: IA Keys, Precy FX, Jury LatAm, Docs
 
 ### 🔑 Feature — Gestão de IA sem .env (UI No-Code)
