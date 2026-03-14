@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { Deal, DealView, DealItem, Company, Contact } from '@/types';
 import { dealsService } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '../AuthContext';
 
 interface DealsContextType {
@@ -65,6 +66,33 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     fetchDeals();
   }, [fetchDeals]);
+
+  // ── Real-time: auto-refresh when a Deal is inserted/updated externally ──
+  // This makes the Kanban update instantly when the typebot-webhook creates
+  // a new Deal, without requiring an F5 refresh.
+  useEffect(() => {
+    if (!profile?.company_id) return;
+
+    const channel = supabase
+      .channel(`deals-realtime-${profile.company_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',           // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'deals',
+        },
+        (_payload) => {
+          // Re-fetch all deals for this company on any change
+          fetchDeals();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.company_id, fetchDeals]);
 
   // CRUD Operations
   const addDeal = useCallback(

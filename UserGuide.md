@@ -80,21 +80,23 @@ O **Encontro d'Água Hub** é um CRM SaaS modular com:
 
 ### Precy (Agente de Precificação)
 - Calcula preço final com base em: horas × valor/hora + margem + impacto + stack
-- **Impactos**: Low (1×), Medium (1.2×), High (1.5×), Ultra (2×), Transformational (3×)
-- **Precificação Social**: desconto de 60% com campo de note explicativo
-- **Câmbio**: 10 moedas suportadas (BRL, USD, EUR, AUD, COP, PEN, ARS, MXN, CLP, UYU)
-  - Ao trocar moeda, o cálculo é **resetado** (evita valores incorretos)
-  - Preço salvo no catálogo já convertido para a moeda selecionada
-- **Salvar no Catálogo**: usa upsert (sem duplicatas/409) com nome + currency como chave
-- **Tech Stack**: selecione ferramentas cadastradas para somar custo à base
+- **Impactos**: Low (1×), Medium (1.2×), High (1.5×)
+- **Precificação Social**: desconto de 60%
+- **Câmbio Real**: 10 moedas suportadas (BRL, USD, EUR, AUD, COP, PEN, ARS, MXN, CLP, UYU)
+  - O `Valor/hora` deve ser digitado **na moeda selecionada** (ex: se escolher USD, digite em dólares)
+  - O sistema converte internamente para BRL, calcula, e exibe o resultado de volta na moeda certa
+  - Ao trocar moeda, o cálculo é resetado — redigite o valor/hora na nova moeda
+- **Salvar no Catálogo**: usa upsert — cria ou atualiza produto pelo nome (sem erro 409)
+- **Tech Stack**: selecione ferramentas cadastradas para somar custo à base (valores em BRL)
 
 ### Jury (Consultora Jurídica Internacional)
-- Chat **aberto automaticamente** ao entrar na aba
-- **Jurisdições**: BR, US, AU, EU, CO, PE, AR, MX, CL, UY (com leis específicas de cada)
-- **Modo Consulta**: a Jury faz perguntas antes de gerar qualquer documento
+- Chat **fechado por padrão** — clique em **"Abrir Chat Jury"** no cabeçalho para ativar
+- O chat aparece como **overlay flutuante** (canto inferior direito) — **não empurra** a página
+- Botão **✕** no header do chat fecha sem F5
+- **Jurisdições**: BR, US, AU, EU, CO, PE, AR, MX, CL, UY (leis específicas de cada)
 - **Saídas separadas**:
-  - **Chat**: diálogo, perguntas jurídicas, resumos para e-mail
-  - **Contrato** (abaixo do chat): documento formal pronto para PDF
+  - **Chat overlay**: diálogo, perguntas jurídicas, resumos para e-mail
+  - **Contrato** (seção abaixo): documento formal pronto para PDF
 - Botão **Gerar Contrato**: produz documento Markdown estruturado
 - Botão **Copiar para Clipboard**: exporta o texto do contrato
 - Botão **Salvar na Conta**: salva como nota na Timeline do Deal
@@ -155,25 +157,57 @@ LEAD → MQL → PROSPECT → CUSTOMER
 - Acessa dados via tools: lista de deals, contatos, atividades pendentes
 - Histórico persistido na sessão
 
+## 8. Automações de Lead — Como Funciona por Completo
+
+### Fluxo Completo (LP → Kanban)
+```
+[Lead preenche LP] → [Typebot coleta dados] → [typebot-webhook (Edge Function)]
+         ↓
+[Cria Contato no Supabase]  →  [Cria Deal no board SDR]
+         ↓
+[Kanban atualiza em Real-Time automaticamente — sem F5]
+```
+
+### Edge Function: `typebot-webhook`
+- **Localização no código**: `supabase/functions/typebot-webhook/index.ts`
+- **Localização no painel**: Supabase Dashboard → Edge Functions → `typebot-webhook`
+- **O que ela faz**:
+  1. Recebe o payload do Typebot (nome, e-mail, WhatsApp, serviços, mensagem)
+  2. Cria/encontra o `Contato` (se phone já existir, reutiliza o ID — sem duplicata)
+  3. Cria um `Deal` no board SDR com status `LEAD`
+  4. Adiciona à `waitlist` para compatibilidade retroativa
+- **Para redesployar após mudanças**: Supabase → Edge Functions → typebot-webhook → **Redeploy**
+
+### Automações configuráveis na UI dos Boards
+- Em **Boards → Configurações do Board** você pode configurar:
+  - **Gatilhos de etapa**: ao mover para determinada coluna, o sistema pode criar uma atividade automática
+  - **Notificações**: ao entrar em determinada etapa, o owner recebe notificação push
+  - **Tarefas automáticas**: agenda follow-up com X dias de prazo ao entrar na etapa
+- Essas automações **não interferem** no fluxo do webhook — são independentes
+- O webhook cria o Deal diretamente com `status: 'LEAD'` (primeira coluna do SDR)
+
+### Real-Time Kanban (sem F5)
+- `DealsContext` mantém uma conexão `supabase.channel('postgres_changes')` ativa
+- Qualquer `INSERT` ou `UPDATE` na tabela `deals` dispara `fetchDeals()` automaticamente
+- Isso significa: quando o webhook cria o Deal do Ben Jor, o card aparece no Kanban **em segundos**, sem recarregar
+- A conexão é por `company_id` (isolamento multi-tenant)
+
+### Configurações de IA — Dual Key
+- **Chave Principal**: usada em todas as chamadas normais
+- **Nota da Chave**: campo de texto livre para identificar de qual conta/e-mail veio
+- **Chave Reserva**: assume automaticamente quando a principal retorna erro 429 (quota)
+- **Persistência**: salvas no Supabase (`user_settings`) — não dependem de `.env` ou Vercel
+
 ---
 
-## 8. Leads da Landing Page → SDR Automático
-
-1. Lead preenche o formulário no site (LP)
-2. Webhook Supabase cria automaticamente: **Contato** + **Deal** no board SDR
-3. O `briefing_json` captura: nome, e-mail, WhatsApp, serviços de interesse, mensagem
-4. Deal aparece na coluna inicial do board SDR
-5. SDR vê o briefing na aba **Briefing** do card — e usa o botão WA IA para o primeiro contato
-
----
-
-## 9. ⚠️ SQL Necessário (Ação Manual)
-
-Para que a coluna `ai_api_key_secondary` seja persistida no Supabase, execute no SQL Editor:
+## 9. ⚠️ SQL Necessário (Execute no Supabase SQL Editor)
 
 ```sql
-ALTER TABLE user_settings 
-ADD COLUMN IF NOT EXISTS ai_api_key_secondary text;
+-- Colunas para AI Keys e notas (execute uma vez)
+ALTER TABLE user_settings
+    ADD COLUMN IF NOT EXISTS ai_api_key_secondary text,
+    ADD COLUMN IF NOT EXISTS ai_api_key_note text,
+    ADD COLUMN IF NOT EXISTS ai_api_key_secondary_note text;
 ```
 
 ---
@@ -185,4 +219,4 @@ ADD COLUMN IF NOT EXISTS ai_api_key_secondary text;
 
 ---
 
-*Última atualização: 13/03/2026 — Sprint Estabilização Internacional*
+*Última atualização: 13/03/2026 — Sprint: Real-Time, Precy FX Real, Jury Overlay, Webhook Fix*
