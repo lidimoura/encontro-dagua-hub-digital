@@ -464,7 +464,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
       description: newNote,
       date: new Date().toISOString(),
       user: { name: 'Eu', avatar: 'https://i.pravatar.cc/150?u=me' },
-      completed: true,
+      completed: false, // Fix: notas nasciam riscadas
     };
 
     addActivity(noteActivity);
