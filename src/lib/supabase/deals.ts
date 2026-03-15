@@ -25,6 +25,7 @@ export interface DbDeal {
   updated_at: string;
   owner_id: string | null;
   is_demo_data: boolean | null;
+  source: string | null;
 }
 
 export interface DbDealItem {
@@ -65,6 +66,7 @@ const transformDeal = (db: DbDeal, items: DbDealItem[]): Deal => ({
       price: i.price,
     })),
   owner: { name: 'Você', avatar: '' }, // Will be enriched later
+  source: db.source || undefined,
 });
 
 // Transform App -> DB
