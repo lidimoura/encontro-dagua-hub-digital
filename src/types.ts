@@ -134,6 +134,7 @@ export interface Deal {
     };
     aiSummary?: string;
     closedAt?: string;
+    source?: string;
 }
 
 // ============================================
