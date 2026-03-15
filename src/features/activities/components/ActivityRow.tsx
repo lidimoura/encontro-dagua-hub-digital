@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, Users, Mail, CheckSquare, Calendar, Clock, MoreHorizontal, Trash2, Edit2, CheckCircle2, Circle } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, Deal } from '@/types';
@@ -22,6 +22,8 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
     isSelected = false,
     onSelect
 }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    
     const getActivityIcon = (type: Activity['type']) => {
         switch (type) {
             case 'CALL': return <Phone size={16} className="text-blue-500" />;
@@ -141,6 +143,21 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                         </span>
                     )}
                 </div>
+                {activity.description && (
+                   <div className="mb-2">
+                      <p className={`text-sm text-slate-600 dark:text-slate-300 ${!isExpanded ? 'line-clamp-2' : ''} whitespace-pre-wrap`}>
+                         {activity.description}
+                      </p>
+                      {activity.description.length > 100 && (
+                         <button 
+                             onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} 
+                             className="text-[10px] font-bold text-primary-500 hover:text-primary-600 mt-1 uppercase tracking-wider"
+                         >
+                            {isExpanded ? 'Ver Menos' : 'Ver Mais'}
+                         </button>
+                      )}
+                   </div>
+                )}
                 <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                     {deal && (
                         <span className="flex items-center gap-1.5 text-primary-600 dark:text-primary-400 font-medium">
