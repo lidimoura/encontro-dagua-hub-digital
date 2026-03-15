@@ -138,6 +138,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
   // ── Documents tab state ───────────────────────────────────────
   const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
+  
+  // ── Edit Note State ───────────────────────────────────────────
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [docsError, setDocsError] = useState<string | null>(null);
 
@@ -455,19 +458,24 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const handleAddNote = () => {
     if (!newNote.trim()) return;
 
-    const noteActivity: Activity = {
-      id: crypto.randomUUID(),
-      dealId: deal.id,
-      dealTitle: deal.title,
-      type: 'NOTE',
-      title: 'Nota Adicionada',
-      description: newNote,
-      date: new Date().toISOString(),
-      user: { name: 'Eu', avatar: 'https://i.pravatar.cc/150?u=me' },
-      completed: false, // Fix: notas nasciam riscadas
-    };
+    if (editingActivityId) {
+      updateActivity(editingActivityId, { description: newNote });
+      setEditingActivityId(null);
+    } else {
+      const noteActivity: Activity = {
+        id: crypto.randomUUID(),
+        dealId: deal.id,
+        dealTitle: deal.title,
+        type: 'NOTE',
+        title: 'Nota Adicionada',
+        description: newNote,
+        date: new Date().toISOString(),
+        user: { name: 'Eu', avatar: 'https://i.pravatar.cc/150?u=me' },
+        completed: false, // Fix: notas nasciam riscadas
+      };
+      addActivity(noteActivity);
+    }
 
-    addActivity(noteActivity);
     setNewNote('');
   };
 
@@ -1050,10 +1058,18 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     </div>
                   )}
 
-                  <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm">
+                    <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm relative">
+                    {editingActivityId && (
+                      <div className="absolute top-2 right-2 flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-orange-500 bg-orange-100 dark:bg-orange-500/20 px-2 py-0.5 rounded-md uppercase">Editando</span>
+                        <button onClick={() => { setEditingActivityId(null); setNewNote(''); }} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                           <X size={14} />
+                        </button>
+                      </div>
+                    )}
                     <textarea
-                      className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none min-h-[80px]"
-                      placeholder="Escreva uma nota..."
+                      className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none min-h-[80px] mt-2"
+                      placeholder={editingActivityId ? "Edite a anotação..." : "Escreva uma nota..."}
                       value={newNote}
                       onChange={e => setNewNote(e.target.value)}
                     ></textarea>
@@ -1081,7 +1097,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         disabled={!newNote.trim()}
                         className="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all"
                       >
-                        <Check size={14} /> Salvar
+                        <Check size={14} /> {editingActivityId ? 'Atualizar' : 'Salvar'}
                       </button>
                     </div>
                   </div>
@@ -1101,7 +1117,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                           const act = activities.find(a => a.id === id);
                           if (act) updateActivity(id, { completed: !act.completed });
                         }}
-                        onEdit={() => { }} // Edit not implemented in modal yet
+                        onEdit={(act) => {
+                          setNewNote(act.description || '');
+                          setEditingActivityId(act.id);
+                          setActiveTab('timeline'); // garante que a nota tá focada
+                        }}
                         onDelete={id => deleteActivity(id)}
                       />
                     ))}
