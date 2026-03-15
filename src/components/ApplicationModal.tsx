@@ -31,26 +31,25 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
         setIsSubmitting(true);
 
         try {
-            // Insert directly into contacts table (CRM integration)
-            const { error: contactError } = await supabase
-                .from('contacts')
-                .insert([{
+            // Chamada para a Edge Function unificada que lida com leads da LP/Link d'água
+            const { data, error: functionError } = await supabase.functions.invoke('form-lp-lead', {
+                body: {
                     name: formData.name,
-                    phone: formData.whatsapp,
-                    email: formData.email || `${formData.whatsapp}@temp.com`,
-                    status: 'ACTIVE',
-                    stage: 'LEAD',
-                    source: 'WEBSITE',
-                    notes: `Aplicação via Landing Page\nIntenção/Diagnóstico: ${formData.businessType || 'Não informado'}\nReferência: ${formData.referralSource || 'Nenhuma'}`,
-                    company_id: null, // Will be created by admin
-                }]);
+                    whatsapp: formData.whatsapp,
+                    email: formData.email,
+                    services: formData.businessType, // Mapeado para 'services' conforme esperado pela Edge Function
+                    landedVia: formData.referralSource || 'Landing Page Hub', // Mapeia a origem
+                    source: 'LP do Hub', // Garante a tag correta no Kanban
+                    message: `Intenção/Diagnóstico: ${formData.businessType || 'Não informado'} | Referência: ${formData.referralSource || 'Nenhuma'}`
+                }
+            });
 
-            if (contactError) {
-                console.error('❌ Contact creation error:', contactError);
-                throw new Error(`Erro ao salvar lead: ${contactError.message}`);
+            if (functionError) {
+                console.error('❌ Erro na Edge Function:', functionError);
+                throw new Error(`Erro no servidor: ${functionError.message}`);
             }
 
-            console.log('✅ Lead salvo com sucesso no CRM');
+            console.log('✅ Lead enviado com sucesso para a Edge Function', data);
             addToast('🎉 Aplicação enviada com sucesso!', 'success');
 
             // Reset form
