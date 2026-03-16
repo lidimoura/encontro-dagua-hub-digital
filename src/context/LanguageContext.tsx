@@ -10,11 +10,8 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // Initialize from localStorage or default to 'pt' (PT-BR is the primary market)
-    const [language, setLanguageState] = useState<Language>(() => {
-        const saved = localStorage.getItem('app_language_v2');
-        return (saved === 'pt' || saved === 'en') ? saved : 'pt';
-    });
+    // On PROVADAGUA branch, we FORCE English 100%
+    const [language, setLanguageState] = useState<Language>('en');
 
     // Translation function
     const t = (key: string): string => {
