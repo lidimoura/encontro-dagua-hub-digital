@@ -201,7 +201,7 @@ serve(async (req) => {
       ? await supabaseClient.from("boards").select("id").limit(1).maybeSingle()
       : { data: null };
 
-    const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
+    let targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
     let targetStageId = null;
 
     if (targetBoardId) {
