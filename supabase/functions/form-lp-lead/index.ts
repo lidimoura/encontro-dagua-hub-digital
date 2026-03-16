@@ -205,15 +205,34 @@ serve(async (req) => {
     let targetStageId = null;
 
     if (targetBoardId) {
-      const { data: firstStage } = await supabaseClient
+      // 1) Try to find a stage specifically for leads
+      const { data: leadStage } = await supabaseClient
         .from("board_stages")
         .select("id")
         .eq("board_id", targetBoardId)
-        .order("order", { ascending: true })
+        .or("label.ilike.%Lead%,label.ilike.%Novo%,name.ilike.%Lead%,name.ilike.%Novo%")
         .limit(1)
         .maybeSingle();
 
-      targetStageId = firstStage?.id ?? "LEAD"; // FALLBACK REABLISHED TO "LEAD"
+      if (leadStage?.id) {
+          targetStageId = leadStage.id;
+      } else {
+          // 2) Fallback to the very first stage
+          const { data: firstStage } = await supabaseClient
+            .from("board_stages")
+            .select("id")
+            .eq("board_id", targetBoardId)
+            .order("order", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
+          targetStageId = firstStage?.id ?? null;
+      }
+
+      if (!targetStageId) {
+         console.warn("[form-lp-lead] Board found but has NO stages. Skipping deal creation to avoid UUID syntax error.");
+         targetBoardId = null; 
+      }
     }
 
     if (targetBoardId && resolvedContactId) {

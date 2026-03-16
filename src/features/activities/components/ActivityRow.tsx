@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Phone, Users, Mail, CheckSquare, Calendar, Clock, MoreHorizontal, Trash2, Edit2, CheckCircle2, Circle } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, Deal } from '@/types';
@@ -37,27 +37,43 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
 
     const { activeBoard } = useCRM();
 
-    const translateStatus = (status: string) => {
-        // First try to find in active board stages
-        const stage = activeBoard.stages.find(s => s.id === status);
-        if (stage) return stage.label;
+    const translatedTitle = useMemo(() => {
+        const title = activity.title;
+        if (title.includes('Moveu para')) {
+            const status = title.replace('Moveu para ', '');
+            let label = status;
 
-        const map: Record<string, string> = {
-            'NEW': 'Novas Oportunidades',
-            'CONTACTED': 'Contatado',
-            'PROPOSAL': 'Proposta',
-            'NEGOTIATION': 'Negociação',
-            'CLOSED_WON': 'Ganho',
-            'CLOSED_LOST': 'Perdido',
-            'LEAD': 'Lead',
-            'MQL': 'Lead Qualificado',
-            'PROSPECT': 'Oportunidade',
-            'CUSTOMER': 'Cliente'
-        };
-        return map[status] || status;
-    };
+            const stage = activeBoard?.stages?.find(s => s.id === status);
+            if (stage) {
+                label = stage.label;
+            } else {
+                const map: Record<string, string> = {
+                    'NEW': 'Novas Oportunidades',
+                    'CONTACTED': 'Contatado',
+                    'PROPOSAL': 'Proposta',
+                    'NEGOTIATION': 'Negociação',
+                    'CLOSED_WON': 'Ganho',
+                    'CLOSED_LOST': 'Perdido',
+                    'LEAD': 'Lead',
+                    'MQL': 'Lead Qualificado',
+                    'PROSPECT': 'Oportunidade',
+                    'CUSTOMER': 'Cliente'
+                };
+                label = map[status] || status;
+            }
 
-    const formatRelativeTime = (dateString: string) => {
+            return (
+                <span>
+                    Movido para <span className="font-bold text-slate-700 dark:text-slate-200">{label}</span>
+                </span>
+            );
+        }
+        if (title === 'Negócio Criado') return 'Negócio criado';
+        return title;
+    }, [activity.title, activeBoard?.stages]);
+
+    const relativeTime = useMemo(() => {
+        const dateString = activity.date;
         const date = new Date(dateString);
         const now = new Date();
         const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -67,20 +83,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
         if (diffInSeconds < 86400) return `há ${Math.floor(diffInSeconds / 3600)} h`;
         if (diffInSeconds < 172800) return 'ontem';
         return date.toLocaleDateString('pt-BR');
-    };
-
-    const formatTitle = (title: string) => {
-        if (title.includes('Moveu para')) {
-            const status = title.replace('Moveu para ', '');
-            return (
-                <span>
-                    Movido para <span className="font-bold text-slate-700 dark:text-slate-200">{translateStatus(status)}</span>
-                </span>
-            );
-        }
-        if (title === 'Negócio Criado') return 'Negócio criado';
-        return title;
-    };
+    }, [activity.date]);
 
     const isSystemActivity = activity.type === 'STATUS_CHANGE';
     const isOverdue = new Date(activity.date) < new Date() && !activity.completed;
@@ -96,12 +99,12 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                 <div className="flex-1 flex items-center justify-between min-w-0">
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-slate-600 dark:text-slate-400">
-                            {formatTitle(activity.title)}
+                            {translatedTitle}
                         </span>
                     </div>
 
                     <span className="text-xs text-slate-400 whitespace-nowrap ml-4">
-                        {formatRelativeTime(activity.date)}
+                        {relativeTime}
                     </span>
                 </div>
             </div>
@@ -135,7 +138,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                         {getActivityIcon(activity.type)}
                     </span>
                     <h3 className={`font-medium text-slate-900 dark:text-white truncate ${activity.completed ? 'line-through text-slate-500' : ''}`}>
-                        {formatTitle(activity.title)}
+                        {translatedTitle}
                     </h3>
                     {isOverdue && (
                         <span className="text-[10px] font-bold px-2 py-0.5 bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-full">
@@ -167,7 +170,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                     )}
                     <span className="flex items-center gap-1.5">
                         <Clock size={14} />
-                        {formatRelativeTime(activity.date)}
+                        {relativeTime}
                     </span>
                 </div>
             </div>

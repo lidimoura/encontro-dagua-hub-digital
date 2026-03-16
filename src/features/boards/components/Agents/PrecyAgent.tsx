@@ -113,13 +113,13 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         fetchLiveRates();
     }, []);
 
-    // Convert hourlyRate from selected currency to BRL for internal calculation
+    // Convert amount in chosen currency (e.g. AUD 100) to internal BRL (for internal analytics if needed, but we keep core logic in selected currency now)
     const toInternalBRL = (amountInCurrency: number): number => {
         const rate = liveRates[currency] ?? 1;
         return rate === 0 ? amountInCurrency : amountInCurrency / rate;
     };
 
-    // Convert a BRL price to the selected currency for display / catalog save
+    // Obsolete function since we now price directly in the currency. Keeping for backward compatibility if used elsewhere.
     const convertPrice = (priceBRL: number): number => {
         const rate = liveRates[currency] ?? 1;
         return Math.round(priceBRL * rate * 100) / 100;
@@ -165,28 +165,33 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     const calculatePrice = () => {
-        // hourlyRate is in the selected currency — convert to BRL for internal math
-        const hourlyRateBRL = toInternalBRL(hourlyRate);
-        const laborCost = hours * hourlyRateBRL;        // in BRL
-        const totalCost = stackCost + laborCost;        // stackCost already BRL (from products table)
-        const basePrice = totalCost * (1 + margin);
+        // Agora, a matemática é NATIVA na Moeda Selecionada. (Lógica Inteligente)
+        // Se a Lidi digitou "50" horas e "13" AUD/hora, vamos multiplicar direto na Moeda.
+        const laborCostCurrency = hours * hourlyRate; // in Currency
+        
+        // As ferramentas (Stack) estão no banco em BRL. Precisamos CONVERTER elas PARA a Moeda Selecionada.
+        const stackCostCurrency = convertPrice(stackCost);
+
+        const totalCostCurrency = stackCostCurrency + laborCostCurrency; 
+        const basePriceCurrency = totalCostCurrency * (1 + margin);
+        
         const impactMultiplier = impactMultipliers[impact];
-        const finalPrice = basePrice * impactMultiplier; // BRL
-        const socialPrice = finalPrice * (1 - SOCIAL_DISCOUNT);
+        const finalPriceCurrency = basePriceCurrency * impactMultiplier; 
+        const socialPriceCurrency = finalPriceCurrency * (1 - SOCIAL_DISCOUNT);
 
         const calc: PricingCalculation = {
-            stackCost,
+            stackCost: stackCostCurrency,
             hours,
-            hourlyRate: hourlyRateBRL,   // stored in BRL internally
-            laborCost,
-            totalCost,
+            hourlyRate: hourlyRate,   // Agora salvo na MOEDA SELECIONADA
+            laborCost: laborCostCurrency,
+            totalCost: totalCostCurrency,
             margin,
-            basePrice,
+            basePrice: basePriceCurrency,
             socialDiscount: SOCIAL_DISCOUNT,
-            socialPrice,
+            socialPrice: socialPriceCurrency,
             impact,
             impactMultiplier,
-            finalPrice: isSocialPricing ? socialPrice : finalPrice,  // always BRL
+            finalPrice: isSocialPricing ? socialPriceCurrency : finalPriceCurrency,
         };
 
         setCalculation(calc);
@@ -210,12 +215,12 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         };
     };
 
-    // FIXED: Save the priced product to the products table for use in Deals
     // Uses upsert to prevent 409 Conflict when name already exists.
     const handleSaveProduct = async () => {
         if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
-        const priceInSelectedCurrency = convertPrice(calculation.finalPrice);
+        // calculation.finalPrice já está na moeda SELECIONADA
+        const priceInSelectedCurrency = calculation.finalPrice;
         try {
             const { error } = await supabase
                 .from('products')
@@ -241,7 +246,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
                         currency,
                         fx_timestamp: fxTimestamp, 
                         live_rate_used: liveRates[currency] ?? 1,
-                        price_brl: calculation.finalPrice,
+                        price_brl: toInternalBRL(priceInSelectedCurrency), // Guarda o equivalente em BRL p/ Data Analytics
                     },
                 }], { onConflict: 'name', ignoreDuplicates: false });
 
@@ -420,7 +425,7 @@ ${isSocialPricing ? `
                     </div>
                 )}
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {language === 'en' ? 'Total selected cost: ' : 'Custo total selecionado: '} <span className="font-mono font-semibold text-green-600">{formatCurrency(stackCost, language, currency)}</span>
+                    {language === 'en' ? 'Total stack cost: ' : 'Ferramentas selecionadas: '} <span className="font-mono font-semibold text-green-600">{formatCurrency(stackCost, language, 'BRL')}</span>
                 </p>
             </div>
 
