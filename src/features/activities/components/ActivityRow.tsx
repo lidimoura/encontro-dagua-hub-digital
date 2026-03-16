@@ -174,7 +174,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
 
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                    onClick={() => onEdit(activity)}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); onEdit(activity); }}
                     className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-colors"
                     title="Editar"
                 >

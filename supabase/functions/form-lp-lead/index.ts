@@ -213,14 +213,7 @@ serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
-      targetStageId = firstStage?.id ?? null;
-
-      if (!targetStageId) {
-        console.warn(
-          "[form-lp-lead] Board found but has NO stages. Skipping deal creation to avoid UUID syntax error 500.",
-        );
-        targetBoardId = null; // Prevent deal creation with invalid stage_id
-      }
+      targetStageId = firstStage?.id ?? "LEAD"; // FALLBACK REABLISHED TO "LEAD"
     }
 
     if (targetBoardId && resolvedContactId) {

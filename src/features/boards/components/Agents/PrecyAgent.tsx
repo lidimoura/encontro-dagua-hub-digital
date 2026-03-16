@@ -61,11 +61,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { profile } = useAuth();
     const [currency, setCurrency] = useState('BRL');
 
-    // Convert hourlyRate from selected currency to BRL for internal calculation
-    const toInternalBRL = (amountInCurrency: number): number => {
-        const rate = FX_RATES[currency] ?? 1;
-        return rate === 0 ? amountInCurrency : amountInCurrency / rate;
-    };
+
 
     // Reset calculation when currency changes but keep hourlyRate as-is
     // (user will update it to match the new currency if needed)
