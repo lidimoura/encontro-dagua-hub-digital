@@ -222,7 +222,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const handleSaveProduct = async () => {
         if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
-        const priceInSelectedCurrency = convertPrice(calculation.finalPrice);
+        const priceInSelectedCurrency = calculation.finalPrice;
         try {
             const { error } = await supabase
                 .from('products')
