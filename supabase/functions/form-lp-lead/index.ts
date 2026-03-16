@@ -104,8 +104,8 @@ serve(async (req) => {
       ? services
       : typeof services === "string" && services.trim()
         ? services.split(",").map((s: string) => s.trim())
-        : businessType
-          ? [businessType]
+        : payload.businessType
+          ? [payload.businessType]
           : [];
 
     // ── briefing_json: structured payload for CRM display ─────────────
@@ -210,7 +210,7 @@ serve(async (req) => {
         .from("board_stages")
         .select("id")
         .eq("board_id", targetBoardId)
-        .or("label.ilike.%Lead%,label.ilike.%Novo%,name.ilike.%Lead%,name.ilike.%Novo%")
+        .or("label.ilike.*Lead*,label.ilike.*Novo*,name.ilike.*Lead*,name.ilike.*Novo*")
         .limit(1)
         .maybeSingle();
 
@@ -244,9 +244,6 @@ serve(async (req) => {
           value: 0,
           board_id: targetBoardId,
           contact_id: resolvedContactId,
-          source: source,
-          briefing_json: briefingJson,
-          notes: `Lead automático capturado via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(", ") || "n/i"}`,
           probability: 20,
           priority: "medium",
         },
