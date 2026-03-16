@@ -253,14 +253,12 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const isGodMode = profile?.is_super_admin || profile?.role === 'super_admin' || profile?.email?.includes('lidi');
   const isSandbox = window.location.hostname.includes('prova');
 
-  const isTestData = (text1: string, text2: string = '') => {
-    const searchString = `${text1} ${text2}`.toLowerCase();
-    return searchString.includes('test') || 
-           searchString.includes('qa') || 
-           searchString.includes('demo') || 
-           searchString.includes('andré luis') || 
-           searchString.includes('andre luis') || 
-           searchString.includes('sereno');
+  const isTestData = (text1: string, text2: string = '', text3: string = '') => {
+    const searchString = `${text1} ${text2} ${text3}`.toLowerCase();
+    return searchString.includes('lidi@teste.com') || 
+           searchString.includes('0000000000') || 
+           searchString.includes('test') || 
+           searchString.includes('qa');
   };
 
   // View Projection: deals with company/contact names + Domain Filter
@@ -272,26 +270,26 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       contactEmail: contactMap[deal.contactId]?.email || '',
     }));
 
-    if (isSandbox && !isGodMode) {
-      projectedDeals = projectedDeals.filter(d => isTestData(d.contactName, d.contactEmail) || isTestData(d.title));
+    if (isSandbox) {
+      projectedDeals = projectedDeals.filter(d => isTestData(d.contactName, d.contactEmail, d.tags?.join(' ')) || isTestData(d.title, d.tags?.join(' ')));
     }
 
     return projectedDeals;
-  }, [rawDeals, companyMap, contactMap, isSandbox, isGodMode]);
+  }, [rawDeals, companyMap, contactMap, isSandbox]);
 
   const exportedContacts = useMemo(() => {
-    if (isSandbox && !isGodMode) {
-       return contacts.filter(c => isTestData(c.name, c.email));
+    if (isSandbox) {
+       return contacts.filter(c => isTestData(c.name, c.email, c.phone));
     }
     return contacts;
-  }, [contacts, isSandbox, isGodMode]);
+  }, [contacts, isSandbox]);
 
   const exportedLeads = useMemo(() => {
-    if (isSandbox && !isGodMode) {
-       return leads.filter(l => isTestData(l.name, l.email));
+    if (isSandbox) {
+       return leads.filter(l => isTestData(l.name, l.email, l.phone));
     }
     return leads;
-  }, [leads, isSandbox, isGodMode]);
+  }, [leads, isSandbox]);
 
   // Update contact stage helper
   const updateContactStage = useCallback(async (id: string, stage: string) => {
