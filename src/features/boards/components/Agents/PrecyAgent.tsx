@@ -165,25 +165,32 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     const calculatePrice = () => {
-        // hourlyRate is in the selected currency — convert to BRL for internal math
-        const hourlyRateBRL = toInternalBRL(hourlyRate);
-        const laborCost = hours * hourlyRateBRL;        // in BRL
-        const totalCost = stackCost + laborCost;        // stackCost already BRL (from products table)
-        const basePrice = totalCost * (1 + margin);
+        // Conversão UNITÁRIA: O custo hora base (BRL) é convertido para a moeda selecionada primeiro.
+        const hourlyRateCurrency = convertPrice(hourlyRate);
+        
+        // Cálculo da mão de obra usa o valor unitário já convertido mantendo as horas intactas.
+        const laborCostCurrency = hours * hourlyRateCurrency;
+        
+        // As ferramentas (Stack) estão no banco em BRL. Precisamos CONVERTER elas PARA a Moeda Selecionada.
+        const stackCostCurrency = convertPrice(stackCost);
+
+        const totalCostCurrency = stackCostCurrency + laborCostCurrency; 
+        const basePriceCurrency = totalCostCurrency * (1 + margin);
+        
         const impactMultiplier = impactMultipliers[impact];
-        const finalPrice = basePrice * impactMultiplier; // BRL
+        const finalPrice = basePriceCurrency * impactMultiplier; // Currency
         const socialPrice = finalPrice * (1 - SOCIAL_DISCOUNT);
 
         const calc: PricingCalculation = {
-            stackCost,
+            stackCost: stackCostCurrency,
             hours,
-            hourlyRate: hourlyRateBRL,   // stored in BRL internally
-            laborCost,
-            totalCost,
+            hourlyRate: hourlyRateCurrency,   // Agora salvo na MOEDA SELECIONADA
+            laborCost: laborCostCurrency,
+            totalCost: totalCostCurrency,
             margin,
-            basePrice,
+            basePrice: basePriceCurrency,
             socialDiscount: SOCIAL_DISCOUNT,
-            socialPrice,
+            socialPrice: socialPrice,
             impact,
             impactMultiplier,
             finalPrice: isSocialPricing ? socialPrice : finalPrice,  // always BRL
@@ -341,7 +348,7 @@ ${isSocialPricing ? `
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            {t('hourlyRateLabel')}
+                            {t('hourlyRateLabel')} (BRL base)
                         </label>
                         <input
                             type="number"
@@ -442,8 +449,8 @@ ${isSocialPricing ? `
                     />
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         {language === 'en'
-                            ? `Required work hours (${formatCurrency(hourlyRate, language, currency)}/h)`
-                            : `Horas de trabalho necessárias (${formatCurrency(hourlyRate, language, currency)}/h)`}
+                            ? `Required work hours (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`
+                            : `Horas de trabalho necessárias (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`}
                     </p>
                 </div>
 
