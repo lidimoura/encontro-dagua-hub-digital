@@ -165,9 +165,11 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     const calculatePrice = () => {
-        // Agora, a matemática é NATIVA na Moeda Selecionada. (Lógica Inteligente)
-        // Se a Lidi digitou "50" horas e "13" AUD/hora, vamos multiplicar direto na Moeda.
-        const laborCostCurrency = hours * hourlyRate; // in Currency
+        // Conversão UNITÁRIA: O custo hora base (BRL) é convertido para a moeda selecionada primeiro.
+        const hourlyRateCurrency = convertPrice(hourlyRate);
+        
+        // Cálculo da mão de obra usa o valor unitário já convertido mantendo as horas intactas.
+        const laborCostCurrency = hours * hourlyRateCurrency;
         
         // As ferramentas (Stack) estão no banco em BRL. Precisamos CONVERTER elas PARA a Moeda Selecionada.
         const stackCostCurrency = convertPrice(stackCost);
@@ -182,7 +184,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         const calc: PricingCalculation = {
             stackCost: stackCostCurrency,
             hours,
-            hourlyRate: hourlyRate,   // Agora salvo na MOEDA SELECIONADA
+            hourlyRate: hourlyRateCurrency,   // Agora salvo na MOEDA SELECIONADA
             laborCost: laborCostCurrency,
             totalCost: totalCostCurrency,
             margin,
@@ -346,7 +348,7 @@ ${isSocialPricing ? `
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            {t('hourlyRateLabel')}
+                            {t('hourlyRateLabel')} (BRL base)
                         </label>
                         <input
                             type="number"
@@ -447,8 +449,8 @@ ${isSocialPricing ? `
                     />
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         {language === 'en'
-                            ? `Required work hours (${formatCurrency(hourlyRate, language, currency)}/h)`
-                            : `Horas de trabalho necessárias (${formatCurrency(hourlyRate, language, currency)}/h)`}
+                            ? `Required work hours (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`
+                            : `Horas de trabalho necessárias (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`}
                     </p>
                 </div>
 
