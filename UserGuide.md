@@ -79,7 +79,9 @@
 - Prompt: describe the scenario and ask for an action recommendation
 
 ### Precy (Pricing Agent)
-- Calculates final price based on: hours × hourly rate + margin + impact + stack
+The Precy Agent calculates fair prices based on Tech Stack Cost + Margin + ROI Impact.
+- Precy uses asynchronous international currency updates based on live exchange rates.
+- The price/hour field accepts decimal fractions, automatically converting R$ 50 to $ 12.50 (USD), and the recalculation of `Final Price` and `ROI` occurs in the same fraction of a second thanks to the `useEffect` tied to the currency dropdown.
 - **Impacts**: Low (1×), Medium (1.2×), High (1.5×)
 - **Social Pricing**: 60% discount
 - **Real Exchange Rate**: 10 supported currencies (BRL, USD, EUR, AUD, COP, PEN, ARS, MXN, CLP, UUY)
