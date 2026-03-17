@@ -112,6 +112,11 @@ export const dealsService = {
         dealsQuery = dealsQuery.or('is_demo_data.is.null,is_demo_data.eq.false');
       }
 
+      // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
+      if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
+        dealsQuery = dealsQuery.or('is_demo_data.eq.true');
+      }
+
       const [dealsResult, itemsResult] = await Promise.all([
         dealsQuery,
         supabase.from('deal_items').select('*'),

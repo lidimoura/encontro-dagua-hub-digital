@@ -20,6 +20,7 @@ import { ContactsProvider, useContacts } from './contacts/ContactsContext';
 import { ActivitiesProvider, useActivities } from './activities/ActivitiesContext';
 import { BoardsProvider, useBoards } from './boards/BoardsContext';
 import { SettingsProvider, useSettings } from './settings/SettingsContext';
+import { useAuth } from './AuthContext';
 
 // ============================================
 // CRM CONTEXT TYPE (Legacy API - Backward Compatible)
@@ -138,6 +139,8 @@ const CRMContext = createContext<CRMContextType | undefined>(undefined);
 // ============================================
 
 const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { profile } = useAuth();
+  
   // Use individual contexts
   const {
     rawDeals,
@@ -246,15 +249,48 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const loading = dealsLoading || contactsLoading || companiesLoading || activitiesLoading || boardsLoading || settingsLoading;
   const error = dealsError || contactsError || companiesError || activitiesError || boardsError || settingsError;
 
-  // View Projection: deals with company/contact names
+  // Domain Isolation Logic (Sandbox vs Production)
+  const isGodMode = profile?.is_super_admin || profile?.role === 'super_admin' || profile?.email?.includes('lidi');
+  const isSandbox = window.location.hostname.includes('prova');
+
+  const isTestData = (text1: string, text2: string = '', text3: string = '') => {
+    const searchString = `${text1} ${text2} ${text3}`.toLowerCase();
+    return searchString.includes('lidi@teste.com') || 
+           searchString.includes('0000000000') || 
+           searchString.includes('00000') || 
+           searchString.includes('gamer pc') || 
+           searchString.includes('lilas');
+  };
+
+  // View Projection: deals with company/contact names + Domain Filter
   const deals: DealView[] = useMemo(() => {
-    return rawDeals.map(deal => ({
+    let projectedDeals = rawDeals.map(deal => ({
       ...deal,
       companyName: companyMap[deal.companyId]?.name || 'Empresa Desconhecida',
       contactName: contactMap[deal.contactId]?.name || 'Sem Contato',
       contactEmail: contactMap[deal.contactId]?.email || '',
     }));
-  }, [rawDeals, companyMap, contactMap]);
+
+    if (isSandbox) {
+      projectedDeals = projectedDeals.filter(d => isTestData(d.contactName, d.contactEmail, d.tags?.join(' ')) || isTestData(d.title, d.tags?.join(' ')));
+    }
+
+    return projectedDeals;
+  }, [rawDeals, companyMap, contactMap, isSandbox]);
+
+  const exportedContacts = useMemo(() => {
+    if (isSandbox) {
+       return contacts.filter(c => isTestData(c.name, c.email, c.phone));
+    }
+    return contacts;
+  }, [contacts, isSandbox]);
+
+  const exportedLeads = useMemo(() => {
+    if (isSandbox) {
+       return leads.filter(l => isTestData(l.name, l.email, l.phone));
+    }
+    return leads;
+  }, [leads, isSandbox]);
 
   // Update contact stage helper
   const updateContactStage = useCallback(async (id: string, stage: string) => {
@@ -621,8 +657,8 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       error,
       deals,
       companies,
-      contacts,
-      leads,
+      contacts: exportedContacts,
+      leads: exportedLeads,
       leadsFromContacts,
       products,
       customFieldDefinitions,
@@ -697,8 +733,8 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       error,
       deals,
       companies,
-      contacts,
-      leads,
+      exportedContacts,
+      exportedLeads,
       leadsFromContacts,
       products,
       customFieldDefinitions,

@@ -49,19 +49,19 @@ export const analyzeLead = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Analise esta oportunidade de venda (Deal) e forneça:
-    1. Uma sugestão curta e prática do que fazer agora (máx 2 frases).
-    2. Uma probabilidade de fechamento (0 a 100) baseada nos dados.
+    Analyze this sales opportunity (Deal) and provide:
+    1. A short and actionable suggestion on what to do next (max 2 sentences).
+    2. A closing probability score (0 to 100) based on the data.
 
-    Retorne APENAS um JSON no formato:
+    Return ONLY a JSON in this format:
     { "suggestion": "...", "probabilityScore": 50 }
 
-    Dados:
-    Título: ${deal.title}
-    Valor: ${deal.value}
-    Estágio: ${deal.status}
-    Probabilidade Atual: ${deal.probability}
-    Prioridade: ${deal.priority}
+    Data:
+    Title: ${deal.title}
+    Value: ${deal.value}
+    Stage: ${deal.status}
+    Current Probability: ${deal.probability}
+    Priority: ${deal.priority}
   `;
 
   try {
@@ -95,15 +95,15 @@ export const generateEmailDraft = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Escreva um rascunho de e-mail curto e persuasivo para este cliente.
-    O objetivo é mover o negócio para a próxima fase.
+    Write a short and persuasive draft email for this client.
+    The goal is to move the deal to the next stage.
     
-    Cliente: ${'contactName' in deal ? deal.contactName : 'Cliente'}
-    Empresa: ${'companyName' in deal ? deal.companyName : 'Empresa'}
-    Negócio: ${deal.title}
-    Estágio Atual: ${deal.status}
+    Client: ${'contactName' in deal ? deal.contactName : 'Cliente'}
+    Company: ${'companyName' in deal ? deal.companyName : 'Empresa'}
+    Deal: ${deal.title}
+    Current Stage: ${deal.status}
 
-    Retorne apenas o corpo do e-mail.
+    Return ONLY the body of the email.
   `;
 
   try {
@@ -148,24 +148,24 @@ export const generateWAOutreach = async (
     : '';
 
   const prompt = `
-    Você é um(a) consultor(a) de vendas caloroso(a) e consultivo(a) do Encontro d'Água Hub Digital.
+    You are a warm and consultative sales consultant at Encontro d'Água Hub Digital.
     
-    Um novo lead acabou de se cadastrar e você vai mandar a PRIMEIRA mensagem no WhatsApp.
+    A new lead just registered and you will send the FIRST message on WhatsApp.
     
-    Dados do Lead:
-    - Nome: ${briefingData?.name || ('contactName' in deal ? deal.contactName : 'Cliente')}
-    - Serviços de interesse: ${servicesStr}${originalMsg}
-    - Negócio no CRM: ${deal.title}
+    Lead Data:
+    - Name: ${briefingData?.name || ('contactName' in deal ? deal.contactName : 'Cliente')}
+    - Services of interest: ${servicesStr}${originalMsg}
+    - Deal in CRM: ${deal.title}
     
-    REGRAS:
-    1. Seja pessoal, caloroso(a) e direto(a). Máx. 4 linhas.
-    2. Mencione especificamente os serviços que eles pediram.
-    3. Termine com uma pergunta aberta que gere resposta (ex: "Posso te contar mais?", "Quando fica bom pra conversar?").
-    4. Use 1-2 emojis naturais, não exagerado.
-    5. NÃO use saudações genéricas como "Olá! Como vai?". Vá direto ao ponto.
-    6. Tom: amigável, humano, consultivo.
+    RULES:
+    1. Be personal, warm, and direct. Max 4 lines.
+    2. Specifically mention the services they requested.
+    3. End with an open question that prompts a reply (e.g., "Can I tell you more?", "When is a good time to chat?").
+    4. Use 1-2 natural emojis, don't overdo it.
+    5. DO NOT use generic greetings like "Hello! How are you?". Get straight to the point.
+    6. Tone: friendly, human, consultative.
     
-    Retorne APENAS o texto da mensagem, sem aspas externas.
+    Return ONLY the text of the message, without external quotes.
   `;
 
   try {
@@ -192,12 +192,12 @@ export const generateObjectionResponse = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    O cliente apresentou a seguinte objeção: "${objection}"
-    Contexto do negócio: ${deal.title}, Valor: ${deal.value}.
+    The client presented the following objection: "${objection}"
+    Deal Context: ${deal.title}, Value: ${deal.value}.
 
-    Forneça 3 opções de resposta curtas e matadoras para contornar essa objeção.
-    Retorne APENAS um JSON array de strings:
-    ["Resposta 1...", "Resposta 2...", "Resposta 3..."]
+    Provide 3 short, killer response options to overcome this objection.
+    Return ONLY a JSON array of strings:
+    ["Response 1...", "Response 2...", "Response 3..."]
   `;
 
   try {
@@ -235,15 +235,15 @@ export const processAudioNote = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Transcreva este áudio de uma nota de venda.
-    Analise o sentimento (Positivo, Neutro, Negativo, Urgente).
-    Se houver uma próxima ação clara (ex: "ligar amanhã", "enviar proposta"), extraia-a.
+    Transcribe this audio of a sales note.
+    Analyze the sentiment (Positive, Neutral, Negative, Urgent).
+    If there is a clear next action (e.g., "call tomorrow", "send proposal"), extract it.
 
-    Retorne JSON:
+    Return JSON:
     {
       "transcription": "...",
       "sentiment": "...",
-      "nextAction": { "type": "CALL" | "EMAIL" | "TASK", "title": "...", "date": "ISOString" } (opcional)
+      "nextAction": { "type": "CALL" | "EMAIL" | "TASK", "title": "...", "date": "ISOString" } (optional)
     }
   `;
 
@@ -293,18 +293,18 @@ export const generateDailyBriefing = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Você é um gerente de vendas sênior analisando o CRM.
-    Gere um briefing matinal curto e motivador para o vendedor "Thales".
+    You are a senior sales manager analyzing the CRM.
+    Generate a short and motivating morning briefing for the salesperson.
     
-    Dados do dia:
-    - Aniversariantes: ${data.birthdays.length}
-    - Negócios Estagnados (Risco): ${data.stalledDeals}
-    - Atividades Atrasadas: ${data.overdueActivities}
-    - Oportunidades de Upsell: ${data.upsellDeals}
+    Today's Data:
+    - Birthdays: ${data.birthdays.length}
+    - Stalled Deals (At Risk): ${data.stalledDeals}
+    - Overdue Activities: ${data.overdueActivities}
+    - Upsell Opportunities: ${data.upsellDeals}
 
-    Fale em primeira pessoa ("Eu notei que...", "Sugiro que...").
-    Se houver riscos, foque neles. Se estiver tudo limpo, parabenize.
-    Máximo 3 frases.
+    Speak in the first person ("I noticed that...", "I suggest you...").
+    If there are risks, focus on them. If everything is clear, congratulate them.
+    Maximum 3 sentences.
   `;
 
   try {
@@ -334,12 +334,12 @@ export const generateRescueMessage = async (
   const model = getModel(provider, apiKey, modelId);
 
   let context = `
-    Cliente: ${'contactName' in deal ? deal.contactName : 'Cliente'}
-    Empresa: ${'companyName' in deal ? deal.companyName : 'Empresa'}
-    Negócio: ${deal.title}
-    Valor: ${deal.value}
-    Estágio: ${deal.status}
-    Tempo parado: > 7 dias
+    Client: ${'contactName' in deal ? deal.contactName : 'Cliente'}
+    Company: ${'companyName' in deal ? deal.companyName : 'Empresa'}
+    Deal: ${deal.title}
+    Value: ${deal.value}
+    Stage: ${deal.status}
+    Time stalled: > 7 days
     `;
 
   let prompt = '';
@@ -347,30 +347,30 @@ export const generateRescueMessage = async (
   if (channel === 'WHATSAPP') {
     prompt = `
         ${context}
-        Escreva uma mensagem de WhatsApp curta, casual e direta para reativar esse contato.
-        Use emojis com moderação. O tom deve ser "preocupado mas leve".
-        Ex: "Oi Fulano, tudo bem? Vi que..."
-        Retorne APENAS o texto da mensagem.
+        Write a short, casual, and direct WhatsApp message to reactivate this contact.
+        Use emojis sparingly. The tone should be "concerned but light".
+        e.g.: "Hi John, how are you? I saw that..."
+        Return ONLY the text of the message.
         `;
   } else if (channel === 'PHONE') {
     prompt = `
         ${context}
-        Crie um mini-script de ligação (bullet points) para o vendedor ligar agora.
-        O objetivo é descobrir se o projeto ainda está de pé.
-        Inclua:
-        - Abertura (Quebra-gelo)
-        - Pergunta Chave (O motivo da ligação)
-        - Fechamento (Próximo passo)
-        Retorne em formato de lista simples.
+        Create a mini call script (bullet points) for the salesperson to call right now.
+        The goal is to find out if the project is still on track.
+        Include:
+        - Opening (Icebreaker)
+        - Key Question (The reason for the call)
+        - Closing (Next step)
+        Return in a simple list format.
         `;
   } else {
     // EMAIL
     prompt = `
         ${context}
-        Escreva um e-mail de "Break-up" (técnica de vendas).
-        Seja educado mas firme: pergunte se o projeto foi cancelado para que você possa fechar o arquivo.
-        Isso geralmente gera resposta.
-        Retorne APENAS o corpo do e-mail.
+        Write a "Break-up" email (sales technique).
+        Be polite but firm: ask if the project has been cancelled so you can close the file.
+        This usually gets a response.
+        Return ONLY the body of the email.
         `;
   }
 
@@ -415,19 +415,19 @@ export const parseNaturalLanguageAction = async (
 
   const now = new Date();
   const prompt = `
-    Você é um assistente pessoal inteligente. Analise o seguinte comando de voz/texto e extraia uma ação estruturada.
+    You are an intelligent personal assistant. Analyze the following voice/text command and extract a structured action.
     
-    Comando: "${text}"
+    Command: "${text}"
     
     Temporal Context: Today is ${now.toLocaleDateString('en-US')} (${now.toLocaleDateString('en-US', { weekday: 'long' })}), at ${now.toLocaleTimeString('en-US')}.
     
-    Instruções:
-    1. Identifique a ação principal (Ligar, Reunião, Email, Tarefa).
-    2. Extraia a data e hora mencionadas. Se for relativo (ex: "amanhã à tarde"), calcule a data ISO aproximada. Se não houver hora, defina 09:00 para tarefas e 14:00 para reuniões.
-    3. Identifique nomes de pessoas (contactName) e empresas (companyName).
-    4. Crie um título curto e descritivo.
+    Instructions:
+    1. Identify the main action (Call, Meeting, Email, Task).
+    2. Extract the mentioned date and time. If relative (e.g., "tomorrow afternoon"), calculate the approximate ISO date. If no time is given, set 09:00 for tasks and 14:00 for meetings.
+    3. Identify people's names (contactName) and company names (companyName).
+    4. Create a short and descriptive title.
     
-    Retorne JSON.
+    Return JSON.
   `;
 
   try {
@@ -471,9 +471,9 @@ export const chatWithCRM = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Você é um assistente de CRM. O usuário disse: "${message}".
-    Contexto atual: ${JSON.stringify(context)}.
-    Responda de forma útil e concisa.
+    You are a CRM assistant. The user said: "${message}".
+    Current context: ${JSON.stringify(context)}.
+    Answer in a helpful and concise way.
   `;
 
   try {
@@ -503,10 +503,10 @@ export const generateBirthdayMessage = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
-    Escreva uma mensagem curta e amigável de feliz aniversário para o cliente ${contactName}.
-    ${age ? `Ele está fazendo ${age} anos.` : ''}
-    Tom profissional mas caloroso.
-    Retorne APENAS o texto da mensagem.
+    Write a short and friendly happy birthday message to the client ${contactName}.
+    ${age ? `They are turning ${age} years old.` : ''}
+    Tone should be professional but warm.
+    Return ONLY the text of the message.
   `;
 
   try {

@@ -63,11 +63,36 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
 
 
 
-    // Reset calculation when currency changes but keep hourlyRate as-is
-    // (user will update it to match the new currency if needed)
+    const prevCurrencyRef = React.useRef(currency);
+
+    // Escuta a mudança de moeda via useEffect, conforme exigência da Lidi
+    useEffect(() => {
+        if (currency !== prevCurrencyRef.current) {
+            const oldCurrency = prevCurrencyRef.current;
+            const currentRate = liveRates[oldCurrency] ?? 1;
+            // Se a moeda atual for BRL, taxa é 1. Convertemos o valor atual de volta para BRL:
+            const baseBrl = currentRate === 0 ? hourlyRate : hourlyRate / currentRate;
+            
+            const newRate = liveRates[currency] ?? 1;
+            // Convertemos o valor BRL base para a nova moeda:
+            const updatedHourlyRate = Math.round(baseBrl * newRate * 100) / 100;
+            
+            setHourlyRate(updatedHourlyRate);
+            prevCurrencyRef.current = currency;
+
+            // Force fresh calculation visually if previously calculated by clicking the hidden trigger.
+            if (calculation) {
+                setTimeout(() => {
+                    const btn = document.getElementById('btn-calculate-precy');
+                    if (btn) btn.click();
+                }, 50);
+            }
+        }
+    }, [currency, liveRates]);
+
+    // Update hourlyRate to reflect the new currency
     const handleCurrencyChange = (newCurrency: string) => {
         setCurrency(newCurrency);
-        setCalculation(null); // Force fresh calculation after currency switch
     };
 
     // Quote-to-Product
@@ -113,13 +138,13 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         fetchLiveRates();
     }, []);
 
-    // Convert amount in chosen currency (e.g. AUD 100) to internal BRL (for internal analytics if needed, but we keep core logic in selected currency now)
+    // Convert hourlyRate from selected currency to BRL for internal calculation
     const toInternalBRL = (amountInCurrency: number): number => {
         const rate = liveRates[currency] ?? 1;
         return rate === 0 ? amountInCurrency : amountInCurrency / rate;
     };
 
-    // Obsolete function since we now price directly in the currency. Keeping for backward compatibility if used elsewhere.
+    // Convert a BRL price to the selected currency for display / catalog save
     const convertPrice = (priceBRL: number): number => {
         const rate = liveRates[currency] ?? 1;
         return Math.round(priceBRL * rate * 100) / 100;
@@ -165,8 +190,8 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     };
 
     const calculatePrice = () => {
-        // Conversão UNITÁRIA: O custo hora base (BRL) é convertido para a moeda selecionada primeiro.
-        const hourlyRateCurrency = convertPrice(hourlyRate);
+        // Conversão UNITÁRIA: hourlyRate já está na moeda selecionada (graças ao handleCurrencyChange).
+        const hourlyRateCurrency = hourlyRate;
         
         // Cálculo da mão de obra usa o valor unitário já convertido mantendo as horas intactas.
         const laborCostCurrency = hours * hourlyRateCurrency;
@@ -184,7 +209,7 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         const calc: PricingCalculation = {
             stackCost: stackCostCurrency,
             hours,
-            hourlyRate: hourlyRateCurrency,   // Agora salvo na MOEDA SELECIONADA
+            hourlyRate: hourlyRateCurrency,
             laborCost: laborCostCurrency,
             totalCost: totalCostCurrency,
             margin,
@@ -217,40 +242,33 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         };
     };
 
+    // FIXED: Save the priced product to the products table for use in Deals
     // Uses upsert to prevent 409 Conflict when name already exists.
     const handleSaveProduct = async () => {
         if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
-        // calculation.finalPrice já está na moeda SELECIONADA
         const priceInSelectedCurrency = calculation.finalPrice;
+        
+        const rate = liveRates[currency] ?? 1;
+        const fallbackBRLPrice = rate === 0 ? calculation.finalPrice : calculation.finalPrice / rate;
+
+        const productData = {
+            name: productName.trim(),
+            description: `Produto gerado automaticamente. Custo hora: ${currency} ${calculation.hourlyRate} | ${calculation.hours}h | Stack: ${currency} ${calculation.stackCost}`,
+            price: priceInSelectedCurrency,
+            product_type: 'service',
+            is_active: true,
+            metadata: {
+                price_currency: currency,
+                price_brl: fallbackBRLPrice,
+                ...calculation
+            }
+        };
+
         try {
             const { error } = await supabase
                 .from('products')
-                .upsert([{
-                    name: productName.trim(),
-                    description: `Precificado pela Precy — ${impact.toUpperCase()} impact × ${calculation.impactMultiplier}x (${currency})`,
-                    price: priceInSelectedCurrency,
-                    product_type: 'crm_service',
-                    is_internal: false,
-                    is_active: true,
-                    pricing_model: 'fixed',
-                    stack_category: null,
-                    metadata: {
-                        generated_by: 'precy',
-                        stack_cost: calculation.stackCost,
-                        labor_cost: calculation.laborCost,
-                        hours: calculation.hours,
-                        hourly_rate: calculation.hourlyRate,
-                        margin: calculation.margin,
-                        impact,
-                        impact_multiplier: calculation.impactMultiplier,
-                        is_social_pricing: isSocialPricing,
-                        currency,
-                        fx_timestamp: fxTimestamp, 
-                        live_rate_used: liveRates[currency] ?? 1,
-                        price_brl: toInternalBRL(priceInSelectedCurrency), // Guarda o equivalente em BRL p/ Data Analytics
-                    },
-                }], { onConflict: 'name', ignoreDuplicates: false });
+                .upsert([productData], { onConflict: 'name', ignoreDuplicates: false });
 
             if (error) throw error;
             addToast(t('productSaved') || `"${productName}" salvo no catálogo (${currency})!`, 'success');
@@ -348,7 +366,7 @@ ${isSocialPricing ? `
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            {t('hourlyRateLabel')} (BRL base)
+                            {t('hourlyRateLabel')}
                         </label>
                         <input
                             type="number"
@@ -356,7 +374,7 @@ ${isSocialPricing ? `
                             onChange={(e) => setHourlyRate(Number(e.target.value))}
                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500"
                             min="0"
-                            step="5"
+                            step="any"
                         />
                     </div>
                     <div>
@@ -427,7 +445,7 @@ ${isSocialPricing ? `
                     </div>
                 )}
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {language === 'en' ? 'Total stack cost: ' : 'Ferramentas selecionadas: '} <span className="font-mono font-semibold text-green-600">{formatCurrency(stackCost, language, 'BRL')}</span>
+                    {language === 'en' ? 'Total selected cost: ' : 'Custo total selecionado: '} <span className="font-mono font-semibold text-green-600">{formatCurrency(stackCost, language, currency)}</span>
                 </p>
             </div>
 
@@ -449,8 +467,8 @@ ${isSocialPricing ? `
                     />
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         {language === 'en'
-                            ? `Required work hours (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`
-                            : `Horas de trabalho necessárias (${formatCurrency(convertPrice(hourlyRate), language, currency)}/h)`}
+                            ? `Required work hours (${formatCurrency(hourlyRate, language, currency)}/h)`
+                            : `Horas de trabalho necessárias (${formatCurrency(hourlyRate, language, currency)}/h)`}
                     </p>
                 </div>
 
@@ -583,6 +601,7 @@ ${isSocialPricing ? `
 
             {/* Calculate Button */}
             <button
+                id="btn-calculate-precy"
                 onClick={calculatePrice}
                 disabled={stackCost === 0 && hours === 0}
                 className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
