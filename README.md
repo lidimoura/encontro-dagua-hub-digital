@@ -31,6 +31,13 @@ A powerful "Link in Bio" and QR Code generator that feeds directly into the CRM.
 - **Deep Integration:** Scans instantly become Leads on the Kanban.
 - **SVG QR Codes:** Vectorial, sharp on any screen, ready for professional printing.
 
+## Status de Estabilidade Recente (Março de 2026)
+* Correção do webhook do Link d'Água (restaurando identidade `amazo-sdr`) e integração de Edge Functions.
+* Matemáica visual correta no PrecyAgent (`step="any"`).
+* Botão "Converter" reinstalado no DealCard.
+* Restauração da persistência nas colunas do Board SDR (evitadas falhas RLS em boards templates globais).
+* Implementação do Filtro de Privacidade (Firewall de Queries pelo hostname) para `prova.encontrodagua.com`.
+
 ### 2. The AI Squad (The Engine)
 - **Amazô (External CS):** 24/7 sales/support agent on the Landing Page.
 - **Mazô (Internal CS):** Monitors client health and "rotting" deals.
