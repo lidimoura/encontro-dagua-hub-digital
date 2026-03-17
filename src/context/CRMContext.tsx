@@ -257,8 +257,9 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const searchString = `${text1} ${text2} ${text3}`.toLowerCase();
     return searchString.includes('lidi@teste.com') || 
            searchString.includes('0000000000') || 
-           searchString.includes('test') || 
-           searchString.includes('qa');
+           searchString.includes('00000') || 
+           searchString.includes('gamer pc') || 
+           searchString.includes('lilas');
   };
 
   // View Projection: deals with company/contact names + Domain Filter
