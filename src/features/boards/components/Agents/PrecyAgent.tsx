@@ -76,7 +76,13 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         
         setHourlyRate(updatedHourlyRate);
         setCurrency(newCurrency);
-        setCalculation(null); // Force fresh calculation after currency switch
+        // Force fresh calculation visually if previously calculated by clicking the hidden trigger.
+        if (calculation) {
+            setTimeout(() => {
+                const btn = document.getElementById('btn-calculate-precy');
+                if (btn) btn.click();
+            }, 50);
+        }
     };
 
     // Quote-to-Product
@@ -358,7 +364,7 @@ ${isSocialPricing ? `
                             onChange={(e) => setHourlyRate(Number(e.target.value))}
                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500"
                             min="0"
-                            step="5"
+                            step="any"
                         />
                     </div>
                     <div>
@@ -585,6 +591,7 @@ ${isSocialPricing ? `
 
             {/* Calculate Button */}
             <button
+                id="btn-calculate-precy"
                 onClick={calculatePrice}
                 disabled={stackCost === 0 && hours === 0}
                 className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

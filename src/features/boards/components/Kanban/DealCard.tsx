@@ -4,6 +4,9 @@ import { Building2, Hourglass, QrCode, Scan } from 'lucide-react';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useClientQREngagement } from '@/lib/query/hooks/useContactsQuery';
+import { useCRM } from '@/context/CRMContext';
+import { useToast } from '@/context/ToastContext';
+import { supabase } from '@/lib/supabase/client';
 
 interface DealCardProps {
   deal: DealView;
@@ -35,10 +38,44 @@ export const DealCard: React.FC<DealCardProps> = ({
   setLastMouseDownDealId,
 }) => {
   const [localDragging, setLocalDragging] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const { t } = useTranslation();
+  const { moveDeal, boards } = useCRM();
+  const { addToast } = useToast();
 
   // Cross-app analytics: fetch QR engagement for this deal's contact email
   const { data: qrEngagement } = useClientQREngagement(deal.contactEmail || undefined);
+
+  const handleQuickConvert = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!deal.contactId || isConverting) return;
+    setIsConverting(true);
+
+    try {
+      const { data, error } = await supabase.rpc('convert_lead_to_client', {
+        p_deal_id: deal.id,
+        p_contact_id: deal.contactId,
+      });
+      if (error) throw error;
+      
+      const onboardingBoard = boards.find(b =>
+        ['ONBOARDING', 'CUSTOMER', 'CLIENTE'].some(kw =>
+          (b.name || '').toUpperCase().includes(kw)
+        )
+      );
+      if (onboardingBoard && onboardingBoard.stages?.length > 0) {
+        addToast('✅ Lead convertido e espelhado no Onboarding!', 'success');
+      } else {
+        moveDeal(deal.id, DealStatus.CLOSED_WON);
+        addToast('✅ Lead convertido para cliente (Ganho)!', 'success');
+      }
+    } catch (err) {
+      moveDeal(deal.id, DealStatus.CLOSED_WON);
+      addToast('✅ Lead foi marcado como Ganho.', 'success');
+    } finally {
+      setIsConverting(false);
+    }
+  };
 
   const handleToggleMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -174,6 +211,16 @@ export const DealCard: React.FC<DealCardProps> = ({
         </div>
 
         <div className="flex items-center">
+          {deal.status !== 'CUSTOMER' && deal.status !== DealStatus.CLOSED_WON && deal.contactId && (deal.source?.toLowerCase().includes('link d\'água') || deal.source?.toLowerCase().includes('amazo') || deal.source?.toLowerCase().includes('webhook')) && (
+            <button
+              onClick={handleQuickConvert}
+              disabled={isConverting}
+              className={`mr-2 flex items-center justify-center w-6 h-6 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors ${isConverting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title="Converter rapidamente este Lead"
+            >
+              <Building2 size={12} />
+            </button>
+          )}
           <ActivityStatusIcon
             status={activityStatus}
             type={deal.nextActivity?.type}
