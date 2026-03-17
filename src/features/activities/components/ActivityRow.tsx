@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Phone, Users, Mail, CheckSquare, Calendar, Clock, MoreHorizontal, Trash2, Edit2, CheckCircle2, Circle } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, Deal } from '@/types';
@@ -37,43 +37,27 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
 
     const { activeBoard } = useCRM();
 
-    const translatedTitle = useMemo(() => {
-        const title = activity.title;
-        if (title.includes('Moveu para')) {
-            const status = title.replace('Moveu para ', '');
-            let label = status;
+    const translateStatus = (status: string) => {
+        // First try to find in active board stages
+        const stage = activeBoard.stages.find(s => s.id === status);
+        if (stage) return stage.label;
 
-            const stage = activeBoard?.stages?.find(s => s.id === status);
-            if (stage) {
-                label = stage.label;
-            } else {
-                const map: Record<string, string> = {
-                    'NEW': 'Novas Oportunidades',
-                    'CONTACTED': 'Contatado',
-                    'PROPOSAL': 'Proposta',
-                    'NEGOTIATION': 'Negociação',
-                    'CLOSED_WON': 'Ganho',
-                    'CLOSED_LOST': 'Perdido',
-                    'LEAD': 'Lead',
-                    'MQL': 'Lead Qualificado',
-                    'PROSPECT': 'Oportunidade',
-                    'CUSTOMER': 'Cliente'
-                };
-                label = map[status] || status;
-            }
+        const map: Record<string, string> = {
+            'NEW': 'Novas Oportunidades',
+            'CONTACTED': 'Contatado',
+            'PROPOSAL': 'Proposta',
+            'NEGOTIATION': 'Negociação',
+            'CLOSED_WON': 'Ganho',
+            'CLOSED_LOST': 'Perdido',
+            'LEAD': 'Lead',
+            'MQL': 'Lead Qualificado',
+            'PROSPECT': 'Oportunidade',
+            'CUSTOMER': 'Cliente'
+        };
+        return map[status] || status;
+    };
 
-            return (
-                <span>
-                    Movido para <span className="font-bold text-slate-700 dark:text-slate-200">{label}</span>
-                </span>
-            );
-        }
-        if (title === 'Negócio Criado') return 'Negócio criado';
-        return title;
-    }, [activity.title, activeBoard?.stages]);
-
-    const relativeTime = useMemo(() => {
-        const dateString = activity.date;
+    const formatRelativeTime = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
         const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -83,7 +67,20 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
         if (diffInSeconds < 86400) return `há ${Math.floor(diffInSeconds / 3600)} h`;
         if (diffInSeconds < 172800) return 'ontem';
         return date.toLocaleDateString('pt-BR');
-    }, [activity.date]);
+    };
+
+    const formatTitle = (title: string) => {
+        if (title.includes('Moveu para')) {
+            const status = title.replace('Moveu para ', '');
+            return (
+                <span>
+                    Movido para <span className="font-bold text-slate-700 dark:text-slate-200">{translateStatus(status)}</span>
+                </span>
+            );
+        }
+        if (title === 'Negócio Criado') return 'Negócio criado';
+        return title;
+    };
 
     const isSystemActivity = activity.type === 'STATUS_CHANGE';
     const isOverdue = new Date(activity.date) < new Date() && !activity.completed;
@@ -99,12 +96,12 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                 <div className="flex-1 flex items-center justify-between min-w-0">
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-slate-600 dark:text-slate-400">
-                            {translatedTitle}
+                            {formatTitle(activity.title)}
                         </span>
                     </div>
 
                     <span className="text-xs text-slate-400 whitespace-nowrap ml-4">
-                        {relativeTime}
+                        {formatRelativeTime(activity.date)}
                     </span>
                 </div>
             </div>
@@ -138,7 +135,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                         {getActivityIcon(activity.type)}
                     </span>
                     <h3 className={`font-medium text-slate-900 dark:text-white truncate ${activity.completed ? 'line-through text-slate-500' : ''}`}>
-                        {translatedTitle}
+                        {formatTitle(activity.title)}
                     </h3>
                     {isOverdue && (
                         <span className="text-[10px] font-bold px-2 py-0.5 bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-full">
@@ -148,17 +145,17 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                 </div>
                 {activity.description && (
                    <div className="mb-2">
-                       <p className={`text-sm text-slate-600 dark:text-slate-300 ${!isExpanded ? 'line-clamp-2' : ''} whitespace-pre-wrap`}>
-                          {activity.description}
-                       </p>
-                       {activity.description.length > 100 && (
-                          <button 
-                              onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} 
-                              className="text-[10px] font-bold text-primary-500 hover:text-primary-600 mt-1 uppercase tracking-wider"
-                          >
-                             {isExpanded ? 'Ver Menos' : 'Ver Mais'}
-                          </button>
-                       )}
+                      <p className={`text-sm text-slate-600 dark:text-slate-300 ${!isExpanded ? 'line-clamp-2' : ''} whitespace-pre-wrap`}>
+                         {activity.description}
+                      </p>
+                      {activity.description.length > 100 && (
+                         <button 
+                             onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} 
+                             className="text-[10px] font-bold text-primary-500 hover:text-primary-600 mt-1 uppercase tracking-wider"
+                         >
+                            {isExpanded ? 'Ver Menos' : 'Ver Mais'}
+                         </button>
+                      )}
                    </div>
                 )}
                 <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
@@ -170,14 +167,14 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
                     )}
                     <span className="flex items-center gap-1.5">
                         <Clock size={14} />
-                        {relativeTime}
+                        {formatRelativeTime(activity.date)}
                     </span>
                 </div>
             </div>
 
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); onEdit(activity); }}
+                    onClick={() => onEdit(activity)}
                     className="p-2 text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-colors"
                     title="Editar"
                 >

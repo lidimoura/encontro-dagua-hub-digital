@@ -99,7 +99,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     addActivity,
     updateActivity,
     deleteActivity,
-    toggleActivityCompletion,
     products,
     addItemToDeal,
     removeItemFromDeal,
@@ -139,7 +138,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
   // ── Documents tab state ───────────────────────────────────────
   const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
-
+  
   // ── Edit Note State ───────────────────────────────────────────
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
@@ -1059,7 +1058,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     </div>
                   )}
 
-                  <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm relative">
+                    <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm relative">
                     {editingActivityId && (
                       <div className="absolute top-2 right-2 flex items-center gap-2">
                         <span className="text-[10px] font-bold text-orange-500 bg-orange-100 dark:bg-orange-500/20 px-2 py-0.5 rounded-md uppercase">Editando</span>
@@ -1115,7 +1114,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         activity={activity}
                         deal={deal}
                         onToggleComplete={id => {
-                          toggleActivityCompletion(id);
+                          const act = activities.find(a => a.id === id);
+                          if (act) updateActivity(id, { completed: !act.completed });
                         }}
                         onEdit={(act) => {
                           setNewNote(act.description || '');
