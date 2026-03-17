@@ -227,7 +227,8 @@ export const boardsService = {
 
         // Upsert new/existing stages
         const stagesToUpsert = updates.stages.map((stage, index) =>
-          transformStageToDb(stage, id, index, companyId)
+          // Não passa o companyId no UPDATE para evitar conflitos de RLS em Boards Globais (Templates)
+          transformStageToDb(stage, id, index, undefined)
         );
 
         if (stagesToUpsert.length > 0) {

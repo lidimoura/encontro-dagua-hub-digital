@@ -37,11 +37,17 @@ serve(async (req) => {
         const businessType = payload.businessType || payload.tipoNegocio || null;
         // The source can be 'Amazô SDR', 'Link d\'Água', or 'LP do Hub'. Fallback to Webhook.
         let source = payload.source || payload.origem || 'LP do Hub';
-        if (source.toLowerCase() === 'new' || source.toLowerCase() === 'lead') {
-            source = 'LP do Hub';
-        }
-        if (payload.landedVia?.toLowerCase().includes('linkdagua') || payload.landedVia?.toLowerCase().includes('link d\'água')) {
-             source = 'Link d\'Água';
+        
+        // Se a payload já se identificar como amazo-sdr, preserve isso estritamente
+        if (source.toLowerCase() === 'amazo-sdr' || payload.process === 'amazo-sdr') {
+            source = 'amazo-sdr';
+        } else {
+            if (source.toLowerCase() === 'new' || source.toLowerCase() === 'lead') {
+                source = 'LP do Hub';
+            }
+            if (payload.landedVia?.toLowerCase().includes('linkdagua') || payload.landedVia?.toLowerCase().includes('link d\'água')) {
+                 source = 'Link d\'Água';
+            }
         }
 
         // Validate required
