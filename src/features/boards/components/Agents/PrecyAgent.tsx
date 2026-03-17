@@ -63,26 +63,36 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
 
 
 
+    const prevCurrencyRef = React.useRef(currency);
+
+    // Escuta a mudança de moeda via useEffect, conforme exigência da Lidi
+    useEffect(() => {
+        if (currency !== prevCurrencyRef.current) {
+            const oldCurrency = prevCurrencyRef.current;
+            const currentRate = liveRates[oldCurrency] ?? 1;
+            // Se a moeda atual for BRL, taxa é 1. Convertemos o valor atual de volta para BRL:
+            const baseBrl = currentRate === 0 ? hourlyRate : hourlyRate / currentRate;
+            
+            const newRate = liveRates[currency] ?? 1;
+            // Convertemos o valor BRL base para a nova moeda:
+            const updatedHourlyRate = Math.round(baseBrl * newRate * 100) / 100;
+            
+            setHourlyRate(updatedHourlyRate);
+            prevCurrencyRef.current = currency;
+
+            // Force fresh calculation visually if previously calculated by clicking the hidden trigger.
+            if (calculation) {
+                setTimeout(() => {
+                    const btn = document.getElementById('btn-calculate-precy');
+                    if (btn) btn.click();
+                }, 50);
+            }
+        }
+    }, [currency, liveRates]);
+
     // Update hourlyRate to reflect the new currency
     const handleCurrencyChange = (newCurrency: string) => {
-        const currentRate = liveRates[currency] ?? 1;
-        // Se a moeda atual for BRL, taxa é 1.
-        // Convertemos o valor atual de volta para BRL:
-        const baseBrl = currentRate === 0 ? hourlyRate : hourlyRate / currentRate;
-        
-        const newRate = liveRates[newCurrency] ?? 1;
-        // Convertemos o valor BRL base para a nova moeda:
-        const updatedHourlyRate = Math.round(baseBrl * newRate * 100) / 100;
-        
-        setHourlyRate(updatedHourlyRate);
         setCurrency(newCurrency);
-        // Force fresh calculation visually if previously calculated by clicking the hidden trigger.
-        if (calculation) {
-            setTimeout(() => {
-                const btn = document.getElementById('btn-calculate-precy');
-                if (btn) btn.click();
-            }, 50);
-        }
     };
 
     // Quote-to-Product
