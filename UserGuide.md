@@ -78,9 +78,10 @@
 - Can automatically create activities and notes
 - Prompt: describe the scenario and ask for an action recommendation
 
-### Precy (Pricing Agent)
-- Calculates final price based on: hours × hourly rate + margin + impact + stack
-- **Impacts**: Low (1×), Medium (1.2×), High (1.5×)
+### Precy (IA de Precificação)
+A Precy Agent calcula preços justos baseada no custo Tech Stack + Margem + Impacto do ROI.
+- A Precy usa atualização assíncrona orientada a moedas internacionais baseada em taxas de câmbio ao vivo.
+- O campo de preço/hora aceita frações decimais, convertendo automaticamente R$ 50 para $ 12.50 (USD), e o recálculo do `Preço Final` e `ROI` ocorre na mesma fração de segundo graças ao `useEffect` atrelado no menu de câmbio.
 - **Social Pricing**: 60% discount
 - **Real Exchange Rate**: 10 supported currencies (BRL, USD, EUR, AUD, COP, PEN, ARS, MXN, CLP, UUY)
   - The `Hourly Rate` must be entered **in the selected currency** (e.g., if you choose USD, enter dollars)
