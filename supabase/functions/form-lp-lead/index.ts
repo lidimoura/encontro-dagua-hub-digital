@@ -148,20 +148,39 @@ serve(async (req) => {
         let targetStageId = null;
 
         if (targetBoardId) {
-             const { data: firstStage } = await supabaseClient
-                 .from('board_stages')
-                 .select('id')
-                 .eq('board_id', targetBoardId)
-                 .order('order', { ascending: true })
-                 .limit(1)
-                 .maybeSingle();
-             targetStageId = firstStage?.id ?? 'LEAD';
+            // 1) Try to find a stage specifically for leads
+            const { data: leadStage } = await supabaseClient
+                .from("board_stages")
+                .select("id")
+                .eq("board_id", targetBoardId)
+                .or("label.ilike.*Lead*,label.ilike.*Novo*,name.ilike.*Lead*,name.ilike.*Novo*")
+                .limit(1)
+                .maybeSingle();
+
+            if (leadStage?.id) {
+                targetStageId = leadStage.id;
+            } else {
+                // 2) Fallback to the very first stage
+                const { data: firstStage } = await supabaseClient
+                    .from("board_stages")
+                    .select("id")
+                    .eq("board_id", targetBoardId)
+                    .order("order", { ascending: true })
+                    .limit(1)
+                    .maybeSingle();
+
+                targetStageId = firstStage?.id ?? null;
+            }
+
+            if (!targetStageId) {
+               console.warn("[form-lp-lead] Board found but has NO stages. Skipping deal creation to avoid UUID syntax error.");
+               targetBoardId = null; 
+            }
         }
 
         if (targetBoardId && resolvedContactId) {
-            const { error: dealError } = await supabaseClient
-                .from('deals')
-                .insert([{
+            const { error: dealError } = await supabaseClient.from("deals").insert([
+                {
                     title: `Lead: ${name} (${source})`,
                     status: targetStageId,
                     stage_id: targetStageId,
@@ -172,16 +191,30 @@ serve(async (req) => {
                     briefing_json: briefingJson,
                     notes: `Lead automático capturado via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
                     probability: 20,
-                    priority: 'medium',
-                }]);
+                    priority: "medium",
+                },
+            ]);
 
             if (dealError) {
-                console.warn('[form-lp-lead] Deal creation warning:', dealError.message);
+                console.warn(
+                    "[form-lp-lead] Deal creation warning:",
+                    dealError.message,
+                );
             } else {
-                console.log('[form-lp-lead] ✅ Deal created in board:', targetBoardId, 'for contact:', resolvedContactId);
+                console.log(
+                    "[form-lp-lead] ✅ Deal created in board:",
+                    targetBoardId,
+                    "for contact:",
+                    resolvedContactId,
+                );
             }
         } else {
-            console.warn('[form-lp-lead] Skipping deal creation — board:', targetBoardId, 'contact:', resolvedContactId);
+            console.warn(
+                "[form-lp-lead] Skipping deal creation — board:",
+                targetBoardId,
+                "contact:",
+                resolvedContactId,
+            );
         }
 
 

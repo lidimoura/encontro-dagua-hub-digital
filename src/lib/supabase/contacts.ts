@@ -152,7 +152,7 @@ export const contactsService = {
 
       // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
       if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
-        query.or('email.ilike.%00000%,name.ilike.%test%');
+        query.or('is_test.eq.true,email.eq.00000@sdr.webhook');
       }
 
       const { data, error } = await query;
