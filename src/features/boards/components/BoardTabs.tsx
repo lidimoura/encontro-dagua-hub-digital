@@ -3,12 +3,11 @@ import { Board } from '@/types';
 import { Brain, Target, MessageSquare } from 'lucide-react';
 import { BoardStrategyHeader } from './Kanban/BoardStrategyHeader';
 import { InsightsPanel } from './InsightsPanel';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface BoardTabsProps {
     board: Board;
 }
-
-import { useLanguage } from '@/context/LanguageContext';
 
 export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
     const [activeTab, setActiveTab] = useState<'strategy' | 'insights'>('strategy');
