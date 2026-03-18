@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Copy, Check } from 'lucide-react';
 
 interface InviteGeneratorProps {
     onInviteGenerated?: () => void;
@@ -8,6 +9,8 @@ interface InviteGeneratorProps {
 
 export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenerated }) => {
     const { t } = useTranslation();
+    const [generatedLink, setGeneratedLink] = useState('');
+    const [copied, setCopied] = useState(false);
 
     const generateInvite = async () => {
         // LOBOTOMY: Pure JavaScript, NO React states, NO modal
@@ -31,17 +34,24 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
 
             if (error) throw error;
 
-            // Generate invite link
-            const inviteLink = `https://encontro-dagua-hub.vercel.app/#/join?token=${token}`;
-
-            // PURE WINDOW.PROMPT - Works on ANY mobile device
-            window.prompt(t('inviteCreated'), inviteLink);
+            // Generate invite link (dynamic domain)
+            const inviteLink = `${window.location.origin}/#/join?token=${token}`;
+            
+            setGeneratedLink(inviteLink);
+            setCopied(false);
 
             onInviteGenerated?.();
         } catch (error: any) {
             document.body.style.cursor = 'default';
-            alert(t('inviteError') + error.message);
+            alert('Falha ao gerar convite: ' + error.message);
         }
+    };
+
+    const handleCopy = () => {
+        if (!generatedLink) return;
+        navigator.clipboard.writeText(generatedLink);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     return (
@@ -70,10 +80,36 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                         generateInvite();
                     }
                 }}
-                className="cursor-pointer w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-acai-900/20 text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-acai-900 transition-all active:scale-[0.98] select-none"
+                className="cursor-pointer w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-acai-900/20 text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 transition-all active:scale-[0.98] select-none"
             >
                 {t('generateInviteButton')}
             </div>
+
+            {generatedLink && (
+                <div className="mt-4 p-4 bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Link de Convite</p>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            readOnly
+                            value={generatedLink}
+                            className="flex-1 bg-white dark:bg-rionegro-900 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                            onClick={(e) => e.currentTarget.select()}
+                        />
+                        <button
+                            onClick={handleCopy}
+                            className={`flex items-center justify-center p-2 rounded-lg transition-colors ${
+                                copied 
+                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                                    : 'bg-primary-100 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800/40'
+                            }`}
+                            title="Copiar Link"
+                        >
+                            {copied ? <Check size={18} /> : <Copy size={18} />}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -105,9 +105,12 @@ const JoinPage: React.FC = () => {
                     password: formData.password,
                     options: {
                         data: {
-                            name: formData.name
+                            name: formData.name,
+                            full_name: formData.name,
+                            company_id: inviteData?.company_id,
+                            role: inviteData?.role || 'vendedor'
                         },
-                        emailRedirectTo: 'https://encontro-dagua-hub.vercel.app/auth/callback',
+                        emailRedirectTo: `${window.location.origin}/#/auth/callback`,
                     }
                 });
 
