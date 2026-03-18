@@ -23,6 +23,13 @@ From a Celeron laptop running Streamlit to a cloud-native Enterprise System.
 
 ---
 
+## Recent Stability Status (March 2026)
+* Fixed Link d'Água webhook (restoring `amazo-sdr` identity) and Edge Functions sync.
+* Correct visual math applied in PrecyAgent (`step="any"`).
+* "Convert" button re-installed on DealCard.
+* Restored persistence in SDR Board columns (avoiding RLS failures on global template boards).
+* Implemented Privacy Filter (Query Firewall by hostname) for `prova.encontrodagua.com`.
+
 ## 🚀 Key Features
 
 ### 1. Link d'Água — The Digital Showcase (Core Product)

@@ -145,14 +145,14 @@ export const contactsService = {
       // NOTE: We rely on RLS for tenant isolation.
       // Removing explicit .eq('company_id') so that contacts imported without
       // company_id (old records) are also visible to their company's admin.
-      const query = supabase
+      let query = supabase
         .from('contacts')
         .select('*')
         .order('created_at', { ascending: false });
 
       // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
       if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
-        query.or('is_test.eq.true,email.eq.00000@sdr.webhook');
+         query = query.or('is_test.eq.true,email.ilike.%00000%,name.ilike.%Gamer pc%,name.ilike.%Lilas%');
       }
 
       const { data, error } = await query;

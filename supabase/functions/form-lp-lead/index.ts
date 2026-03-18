@@ -50,6 +50,14 @@ serve(async (req) => {
             }
         }
 
+        let tagsArray = ['Hub-lp'];
+        let originValue = 'lp hub';
+        if (source === 'amazo-sdr' || source === 'Link d\'Água') {
+            tagsArray = ['SDR-amazo'];
+            originValue = 'lp linkdagua';
+        }
+
+
         // Validate required
         if (!name || !whatsapp) {
             return new Response(
@@ -144,7 +152,7 @@ serve(async (req) => {
             .limit(1)
             .maybeSingle() : { data: null };
 
-        const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
+        let targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
         let targetStageId = null;
 
         if (targetBoardId) {
@@ -153,23 +161,23 @@ serve(async (req) => {
                 .from("board_stages")
                 .select("id")
                 .eq("board_id", targetBoardId)
-                .or("label.ilike.*Lead*,label.ilike.*Novo*,name.ilike.*Lead*,name.ilike.*Novo*")
+                .or("label.ilike.%Lead%,label.ilike.%Novo%,name.ilike.%Lead%,name.ilike.%Novo%")
                 .limit(1)
                 .maybeSingle();
 
             if (leadStage?.id) {
                 targetStageId = leadStage.id;
             } else {
-                // 2) Fallback to the very first stage
-                const { data: firstStage } = await supabaseClient
+                // 2) Fallback to the very first stage using robust ordering mapping
+                const { data: stages } = await supabaseClient
                     .from("board_stages")
-                    .select("id")
-                    .eq("board_id", targetBoardId)
-                    .order("order", { ascending: true })
-                    .limit(1)
-                    .maybeSingle();
+                    .select("id, order")
+                    .eq("board_id", targetBoardId);
 
-                targetStageId = firstStage?.id ?? null;
+                if (stages && stages.length > 0) {
+                    const sortedStages = stages.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+                    targetStageId = sortedStages[0].id;
+                }
             }
 
             if (!targetStageId) {
@@ -189,6 +197,8 @@ serve(async (req) => {
                     contact_id: resolvedContactId,
                     source: source,
                     briefing_json: briefingJson,
+                    tags: tagsArray,
+                    custom_fields: { Origem: originValue },
                     notes: `Lead automático capturado via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
                     probability: 20,
                     priority: "medium",
@@ -230,7 +240,7 @@ serve(async (req) => {
                 metadata: { ...briefingJson, rawPayload: payload },
             }])
             .select()
-            .then(({ error }) => {
+            .then(({ error }: any) => {
                 if (error) console.warn('[form-lp-lead] Waitlist insert warning:', error.message);
             });
 
@@ -238,7 +248,7 @@ serve(async (req) => {
         // Non-blocking: push is best-effort
         const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
         const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-        fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+        await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -250,7 +260,7 @@ serve(async (req) => {
                 url: '/boards',
                 lead_id: contactData?.id,
             }),
-        }).catch(e => console.warn('[form-lp-lead] Push notification failed:', e.message));
+        }).catch((e: any) => console.warn('[form-lp-lead] Push notification failed:', e.message));
 
         return new Response(
             JSON.stringify({
@@ -261,7 +271,7 @@ serve(async (req) => {
             }),
             { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
-    } catch (error) {
+    } catch (error: any) {
         console.error('[form-lp-lead] Error:', error);
         return new Response(
             JSON.stringify({ error: error.message || 'Internal server error' }),

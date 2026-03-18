@@ -57,13 +57,15 @@ export const useContactsController = () => {
     phone: '',
     role: '',
     companyName: '',
+    stage: ContactStage.LEAD as string,
+    source: '',
   });
 
   const isLoading = contactsLoading || companiesLoading;
 
   const openCreateModal = () => {
     setEditingContact(null);
-    setFormData({ name: '', email: '', phone: '', role: '', companyName: '' });
+    setFormData({ name: '', email: '', phone: '', role: '', companyName: '', stage: ContactStage.LEAD, source: '' });
     setIsModalOpen(true);
   };
 
@@ -76,6 +78,8 @@ export const useContactsController = () => {
       phone: contact.phone,
       role: contact.role || '',
       companyName: company?.name || '',
+      stage: contact.stage || ContactStage.LEAD,
+      source: contact.source || '',
     });
     setIsModalOpen(true);
   };
@@ -127,6 +131,8 @@ export const useContactsController = () => {
             phone: formData.phone,
             role: formData.role,
             companyId: companyId,
+            stage: formData.stage,
+            source: formData.source,
           },
         },
         {
@@ -145,7 +151,8 @@ export const useContactsController = () => {
           role: formData.role,
           companyId: companyId || '',
           status: 'ACTIVE',
-          stage: ContactStage.LEAD,
+          stage: formData.stage || ContactStage.LEAD,
+          source: formData.source,
           totalValue: 0,
         },
         {
@@ -163,6 +170,17 @@ export const useContactsController = () => {
     const contact = contacts.find(c => c.id === contactId);
     if (!contact) return;
 
+    // Auto-tagging logic derived from contact source
+    const autoTags: string[] = [];
+    const lowerSource = (contact.source || '').toLowerCase();
+    
+    if (lowerSource.includes('amazo') || lowerSource.includes('linkdagua') || lowerSource.includes("link d'agua")) {
+      autoTags.push('SDR-amazo');
+    }
+    if (lowerSource.includes('hub')) {
+      autoTags.push('Hub-lp');
+    }
+
     // For now, create a deal without board/stage - can be assigned later
     createDealMutation.mutate({
       title: `Deal - ${contact.name}`,
@@ -173,9 +191,12 @@ export const useContactsController = () => {
       value: 0,
       probability: 0,
       priority: 'medium',
-      tags: [],
+      tags: autoTags,
+      source: contact.source,
       items: [],
-      customFields: {},
+      customFields: {
+        Origem: contact.source || ''
+      },
       owner: { name: 'Eu', avatar: '' },
     });
   };
