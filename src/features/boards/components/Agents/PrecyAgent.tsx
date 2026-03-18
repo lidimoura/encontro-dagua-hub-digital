@@ -61,7 +61,42 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const { profile } = useAuth();
     const [currency, setCurrency] = useState('BRL');
 
+    // ── Live FX Rates State ─────────────────────────────────────
+    const [liveRates, setLiveRates] = useState<Record<string, number>>({ BRL: 1.0 });
+    const [fxTimestamp, setFxTimestamp] = useState<string | null>(null);
+    const [loadingFx, setLoadingFx] = useState(false);
 
+    // Fetch Live Exchange Rates (Base: BRL) using ExchangeRate-API (Public, Free, No-key endpoint)
+    // The endpoint returns base against USD usually, but we convert to have BRL as multiplier base.
+    const fetchLiveRates = async () => {
+        setLoadingFx(true);
+        try {
+            // Using a free endpoint for rates based on USD
+            const response = await fetch('https://open.er-api.com/v6/latest/BRL');
+            const data = await response.json();
+            
+            if (data && data.rates) {
+                 setLiveRates(data.rates);
+                 setFxTimestamp(new Date().toISOString());
+            } else {
+                 throw new Error('Formato inesperado de dados da API de câmbio.');
+            }
+        } catch (error) {
+            console.warn('[Precy] Falha ao buscar taxas ao vivo, caindo para fallback estático:', error);
+            // Fallback
+            setLiveRates({
+                BRL: 1.0, USD: 0.185, EUR: 0.170, AUD: 0.290, COP: 750,
+                PEN: 0.68, ARS: 180, MXN: 3.20, CLP: 175, UYU: 7.3,
+            });
+            setFxTimestamp(new Date().toISOString());
+        } finally {
+            setLoadingFx(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchLiveRates();
+    }, []);
 
     const prevCurrencyRef = React.useRef(currency);
 
@@ -100,43 +135,6 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const [savingProduct, setSavingProduct] = useState(false);
 
     const SOCIAL_DISCOUNT = 0.60; // 60% discount for social pricing
-
-    // ── Live FX Rates State ─────────────────────────────────────
-    const [liveRates, setLiveRates] = useState<Record<string, number>>({ BRL: 1.0 });
-    const [fxTimestamp, setFxTimestamp] = useState<string | null>(null);
-    const [loadingFx, setLoadingFx] = useState(false);
-
-    // Fetch Live Exchange Rates (Base: BRL) using ExchangeRate-API (Public, Free, No-key endpoint)
-    // The endpoint returns base against USD usually, but we convert to have BRL as multiplier base.
-    const fetchLiveRates = async () => {
-        setLoadingFx(true);
-        try {
-            // Using a free endpoint for rates based on USD
-            const response = await fetch('https://open.er-api.com/v6/latest/BRL');
-            const data = await response.json();
-            
-            if (data && data.rates) {
-                 setLiveRates(data.rates);
-                 setFxTimestamp(new Date().toISOString());
-            } else {
-                 throw new Error('Formato inesperado de dados da API de câmbio.');
-            }
-        } catch (error) {
-            console.warn('[Precy] Falha ao buscar taxas ao vivo, caindo para fallback estático:', error);
-            // Fallback
-            setLiveRates({
-                BRL: 1.0, USD: 0.185, EUR: 0.170, AUD: 0.290, COP: 750,
-                PEN: 0.68, ARS: 180, MXN: 3.20, CLP: 175, UYU: 7.3,
-            });
-            setFxTimestamp(new Date().toISOString());
-        } finally {
-            setLoadingFx(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchLiveRates();
-    }, []);
 
     // Convert hourlyRate from selected currency to BRL for internal calculation
     const toInternalBRL = (amountInCurrency: number): number => {

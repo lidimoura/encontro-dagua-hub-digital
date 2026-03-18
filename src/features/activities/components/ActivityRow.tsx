@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Phone, Users, Mail, CheckSquare, Calendar, Clock, MoreHorizontal, Trash2, Edit2, CheckCircle2, Circle } from 'lucide-react';
-import { useCRM } from '@/context/CRMContext';
 import { Activity, Deal } from '@/types';
 
 interface ActivityRowProps {
@@ -11,6 +10,7 @@ interface ActivityRowProps {
     onDelete: (id: string) => void;
     isSelected?: boolean;
     onSelect?: (id: string, selected: boolean) => void;
+    boardStages?: { id: string; label: string }[];
 }
 
 export const ActivityRow: React.FC<ActivityRowProps> = ({
@@ -20,7 +20,8 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
     onEdit,
     onDelete,
     isSelected = false,
-    onSelect
+    onSelect,
+    ...props
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     
@@ -35,12 +36,12 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
         }
     };
 
-    const { activeBoard } = useCRM();
-
     const translateStatus = (status: string) => {
-        // First try to find in active board stages
-        const stage = activeBoard.stages.find(s => s.id === status);
-        if (stage) return stage.label;
+        // First try to find in provided board stages
+        if (props.boardStages) {
+             const stage = props.boardStages.find(s => s.id === status);
+             if (stage) return stage.label;
+        }
 
         const map: Record<string, string> = {
             'NEW': 'Novas Oportunidades',
