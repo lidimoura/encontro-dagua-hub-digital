@@ -65,23 +65,8 @@ serve(async (req) => {
 
         if (createError) throw createError;
 
-        // 3. Create User Profile
-        const { error: profileError } = await adminClient
-            .from("profiles")
-            .insert({
-                id: authData.user.id,
-                email: email,
-                role: invite.role,
-                company_id: invite.company_id,
-                status: "active",
-                created_at: new Date().toISOString(),
-            });
-
-        if (profileError) {
-            // Cleanup auth user if profile creation fails
-            await adminClient.auth.admin.deleteUser(authData.user.id);
-            throw profileError;
-        }
+        // Postgres 'handle_new_user' trigger automatically creates the Profile from user_metadata.
+        // We do not need to manually insert it here, which was causing the duplicate key "Database error".
 
         // 4. (Optional) Track usage count here if we added a column, but for now just don't mark as used_at
         // await adminClient.from("company_invites").update({ used_at: new Date().toISOString() }).eq("id", invite.id);
