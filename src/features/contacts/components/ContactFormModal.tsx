@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Contact } from '@/types';
+import { useCRM } from '@/context/CRMContext';
 
 interface ContactFormData {
   name: string;
@@ -8,6 +9,7 @@ interface ContactFormData {
   phone: string;
   role: string;
   companyName: string;
+  stage: string;
 }
 
 interface ContactFormModalProps {
@@ -27,6 +29,8 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   setFormData,
   editingContact,
 }) => {
+  const { lifecycleStages, companies } = useCRM();
+
   if (!isOpen) return null;
 
   return (
@@ -92,23 +96,42 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               />
             </div>
           </div>
-          {!editingContact && (
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                 Empresa
               </label>
               <input
                 type="text"
+                list="companies-list"
                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="Nome da Empresa"
                 value={formData.companyName}
                 onChange={e => setFormData({ ...formData, companyName: e.target.value })}
               />
+              <datalist id="companies-list">
+                {companies?.map(c => <option key={c.id} value={c.name} />)}
+              </datalist>
               <p className="text-[10px] text-slate-400 mt-1">
-                Se a empresa já existir, o contato será vinculado a ela.
+                Se já existir, o contato será vinculado.
               </p>
             </div>
-          )}
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                Estágio
+              </label>
+              <select
+                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
+                value={formData.stage}
+                onChange={e => setFormData({ ...formData, stage: e.target.value })}
+              >
+                {lifecycleStages?.map(stage => (
+                  <option key={stage.id} value={stage.id}>{stage.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           <button
             type="submit"

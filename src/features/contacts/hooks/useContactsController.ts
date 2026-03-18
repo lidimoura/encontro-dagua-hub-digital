@@ -57,13 +57,14 @@ export const useContactsController = () => {
     phone: '',
     role: '',
     companyName: '',
+    stage: ContactStage.LEAD as string,
   });
 
   const isLoading = contactsLoading || companiesLoading;
 
   const openCreateModal = () => {
     setEditingContact(null);
-    setFormData({ name: '', email: '', phone: '', role: '', companyName: '' });
+    setFormData({ name: '', email: '', phone: '', role: '', companyName: '', stage: ContactStage.LEAD });
     setIsModalOpen(true);
   };
 
@@ -76,6 +77,7 @@ export const useContactsController = () => {
       phone: contact.phone,
       role: contact.role || '',
       companyName: company?.name || '',
+      stage: contact.stage || ContactStage.LEAD,
     });
     setIsModalOpen(true);
   };
@@ -127,6 +129,7 @@ export const useContactsController = () => {
             phone: formData.phone,
             role: formData.role,
             companyId: companyId,
+            stage: formData.stage,
           },
         },
         {
@@ -145,7 +148,7 @@ export const useContactsController = () => {
           role: formData.role,
           companyId: companyId || '',
           status: 'ACTIVE',
-          stage: ContactStage.LEAD,
+          stage: formData.stage || ContactStage.LEAD,
           totalValue: 0,
         },
         {

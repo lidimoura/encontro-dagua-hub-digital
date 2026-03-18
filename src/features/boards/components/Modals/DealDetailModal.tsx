@@ -21,8 +21,8 @@ import {
   Pencil,
   ThumbsUp,
   ThumbsDown,
-  Building2,
   User,
+  Target,
   FileText,
   Mic,
   StopCircle,
@@ -96,10 +96,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     updateDeal,
     deleteDeal,
     activities,
-    addActivity,
     updateActivity,
     deleteActivity,
     products,
+    companies,
     addItemToDeal,
     removeItemFromDeal,
     customFieldDefinitions,
@@ -656,7 +656,46 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
                   <Building2 size={14} /> Empresa (Conta)
                 </h3>
-                <p className="text-slate-900 dark:text-white font-medium">{deal.companyName}</p>
+                <select
+                  value={deal.companyId || ''}
+                  onChange={(e) => updateDeal(deal.id, { companyId: e.target.value })}
+                  className="w-full text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
+                >
+                  <option value="">Sem empresa vinculada...</option>
+                  {companies.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
+                  <Target size={14} /> Estágio (Funil)
+                </h3>
+                <select
+                  value={deal.status}
+                  onChange={(e) => moveDeal(deal.id, e.target.value)}
+                  className="w-full text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
+                >
+                  {dealBoard.stages.map(s => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                  <option value={DealStatus.CLOSED_WON}>GANHO</option>
+                  <option value={DealStatus.CLOSED_LOST}>PERDIDO</option>
+                </select>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
+                  <Tag size={14} /> Tags
+                </h3>
+                <input
+                  type="text"
+                  placeholder="tag1, tag2..."
+                  value={(deal.tags || []).join(', ')}
+                  onChange={(e) => updateDeal(deal.id, { tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                  className="w-full text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
+                />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
@@ -901,21 +940,22 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
               )}
 
               {/* DYNAMIC CUSTOM FIELDS INPUTS */}
-              {customFieldDefinitions.length > 0 && (
+              {(customFieldDefinitions.length > 0 || Object.keys(deal.customFields || {}).length > 0) && (
                 <div className="pt-4 border-t border-slate-100 dark:border-white/5">
                   <h3 className="text-xs font-bold text-slate-400 uppercase mb-3">
                     Campos Personalizados
                   </h3>
                   <div className="space-y-4">
+                    {/* Render defined fields */}
                     {customFieldDefinitions.map(field => (
                       <div key={field.id}>
                         <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                          {field.label}
+                          {field.label || field.name}
                         </label>
                         {field.type === 'select' ? (
                           <select
-                            value={String(deal.customFields?.[field.key] ?? '')}
-                            onChange={e => updateCustomField(field.key, e.target.value)}
+                            value={String(deal.customFields?.[field.key || field.name || ''] ?? '')}
+                            onChange={e => updateCustomField(field.key || field.name || '', e.target.value)}
                             className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded px-2 py-1.5 text-sm dark:text-white focus:ring-1 focus:ring-primary-500 outline-none"
                           >
                             <option value="">Selecione...</option>
@@ -927,12 +967,29 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                           </select>
                         ) : (
                           <input
-                            type={field.type}
-                            value={String(deal.customFields?.[field.key] ?? '')}
-                            onChange={e => updateCustomField(field.key, e.target.value)}
+                            type={field.type === 'number' ? 'number' : 'text'}
+                            value={String(deal.customFields?.[field.key || field.name || ''] ?? '')}
+                            onChange={e => updateCustomField(field.key || field.name || '', e.target.value)}
                             className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded px-2 py-1.5 text-sm dark:text-white focus:ring-1 focus:ring-primary-500 outline-none"
                           />
                         )}
+                      </div>
+                    ))}
+                    
+                    {/* Render extra ad-hoc fields */}
+                    {Object.entries(deal.customFields || {})
+                      .filter(([key]) => !customFieldDefinitions.some(d => (d.key === key || d.name === key)))
+                      .map(([key, value]) => (
+                      <div key={key}>
+                        <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 capitalize">
+                          {key}
+                        </label>
+                        <input
+                          type="text"
+                          value={String(value ?? '')}
+                          onChange={e => updateCustomField(key, e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded px-2 py-1.5 text-sm dark:text-white focus:ring-1 focus:ring-primary-500 outline-none"
+                        />
                       </div>
                     ))}
                   </div>

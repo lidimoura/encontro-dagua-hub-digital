@@ -50,6 +50,14 @@ serve(async (req) => {
             }
         }
 
+        let tagsArray = ['Hub-lp'];
+        let originValue = 'lp hub';
+        if (source === 'amazo-sdr' || source === 'Link d\'Água') {
+            tagsArray = ['SDR-amazo'];
+            originValue = 'lp linkdagua';
+        }
+
+
         // Validate required
         if (!name || !whatsapp) {
             return new Response(
@@ -144,7 +152,7 @@ serve(async (req) => {
             .limit(1)
             .maybeSingle() : { data: null };
 
-        const targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
+        let targetBoardId = sdrBoard?.id ?? fallbackBoard?.id ?? null;
         let targetStageId = null;
 
         if (targetBoardId) {
@@ -189,6 +197,8 @@ serve(async (req) => {
                     contact_id: resolvedContactId,
                     source: source,
                     briefing_json: briefingJson,
+                    tags: tagsArray,
+                    custom_fields: { Origem: originValue },
                     notes: `Lead automático capturado via ${source}\nWhatsApp: ${whatsapp}\nServiços: ${servicesArray.join(', ') || 'n/i'}`,
                     probability: 20,
                     priority: "medium",
