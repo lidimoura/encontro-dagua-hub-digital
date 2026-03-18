@@ -114,7 +114,7 @@ export const dealsService = {
 
       // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
       if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
-        dealsQuery = dealsQuery.or('is_demo_data.eq.true');
+        dealsQuery = dealsQuery.or('is_demo_data.eq.true,tags.cs.{"test/QA"},title.ilike.%Gamer pc%,title.ilike.%Lilas%');
       }
 
       const [dealsResult, itemsResult] = await Promise.all([
