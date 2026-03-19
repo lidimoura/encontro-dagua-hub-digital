@@ -10,8 +10,12 @@
   <script>
     if (window.location.hostname.includes('hub.encontrodagua.com')) {
       document.title = "Hub Encontro d'água";
+      document.documentElement.lang = 'pt-BR';
     } else if (window.location.hostname.includes('prova.encontrodagua.com')) {
       document.title = "Prova d'água Hub";
+      document.documentElement.lang = 'en';
+    } else {
+      document.documentElement.lang = 'pt-BR';
     }
   </script>
   <!-- Preconnect para recursos externos (economiza ~200-400ms) -->

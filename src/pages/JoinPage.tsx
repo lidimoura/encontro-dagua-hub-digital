@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Mail, Lock, User, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { IS_DEMO } from '@/lib/appConfig';
 
 const JoinPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -140,7 +141,12 @@ const JoinPage: React.FC = () => {
 
             if (signInError) throw signInError;
 
-            addToast('Conta criada com sucesso! Bem-vindo.', 'success');
+            addToast(
+                IS_DEMO
+                    ? `Welcome, ${formData.name.split(' ')[0]}! Your account is ready.`
+                    : `Conta criada com sucesso! Bem-vindo(a), ${formData.name.split(' ')[0]}!`,
+                'success'
+            );
             navigate('/');
         } catch (err: any) {
             console.error('❌ Signup error:', err);
@@ -189,10 +195,14 @@ const JoinPage: React.FC = () => {
             <div className="max-w-md w-full relative z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display tracking-tight mb-2">
-                        Aceitar Convite
+                        {IS_DEMO
+                            ? (formData.name ? `Hi, ${formData.name.split(' ')[0]}! 👋` : 'Accept Invite')
+                            : 'Aceitar Convite'}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
-                        Crie sua conta para se juntar à equipe.
+                        {IS_DEMO
+                            ? 'Create your account to access the Prova d\'água Hub.'
+                            : 'Crie sua conta para se juntar à equipe.'}
                     </p>
                 </div>
 
@@ -200,7 +210,7 @@ const JoinPage: React.FC = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Nome Completo
+                                {IS_DEMO ? 'Full Name' : 'Nome Completo'}
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -210,7 +220,7 @@ const JoinPage: React.FC = () => {
                                     type="text"
                                     required
                                     className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all sm:text-sm"
-                                    placeholder="Seu nome"
+                                    placeholder={IS_DEMO ? 'Your name' : 'Seu nome'}
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 />
@@ -266,7 +276,7 @@ const JoinPage: React.FC = () => {
                                 <Loader2 className="animate-spin h-5 w-5" />
                             ) : (
                                 <>
-                                    Criar Conta e Entrar
+                                    {IS_DEMO ? 'Create Account & Sign In' : 'Criar Conta e Entrar'}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
                             )}

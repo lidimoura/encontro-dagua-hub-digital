@@ -13,6 +13,7 @@ import { queryKeys } from '../queryKeys';
 import { dealsService, contactsService, companiesService } from '@/lib/supabase';
 import type { Deal, DealView, DealItem, DealStatusType } from '@/types';
 import { DealStatus } from '@/types';
+import { isDemoVisible, IS_DEMO } from '@/lib/appConfig';
 
 // ============ QUERY HOOKS ============
 
@@ -198,10 +199,10 @@ export const useDealsByBoard = (boardId: string) => {
         };
       });
 
-      // AUTO-MAPPING: Only create ghost cards for contacts that have NO real deal anywhere in the CRM.
-      // This prevents duplication when a contact is moved from one board to another.
+      // AUTO-MAPPING: Only create ghost cards on main branch.
+      // On provadagua, ghost cards are disabled to prevent duplicates with test data.
       const activeBoard = boardResult.find((b: any) => b.id === boardId);
-      if (activeBoard && activeBoard.stages) {
+      if (activeBoard && activeBoard.stages && !IS_DEMO) {
         // Critical fix: use ALL deals from ALL boards to exclude contacts that already have a real deal
         const allDeals = dealsResult.data || [];
         const contactIdsWithAnyDeal = new Set(allDeals.map((d: any) => d.contactId).filter(Boolean));
@@ -259,18 +260,29 @@ export const useDealsByBoard = (boardId: string) => {
       }
 
       // DEDUPLICATION: remove any deal that appears more than once by id
-      // (guards against contacts appearing twice in the DB — a real-world anomaly)
       const seenIds = new Set<string>();
-      const dedupedDeals = enrichedDeals.filter(deal => {
-        // Drop ghost cards for contacts with no name identifier
+      let dedupedDeals = enrichedDeals.filter(deal => {
         if (deal.id.startsWith('auto-') && !deal.contactId) return false;
-        // Drop real deals with no valid status (would cause Kanban column crash)
         if (!deal.status) return false;
-        // Dedup by id
         if (seenIds.has(deal.id)) return false;
         seenIds.add(deal.id);
         return true;
       });
+
+      // ── PRIVACIDADE ESTRITA (branch provadagua) ─────────────────────────
+      // Filtra deals cujo contato não satisfaz os critérios da branch provadagua.
+      if (IS_DEMO) {
+        const contactCache = new Map(contacts.map(c => [c.id, c]));
+        dedupedDeals = dedupedDeals.filter(deal => {
+          const contact = contactCache.get(deal.contactId);
+          if (!contact) return false;
+          return isDemoVisible({
+            tags:  (contact as any).tags,
+            email: contact.email,
+            phone: (contact as any).phone,
+          });
+        });
+      }
 
       return dedupedDeals;
 
