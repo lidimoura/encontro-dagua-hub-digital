@@ -47,7 +47,7 @@ export const useContacts = (filters?: ContactsFilters) => {
       // Critérios: email exato lidi@teste.com | telefone 0000000000 | tags permitidas
       // Na main: todos os contatos são visíveis sem filtro.
       contacts = contacts.filter(contact => isDemoVisible({
-        tags:  (contact as any).tags,
+        tags:  contact.tags,
         email: contact.email,
         phone: (contact as any).phone,
       }));
