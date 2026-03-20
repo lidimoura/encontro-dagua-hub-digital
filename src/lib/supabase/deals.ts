@@ -96,25 +96,30 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
 export const dealsService = {
   async getAll(companyId: string, isDemoUser: boolean = false): Promise<{ data: Deal[] | null; error: Error | null }> {
     try {
-      if (!companyId && !isDemoUser) return { data: [], error: null };
+      const isProvadagua = typeof window !== 'undefined' &&
+        (window.location.hostname.includes('prova.encontrodagua.com') || window.location.hostname === 'localhost');
+
+      // On provadagua: skip company_id filter — QA contacts have company_id = null
+      if (!companyId && !isDemoUser && !isProvadagua) return { data: [], error: null };
 
       let dealsQuery = supabase.from('deals').select('*').order('created_at', { ascending: false });
 
-      if (companyId) {
+      // On provadagua: no company_id restriction (QA leads have null company_id)
+      // On main: always filter by company_id
+      if (companyId && !isProvadagua) {
         dealsQuery = dealsQuery.eq('company_id', companyId);
+      } else if (companyId && isProvadagua) {
+        // Allow own company deals OR null (QA/webhook leads)
+        dealsQuery = dealsQuery.or(`company_id.eq.${companyId},company_id.is.null`);
       }
 
-      // Demo isolation: filter by is_demo_data flag
-      if (isDemoUser) {
-        dealsQuery = dealsQuery.eq('is_demo_data', true);
-      } else {
-        // Regular users see only non-demo data (or null for backward compatibility)
-        dealsQuery = dealsQuery.or('is_demo_data.is.null,is_demo_data.eq.false');
-      }
-
-      // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
-      if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
-        dealsQuery = dealsQuery.or('is_demo_data.eq.true,title.ilike.%Gamer pc%,title.ilike.%Lilas%');
+      // Demo isolation flag — only apply on main (not on provadagua where we want all QA data)
+      if (!isProvadagua) {
+        if (isDemoUser) {
+          dealsQuery = dealsQuery.eq('is_demo_data', true);
+        } else {
+          dealsQuery = dealsQuery.or('is_demo_data.is.null,is_demo_data.eq.false');
+        }
       }
 
       const [dealsResult, itemsResult] = await Promise.all([
