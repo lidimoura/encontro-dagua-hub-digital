@@ -46,22 +46,44 @@ serve(async (req) => {
         const message      = payload.message || payload.mensagem || null;
         const businessType = payload.businessType || payload.tipoNegocio || null;
         const rawOrigin    = (payload.origin || payload.source || payload.origem || '').toLowerCase().trim();
+        const rawProcess   = (payload.process || '').toLowerCase().trim();
+        const rawLandedVia = (payload.landedVia || payload.landed_via || payload.origem_url || '').toLowerCase().trim();
 
-        // ── REGRA DE TAGS (idêntica ao fluxo original) ───────────────────────
+        // ── REGRA DE TAGS ─────────────────────────────────────────────────────
+        // Detecta origem com tolerância máxima: cobre todos os formatos que Link d'Água pode enviar.
+        //
+        //  · amazo-sdr   → tag 'amazo-sdr'       (SDR via Amazô)
+        //  · linkdagua   → tags ['linkdagua', '🤖 sdr']  (Link d'Água / QR d'Água)
+        //  · sdr         → idem (payload simplificado)
+        //  · qualquer outro → 'Hub-lp' (formulário da landing page principal)
+        //
         let source: string;
         let tagsArray: string[];
         let originValue: string;
 
-        if (rawOrigin === 'amazo-sdr' || payload.process === 'amazo-sdr') {
+        const isAmazoSdr = rawOrigin === 'amazo-sdr' || rawProcess === 'amazo-sdr';
+
+        // Link d'Água: qualquer menção a 'linkdagua', 'link d'água', 'sdr' ou 'qrdagua'
+        const isLinkDagua =
+            rawOrigin.includes('linkdagua') ||
+            rawOrigin.includes("link d'água") ||
+            rawOrigin.includes('linkd') ||
+            rawOrigin === 'sdr' ||
+            rawOrigin === 'qrdagua' ||
+            rawProcess.includes('linkdagua') ||
+            rawProcess === 'sdr' ||
+            rawLandedVia.includes('linkdagua') ||
+            rawLandedVia.includes('qrdagua') ||
+            (payload.tags && Array.isArray(payload.tags) && payload.tags.some((t: string) =>
+                ['sdr', '🤖 sdr', 'linkdagua'].includes(String(t).toLowerCase())
+            ));
+
+        if (isAmazoSdr) {
             source      = 'amazo-sdr';
             tagsArray   = ['amazo-sdr'];
             originValue = 'amazo sdr';
-        } else if (
-            rawOrigin.includes('linkdagua') ||
-            rawOrigin.includes("link d'água") ||
-            (landedVia || '').toLowerCase().includes('linkdagua')
-        ) {
-                    source      = "Link d'Água";
+        } else if (isLinkDagua) {
+            source      = "Link d'Água";
             tagsArray   = ['linkdagua', '🤖 sdr'];
             originValue = 'lp linkdagua';
         } else {
