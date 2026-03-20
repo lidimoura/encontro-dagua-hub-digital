@@ -61,8 +61,8 @@ serve(async (req) => {
             rawOrigin.includes("link d'água") ||
             (landedVia || '').toLowerCase().includes('linkdagua')
         ) {
-            source      = "Link d'Água";
-            tagsArray   = ['linkdagua'];
+                    source      = "Link d'Água";
+            tagsArray   = ['linkdagua', '🤖 sdr'];
             originValue = 'lp linkdagua';
         } else {
             source      = 'LP do Hub';
