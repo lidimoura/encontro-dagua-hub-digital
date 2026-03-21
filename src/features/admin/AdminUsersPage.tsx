@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Edit2, Shield, Building2, Mail, UserCog } from 'lucide-react';
+import { Users, Edit2, Shield, Building2, Mail, UserCog, UserPlus, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
@@ -14,9 +14,9 @@ interface User {
     company_name?: string;
     is_super_admin: boolean;
     created_at: string;
-    plan?: 'free' | 'pro' | 'enterprise'; // God Mode: Plan management
-    status?: string; // God Mode: User status
-    access_level?: string[]; // God Mode: Access permissions
+    plan?: 'free' | 'pro' | 'enterprise';
+    status?: string;
+    access_level?: string[];
 }
 
 interface Company {
@@ -38,11 +38,35 @@ export const AdminUsersPage: React.FC = () => {
         role: 'vendedor' as 'admin' | 'vendedor',
         company_id: '',
         is_super_admin: false,
-        access_level: [] as string[], // GOD MODE: Access permissions
+        access_level: [] as string[],
     });
 
-    // Check if user is super admin
-    if (!profile?.is_super_admin) {
+    // ── Cadastro Direto de Usuário ─────────────────────────────────────────
+    const [showNewUserForm, setShowNewUserForm] = useState(false);
+    const [newUserData, setNewUserData] = useState({ name: '', email: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [creatingUser, setCreatingUser] = useState(false);
+
+    // ── Todos os hooks ANTES de qualquer return condicional ────────────────
+    useEffect(() => {
+        // Guard inside the effect — never before it
+        if (!profile?.is_super_admin) return;
+        fetchUsers();
+        fetchCompanies();
+    }, [profile?.is_super_admin]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Now it's safe to conditionally return — all hooks have been called above
+    // ─────────────────────────────────────────────────────────────────────────
+    if (!profile) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-acai-900" />
+            </div>
+        );
+    }
+
+    if (!profile.is_super_admin) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="text-center">
@@ -57,11 +81,6 @@ export const AdminUsersPage: React.FC = () => {
             </div>
         );
     }
-
-    useEffect(() => {
-        fetchUsers();
-        fetchCompanies();
-    }, []);
 
     const fetchUsers = async () => {
         try {
@@ -113,6 +132,77 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
+    // ── Cadastro Direto: Criar usuário via Supabase Auth + Profile ──────────
+    const handleCreateDirectUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newUserData.email || !newUserData.password || !newUserData.name) {
+            addToast('Preencha todos os campos', 'error');
+            return;
+        }
+        if (newUserData.password.length < 6) {
+            addToast('A senha deve ter pelo menos 6 caracteres', 'error');
+            return;
+        }
+
+        setCreatingUser(true);
+        try {
+            // 1. Criar no Auth do Supabase (Admin API via Edge Function ou direto)
+            const { data: authData, error: authError } = await supabase.auth.admin
+                ? // Se tivermos SDK admin, usamos ele
+                  ({ data: null, error: { message: 'use-invitations' } } as any)
+                : ({ data: null, error: { message: 'use-invitations' } } as any);
+
+            // Fallback: usar signUp normal (usuário confirma pelo e-mail)
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: newUserData.email,
+                password: newUserData.password,
+                options: {
+                    data: {
+                        full_name: newUserData.name,
+                    },
+                    // emailRedirectTo desabilita redirect automático em prod
+                    emailRedirectTo: `${window.location.origin}/#/login`,
+                },
+            });
+
+            if (signUpError) throw signUpError;
+
+            const userId = signUpData.user?.id;
+            if (!userId) throw new Error('Usuário criado mas ID não retornado');
+
+            // 2. Upsert no perfil (garante que o registro existe mesmo sem confirmação de e-mail)
+            const [firstName, ...rest] = newUserData.name.trim().split(' ');
+            const lastName = rest.join(' ') || null;
+
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({
+                    id: userId,
+                    email: newUserData.email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    role: 'vendedor',
+                    plan: 'free',
+                    discount_credits: 0,
+                }, { onConflict: 'id' });
+
+            if (profileError) {
+                console.warn('[AdminUsersPage] Profile upsert warning:', profileError.message);
+                // Não lança erro — o usuário Auth foi criado
+            }
+
+            addToast(`✅ Usuário ${newUserData.name} criado! Um e-mail de confirmação foi enviado para ${newUserData.email}.`, 'success');
+            setNewUserData({ name: '', email: '', password: '' });
+            setShowNewUserForm(false);
+            await fetchUsers();
+        } catch (error: any) {
+            console.error('[AdminUsersPage] Erro ao criar usuário:', error);
+            addToast(`Erro: ${error.message}`, 'error');
+        } finally {
+            setCreatingUser(false);
+        }
+    };
+
     const handleEdit = (user: User) => {
         setEditingUser(user);
         setFormData({
@@ -122,7 +212,7 @@ export const AdminUsersPage: React.FC = () => {
             role: user.role,
             company_id: user.company_id,
             is_super_admin: user.is_super_admin,
-            access_level: user.access_level || [], // GOD MODE
+            access_level: user.access_level || [],
         });
     };
 
@@ -130,7 +220,6 @@ export const AdminUsersPage: React.FC = () => {
         if (!editingUser) return;
 
         try {
-            // Update user via direct Supabase (includes access_level)
             const { error } = await supabase
                 .from('profiles')
                 .update({
@@ -140,7 +229,7 @@ export const AdminUsersPage: React.FC = () => {
                     role: formData.role,
                     company_id: formData.company_id,
                     is_super_admin: formData.is_super_admin,
-                    access_level: formData.access_level, // GOD MODE
+                    access_level: formData.access_level,
                 })
                 .eq('id', editingUser.id);
 
@@ -155,32 +244,24 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
-    // GOD MODE: Update user plan with automatic date calculation
     const handlePlanChange = async (userId: string, newPlan: 'free' | 'pro' | 'enterprise') => {
         try {
-            // Calculate valid_until based on plan
             let validUntil: string | null = null;
             const today = new Date();
 
             if (newPlan === 'pro') {
-                // Monthly: +30 days
                 const monthlyDate = new Date(today);
                 monthlyDate.setDate(monthlyDate.getDate() + 30);
                 validUntil = monthlyDate.toISOString();
             } else if (newPlan === 'enterprise') {
-                // Annual: +365 days
                 const annualDate = new Date(today);
                 annualDate.setDate(annualDate.getDate() + 365);
                 validUntil = annualDate.toISOString();
             }
-            // free = lifetime = null (no expiration)
 
             const { error } = await supabase
                 .from('profiles')
-                .update({
-                    plan: newPlan,
-                    valid_until: validUntil // Automatic date
-                })
+                .update({ plan: newPlan, valid_until: validUntil })
                 .eq('id', userId);
 
             if (error) throw error;
@@ -189,7 +270,7 @@ export const AdminUsersPage: React.FC = () => {
                 ? ` até ${new Date(validUntil).toLocaleDateString('pt-BR')}`
                 : ' (sem expiração)';
             addToast(`Plano atualizado para ${newPlan.toUpperCase()}${dateMsg}`, 'success');
-            fetchUsers(); // Refresh list
+            fetchUsers();
         } catch (error: any) {
             addToast(`Erro ao atualizar plano: ${error.message}`, 'error');
         }
@@ -207,9 +288,6 @@ export const AdminUsersPage: React.FC = () => {
         <div className="p-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-4xl font-black text-red-600 mb-4 border-4 border-red-600 p-4 bg-yellow-200">
-                    ⚠️ ATUALIZAÇÃO CONFIRMADA - VERSÃO SEM MODAL ⚠️
-                </h1>
                 <div className="flex items-center gap-3 mb-2">
                     <UserCog className="w-8 h-8 text-acai-900" />
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -221,55 +299,103 @@ export const AdminUsersPage: React.FC = () => {
                 </p>
             </div>
 
-            {/* INLINE INVITE GENERATOR - MOBILE FRIENDLY */}
-            <div className="mb-8 bg-white dark:bg-rionegro-950 rounded-xl shadow-lg border border-slate-200 dark:border-rionegro-800 p-6">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">🔗 Gerar Convite</h3>
-
-                <div className="space-y-4">
-                    <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            try {
-                                // Generate unique token
-                                const token = crypto.randomUUID();
-
-                                // Insert into company_invites
-                                const { error } = await supabase
-                                    .from('company_invites')
-                                    .insert({
-                                        token,
-                                        email: null,
-                                        offer_discount: false,
-                                        expires_at: null,
-                                    });
-
-                                if (error) throw error;
-
-                                // Generate link
-                                const inviteLink = `https://encontro-dagua-hub.vercel.app/#/join?token=${token}`;
-
-                                // MOBILE-FRIENDLY: Use window.prompt (works 100% on mobile)
-                                window.prompt("✅ CONVITE GERADO! Copie o link:", inviteLink);
-
-                                addToast('Convite gerado com sucesso!', 'success');
-                            } catch (error: any) {
-                                addToast(`Erro: ${error.message}`, 'error');
-                            }
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.currentTarget.click();
-                            }
-                        }}
-                        className="cursor-pointer w-full px-6 py-3 bg-acai-900 hover:bg-acai-800 text-white text-center rounded-lg font-bold transition-colors select-none"
-                    >
-                        GERAR CONVITE (ANTI-REFRESH)
+            {/* ── CADASTRO DIRETO ─────────────────────────────────────────── */}
+            <div className="mb-8 bg-white dark:bg-rionegro-950 rounded-xl shadow-lg border border-slate-200 dark:border-rionegro-800 overflow-hidden">
+                <button
+                    type="button"
+                    onClick={() => setShowNewUserForm(v => !v)}
+                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-rionegro-900 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center">
+                            <UserPlus className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                            <p className="font-bold text-slate-900 dark:text-white">Cadastro Direto de Usuário</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Crie a conta de Amanda e das sócias sem precisar de link</p>
+                        </div>
                     </div>
-                </div>
+                    <span className="text-2xl text-slate-400">{showNewUserForm ? '−' : '+'}</span>
+                </button>
+
+                {showNewUserForm && (
+                    <div className="px-6 pb-6 border-t border-slate-100 dark:border-rionegro-800">
+                        <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mt-4 mb-4">
+                            ⚠️ Um e-mail de confirmação será enviado. Peça à Amanda para clicar no link antes de fazer login.
+                        </p>
+                        <form onSubmit={handleCreateDirectUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Nome completo
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newUserData.name}
+                                    onChange={e => setNewUserData({ ...newUserData, name: e.target.value })}
+                                    placeholder="Ex: Amanda Silva"
+                                    required
+                                    className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    E-mail
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                                    <input
+                                        type="email"
+                                        value={newUserData.email}
+                                        onChange={e => setNewUserData({ ...newUserData, email: e.target.value })}
+                                        placeholder="amanda@email.com"
+                                        required
+                                        className="flex-1 px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Senha temporária
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={newUserData.password}
+                                        onChange={e => setNewUserData({ ...newUserData, password: e.target.value })}
+                                        placeholder="Mínimo 6 caracteres"
+                                        required
+                                        minLength={6}
+                                        className="w-full px-4 py-2 pr-10 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(v => !v)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={creatingUser}
+                                className="w-full py-3 px-4 bg-acai-900 hover:bg-acai-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
+                            >
+                                {creatingUser ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Criando usuário...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserPlus className="w-4 h-4" />
+                                        Criar Usuário
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                )}
             </div>
 
             {/* Users Grid */}
@@ -294,9 +420,6 @@ export const AdminUsersPage: React.FC = () => {
                                     💎 Plano
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                                    🎛️ Acessos
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                                     Ações
                                 </th>
                             </tr>
@@ -316,7 +439,7 @@ export const AdminUsersPage: React.FC = () => {
                                                 <div className="font-medium text-slate-900 dark:text-white">
                                                     {user.first_name && user.last_name
                                                         ? `${user.first_name} ${user.last_name}`
-                                                        : 'Sem nome'}
+                                                        : user.first_name || 'Sem nome'}
                                                 </div>
                                                 {user.is_super_admin && (
                                                     <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
@@ -349,7 +472,6 @@ export const AdminUsersPage: React.FC = () => {
                                             {user.company_name}
                                         </div>
                                     </td>
-                                    {/* GOD MODE: Plan Selector */}
                                     <td className="px-6 py-4">
                                         <select
                                             value={user.plan || 'free'}
@@ -360,20 +482,6 @@ export const AdminUsersPage: React.FC = () => {
                                             <option value="pro">Pro</option>
                                             <option value="enterprise">Enterprise</option>
                                         </select>
-                                    </td>
-                                    {/* GOD MODE: Access Badges */}
-                                    <td className="px-6 py-4">
-                                        <div className="flex gap-2">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" title="Prompt Lab">
-                                                🤖
-                                            </span>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" title="QR Code">
-                                                📱
-                                            </span>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" title="CRM">
-                                                📊
-                                            </span>
-                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <button
@@ -386,6 +494,13 @@ export const AdminUsersPage: React.FC = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {users.length === 0 && (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                        Nenhum usuário encontrado.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -400,24 +515,8 @@ export const AdminUsersPage: React.FC = () => {
                         </h2>
 
                         <div className="space-y-4">
-                            {/* Email */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white"
-                                />
-                            </div>
-
-                            {/* First Name */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Nome
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome</label>
                                 <input
                                     type="text"
                                     value={formData.first_name}
@@ -425,12 +524,8 @@ export const AdminUsersPage: React.FC = () => {
                                     className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white"
                                 />
                             </div>
-
-                            {/* Last Name */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Sobrenome
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Sobrenome</label>
                                 <input
                                     type="text"
                                     value={formData.last_name}
@@ -438,34 +533,25 @@ export const AdminUsersPage: React.FC = () => {
                                     className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white"
                                 />
                             </div>
-
-                            {/* Role */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Role
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Role</label>
                                 <select
                                     value={formData.role}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, role: e.target.value as 'admin' | 'vendedor' })
-                                    }
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'vendedor' })}
                                     className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white"
                                 >
                                     <option value="vendedor">Vendedor</option>
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
-
-                            {/* Company */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Empresa
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Empresa</label>
                                 <select
                                     value={formData.company_id}
                                     onChange={(e) => setFormData({ ...formData, company_id: e.target.value })}
                                     className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg focus:ring-2 focus:ring-acai-900 focus:border-transparent text-slate-900 dark:text-white"
                                 >
+                                    <option value="">— Sem empresa —</option>
                                     {companies.map((company) => (
                                         <option key={company.id} value={company.id}>
                                             {company.name}
@@ -473,28 +559,20 @@ export const AdminUsersPage: React.FC = () => {
                                     ))}
                                 </select>
                             </div>
-
-                            {/* Super Admin */}
                             <div className="flex items-center gap-3">
                                 <input
                                     type="checkbox"
                                     id="is_super_admin"
                                     checked={formData.is_super_admin}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, is_super_admin: e.target.checked })
-                                    }
+                                    onChange={(e) => setFormData({ ...formData, is_super_admin: e.target.checked })}
                                     className="w-5 h-5 text-acai-900 bg-slate-50 dark:bg-rionegro-900 border-slate-300 dark:border-rionegro-700 rounded focus:ring-acai-900"
                                 />
-                                <label
-                                    htmlFor="is_super_admin"
-                                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                                >
+                                <label htmlFor="is_super_admin" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Super Admin (acesso global)
                                 </label>
                             </div>
                         </div>
 
-                        {/* Actions */}
                         <div className="flex gap-3 mt-6">
                             <button
                                 onClick={() => setEditingUser(null)}

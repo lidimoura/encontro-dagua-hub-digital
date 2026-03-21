@@ -170,7 +170,7 @@ export const DealCard: React.FC<DealCardProps> = ({
         {deal.title}
       </h4>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
-        <Building2 size={10} /> {deal.companyName}
+        <Building2 size={10} /> {deal?.companyName || 'Sem empresa'}
       </p>
 
       {/* Cross-App QR Engagement Badge */}

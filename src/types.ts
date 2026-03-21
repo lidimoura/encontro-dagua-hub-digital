@@ -78,6 +78,7 @@ export interface Contact {
     totalValue?: number;
     avatar?: string;
     source?: string;
+    tags?: string[];                // ← DB tags (🤖 sdr, linkdagua, etc.) — required for isDemoVisible
     notes?: string;
     birthDate?: string;
     lastInteraction?: string;

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Copy, Check } from 'lucide-react';
+
+const STORAGE_KEY = 'crm_ultimo_convite';
 
 interface InviteGeneratorProps {
     onInviteGenerated?: () => void;
@@ -11,54 +12,77 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
     const { t } = useTranslation();
     const [generatedLink, setGeneratedLink] = useState('');
     const [copied, setCopied] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const [error, setError] = useState('');
+    // ref to avoid stale closure in async
+    const generatingRef = useRef(false);
 
-    const generateInvite = async () => {
-        // LOBOTOMY: Pure JavaScript, NO React states, NO modal
-        document.body.style.cursor = 'wait';
+    // ── Recupera o último link ao montar (sobrevive a refresh/piscar) ──────
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) setGeneratedLink(saved);
+        } catch (_) { /* localStorage indisponível — sem problema */ }
+    }, []);
+
+    const generateInvite = async (e?: React.SyntheticEvent) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (generatingRef.current) return;
+        generatingRef.current = true;
+        setGenerating(true);
+        setError('');
 
         try {
-            // Generate unique token
             const token = crypto.randomUUID();
 
-            // Insert into company_invites table
-            const { error } = await supabase
+            const { error: dbError } = await supabase
                 .from('company_invites')
-                .insert({
-                    token,
-                    email: null,
-                    offer_discount: false,
-                    expires_at: null,
-                });
+                .insert({ token, email: null, offer_discount: false, expires_at: null });
 
-            document.body.style.cursor = 'default';
+            if (dbError) throw dbError;
 
-            if (error) throw error;
+            const link = `${window.location.origin}/#/join?token=${token}`;
 
-            // Generate invite link (dynamic domain)
-            const inviteLink = `${window.location.origin}/#/join?token=${token}`;
-            
-            setGeneratedLink(inviteLink);
+            // ── Persiste no localStorage ANTES de atualizar o state ────────
+            try { localStorage.setItem(STORAGE_KEY, link); } catch (_) {}
+
+            setGeneratedLink(link);
             setCopied(false);
 
+            // Auto-copy (best-effort)
+            navigator.clipboard.writeText(link)
+                .then(() => { setCopied(true); setTimeout(() => setCopied(false), 3000); })
+                .catch(() => {});
+
             onInviteGenerated?.();
-        } catch (error: any) {
-            document.body.style.cursor = 'default';
-            alert('Falha ao gerar convite: ' + error.message);
+        } catch (err: any) {
+            setError('Falha: ' + (err?.message || 'Erro desconhecido'));
+        } finally {
+            setGenerating(false);
+            generatingRef.current = false;
         }
     };
 
-    const handleCopy = () => {
+    const handleCopy = (e: React.MouseEvent) => {
+        e.preventDefault(); e.stopPropagation();
         if (!generatedLink) return;
-        navigator.clipboard.writeText(generatedLink);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        navigator.clipboard.writeText(generatedLink)
+            .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500); })
+            .catch(() => {});
+    };
+
+    const handleClear = (e: React.MouseEvent) => {
+        e.preventDefault(); e.stopPropagation();
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        setGeneratedLink('');
+        setCopied(false);
     };
 
     return (
         <div className="bg-white dark:bg-rionegro-900 rounded-2xl shadow-xl border border-solimoes-400/20 dark:border-solimoes-400/10 p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl flex items-center justify-center">
-                    <span className="text-white text-xl">📧</span>
+                    <span className="text-white text-xl">🔗</span>
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -70,44 +94,92 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                 </div>
             </div>
 
-            {/* LOBOTOMY: Pure div button, NO form, NO modal */}
-            <div
-                role="button"
-                tabIndex={0}
+            {/* Botão principal — NUNCA dentro de um form */}
+            <button
+                type="button"
                 onClick={generateInvite}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        generateInvite();
-                    }
-                }}
-                className="cursor-pointer w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-acai-900/20 text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 transition-all active:scale-[0.98] select-none"
+                disabled={generating}
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-acai-900 hover:bg-acai-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-                {t('generateInviteButton')}
-            </div>
+                {generating ? '⏳ Gerando...' : (generatedLink ? '🔄 Gerar Novo Link' : t('generateInviteButton'))}
+            </button>
 
+            {error && (
+                <p className="mt-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2">
+                    {error}
+                </p>
+            )}
+
+            {/* CARD VERDE FIXO — persiste via localStorage mesmo após refresh */}
             {generatedLink && (
-                <div className="mt-4 p-4 bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl space-y-2 animate-in fade-in zoom-in-95 duration-200">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Link de Convite</p>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            readOnly
-                            value={generatedLink}
-                            className="flex-1 bg-white dark:bg-rionegro-900 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none"
-                            onClick={(e) => e.currentTarget.select()}
-                        />
+                <div
+                    style={{
+                        marginTop: 16,
+                        border: '2px solid #22c55e',
+                        borderRadius: 14,
+                        padding: 16,
+                        background: 'rgba(34,197,94,0.08)',
+                    }}
+                >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: '#16a34a' }}>
+                            ✅ Link de Convite {copied ? '— Copiado!' : 'Gerado'}
+                        </span>
                         <button
-                            onClick={handleCopy}
-                            className={`flex items-center justify-center p-2 rounded-lg transition-colors ${
-                                copied 
-                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
-                                    : 'bg-primary-100 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800/40'
-                            }`}
-                            title="Copiar Link"
+                            type="button"
+                            onClick={handleClear}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}
+                            title="Descartar link"
                         >
-                            {copied ? <Check size={18} /> : <Copy size={18} />}
+                            ✕
                         </button>
                     </div>
+
+                    <div
+                        style={{
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                            background: 'rgba(0,0,0,0.07)',
+                            borderRadius: 8,
+                            padding: '8px 12px',
+                            marginBottom: 12,
+                            wordBreak: 'break-all',
+                            userSelect: 'all',
+                            cursor: 'text',
+                            color: '#1e293b',
+                        }}
+                        onClick={(e) => {
+                            const range = document.createRange();
+                            range.selectNodeContents(e.currentTarget);
+                            window.getSelection()?.removeAllRanges();
+                            window.getSelection()?.addRange(range);
+                        }}
+                    >
+                        {generatedLink}
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleCopy}
+                        style={{
+                            width: '100%',
+                            padding: '10px 0',
+                            borderRadius: 8,
+                            border: 'none',
+                            fontWeight: 700,
+                            fontSize: 14,
+                            cursor: 'pointer',
+                            background: copied ? '#16a34a' : '#1e3a5f',
+                            color: 'white',
+                            transition: 'background 0.15s',
+                        }}
+                    >
+                        {copied ? '✅ Copiado!' : '📋 Copiar Link'}
+                    </button>
+
+                    <p style={{ textAlign: 'center', fontSize: 11, color: '#64748b', marginTop: 6 }}>
+                        Envie para a Amanda pelo WhatsApp. O link expira quando ela criar a conta.
+                    </p>
                 </div>
             )}
         </div>
