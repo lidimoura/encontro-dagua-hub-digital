@@ -26,6 +26,7 @@ export interface DbContact {
   status: string;
   stage: string;
   source: string | null;
+  tags: string[] | null;          // ← CRITICAL: required for isDemoVisible filter
   birth_date: string | null;
   last_interaction: string | null;
   last_purchase_date: string | null;
@@ -71,6 +72,7 @@ const transformContact = (db: DbContact): Contact => ({
   status: db.status as Contact['status'],
   stage: db.stage,
   source: db.source as Contact['source'] || undefined,
+  tags: db.tags || [],            // ← tags now flow through to isDemoVisible()
   birthDate: db.birth_date || undefined,
   lastInteraction: db.last_interaction || undefined,
   lastPurchaseDate: db.last_purchase_date || undefined,

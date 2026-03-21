@@ -13,6 +13,7 @@ import { contactsService, companiesService } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import type { Contact, ContactStage, Company } from '@/types';
+import { isDemoVisible } from '@/lib/appConfig';
 
 // ============ QUERY HOOKS ============
 
@@ -41,6 +42,15 @@ export const useContacts = (filters?: ContactsFilters) => {
       if (error) throw error;
 
       let contacts = data || [];
+
+      // ── PRIVACIDADE ESTRITA (branch provadagua) ────────────────────────
+      // Critérios: email exato lidi@teste.com | telefone 0000000000 | tags permitidas
+      // Na main: todos os contatos são visíveis sem filtro.
+      contacts = contacts.filter(contact => isDemoVisible({
+        tags:  contact.tags,
+        email: contact.email,
+        phone: (contact as any).phone,
+      }));
 
       // Apply client-side filters
       if (filters) {
