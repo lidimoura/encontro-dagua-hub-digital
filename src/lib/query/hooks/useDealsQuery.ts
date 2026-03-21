@@ -277,7 +277,7 @@ export const useDealsByBoard = (boardId: string) => {
           const contact = contactCache.get(deal.contactId);
           if (!contact) return false;
           return isDemoVisible({
-            tags:  (contact as any).tags,
+            tags:  contact.tags, // Fixed: use real tags array
             email: contact.email,
             phone: (contact as any).phone,
           });

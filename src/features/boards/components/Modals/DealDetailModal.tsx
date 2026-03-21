@@ -11,6 +11,7 @@ import {
   generateWAOutreach,
 } from '@/services/geminiService';
 import {
+  Building2,
   BrainCircuit,
   Mail,
   Phone,
@@ -95,6 +96,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     moveDeal,
     updateDeal,
     deleteDeal,
+    addActivity,
     activities,
     updateActivity,
     deleteActivity,
@@ -657,7 +659,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                   <Building2 size={14} /> Empresa (Conta)
                 </h3>
                 <select
-                  value={deal.companyId || ''}
+                  value={deal?.companyId || ''}
                   onChange={(e) => updateDeal(deal.id, { companyId: e.target.value })}
                   className="w-full text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
                 >
