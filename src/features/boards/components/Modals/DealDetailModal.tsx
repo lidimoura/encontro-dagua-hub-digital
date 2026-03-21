@@ -11,7 +11,6 @@ import {
   generateWAOutreach,
 } from '@/services/geminiService';
 import {
-  Building2,
   BrainCircuit,
   Mail,
   Phone,
