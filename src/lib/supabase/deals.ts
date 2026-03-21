@@ -105,11 +105,8 @@ export const dealsService = {
       let dealsQuery = supabase.from('deals').select('*').order('created_at', { ascending: false });
 
       // On provadagua: no company_id restriction (QA leads have null company_id)
-      // On main: always filter by company_id
-      if (companyId && !isProvadagua) {
-        dealsQuery = dealsQuery.eq('company_id', companyId);
-      } else if (companyId && isProvadagua) {
-        // Allow own company deals OR null (QA/webhook leads)
+      // On both main and provadagua: allow own company deals OR null (QA/webhook leads)
+      if (companyId) {
         dealsQuery = dealsQuery.or(`company_id.eq.${companyId},company_id.is.null`);
       }
 
