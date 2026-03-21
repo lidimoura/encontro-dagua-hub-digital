@@ -97,7 +97,6 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     moveDeal,
     updateDeal,
     deleteDeal,
-    addActivity,
     activities,
     addActivity,
     updateActivity,
