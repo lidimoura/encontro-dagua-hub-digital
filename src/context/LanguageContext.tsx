@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { translations, Language } from '@/lib/translations';
+import { DEFAULT_LANG } from '@/lib/appConfig';
 
 interface LanguageContextType {
     language: Language;
@@ -10,8 +11,9 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // On PROVADAGUA branch, we FORCE English 100%
-    const [language, setLanguageState] = useState<Language>('en');
+    // Use DEFAULT_LANG from appConfig (driven by VITE_APP_MODE env var):
+    // DEMO → 'en'  |  PRODUCTION → 'pt'
+    const [language, setLanguageState] = useState<Language>(DEFAULT_LANG);
 
     // Translation function
     const t = (key: string): string => {
