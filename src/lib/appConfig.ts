@@ -1,44 +1,45 @@
 /**
  * appConfig.ts — Configuração de contexto por branch
  *
- * main (hub.encontrodagua.com):
- *   - IS_DEMO = false
- *   - APP_TITLE = "Hub Encontro d'água"
- *   - DEFAULT_LANG = 'pt'
- *   - Dados: acesso total a todos os leads
+ * Controlado pela variável de ambiente VITE_APP_MODE:
  *
- * provadagua (prova.encontrodagua.com):
- *   - IS_DEMO = true
- *   - APP_TITLE = "Prova d'água Hub"
- *   - DEFAULT_LANG = 'en'
- *   - Dados: filtro de privacidade estrito (apenas leads test/QA/Lilas/Gamer pc/00000)
+ *   VITE_APP_MODE=DEMO       → Inglês, Modo Demo, filtros de privacidade ATIVADOS
+ *                               (usado em prova.encontrodagua.com)
  *
- * Detecção via hostname (sem necessidade de variáveis de build extras).
+ *   VITE_APP_MODE=PRODUCTION → Português, dados reais, TODOS os leads visíveis
+ *                               (usado em hub.encontrodagua.com)
+ *
+ * Fallback: se a variável não estiver definida, usa detecção por hostname.
  */
 
-const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+const appMode = import.meta.env.VITE_APP_MODE as string | undefined;
 
-export const IS_DEMO = hostname.includes('prova.encontrodagua.com');
+// Primary: use env var; Secondary: hostname fallback for local dev
+const _isDemo = appMode
+  ? appMode === 'DEMO'
+  : (typeof window !== 'undefined' && window.location.hostname.includes('prova.encontrodagua.com'));
+
+export const IS_DEMO = _isDemo;
 
 export const APP_TITLE = IS_DEMO ? "Prova d'água Hub" : "Hub Encontro d'água";
 
 export const DEFAULT_LANG: 'pt' | 'en' = IS_DEMO ? 'en' : 'pt';
 
 /**
- * Critérios ESTRITOS permitidos na branch provadagua.
+ * Critérios ESTRITOS permitidos no modo DEMO (branch provadagua).
  * Qualquer contato/deal que NÃO satisfaça pelo menos um critério será ocultado.
  *
- * Email exato:     lidi@teste.com
- * Telefone exato:  0000000000
- * Tags permitidas: test | QA | Gamer pc | Lilas | amazo-sdr
+ * Email:  lidi@teste.com
+ * Fone:   0000000000
+ * Tags:   test | QA | Gamer pc | Lilas | amazo-sdr | 🤖 sdr
  */
 export const DEMO_ALLOWED_EMAILS   = ['lidi@teste.com'];
 export const DEMO_ALLOWED_PHONES   = ['0000000000'];
 export const DEMO_ALLOWED_TAGS     = ['test', 'QA', 'Gamer pc', 'Lilas', 'amazo-sdr', '🤖 sdr'];
 
 /**
- * Retorna true se um contato deve ser exibido na branch provadagua.
- * Na main, sempre retorna true (sem filtro).
+ * Retorna true se um contato deve ser exibido.
+ * No modo PRODUCTION, sempre retorna true (sem filtro).
  */
 export function isDemoVisible(contact: {
     tags?: string[] | null;
