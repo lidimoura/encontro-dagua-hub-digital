@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/services/ai/bilingualService';
 import { useCRMAgent } from '@/features/ai-hub/hooks/useCRMAgent';
+import { IS_DEMO, isDemoVisible } from '@/lib/appConfig';
 import jsPDF from 'jspdf';
 import ReactMarkdown from 'react-markdown';
 
@@ -146,10 +147,23 @@ export const JuryAgent: React.FC<JuryAgentProps> = ({ boardId, dealId }) => {
         const fetchDeals = async () => {
             const { data } = await supabase
                 .from('deals')
-                .select('id, title, value')
+                .select('id, title, value, contact_id, contacts(email, phone, tags)')
                 .order('created_at', { ascending: false })
                 .limit(50);
-            if (data) setAvailableDeals(data);
+            if (data) {
+                // On DEMO branch, filter deals to only show test/QA data
+                const filtered = IS_DEMO
+                    ? data.filter((d: any) => {
+                        const c = d.contacts as any;
+                        return isDemoVisible({
+                            email: c?.email,
+                            phone: c?.phone,
+                            tags: c?.tags,
+                        });
+                    })
+                    : data;
+                setAvailableDeals(filtered.map((d: any) => ({ id: d.id, title: d.title, value: d.value })));
+            }
         };
         fetchDeals();
     }, []);

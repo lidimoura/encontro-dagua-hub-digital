@@ -264,9 +264,28 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         };
 
         try {
-            const { error } = await supabase
+            // Check if a product with this name already exists (avoid 42P10: no unique constraint on 'name')
+            const { data: existing } = await supabase
                 .from('products')
-                .upsert([productData], { onConflict: 'name', ignoreDuplicates: false });
+                .select('id')
+                .eq('name', productData.name)
+                .maybeSingle();
+
+            let error: any = null;
+            if (existing?.id) {
+                // Update existing product
+                const { error: updateError } = await supabase
+                    .from('products')
+                    .update(productData)
+                    .eq('id', existing.id);
+                error = updateError;
+            } else {
+                // Insert new product
+                const { error: insertError } = await supabase
+                    .from('products')
+                    .insert([productData]);
+                error = insertError;
+            }
 
             if (error) throw error;
             addToast(t('productSaved') || `"${productName}" salvo no catálogo (${currency})!`, 'success');
