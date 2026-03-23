@@ -1,93 +1,85 @@
-# 🌀 Encontro D'água Hub
+# Encontro d'Água Hub — CRM de Produção
 
-> **Accessible technology, real results.**
-> _Tecnologia acessível, resultados reais._
-
-**Encontro D'água Hub** is a Bilingual Enterprise SaaS that integrates Human Strategy with AI Efficiency.
-More than a CRM, it's a **Nexus** — the central point where Leads, Deals, and AI Agents meet.
-
-[![Status](https://img.shields.io/badge/Status-Beta%20Launch-brightgreen)](HUB_SHOWCASE.md)
-[![Stack](https://img.shields.io/badge/Stack-React%20%7C%20Supabase%20%7C%20Gemini-blue)](package.json)
-[![Main Language](https://img.shields.io/badge/Language-EN-yellow)](src/context/LanguageContext.tsx)
-
-## 🏆 Credits & Evolution
-
-- **Core CRM Architecture:** Provided by **Thales Laray** (Automation School - Lifetime Access).
-- **Evolved by:** **Lidi Moura** (Nexus Protocol, AI Agents, Link d'Água integration).
-- **Powered by:** **Deepmind Antigravity Agent**.
-
-## 📖 The Journey
-
-From a Celeron laptop running Streamlit to a cloud-native Enterprise System.
-👉 **[Read the Founder's Journey (HUB_SHOWCASE.md)](HUB_SHOWCASE.md)** to understand our "Dogfooding" strategy and the evolution of AI Agents.
+> **Branch `main` → hub.encontrodagua.com**
+> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
 
 ---
 
-## Recent Stability Status (March 2026)
-* Fixed Link d'Água webhook (restoring `amazo-sdr` identity) and Edge Functions sync.
-* Correct visual math applied in PrecyAgent (`step="any"`).
-* "Convert" button re-installed on DealCard.
-* Restored persistence in SDR Board columns (avoiding RLS failures on global template boards).
-* Implemented Privacy Filter (Query Firewall by hostname) for `prova.encontrodagua.com`.
+## 🚀 Sobre o Hub
 
-## 🚀 Key Features
-
-### 1. Link d'Água — The Digital Showcase (Core Product)
-A powerful "Link in Bio" and QR Code generator that feeds directly into the CRM.
-- **Smart Links:** Bridge Pages that capture lead intent.
-- **Deep Integration:** Scans instantly become Leads on the Kanban.
-- **SVG QR Codes:** Vectorial, sharp on any screen, ready for professional printing.
-
-## Status de Estabilidade Recente (Março de 2026)
-* Correção do webhook do Link d'Água (restaurando identidade `amazo-sdr`) e integração de Edge Functions.
-* Matemáica visual correta no PrecyAgent (`step="any"`).
-* Botão "Converter" reinstalado no DealCard.
-* Restauração da persistência nas colunas do Board SDR (evitadas falhas RLS em boards templates globais).
-* Implementação do Filtro de Privacidade (Firewall de Queries pelo hostname) para `prova.encontrodagua.com`.
-
-### 2. The AI Squad (The Engine)
-- **Amazô (External CS):** 24/7 sales/support agent on the Landing Page.
-- **Mazô (Internal CS):** Monitors client health and "rotting" deals.
-- **Jury (Legal):** Generates bilingual contracts (PT/EN) with jurisdiction awareness.
-- **Precy (Financial):** Multicurrency pricing and ROI calculation.
-
-### 3. Enterprise CRM (The Core)
-- **Kanban Board:** Drag-and-drop management with "Rotting" indicators.
-- **Lead Briefing:** SDR's `briefing_json` displayed on the Products tab (services of interest), Timeline (automatic bot note) and sidebar (direct WhatsApp button).
-- **WhatsApp + AI:** Button that generates a personalized message via Gemini and opens a pre-filled `wa.me?text=` — editable before sending.
-- **Ghost Deal Protection:** Robust data integrity checks.
-- **Bilingual Interface:** EN as main language on the provadagua branch.
+O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Água. Centraliza todos os leads reais capturados via Link d'Água (webhook WhatsApp/Typebot), gerencia os deals no Board Kanban e automatiza o follow-up com a IA Mazô.
 
 ---
 
-## 🛠️ Stack & Architecture
+## ✨ Funcionalidades Principais
 
-- **Frontend:** React 18, TypeScript, TailwindCSS.
-- **Backend:** Supabase (PostgreSQL, Auth, Multitenant RLS).
-- **AI:** Google Gemini 2.5 Flash Lite (via `geminiService.ts`).
-- **I18n:** Custom `useTranslation` hook.
+| Módulo | Descrição |
+|---|---|
+| **Board Kanban** | Leads SDR (`🤖 sdr`) aparecem no primeiro estágio automaticamente |
+| **Contatos** | Todos os leads reais sincronizados — sem filtro de privacidade |
+| **Atividades / Inbox** | Tarefas e compromissos reais com briefing da Mazô |
+| **Mazô (IA)** | Agente de vendas com contexto completo dos leads |
+| **Jury (IA)** | Geração de contratos com visualização de PDF |
+| **Precy (IA)** | Precificação em BRL/USD/EUR com conversão automática |
+| **QRDágua** | Geração e gestão de QR Codes / Cartões Digitais |
+| **Catálogo** | Produtos salvos em BRL (preço canônico) |
+| **Reports** | Top Oportunidades, ciclo de vendas, win/loss real |
 
-### Installation
+---
 
-```bash
-# 1. Clone & Install
-git clone [repo-url]
-npm install
+## 🛠️ Stack
 
-# 2. Environment Variables
+- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
+- **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
+- **IA**: Google Gemini (principal), OpenAI, Anthropic
+- **Deploy**: Vercel (branch `main` → `hub.encontrodagua.com`)
+- **Webhook SDR**: Supabase Edge Function `form-lp-lead`
+
+---
+
+## ⚙️ Variáveis de Ambiente
+
+```env
+VITE_APP_MODE=PRODUCTION
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 VITE_GEMINI_API_KEY=...
-
-# 3. Run
-npm run dev
 ```
-
-## 🔒 Security & Access
-**Private** Repository and **Invite-Only** SaaS.
-Access managed via "Nexus Protocol" (Role-Based Access Control with Supabase RLS).
 
 ---
 
-*Built with ❤️ by Lidi Moura.*
-*Powered by Deepmind Antigravity.*
+## 🔑 Fluxo SDR (Link d'Água → Board)
+
+1. Lead preenche formulário no Typebot / WhatsApp
+2. Webhook `form-lp-lead` chama `capture_amazo_lead` no Supabase
+3. Contato criado com tag `🤖 sdr`
+4. Board auto-mapeia o contato para o **primeiro estágio**
+5. Mazô analisa e sugere follow-up no Inbox
+
+---
+
+## 🏗️ Estrutura
+
+```
+src/
+  features/       # Pages e módulos (boards, contacts, admin, ...)
+  lib/
+    supabase/     # Services com IS_DEMO guards
+    query/hooks/  # TanStack Query hooks
+    appConfig.ts  # IS_DEMO = false em PRODUCTION
+  hooks/
+    useTranslation.ts  # i18n (pt-BR padrão em PRODUCTION)
+```
+
+---
+
+## 📦 Deploy
+
+```bash
+git push origin main
+# Vercel detecta e faz build automático → hub.encontrodagua.com
+```
+
+---
+
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI*

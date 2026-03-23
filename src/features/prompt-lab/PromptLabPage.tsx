@@ -4,6 +4,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useToast } from '@/context/ToastContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
+import { IS_DEMO } from '@/lib/appConfig';
+
 
 type Persona = 'software-engineer' | 'product-manager' | 'data-scientist' | 'designer' | 'marketer' | 'teacher' | 'bot-architect' | 'llm-trainer' | 'web-architect';
 
@@ -132,6 +134,8 @@ Agora, gere o prompt perfeito:`;
     };
 
     const fetchSavedPrompts = async () => {
+        // DEMO branch: no real saved prompts shown — fresh CRM sandbox
+        if (IS_DEMO) { setSavedPrompts([]); return; }
         setIsLoadingSaved(true);
         try {
             const { data, error } = await supabase
@@ -152,6 +156,16 @@ Agora, gere o prompt perfeito:`;
     const handleSavePrompt = async () => {
         if (!saveTitle.trim()) {
             showToast(t('insertTitle'), 'error');
+            return;
+        }
+        // DEMO branch: save to localStorage only, do not write to shared DB
+        if (IS_DEMO) {
+            const demoSaved = JSON.parse(localStorage.getItem('demo_saved_prompts') || '[]');
+            demoSaved.unshift({ id: crypto.randomUUID(), title: saveTitle, raw_idea: rawIdea, optimized_prompt: optimizedPrompt, persona: selectedPersona, tags: saveTags.split(',').map(t => t.trim()).filter(Boolean) });
+            localStorage.setItem('demo_saved_prompts', JSON.stringify(demoSaved.slice(0, 20)));
+            setSavedPrompts(demoSaved.slice(0, 20));
+            showToast(t('promptSavedSuccess'), 'success');
+            setShowSaveModal(false); setSaveTitle(''); setSaveTags('');
             return;
         }
 
@@ -196,7 +210,14 @@ Agora, gere o prompt perfeito:`;
 
     const handleDeletePrompt = async (id: string) => {
         if (!confirm(t('confirmDeletePrompt'))) return;
-
+        // DEMO branch: delete from localStorage only
+        if (IS_DEMO) {
+            const demoSaved = JSON.parse(localStorage.getItem('demo_saved_prompts') || '[]').filter((p: any) => p.id !== id);
+            localStorage.setItem('demo_saved_prompts', JSON.stringify(demoSaved));
+            setSavedPrompts(demoSaved);
+            showToast(t('promptDeleted'), 'success');
+            return;
+        }
         try {
             const { error } = await supabase
                 .from('saved_prompts')
@@ -212,6 +233,7 @@ Agora, gere o prompt perfeito:`;
             showToast(t('errorDeleting'), 'error');
         }
     };
+
 
     const loadSavedPrompt = (prompt: any) => {
         setRawIdea(prompt.raw_idea);
