@@ -146,21 +146,16 @@ export const AdminUsersPage: React.FC = () => {
 
         setCreatingUser(true);
         try {
-            // 1. Criar no Auth do Supabase (Admin API via Edge Function ou direto)
-            const { data: authData, error: authError } = await supabase.auth.admin
-                ? // Se tivermos SDK admin, usamos ele
-                  ({ data: null, error: { message: 'use-invitations' } } as any)
-                : ({ data: null, error: { message: 'use-invitations' } } as any);
-
-            // Fallback: usar signUp normal (usuário confirma pelo e-mail)
+            // Simplified signUp: only send full_name in metadata.
+            // The handle_new_user trigger will create the profile row automatically.
+            // We do NOT send company_id here — the trigger now uses NULLIF to handle null safely.
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email: newUserData.email,
                 password: newUserData.password,
                 options: {
                     data: {
-                        full_name: newUserData.name,
+                        full_name: newUserData.name.trim(),
                     },
-                    // emailRedirectTo desabilita redirect automático em prod
                     emailRedirectTo: `${window.location.origin}/#/login`,
                 },
             });
@@ -170,26 +165,21 @@ export const AdminUsersPage: React.FC = () => {
             const userId = signUpData.user?.id;
             if (!userId) throw new Error('Usuário criado mas ID não retornado');
 
-            // 2. Upsert no perfil (garante que o registro existe mesmo sem confirmação de e-mail)
+            // Profile row is created by the DB trigger (handle_new_user).
+            // This manual upsert is a safety net in case the trigger ran before migration.
             const [firstName, ...rest] = newUserData.name.trim().split(' ');
             const lastName = rest.join(' ') || null;
 
-            const { error: profileError } = await supabase
+            await supabase
                 .from('profiles')
                 .upsert({
                     id: userId,
                     email: newUserData.email,
                     first_name: firstName,
                     last_name: lastName,
-                    role: 'vendedor',
-                    plan: 'free',
-                    discount_credits: 0,
-                }, { onConflict: 'id' });
-
-            if (profileError) {
-                console.warn('[AdminUsersPage] Profile upsert warning:', profileError.message);
-                // Não lança erro — o usuário Auth foi criado
-            }
+                    name: newUserData.name.trim(),
+                    role: 'user',
+                }, { onConflict: 'id', ignoreDuplicates: false });
 
             addToast(`✅ Usuário ${newUserData.name} criado! Um e-mail de confirmação foi enviado para ${newUserData.email}.`, 'success');
             setNewUserData({ name: '', email: '', password: '' });
@@ -312,7 +302,7 @@ export const AdminUsersPage: React.FC = () => {
                         </div>
                         <div className="text-left">
                             <p className="font-bold text-slate-900 dark:text-white">Cadastro Direto de Usuário</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Crie a conta de Amanda e das sócias sem precisar de link</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Crie uma conta de usuário diretamente, sem precisar de link de convite</p>
                         </div>
                     </div>
                     <span className="text-2xl text-slate-400">{showNewUserForm ? '−' : '+'}</span>
@@ -321,7 +311,7 @@ export const AdminUsersPage: React.FC = () => {
                 {showNewUserForm && (
                     <div className="px-6 pb-6 border-t border-slate-100 dark:border-rionegro-800">
                         <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mt-4 mb-4">
-                            ⚠️ Um e-mail de confirmação será enviado. Peça à Amanda para clicar no link antes de fazer login.
+                            ⚠️ Um e-mail de confirmação será enviado. O usuário deve clicar no link antes de fazer login.
                         </p>
                         <form onSubmit={handleCreateDirectUser} className="space-y-4">
                             <div>
@@ -332,7 +322,7 @@ export const AdminUsersPage: React.FC = () => {
                                     type="text"
                                     value={newUserData.name}
                                     onChange={e => setNewUserData({ ...newUserData, name: e.target.value })}
-                                    placeholder="Ex: Amanda Silva"
+                                    placeholder="Ex: João Silva"
                                     required
                                     className="w-full px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
                                 />
@@ -347,7 +337,7 @@ export const AdminUsersPage: React.FC = () => {
                                         type="email"
                                         value={newUserData.email}
                                         onChange={e => setNewUserData({ ...newUserData, email: e.target.value })}
-                                        placeholder="amanda@email.com"
+                                        placeholder="usuario@email.com"
                                         required
                                         className="flex-1 px-4 py-2 bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-acai-900 focus:border-transparent"
                                     />

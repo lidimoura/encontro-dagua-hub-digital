@@ -1,5 +1,7 @@
 import { supabase } from './client';
 import { Activity } from '@/types';
+import { IS_DEMO } from '@/lib/appConfig';
+
 
 // ============================================
 // ACTIVITIES SERVICE
@@ -47,6 +49,8 @@ const transformActivityToDb = (activity: Partial<Activity>): Partial<DbActivity>
 
 export const activitiesService = {
   async getAll(): Promise<{ data: Activity[] | null; error: Error | null }> {
+    // DEMO branch: return empty list — no real activities visible in the sandbox
+    if (IS_DEMO) return { data: [], error: null };
     try {
       const { data, error } = await supabase
         .from('activities')
@@ -59,6 +63,7 @@ export const activitiesService = {
       return { data: null, error: e as Error };
     }
   },
+
 
   async create(activity: Omit<Activity, 'id' | 'createdAt'>): Promise<{ data: Activity | null; error: Error | null }> {
     try {

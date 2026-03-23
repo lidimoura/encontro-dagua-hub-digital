@@ -178,7 +178,7 @@ export const InviteGenerator: React.FC<InviteGeneratorProps> = ({ onInviteGenera
                     </button>
 
                     <p style={{ textAlign: 'center', fontSize: 11, color: '#64748b', marginTop: 6 }}>
-                        Envie para a Amanda pelo WhatsApp. O link expira quando ela criar a conta.
+                        Envie este link para o novo usuário. Ele expirará assim que o cadastro for concluído.
                     </p>
                 </div>
             )}
