@@ -259,13 +259,29 @@ export const useDealsByBoard = (boardId: string) => {
         }
       }
 
-      // DEDUPLICATION: remove any deal that appears more than once by id
-      const seenIds = new Set<string>();
+      // DEDUPLICATION: one card per contact — prevents ghost + real deal duplicates
+      // Priority: real deals win over auto-mapped ghost cards
+      const seenContactIds = new Set<string>();
+      const seenDealIds = new Set<string>();
+
+      // Pass 1: register all real deal contactIds (real deals win)
+      for (const deal of enrichedDeals) {
+        if (!deal.id.startsWith('auto-') && deal.contactId) {
+          seenContactIds.add(deal.contactId);
+        }
+      }
+
+      // Pass 2: filter — keep real deals always, keep auto only if contactId not taken
       let dedupedDeals = enrichedDeals.filter(deal => {
-        if (deal.id.startsWith('auto-') && !deal.contactId) return false;
         if (!deal.status) return false;
-        if (seenIds.has(deal.id)) return false;
-        seenIds.add(deal.id);
+        if (seenDealIds.has(deal.id)) return false;
+        seenDealIds.add(deal.id);
+
+        if (deal.id.startsWith('auto-')) {
+          // Drop ghost card if a real deal already covers this contact
+          if (!deal.contactId || seenContactIds.has(deal.contactId)) return false;
+          seenContactIds.add(deal.contactId);
+        }
         return true;
       });
 

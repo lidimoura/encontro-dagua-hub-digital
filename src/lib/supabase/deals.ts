@@ -1,5 +1,7 @@
 import { supabase } from './client';
 import { Deal, DealItem } from '@/types';
+import { IS_DEMO } from '@/lib/appConfig';
+
 
 // ============================================
 // DEALS SERVICE
@@ -96,28 +98,25 @@ const transformDealToDb = (deal: Partial<Deal>): Partial<DbDeal> => {
 export const dealsService = {
   async getAll(companyId: string, isDemoUser: boolean = false): Promise<{ data: Deal[] | null; error: Error | null }> {
     try {
-      const isProvadagua = typeof window !== 'undefined' &&
-        (window.location.hostname.includes('prova.encontrodagua.com') || window.location.hostname === 'localhost');
-
-      // On provadagua: skip company_id filter — QA contacts have company_id = null
-      if (!companyId && !isDemoUser && !isProvadagua) return { data: [], error: null };
+      // DEMO branch: QA contacts have company_id = null — allow fetching without company restriction
+      if (!companyId && !IS_DEMO) return { data: [], error: null };
 
       let dealsQuery = supabase.from('deals').select('*').order('created_at', { ascending: false });
 
-      // On provadagua: no company_id restriction (QA leads have null company_id)
-      // On both main and provadagua: allow own company deals OR null (QA/webhook leads)
+      // Allow own company deals OR null company_id (webhook/SDR leads without company)
       if (companyId) {
         dealsQuery = dealsQuery.or(`company_id.eq.${companyId},company_id.is.null`);
       }
 
-      // Demo isolation flag — only apply on main (not on provadagua where we want all QA data)
-      if (!isProvadagua) {
+      // PRODUCTION only: exclude demo data rows
+      if (!IS_DEMO) {
         if (isDemoUser) {
           dealsQuery = dealsQuery.eq('is_demo_data', true);
         } else {
           dealsQuery = dealsQuery.or('is_demo_data.is.null,is_demo_data.eq.false');
         }
       }
+
 
       const [dealsResult, itemsResult] = await Promise.all([
         dealsQuery,
