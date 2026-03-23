@@ -6,12 +6,14 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { QRCode } from 'react-qrcode-logo';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase/client';
+import { IS_DEMO } from '@/lib/appConfig';
 import { calculateContrastRatio, isContrastSafe, getContrastLevel, suggestForegroundColor } from '@/lib/utils/contrastValidator';
 import { CardLinksEditor } from './components/CardLinksEditor';
 import { ImageUpload } from '@/components/ImageUpload';
 import { useTranslation } from '@/hooks/useTranslation';
 import { templatesService, BridgeTemplate } from '@/lib/supabase/templates';
 import { TemplateManager } from './components/TemplateManager';
+
 
 type ProjectType = 'LINK' | 'BRIDGE' | 'CARD';
 
@@ -358,6 +360,12 @@ export const QRdaguaPage: React.FC = () => {
     }, [profile?.company_id]);
 
     const fetchProjects = async () => {
+        // DEMO branch: no real QR projects shown in sandbox
+        if (IS_DEMO) {
+            setProjects([]);
+            setIsLoadingProjects(false);
+            return;
+        }
         setIsLoadingProjects(true);
         try {
             const { data, error } = await supabase
@@ -374,6 +382,7 @@ export const QRdaguaPage: React.FC = () => {
             setIsLoadingProjects(false);
         }
     };
+
 
     useEffect(() => {
         fetchProjects();

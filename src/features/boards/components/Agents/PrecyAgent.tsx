@@ -253,15 +253,19 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         const productData = {
             name: productName.trim(),
             description: `Produto gerado automaticamente. Custo hora: ${currency} ${calculation.hourlyRate} | ${calculation.hours}h | Stack: ${currency} ${calculation.stackCost}`,
-            price: priceInSelectedCurrency,
+            // Always save the BRL equivalent as the canonical price so the catalog
+            // is consistent regardless of quote currency
+            price: fallbackBRLPrice,
             product_type: 'service',
             is_active: true,
             metadata: {
                 price_currency: currency,
+                price_original: priceInSelectedCurrency,
                 price_brl: fallbackBRLPrice,
                 ...calculation
             }
         };
+
 
         try {
             // Check if a product with this name already exists (avoid 42P10: no unique constraint on 'name')

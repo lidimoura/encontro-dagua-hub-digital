@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { Product } from '@/types';
+import { IS_DEMO } from '@/lib/appConfig';
 
 export const productsService = {
     /**
@@ -11,6 +12,9 @@ export const productsService = {
      * Used by the Deal products tab.
      */
     async getAll(options?: { timestamp?: number }) {
+        // DEMO branch: return empty catalog — no real products shown in sandbox
+        if (IS_DEMO) return { data: [], error: null };
+
         const BLOCKED_TYPES = ['tech_stack', 'infra', 'api_cost'];
         const BLOCKED_NAMES = ['openai', 'gemini', 'anthropic', 'vercel', 'supabase', 'aws', 'gcp', 'azure', 'antigravity'];
 
