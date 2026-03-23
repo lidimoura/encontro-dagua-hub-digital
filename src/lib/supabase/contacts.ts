@@ -1,5 +1,7 @@
 import { supabase } from './client';
 import { Contact, Company } from '@/types';
+import { IS_DEMO } from '@/lib/appConfig';
+
 
 /**
  * Contacts Service
@@ -144,17 +146,17 @@ export const contactsService = {
    */
   async getAll(companyId: string): Promise<{ data: Contact[] | null; error: Error | null }> {
     try {
-      // NOTE: We rely on RLS for tenant isolation.
-      // Removing explicit .eq('company_id') so that contacts imported without
-      // company_id (old records) are also visible to their company's admin.
       let query = supabase
         .from('contacts')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // NOVO: PRIVACIDADE ABSOLUTA PROVADAGUA
-      if (typeof window !== 'undefined' && window.location.hostname === 'prova.encontrodagua.com') {
-         query = query.or('is_test.eq.true,email.ilike.%00000%,name.ilike.%Gamer pc%,name.ilike.%Lilas%');
+      // STRICT DEMO ISOLATION: Only show QA/test contacts on provadagua
+      // This filters in the DB query itself — no data leakage possible.
+      if (IS_DEMO) {
+        query = query.or(
+          "tags.cs.{🤖 sdr},email.ilike.%0000000000%,email.ilike.%@teste%,name.ilike.%Gamer pc%,name.ilike.%Lilas%,is_test.eq.true"
+        );
       }
 
       const { data, error } = await query;
@@ -165,6 +167,7 @@ export const contactsService = {
       return { data: null, error: e as Error };
     }
   },
+
 
   /**
    * Creates a new contact

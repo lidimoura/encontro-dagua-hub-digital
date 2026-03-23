@@ -221,39 +221,47 @@ export const useDealsByBoard = (boardId: string) => {
           }
         }
 
-        // Only create ghost cards for contacts without ANY real deal AND with explicit stage mapping
+        // First stage of the board — used as fallback for SDR force-mapping
+        const firstStageId = activeBoard.stages[0]?.id;
+
+        // Only create ghost cards for contacts without ANY real deal
         const orphanContacts = contacts.filter(c => !contactIdsWithAnyDeal.has(c.id));
 
         for (const contact of orphanContacts) {
           // Skip contacts with no usable identity (neither name nor email)
           if (!contact.name && !contact.email) continue;
 
-          const actualStageText = (contact.stage || '').toUpperCase();
+          const tags: string[] = (contact.tags as any) || [];
+          const hasSdrTag = tags.some(t => t.includes('sdr') || t.includes('🤖'));
 
-          // STRICT: only map via explicit linkedLifecycleStage — no board-name heuristics
+          const actualStageText = (contact.stage || '').toUpperCase();
           const matchedStageId = stageIdToBoardStageId.get(contact.stage) || stageNameToBoardStageId.get(actualStageText);
 
-          if (matchedStageId) {
+          // SDR leads are ALWAYS force-mapped to the first stage if no lifecycle match found
+          // — this restores the original behavior where Link d'Água leads went straight to the board
+          const targetStageId = matchedStageId || (hasSdrTag && firstStageId ? firstStageId : null);
+
+          if (targetStageId) {
             enrichedDeals.push({
               id: `auto-${contact.id}`,
               title: contact.name || contact.email || 'Novo Lead',
               value: contact.totalValue || 0,
               probability: 0,
-              status: matchedStageId,
+              status: targetStageId,
               priority: 'medium' as any,
               boardId: boardId,
               contactId: contact.id,
               companyId: contact.companyId || '',
-              tags: [],
+              tags: tags,
               customFields: {},
               createdAt: contact.createdAt,
-              updatedAt: contact.updatedAt || contact.createdAt,
+              updatedAt: (contact as any).updatedAt || contact.createdAt,
               items: [],
-              owner: { name: 'Auto', avatar: '' },
+              owner: { name: hasSdrTag ? '🤖 SDR' : 'Auto', avatar: '' },
               companyName: 'Sem empresa',
               contactName: contact.name || 'Sem contato',
               contactEmail: contact.email || '',
-              source: contact.source || 'Desconhecido',
+              source: contact.source || (hasSdrTag ? 'Link d\'Água' : 'Desconhecido'),
             });
           }
         }
