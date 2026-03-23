@@ -1,50 +1,74 @@
-# Encontro d'Água Hub — Showcase
+# Prova d'Água — AI Showcase Hub
 
-> **Branch `main` → hub.encontrodagua.com** | CRM de Produção Real
-
----
-
-## 🎯 O que é o Hub
-
-O Hub é o sistema nervoso da operação de vendas da Encontro d'Água. Não é um demo — é produção.
+> **Branch `provadagua` | prova.encontrodagua.com** | Demo · Sandbox · Portfolio
 
 ---
 
-## 🏆 Diferenciais Técnicos
+## 🎯 What is this?
 
-### 1. SDR Automatizado (Link d'Água)
-Leads do WhatsApp chegam via webhook, ganham a tag `🤖 sdr` e aparecem automaticamente no Board Kanban no primeiro estágio. A deduplicação por email (DISTINCT) garante que replays do webhook não criem cards duplicados.
+This is the live showcase of the Encontro d'Água CRM's AI capabilities. It is a **100% isolated sandbox** — no real client data is ever exposed here.
 
-### 2. Agente Mazô — Contexto Real de Vendas
-A Mazô lê todos os deals, contatos e atividades reais para gerar briefings diários, sugerir upsells e resgatar deals parados. Em produção, ela tem contexto completo da base de clientes.
-
-### 3. Board Kanban + Sincronização Bidirecional
-- Mover um card no Board atualiza o estágio do Contato
-- Criar uma atividade no Inbox reflete no deal correspondente
-- Ghost cards (auto-mapeados) mostram contatos sem deal
-
-### 4. Precificação em BRL (Precy)
-A Precy converte USD/EUR → BRL no momento do save, garantindo que o catálogo sempre exiba em Reais.
-
-### 5. Isolamento de Dados por Branch
-Os filtros `IS_DEMO` garantem que a Provadágua nunca acesse dados da operação real. O Hub e a Prova são mundos separados.
+Use this environment to:
+- See AI agents (Mazô, Jury, Precy) in action
+- Explore the full CRM interface without risk
+- Onboard new team members safely
 
 ---
 
-## 📊 Módulos Ativos em Produção
+## 🤖 AI Agents on Demo
 
-| Módulo | Status |
+### Mazô — Sales Intelligence
+- Generates daily briefings from demo leads
+- Suggests upsells, rescues stalled deals, detects birthdays
+- In DEMO mode: fresh context — no real client history
+
+### Jury — Contract Generator
+- Generates professional contracts via natural language
+- Opens PDF viewer inline — no external tools needed
+
+### Precy — AI Pricing Calculator
+- Quotes services in BRL, USD and EUR
+- Saves quoted price in BRL as canonical catalog price
+- Original currency stored in `metadata.price_original`
+
+---
+
+## 🔒 Isolation Architecture
+
+```
+VITE_APP_MODE = DEMO
+       ↓
+IS_DEMO = true
+       ↓
+┌──────────────────────────────┐
+│ activitiesService → []       │
+│ productsService   → []       │
+│ QRdaguaPage       → []       │
+│ contactsService   → DB OR filter │
+│ PromptLabPage     → localStorage│
+│ dealsService      → isDemoVisible filter │
+└──────────────────────────────┘
+```
+
+Only QA contacts (tag `🤖 sdr`, email `@teste`, name `Gamer pc`/`Lilas`) are visible.
+
+---
+
+## 🌐 Languages
+
+Interface defaults to **English** (`VITE_APP_MODE=DEMO → DEFAULT_LANG='en'`).
+Users can switch to Portuguese via the language button.
+
+---
+
+## ✅ Live Test Credentials
+
+| Field | Value |
 |---|---|
-| Board Kanban + SDR | ✅ Ativo |
-| Contatos + Sync | ✅ Ativo |
-| Inbox / Mazô | ✅ Ativo |
-| Jury (Contratos) | ✅ Ativo |
-| Precy (Precif.) | ✅ Ativo |
-| QRDágua | ✅ Ativo |
-| Reports | ✅ Ativo |
-| Prompt Lab | ✅ Ativo |
-| Admin (Usuários) | ✅ Ativo |
+| Email | `lidi@teste.com` |
+| Phone | `0000000000` |
+| Test leads | Gamer pc, Lilas, 🤖 sdr |
 
 ---
 
-*hub.encontrodagua.com — Operação desde 2025 | Stack: React + Supabase + Gemini*
+*Prova d'Água — Encontro d'Água AI Demo | Stack: React + Supabase + Gemini*

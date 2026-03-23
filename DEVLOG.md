@@ -1,47 +1,44 @@
-# DEVLOG — Encontro d'Água Hub (main)
+# DEVLOG — Prova d'Água (provadagua)
 
-> Branch `main` | CRM de Produção
-
----
-
-## 2026-03-23 — Round 4: Isolamento Radical + SDR Fix
-
-### Mudanças
-- `useDealsQuery.ts`: DISTINCT por email mata duplicatas de leads SDR (replays de webhook)
-- `useDealsQuery.ts`: Contatos com `🤖 sdr` são force-mapeados ao primeiro estágio mesmo sem lifecycle stage
-- `productsService.ts`: IS_DEMO guard — catálogo vazio na Provadágua
-- `contacts.ts`: IS_DEMO filter via query Supabase (OR conditions por tag/email/is_test)
-- `PromptLabPage.tsx`: IS_DEMO → localStorage apenas para saves na Provadágua
-- `PrecyAgent.tsx`: `price` canônico = BRL (`fallbackBRLPrice`) — `price_original` salvo em metadata
-- `QRdaguaPage.tsx`: IS_DEMO early-return → lista de projetos vazia na Provadágua
+> Branch `provadagua` | Demo Environment
 
 ---
 
-## 2026-03-22 — Round 3: DEMO Isolation Foundation
+## 2026-03-23 — Full Isolation Enforcement
 
-- `activitiesService.ts`: IS_DEMO guard → getAll() retorna []
-- `dealsService.ts`: Substituído hostname check por IS_DEMO
-- `contactsService.ts`: IS_DEMO import adicionado
-- `AdminUsersPage.tsx`: signUp simplificado — só `full_name` no metadata
-- `InviteGenerator.tsx`: Texto genérico (sem "Amanda")
-- `useDealsQuery.ts`: Deduplicação por contactId (real deals têm prioridade sobre ghost cards)
+All modules now return empty arrays or localStorage-only data in DEMO mode:
 
----
+- `activitiesService.getAll()` → `[]`
+- `productsService.getAll()` → `[]`
+- `QRdaguaPage.fetchProjects()` → `[]` (early return)
+- `contactsService.getAll()` → DB-level OR filter (only QA contacts)
+- `PromptLabPage.fetchSavedPrompts()` → `[]` + localStorage saves
+- `PrecyAgent`: BRL price as canonical `price` column
+- `useDealsByBoard`: email DISTINCT dedup eliminates webhook-replay duplicates
 
-## 2026-03-20 — Round 2: VITE_APP_MODE + SDR Board
-
-- `appConfig.ts`: IS_DEMO via VITE_APP_MODE (env var Vercel)
-- `dealsService.ts`: SDR leads filtrados por isDemoVisible
-- `DealDetailModal.tsx`: optional chaining para company_id null
-- Vercel: provadagua configurada manualmente com VITE_APP_MODE=DEMO
+**Guarantees:**
+> A product added in Demo **will never appear in the Hub**.
+> Real client contacts **will never leak to this branch**.
 
 ---
 
-## 2026-03-17 — Invitation System Fix
+## 2026-03-22 — IS_DEMO Foundation
 
-- `InviteGenerator.tsx`: localStorage persistence para link gerado
-- Redirect URLs Supabase: prova.encontrodagua.com adicionado
+- `appConfig.ts`: `IS_DEMO = VITE_APP_MODE === 'DEMO'`
+- `DEFAULT_LANG = 'en'` when IS_DEMO
+- Vercel env var `VITE_APP_MODE=DEMO` configured for this branch
+- Activities isolation, deals isolation (isDemoVisible)
+- Contacts hostname-check replaced with IS_DEMO
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI)*
+## 2026-03-20 — Branch Created
+
+- `provadagua` branched from `main`
+- QA test contacts created: Gamer pc, Lilas, lidi@teste.com
+- English UI default enabled
+- Greeting changed to "Hi, Amanda!" → Generic "Hi there!"
+
+---
+
+*Sandbox environment — Encontro d'Água | Manager: Antigravity AI*

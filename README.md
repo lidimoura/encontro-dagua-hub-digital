@@ -1,46 +1,52 @@
-# Encontro d'Água Hub — CRM de Produção
+# Prova d'Água — AI CRM Demo / Sandbox
 
-> **Branch `main` → hub.encontrodagua.com**
-> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-
----
-
-## 🚀 Sobre o Hub
-
-O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Água. Centraliza todos os leads reais capturados via Link d'Água (webhook WhatsApp/Typebot), gerencia os deals no Board Kanban e automatiza o follow-up com a IA Mazô.
+> **Branch `provadagua` → prova.encontrodagua.com**
+> Free demo environment. No real client data. English-first interface.
 
 ---
 
-## ✨ Funcionalidades Principais
+## 🌊 What is Prova d'Água?
 
-| Módulo | Descrição |
-|---|---|
-| **Board Kanban** | Leads SDR (`🤖 sdr`) aparecem no primeiro estágio automaticamente |
-| **Contatos** | Todos os leads reais sincronizados — sem filtro de privacidade |
-| **Atividades / Inbox** | Tarefas e compromissos reais com briefing da Mazô |
-| **Mazô (IA)** | Agente de vendas com contexto completo dos leads |
-| **Jury (IA)** | Geração de contratos com visualização de PDF |
-| **Precy (IA)** | Precificação em BRL/USD/EUR com conversão automática |
-| **QRDágua** | Geração e gestão de QR Codes / Cartões Digitais |
-| **Catálogo** | Produtos salvos em BRL (preço canônico) |
-| **Reports** | Top Oportunidades, ciclo de vendas, win/loss real |
+**Prova d'Água** is a fully isolated demo environment showcasing the capabilities of the Encontro d'Água Hub CRM. It is designed for:
+
+- **AI feature demonstration** — Mazô, Jury, Precy agents in action
+- **Client onboarding** — new users can sign up and explore without contaminating production data
+- **Portfolio showcase** — demonstrates the platform's capabilities in a controlled environment
+
+> ⚠️ **This is NOT production.** All data is isolated from `hub.encontrodagua.com`.
 
 ---
 
-## 🛠️ Stack
+## ✨ Features Available in Demo
 
-- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
-- **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
-- **IA**: Google Gemini (principal), OpenAI, Anthropic
-- **Deploy**: Vercel (branch `main` → `hub.encontrodagua.com`)
-- **Webhook SDR**: Supabase Edge Function `form-lp-lead`
+| Module | Status | Notes |
+|---|---|---|
+| **Board Kanban** | ✅ Demo data only | Test leads only (`🤖 sdr`, QA contacts) |
+| **Contacts** | ✅ Demo only | Filtered by tag/email — real clients never visible |
+| **Mazô (AI)** | ✅ Fresh context | No production data fed to AI suggestions |
+| **Jury (AI Contracts)** | ✅ Available | PDF viewer integration |
+| **Precy (AI Pricing)** | ✅ Available | BRL/USD/EUR conversion |
+| **Prompt Lab** | ✅ Local save | Prompts saved to localStorage only |
+| **QRDágua** | ✅ Empty state | No real QR projects shown |
+| **Reports** | ✅ Demo metrics | Based on demo deals only |
+| **Admin / Invite** | ✅ Available | Generic invite flow, no company_id required |
 
 ---
 
-## ⚙️ Variáveis de Ambiente
+## 🔒 Data Isolation Guarantee
+
+Every Supabase query in DEMO mode is either:
+1. **Early-returned as `[]`** (activities, products, QR projects)
+2. **Filtered at DB level** via `.or("tags.cs.{🤖 sdr},email.ilike.%0000000000%,...")`
+
+A product added in the Demo **will never appear in the Hub**, and vice versa.
+
+---
+
+## ⚙️ Environment Variables
 
 ```env
-VITE_APP_MODE=PRODUCTION
+VITE_APP_MODE=DEMO
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 VITE_GEMINI_API_KEY=...
@@ -48,38 +54,22 @@ VITE_GEMINI_API_KEY=...
 
 ---
 
-## 🔑 Fluxo SDR (Link d'Água → Board)
+## 🚀 Getting Started (Demo User)
 
-1. Lead preenche formulário no Typebot / WhatsApp
-2. Webhook `form-lp-lead` chama `capture_amazo_lead` no Supabase
-3. Contato criado com tag `🤖 sdr`
-4. Board auto-mapeia o contato para o **primeiro estágio**
-5. Mazô analisa e sugere follow-up no Inbox
-
----
-
-## 🏗️ Estrutura
-
-```
-src/
-  features/       # Pages e módulos (boards, contacts, admin, ...)
-  lib/
-    supabase/     # Services com IS_DEMO guards
-    query/hooks/  # TanStack Query hooks
-    appConfig.ts  # IS_DEMO = false em PRODUCTION
-  hooks/
-    useTranslation.ts  # i18n (pt-BR padrão em PRODUCTION)
-```
+1. Visit [prova.encontrodagua.com](https://prova.encontrodagua.com)
+2. Enter your invite link or request access from your manager
+3. Explore AI features — Mazô, Jury, Precy — in a safe sandbox
+4. No credit card required. No real data at risk.
 
 ---
 
-## 📦 Deploy
+## 🛠️ Stack
 
-```bash
-git push origin main
-# Vercel detecta e faz build automático → hub.encontrodagua.com
-```
+- **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: Supabase (shared instance, isolated by RLS + IS_DEMO filters)
+- **AI**: Google Gemini 2.5 Flash
+- **Deploy**: Vercel (branch `provadagua` → `prova.encontrodagua.com`)
 
 ---
 
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI*
+*Prova d'Água — Encontro d'Água Hub Demo | Powered by Antigravity AI*
