@@ -178,9 +178,18 @@ export const useDealsByBoard = (boardId: string) => {
       if (dealsResult.error) throw dealsResult.error;
 
       const deals = (dealsResult.data || []).filter(d => d.boardId === boardId);
-      const contacts = contactsResult.data || [];
+      // DISTINCT by email — collapse duplicate contacts created by webhook replays
+      // Keep the newest record (contacts are sorted desc by created_at from service)
+      const seenEmails = new Set<string>();
+      const contacts = (contactsResult.data || []).filter(c => {
+        const emailKey = (c.email || c.id).toLowerCase().trim();
+        if (seenEmails.has(emailKey)) return false;
+        seenEmails.add(emailKey);
+        return true;
+      });
       const companies = companiesResult.data || [];
       const lifecycleStages = lifecycleStagesResult;
+
 
       // Create lookup maps
       const contactMap = new Map(contacts.map(c => [c.id, c]));
