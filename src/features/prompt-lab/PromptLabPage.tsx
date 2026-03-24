@@ -134,17 +134,22 @@ Agora, gere o prompt perfeito:`;
     };
 
     const fetchSavedPrompts = async () => {
-        // DEMO branch: no real saved prompts shown — fresh CRM sandbox
-        if (IS_DEMO) { setSavedPrompts([]); return; }
         setIsLoadingSaved(true);
         try {
             const { data, error } = await supabase
                 .from('saved_prompts')
                 .select('*')
+                .eq('is_demo_data', IS_DEMO)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setSavedPrompts(data || []);
+            if (error) {
+                // Column may not exist yet — fallback: empty for DEMO, all for PRODUCTION
+                if (error.message?.includes('is_demo_data')) {
+                    setSavedPrompts([]);
+                } else throw error;
+            } else {
+                setSavedPrompts(data || []);
+            }
         } catch (error) {
             console.error('Erro ao carregar prompts salvos:', error);
             showToast(t('errorLoadingPrompts'), 'error');
@@ -156,16 +161,6 @@ Agora, gere o prompt perfeito:`;
     const handleSavePrompt = async () => {
         if (!saveTitle.trim()) {
             showToast(t('insertTitle'), 'error');
-            return;
-        }
-        // DEMO branch: save to localStorage only, do not write to shared DB
-        if (IS_DEMO) {
-            const demoSaved = JSON.parse(localStorage.getItem('demo_saved_prompts') || '[]');
-            demoSaved.unshift({ id: crypto.randomUUID(), title: saveTitle, raw_idea: rawIdea, optimized_prompt: optimizedPrompt, persona: selectedPersona, tags: saveTags.split(',').map(t => t.trim()).filter(Boolean) });
-            localStorage.setItem('demo_saved_prompts', JSON.stringify(demoSaved.slice(0, 20)));
-            setSavedPrompts(demoSaved.slice(0, 20));
-            showToast(t('promptSavedSuccess'), 'success');
-            setShowSaveModal(false); setSaveTitle(''); setSaveTags('');
             return;
         }
 
@@ -191,6 +186,7 @@ Agora, gere o prompt perfeito:`;
                     optimized_prompt: optimizedPrompt,
                     persona: selectedPersona,
                     tags: tagsArray,
+                    is_demo_data: IS_DEMO,  // ISOLATION: stamp for branch filter
                 }]);
 
             if (error) throw error;
@@ -199,7 +195,7 @@ Agora, gere o prompt perfeito:`;
             setShowSaveModal(false);
             setSaveTitle('');
             setSaveTags('');
-            fetchSavedPrompts(); // Reload list
+            fetchSavedPrompts();
         } catch (error) {
             console.error('Erro ao salvar prompt:', error);
             showToast(t('errorSaving'), 'error');
@@ -211,13 +207,6 @@ Agora, gere o prompt perfeito:`;
     const handleDeletePrompt = async (id: string) => {
         if (!confirm(t('confirmDeletePrompt'))) return;
         // DEMO branch: delete from localStorage only
-        if (IS_DEMO) {
-            const demoSaved = JSON.parse(localStorage.getItem('demo_saved_prompts') || '[]').filter((p: any) => p.id !== id);
-            localStorage.setItem('demo_saved_prompts', JSON.stringify(demoSaved));
-            setSavedPrompts(demoSaved);
-            showToast(t('promptDeleted'), 'success');
-            return;
-        }
         try {
             const { error } = await supabase
                 .from('saved_prompts')
@@ -233,6 +222,7 @@ Agora, gere o prompt perfeito:`;
             showToast(t('errorDeleting'), 'error');
         }
     };
+
 
 
     const loadSavedPrompt = (prompt: any) => {

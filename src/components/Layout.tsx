@@ -35,6 +35,7 @@ import { prefetchRoute, RouteName } from '@/lib/prefetch';
 import { FloatingAIWidget } from './FloatingAIWidget';
 import { AiflowSupport } from './AiflowSupport';
 import { supabase } from '@/lib/supabase/client';
+import { IS_DEMO } from '@/lib/appConfig';
 
 // Lazy load AI Assistant (heavy component with Gemini SDK)
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -269,10 +270,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
         {/* Logo - Clickable */}
-        <Link to="/" className="h-16 px-6 flex items-center border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-acai-900 to-solimoes-600 bg-clip-text text-transparent">
-            Hub d'água
-          </h1>
+        <Link to="/" className="h-16 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <img
+            src={darkMode
+              ? '/logos/logo-circular-gold-transp.png.png'
+              : '/logos/logo-circular-black-transp.png.png'}
+            alt="Encontro d'Água"
+            className="h-9 w-9 object-contain"
+          />
+          <span className="text-sm font-bold bg-gradient-to-r from-acai-900 to-solimoes-600 bg-clip-text text-transparent tracking-wide">
+            {IS_DEMO ? "Prova d'Água" : "Hub d'Água"}
+          </span>
         </Link>
 
         {/* Navigation */}
