@@ -60,6 +60,10 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
     const dealContext = useDealContext();
     const { profile } = useAuth();
     const [currency, setCurrency] = useState('BRL');
+    const [saveCurrency, setSaveCurrency] = useState('BRL'); // currency in which price is stored in catalog
+
+    // Keep saveCurrency in sync when user changes the quote currency
+    React.useEffect(() => { setSaveCurrency(currency); }, [currency]);
 
     // ── Live FX Rates State ─────────────────────────────────────
     const [liveRates, setLiveRates] = useState<Record<string, number>>({ BRL: 1.0 });
@@ -246,22 +250,30 @@ export const PrecyAgent: React.FC<PrecyAgentProps> = ({ boardId, dealId }) => {
         if (!productName.trim() || !calculation) return;
         setSavingProduct(true);
         const priceInSelectedCurrency = calculation.finalPrice;
-        
-        const rate = liveRates[currency] ?? 1;
-        const fallbackBRLPrice = rate === 0 ? calculation.finalPrice : calculation.finalPrice / rate;
+
+        // Convert to BRL using live rates for metadata reference
+        const brlRate = liveRates['BRL'] ?? 1;
+        const quoteRate = liveRates[saveCurrency] ?? 1;
+        // price the user wants to store in saveCurrency
+        const priceForStorage = saveCurrency === currency
+            ? priceInSelectedCurrency
+            : priceInSelectedCurrency * (quoteRate / (liveRates[currency] ?? 1));
+        // always keep BRL equivalent in metadata
+        const brlEquivalent = saveCurrency === 'BRL'
+            ? priceForStorage
+            : priceForStorage / (liveRates[saveCurrency] ?? 1);
 
         const productData = {
             name: productName.trim(),
             description: `Produto gerado automaticamente. Custo hora: ${currency} ${calculation.hourlyRate} | ${calculation.hours}h | Stack: ${currency} ${calculation.stackCost}`,
-            // Always save the BRL equivalent as the canonical price so the catalog
-            // is consistent regardless of quote currency
-            price: fallbackBRLPrice,
+            price: priceForStorage,
             product_type: 'service',
             is_active: true,
             metadata: {
-                price_currency: currency,
+                price_currency: saveCurrency,
                 price_original: priceInSelectedCurrency,
-                price_brl: fallbackBRLPrice,
+                price_original_currency: currency,
+                price_brl: brlEquivalent,
                 ...calculation
             }
         };
@@ -600,6 +612,22 @@ ${isSocialPricing ? `
                             placeholder={language === 'en' ? 'Ex: Landing Page Development' : 'Ex: Desenvolvimento de Landing Page'}
                         />
                     </div>
+                    {/* Save Currency Chooser */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                        {language === 'en' ? 'Save price in:' : 'Salvar preço em:'}
+                      </label>
+                      <select
+                        value={saveCurrency}
+                        onChange={e => setSaveCurrency(e.target.value)}
+                        className="flex-1 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
+                      >
+                        <option value="BRL">🇧🇷 BRL — Real</option>
+                        <option value="USD">🇺🇸 USD — Dólar</option>
+                        <option value="EUR">🇪🇺 EUR — Euro</option>
+                        <option value="AUD">🇦🇺 AUD — Dólar Australiano</option>
+                      </select>
+                    </div>
                     <button
                         onClick={handleSaveProduct}
                         disabled={!productName || savingProduct}
@@ -613,7 +641,7 @@ ${isSocialPricing ? `
                         ) : (
                             <>
                                 <Sparkles className="w-4 h-4" />
-                                {language === 'en' ? 'Save as Product' : 'Salvar como Produto'}
+                                {language === 'en' ? `Save as Product (${saveCurrency})` : `Salvar como Produto (${saveCurrency})`}
                             </>
                         )}
                     </button>

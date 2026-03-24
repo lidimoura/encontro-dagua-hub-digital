@@ -86,6 +86,7 @@ export const activitiesService = {
           date: activity.date,
           completed: activity.completed || false,
           deal_id: activity.dealId || null,
+          is_demo_data: IS_DEMO,  // ISOLATION: stamp so branch filter works
           // company_id is auto-set by the auto_set_company_id trigger
           // owner_id is auto-set by Supabase RLS via jwt claim
         })
@@ -98,6 +99,7 @@ export const activitiesService = {
       return { data: null, error: e as Error };
     }
   },
+
 
   async update(id: string, updates: Partial<Activity>): Promise<{ error: Error | null }> {
     try {
