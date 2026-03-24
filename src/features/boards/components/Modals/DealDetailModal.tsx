@@ -170,6 +170,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [newContactEmail, setNewContactEmail] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
   const [creatingContact, setCreatingContact] = useState(false);
+  // Add New Company
+  const [showCreateCompany, setShowCreateCompany] = useState(false);
+  const [newCompanyName, setNewCompanyName] = useState('');
+  const [creatingCompany, setCreatingCompany] = useState(false);
 
   // Helper functions removed as they are now handled by ActivityRow component
 
@@ -668,6 +672,53 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
+                {/* ── Add New Company inline ─────────── */}
+                {!showCreateCompany ? (
+                  <button
+                    onClick={() => setShowCreateCompany(true)}
+                    className="mt-1.5 text-xs text-primary-500 hover:text-primary-400 flex items-center gap-1 transition-colors"
+                  >
+                    <span className="text-base leading-none">+</span> Nova empresa
+                  </button>
+                ) : (
+                  <div className="mt-2 flex gap-2 animate-in fade-in">
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder="Nome da empresa..."
+                      value={newCompanyName}
+                      onChange={e => setNewCompanyName(e.target.value)}
+                      onKeyDown={e => e.key === 'Escape' && setShowCreateCompany(false)}
+                      className="flex-1 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/20 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
+                    />
+                    <button
+                      disabled={!newCompanyName.trim() || creatingCompany}
+                      onClick={async () => {
+                        if (!newCompanyName.trim()) return;
+                        setCreatingCompany(true);
+                        try {
+                          const { data: nc, error } = await supabase
+                            .from('companies')
+                            .insert({ name: newCompanyName.trim() })
+                            .select('id')
+                            .single();
+                          if (!error && nc?.id) {
+                            updateDeal(deal.id, { companyId: nc.id });
+                            addToast('✅ Empresa criada e vinculada!', 'success');
+                            setShowCreateCompany(false);
+                            setNewCompanyName('');
+                          } else {
+                            addToast('❌ Erro ao criar empresa', 'error');
+                          }
+                        } finally { setCreatingCompany(false); }
+                      }}
+                      className="text-xs bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white font-bold rounded-lg px-3 py-1.5 transition-colors"
+                    >
+                      {creatingCompany ? '...' : 'Salvar'}
+                    </button>
+                    <button onClick={() => setShowCreateCompany(false)} className="text-slate-400 hover:text-red-400"><X size={14} /></button>
+                  </div>
+                )}
               </div>
 
               <div>
