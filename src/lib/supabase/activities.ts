@@ -49,20 +49,30 @@ const transformActivityToDb = (activity: Partial<Activity>): Partial<DbActivity>
 
 export const activitiesService = {
   async getAll(): Promise<{ data: Activity[] | null; error: Error | null }> {
-    // DEMO branch: return empty list — no real activities visible in the sandbox
-    if (IS_DEMO) return { data: [], error: null };
     try {
+      // DEMO ISOLATION: each branch sees only its own rows via is_demo_data column
+      // Both branches read/write to the same Supabase DB but are fully isolated
       const { data, error } = await supabase
         .from('activities')
         .select('*')
+        .eq('is_demo_data', IS_DEMO)
         .order('date', { ascending: false });
 
-      if (error) return { data: null, error };
+      if (error) {
+        // Column may not exist yet (migration 034 not run) — degrade gracefully
+        if (error.message?.includes('is_demo_data')) {
+          if (IS_DEMO) return { data: [], error: null };
+          const { data: all, error: e2 } = await supabase.from('activities').select('*').order('date', { ascending: false });
+          return { data: all ? all.map(a => transformActivity(a as DbActivity)) : [], error: e2 };
+        }
+        return { data: null, error };
+      }
       return { data: (data || []).map(a => transformActivity(a as DbActivity)), error: null };
     } catch (e) {
       return { data: null, error: e as Error };
     }
   },
+
 
 
   async create(activity: Omit<Activity, 'id' | 'createdAt'>): Promise<{ data: Activity | null; error: Error | null }> {
