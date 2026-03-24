@@ -1250,9 +1250,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     <h3 className="text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
                       <Package size={16} /> Adicionar Produto/Serviço
                     </h3>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-2 items-center">
                       <select
-                        className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
+                        className="flex-1 min-w-[180px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white"
                         value={selectedProductId}
                         onChange={e => setSelectedProductId(e.target.value)}
                       >
@@ -1291,7 +1291,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                       <button
                         onClick={handleAddProduct}
                         disabled={!selectedProductId}
-                        className="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                        className="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap"
                       >
                         Adicionar
                       </button>
