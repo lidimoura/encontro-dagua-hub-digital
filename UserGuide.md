@@ -1,83 +1,81 @@
-# Guia do Usuário — Hub d'Água
+# User Guide — Prova d'Água (Demo)
 
-> **Branch `main` | hub.encontrodagua.com** | CRM de Produção
+> **Branch `provadagua` | prova.encontrodagua.com** | AI Sandbox · Demo
 
 ---
 
-## 🚀 Primeiros Passos
+## 👋 Welcome to the Demo
 
-### 1. Login
-Acesse [hub.encontrodagua.com](https://hub.encontrodagua.com) e faça login com o e-mail e senha fornecidos pelo admin.
+Prova d'Água is a free, fully isolated sandbox of the Encontro d'Água Hub CRM. You can explore all features safely — no real client data is ever at risk.
 
-### 2. Navegação Principal
+---
 
-| Módulo | O que faz |
+## 🚀 Getting Started
+
+1. Visit [prova.encontrodagua.com](https://prova.encontrodagua.com)
+2. Log in with your invite link or request access
+3. The interface defaults to **English** (toggle 🇧🇷 / 🇺🇸 to switch)
+
+---
+
+## 🗂️ Key Modules
+
+| Module | What it does in Demo |
 |---|---|
-| **Dashboard** | Visão geral: pipeline, deals, atividades recentes |
-| **Board (Kanban)** | Gestão visual de deals por estágio |
-| **Contatos** | Base de clientes com filtros e histórico |
-| **Inbox (Mazô)** | Central de IA: briefings, sugestões, WA automático |
-| **Atividades** | Tarefas, reuniões, calls e notas |
-| **Reports** | Funil de vendas, conversão, LTV |
-| **AI Hub** | Acesso às agentes Mazô, Jury, Precy |
-| **QRDágua** | Criação e rastreio de QR Codes |
-| **Prompt Lab** | Criação e otimização de prompts com IA |
-| **Admin** | Gerenciamento de usuários e permissões |
+| **Dashboard** | Shows metrics based on demo leads only |
+| **Board (Kanban)** | Demo deals — isolated from production |
+| **Contacts** | Test leads only (tag `🤖 sdr`, `@teste` emails) |
+| **Inbox (Mazô)** | AI agent with fresh context — no real client history |
+| **Activities** | Your own demo activities (saved per branch) |
+| **Prompt Lab** | Saved prompts are isolated per branch via DB |
+| **Reports** | Based on demo deals only |
+| **Precy (AI Hub)** | Pricing calculator — choose save currency (BRL/USD/EUR/AUD) |
+| **Jury (AI Hub)** | Contract generator — PDF viewer inline |
 
 ---
 
-## 🤖 Agentes IA
+## 🔒 Data Isolation Guarantee
 
-### Mazô — Inteligência de Vendas
-- Acesse via **Inbox** ou o widget flutuante (canto inferior direito)
-- Gera briefings de leads do dia, sugere upsell, detecta risco de churn
-- Em produção: lê todos os dados reais da sua base
-
-### Jury — Contratos
-- Disponível no card de Deal → aba **Documentos**
-- Gera contratos em linguagem natural → exibe PDF inline
-
-### Precy — Precificação
-- Disponível no **AI Hub** → aba Precy
-- Calcula preço justo baseado em hora, stack e impacto
-- Permite salvar no Catálogo em BRL, USD, EUR ou AUD
+| Action | Result |
+|---|---|
+| Add a product | Visible in Demo only |
+| Save a prompt | Visible in Demo only (`is_demo_data = true`) |
+| Create a contact | Must use `@teste` email or `🤖 sdr` tag to stay visible |
+| Hub (production) data | **Never visible here** |
 
 ---
 
-## 📋 SDR / Link d'Água
+## 🤖 AI Agents
 
-Leads do WhatsApp chegam automaticamente com a tag `🤖 sdr`. Eles aparecem no **primer estágio do Board** sem nenhuma ação manual.
+### Mazô
+- Access via **Inbox** or the floating widget (bottom right)
+- In demo: fresh context — no production client history
+- Generates briefings from your demo leads
 
-**Deduplicação:** Replays do webhook não criam cards duplicados (filtro DISTINCT por e-mail).
+### Jury
+- Open any Deal → **Documents** tab → generate contract
+- AI-powered, displayed inline as a rich viewer
 
----
-
-## 🏢 Deals — Card de Detalhes
-
-- **+ Nova empresa**: cria inline sem sair do card
-- **Produtos**: selecione na lista filtrada → "Adicionar" (layout flex adaptativo)
-- **Timeline**: anotações, calls, reuniões e tarefas vinculadas ao deal
-- **IA Insights**: análise do lead com Gemini
-
----
-
-## 🔑 Administração
-
-### Criar Usuário
-1. Vá para **Admin → Usuários**
-2. Preencha nome, e-mail e senha
-3. O sistema cria o perfil automaticamente (trigger `handle_new_user`)
-
-### Convite por Link
-1. **Admin → Gerador de Convite**
-2. Copie o link e envie para o novo usuário
-3. O link expira após o primeiro cadastro
+### Precy
+- **AI Hub → Precy** tab
+- Calculate fair price → choose save currency → **Save as Product (USD/BRL/EUR/AUD)**
 
 ---
 
-## 🌐 Idioma
-Clique no botão 🇧🇷 / 🇺🇸 no topo para alternar entre Português e Inglês.
+## 🏢 Deals — Card Features
+
+- **+ Nova empresa** / **+ New company**: create inline without leaving the card
+- **Products tab**: add products with quantity — layout adapts to any screen width
+- **Timeline**: notes, calls, meetings linked to the deal
+- **AI Insights**: Gemini analysis of the lead
 
 ---
 
-*Hub d'Água — Encontro d'Água CRM | Suporte: lidi@encontrodagua.com*
+## 🌐 Language
+Click the **🇧🇷 / 🇺🇸** button at the top to switch between Portuguese and English.
+
+> Demo defaults to **English** (set by `VITE_APP_MODE=DEMO`).
+
+---
+
+*Prova d'Água — AI Demo Sandbox | Encontro d'Água*
