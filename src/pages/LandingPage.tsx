@@ -276,7 +276,11 @@ Agora, gere o prompt perfeito:`;
       <header className="fixed w-full z-[9999] top-0 py-4 px-6 bg-black/60 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-xl font-bold text-white tracking-tight">Encontro D'água .hub 🌀</span>
+            <img
+              src="/logos/logo-full-dark-gold.png"
+              alt="Encontro d'Água"
+              className="h-10 object-contain"
+            />
           </div>
 
           {/* Desktop Navigation */}

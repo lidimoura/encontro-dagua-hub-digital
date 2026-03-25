@@ -273,8 +273,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Link to="/" className="h-16 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
           <img
             src={darkMode
-              ? '/logos/logo-circular-gold-transp.png.png'
-              : '/logos/logo-circular-black-transp.png.png'}
+              ? '/logos/logo-icon-gold-transp.png'
+              : '/logos/logo-icon-black-transp.png'}
             alt="Encontro d'Água"
             className="h-9 w-9 object-contain"
           />
