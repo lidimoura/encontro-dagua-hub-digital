@@ -104,16 +104,9 @@ const GeneralSettings: React.FC = () => {
 
       <CustomFieldsManager
         customFieldDefinitions={controller.customFieldDefinitions}
-        newFieldLabel={controller.newFieldLabel}
-        setNewFieldLabel={controller.setNewFieldLabel}
-        newFieldType={controller.newFieldType}
-        setNewFieldType={controller.setNewFieldType}
-        newFieldOptions={controller.newFieldOptions}
-        setNewFieldOptions={controller.setNewFieldOptions}
-        editingId={controller.editingId}
-        onStartEditing={controller.startEditingField}
-        onCancelEditing={controller.cancelEditingField}
-        onSaveField={controller.handleSaveField}
+        onSaveField={(label, type, options, editingId) =>
+          controller.handleSaveField(label, type, options, editingId)
+        }
         onRemoveField={controller.removeCustomField}
       />
 

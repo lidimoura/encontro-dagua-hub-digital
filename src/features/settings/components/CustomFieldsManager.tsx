@@ -1,39 +1,64 @@
-import React from 'react';
+import React, { useState, useCallback, useId } from 'react';
 import { PenTool, Pencil, Check, Plus, List, Tag, Trash2 } from 'lucide-react';
 import { SettingsSection } from './SettingsSection';
 import { CustomFieldDefinition, CustomFieldType } from '@/types';
 import { useTranslation } from '@/hooks/useTranslation';
 
+/**
+ * CustomFieldsManager — Internal state version
+ *
+ * FIX: Moved all input state INSIDE this component to prevent re-renders from
+ * the parent SettingsPage from stealing focus on every keystroke.
+ *
+ * The component exposes its completed field via onSave/onRemove callbacks.
+ */
+
 interface CustomFieldsManagerProps {
   customFieldDefinitions: CustomFieldDefinition[];
-  newFieldLabel: string;
-  setNewFieldLabel: (label: string) => void;
-  newFieldType: CustomFieldType;
-  setNewFieldType: (type: CustomFieldType) => void;
-  newFieldOptions: string;
-  setNewFieldOptions: (options: string) => void;
-  editingId: string | null;
-  onStartEditing: (field: CustomFieldDefinition) => void;
-  onCancelEditing: () => void;
-  onSaveField: () => void;
+  onSaveField: (label: string, type: CustomFieldType, options: string, editingId: string | null) => void;
   onRemoveField: (id: string) => void;
 }
 
 export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
   customFieldDefinitions,
-  newFieldLabel,
-  setNewFieldLabel,
-  newFieldType,
-  setNewFieldType,
-  newFieldOptions,
-  setNewFieldOptions,
-  editingId,
-  onStartEditing,
-  onCancelEditing,
   onSaveField,
-  onRemoveField
+  onRemoveField,
 }) => {
   const { t } = useTranslation();
+
+  // Local state — not lifted to parent, so parent re-renders won't steal focus
+  const [newFieldLabel, setNewFieldLabel] = useState('');
+  const [newFieldType, setNewFieldType] = useState<CustomFieldType>('text');
+  const [newFieldOptions, setNewFieldOptions] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const labelId = useId();
+  const typeId = useId();
+  const optionsId = useId();
+
+  const handleSave = useCallback(() => {
+    if (!newFieldLabel.trim()) return;
+    onSaveField(newFieldLabel.trim(), newFieldType, newFieldOptions, editingId);
+    setNewFieldLabel('');
+    setNewFieldType('text');
+    setNewFieldOptions('');
+    setEditingId(null);
+  }, [newFieldLabel, newFieldType, newFieldOptions, editingId, onSaveField]);
+
+  const handleStartEditing = useCallback((field: CustomFieldDefinition) => {
+    setEditingId(field.id);
+    setNewFieldLabel(field.label || field.name || '');
+    setNewFieldType(field.type);
+    setNewFieldOptions(field.options?.join(', ') || '');
+  }, []);
+
+  const handleCancelEditing = useCallback(() => {
+    setEditingId(null);
+    setNewFieldLabel('');
+    setNewFieldType('text');
+    setNewFieldOptions('');
+  }, []);
+
   return (
     <SettingsSection title="Campos Personalizados" icon={PenTool}>
       <p className="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
@@ -48,8 +73,9 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
         )}
         <div className="flex gap-3 items-end mb-3">
           <div className="flex-1">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nome do Campo</label>
+            <label htmlFor={labelId} className="block text-xs font-bold text-slate-500 uppercase mb-1">Nome do Campo</label>
             <input
+              id={labelId}
               type="text"
               value={newFieldLabel}
               onChange={(e) => setNewFieldLabel(e.target.value)}
@@ -58,8 +84,9 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
             />
           </div>
           <div className="w-40">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo</label>
+            <label htmlFor={typeId} className="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo</label>
             <select
+              id={typeId}
               value={newFieldType}
               onChange={(e) => setNewFieldType(e.target.value as CustomFieldType)}
               className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
@@ -73,14 +100,14 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
           <div className="flex gap-2">
             {editingId && (
               <button
-                onClick={onCancelEditing}
+                onClick={handleCancelEditing}
                 className="bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 px-3 py-2 rounded-lg text-sm font-bold transition-colors h-[38px] border border-slate-200 dark:border-white/10"
               >
                 {t('cancel')}
               </button>
             )}
             <button
-              onClick={onSaveField}
+              onClick={handleSave}
               disabled={!newFieldLabel.trim()}
               className={`${editingId ? 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20' : 'bg-primary-600 hover:bg-primary-500 shadow-primary-600/20'} text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors h-[38px] shadow-lg`}
             >
@@ -92,10 +119,11 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
 
         {newFieldType === 'select' && (
           <div className="animate-in slide-in-from-top-2 fade-in duration-200">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-2">
+            <label htmlFor={optionsId} className="block text-xs font-bold text-slate-500 uppercase mb-1 flex items-center gap-2">
               <List size={12} /> Opções (Separadas por vírgula)
             </label>
             <input
+              id={optionsId}
               type="text"
               value={newFieldOptions}
               onChange={(e) => setNewFieldOptions(e.target.value)}
@@ -131,7 +159,7 @@ export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
             </div>
             <div className="flex gap-1">
               <button
-                onClick={() => onStartEditing(field)}
+                onClick={() => handleStartEditing(field)}
                 className="text-slate-400 hover:text-amber-500 p-2 rounded hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
                 title="Editar campo"
               >

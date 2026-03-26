@@ -56,7 +56,7 @@ export function usePushNotifications() {
       // 3. Subscribe to push
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
       });
 
       // 4. Save subscription to Supabase
@@ -71,6 +71,7 @@ export function usePushNotifications() {
           endpoint: subJson.endpoint,
           p256dh: (subJson.keys as any)?.p256dh || '',
           auth: (subJson.keys as any)?.auth || '',
+          app_source: 'crm-hub', // Identifies this subscription as belonging to the CRM Hub
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
 

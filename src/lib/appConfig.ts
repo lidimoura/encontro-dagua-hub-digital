@@ -40,13 +40,23 @@ export const DEMO_ALLOWED_TAGS     = ['test', 'QA', 'Gamer pc', 'Lilas', 'amazo-
 /**
  * Retorna true se um contato deve ser exibido.
  * No modo PRODUCTION, sempre retorna true (sem filtro).
+ *
+ * Critérios de visibilidade na Demo (modo combinado):
+ *   1. is_demo_data === true  (flag de banco — caminho rápido)
+ *   2. Email na lista permitida
+ *   3. Telefone na lista permitida
+ *   4. Ao menos uma tag na lista permitida
  */
 export function isDemoVisible(contact: {
     tags?: string[] | null;
     email?: string | null;
     phone?: string | null;
+    isDemoData?: boolean | null;
 }): boolean {
     if (!IS_DEMO) return true;
+
+    // Fast-path: explicitly flagged as demo data in the DB
+    if (contact.isDemoData === true) return true;
 
     const tags  = contact.tags  || [];
     const email = (contact.email || '').toLowerCase().trim();

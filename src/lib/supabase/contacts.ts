@@ -29,6 +29,7 @@ export interface DbContact {
   stage: string;
   source: string | null;
   tags: string[] | null;          // ← CRITICAL: required for isDemoVisible filter
+  is_demo_data: boolean | null;   // ← privacy wall fast-path
   birth_date: string | null;
   last_interaction: string | null;
   last_purchase_date: string | null;
@@ -75,6 +76,7 @@ const transformContact = (db: DbContact): Contact => ({
   stage: db.stage,
   source: db.source as Contact['source'] || undefined,
   tags: db.tags || [],            // ← tags now flow through to isDemoVisible()
+  isDemoData: db.is_demo_data ?? false, // ← privacy wall fast-path
   birthDate: db.birth_date || undefined,
   lastInteraction: db.last_interaction || undefined,
   lastPurchaseDate: db.last_purchase_date || undefined,
@@ -153,9 +155,10 @@ export const contactsService = {
 
       // STRICT DEMO ISOLATION: Only show QA/test contacts on provadagua
       // This filters in the DB query itself — no data leakage possible.
+      // Combines is_demo_data flag (fast-path) with legacy tag/email patterns.
       if (IS_DEMO) {
         query = query.or(
-          "tags.cs.{🤖 sdr},email.ilike.%0000000000%,email.ilike.%@teste%,name.ilike.%Gamer pc%,name.ilike.%Lilas%,is_test.eq.true"
+          "is_demo_data.eq.true,tags.cs.{🤖 sdr},email.ilike.%0000000000%,email.ilike.%@teste%,name.ilike.%Gamer pc%,name.ilike.%Lilas%"
         );
       }
 
