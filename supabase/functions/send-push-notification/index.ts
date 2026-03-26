@@ -120,20 +120,26 @@ serve(async (req) => {
         );
 
         const body = await req.json();
-        const { title, notifBody: bodyText, url, lead_id } = body as {
+        const { title, notifBody: bodyText, url, lead_id, app_source } = body as {
             title?: string;
             notifBody?: string;
             url?: string;
             lead_id?: string;
+            app_source?: string;
         };
+
+        // Default to 'crm-hub' for backward compatibility.
+        // Link d'Água must pass app_source: 'link-dagua' to route to its subscribers.
+        const targetAppSource = app_source ?? 'crm-hub';
 
         const pushTitle = title ?? '🔔 Novo Lead!';
         const pushBody = bodyText ?? 'Um novo lead chegou no CRM.';
 
-        // Fetch all active push subscriptions
+        // Fetch subscriptions filtered by app_source — prevents cross-app notification bleed
         const { data: subs, error: subsError } = await supabase
             .from('push_subscriptions')
-            .select('endpoint, p256dh, auth');
+            .select('endpoint, p256dh, auth')
+            .eq('app_source', targetAppSource);
 
         if (subsError) throw subsError;
         if (!subs || subs.length === 0) {

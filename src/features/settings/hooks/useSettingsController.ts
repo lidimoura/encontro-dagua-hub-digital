@@ -39,12 +39,17 @@ export const useSettingsController = () => {
     setNewFieldOptions('');
   };
 
-  const handleSaveField = () => {
-    if (!newFieldLabel.trim()) return;
+  const handleSaveField = (
+    label: string,
+    type: CustomFieldType,
+    rawOptions: string,
+    editingId: string | null,
+  ) => {
+    if (!label.trim()) return;
 
     const optionsArray =
-      newFieldType === 'select'
-        ? newFieldOptions
+      type === 'select'
+        ? rawOptions
             .split(',')
             .map(opt => opt.trim())
             .filter(opt => opt !== '')
@@ -55,15 +60,14 @@ export const useSettingsController = () => {
       setCustomFieldDefinitions(prev =>
         prev.map(f =>
           f.id === editingId
-            ? { ...f, label: newFieldLabel, type: newFieldType, options: optionsArray }
+            ? { ...f, label, type, options: optionsArray }
             : f
         )
       );
       addToast('Campo personalizado atualizado com sucesso!', 'success');
-      cancelEditingField();
     } else {
       // CREATE NEW
-      const key = newFieldLabel
+      const key = label
         .toLowerCase()
         .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
           index === 0 ? word.toLowerCase() : word.toUpperCase()
@@ -73,15 +77,13 @@ export const useSettingsController = () => {
       const newField: CustomFieldDefinition = {
         id: crypto.randomUUID(),
         key,
-        label: newFieldLabel,
-        type: newFieldType,
+        label,
+        type,
         options: optionsArray,
       };
 
       setCustomFieldDefinitions(prev => [...prev, newField]);
       addToast('Campo personalizado criado com sucesso!', 'success');
-      setNewFieldLabel('');
-      setNewFieldOptions('');
     }
   };
 

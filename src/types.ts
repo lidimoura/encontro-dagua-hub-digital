@@ -79,6 +79,7 @@ export interface Contact {
     avatar?: string;
     source?: string;
     tags?: string[];                // ← DB tags (🤖 sdr, linkdagua, etc.) — required for isDemoVisible
+    isDemoData?: boolean;           // ← Privacy wall fast-path (from is_demo_data column)
     notes?: string;
     birthDate?: string;
     lastInteraction?: string;
