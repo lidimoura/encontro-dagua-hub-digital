@@ -8,19 +8,21 @@ const CORS = {
 };
 
 /**
- * signup-showcase Edge Function
+ * signup-showcase Edge Function — v2 (Multi-Lead Isolation)
  *
- * Creates a demo user for the ShowcaseLP portal, bypassing:
- * 1. Email confirmation (confirmed immediately via admin API)
- * 2. The broken handle_new_user() trigger (profile inserted manually)
- * 3. Error 228 (no invite token required)
+ * Each new lead gets their own unique company_id UUID.
+ * This means the existing company_id-based RLS automatically
+ * isolates every demo user — no cross-contamination possible.
+ *
+ * Medical leads, startup leads, social leads → all isolated.
+ * Shared template boards (global_template = true) are visible to all.
  *
  * Flow:
- * 1. Receive { name, email, password, language } from ShowcaseLP
- * 2. Create auth user via admin.createUser (email_confirm: true)
- * 3. Manually INSERT into public.profiles with is_demo_data: true
- * 4. Save lead into public.contacts with is_demo_data: true
- * 5. Return { user_id, email } — frontend then calls signInWithPassword
+ * 1. Generate a unique demo_company_id (UUID)
+ * 2. Create auth user via admin API (email_confirm: true → bypasses err228)
+ * 3. Upsert profile with: company_id = demo_company_id, is_demo_data = true
+ * 4. Save lead in contacts (tagged with demo_company_id)
+ * 5. Return { user_id, email } → frontend calls signInWithPassword
  */
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -48,33 +50,41 @@ serve(async (req) => {
       });
     }
 
-    // ─── Admin client (Service Role — bypasses RLS and auth) ─────────────────
+    // ─── Admin client — keys come from Supabase Edge Function secrets ─────────
+    // NEVER hardcode credentials here. All via Supabase dashboard → Secrets.
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );
 
-    // ─── Step 1: Create auth user with email confirmed immediately ────────────
+    // ─── Step 1: Generate a unique company_id for this lead ───────────────────
+    // This is the core of per-lead isolation:
+    // Each demo user lives in their own "virtual company" by UUID.
+    // Existing RLS (company_id = user's company_id) automatically isolates them.
+    const demoCompanyId = crypto.randomUUID();
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName  = name.trim();
+
+    // ─── Step 2: Create auth user — email confirmed immediately ──────────────
     const { data: authData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       password,
-      email_confirm: true,  // ← Bypasses email confirmation requirement
+      email_confirm: true,
       user_metadata: {
-        name:               name.trim(),
-        full_name:          name.trim(),
+        name:               normalizedName,
+        full_name:          normalizedName,
         is_demo_data:       true,
         app_source:         'showcase_lp',
         role:               'vendedor',
+        company_id:         demoCompanyId,   // ← trigger uses this if it runs
+        preferred_language: language ?? 'en',
         preferred_currency: 'AUD',
       },
     });
 
     if (createError) {
-      // Handle "already registered" gracefully
-      if (createError.message?.includes('already registered') ||
-          createError.message?.includes('already been registered') ||
-          createError.message?.toLowerCase().includes('email already')) {
+      if (createError.message?.toLowerCase().includes('already')) {
         return new Response(JSON.stringify({
           error: 'email_already_registered',
           message: language === 'pt'
@@ -82,7 +92,6 @@ serve(async (req) => {
             : 'This email is already registered. Please try logging in.',
         }), { status: 409, headers: { ...CORS, 'Content-Type': 'application/json' } });
       }
-
       console.error('[signup-showcase] admin.createUser failed:', createError.message);
       return new Response(JSON.stringify({ error: createError.message }), {
         status: 500, headers: { ...CORS, 'Content-Type': 'application/json' }
@@ -91,71 +100,89 @@ serve(async (req) => {
 
     const userId = authData.user.id;
 
-    // ─── Step 2: Wait for trigger to run, then upsert profile ────────────────
-    // Give the handle_new_user trigger 300ms to run first.
-    // Then upsert with ONLY the base schema columns (no extra cols needed).
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // ─── Step 3: Wait for trigger to settle, then upsert profile ─────────────
+    await new Promise(resolve => setTimeout(resolve, 400));
 
-    // Check if trigger already created the profile
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .select('id, role')
+      .select('id, company_id')
       .eq('id', userId)
       .maybeSingle();
 
     if (!existingProfile) {
-      // Trigger didn't create it — insert manually (only safe base columns)
+      // Trigger didn't run — insert manually
       const { error: insertError } = await supabaseAdmin
         .from('profiles')
         .insert({
-          id:    userId,
-          email: email.trim().toLowerCase(),
-          name:  name.trim(),
-          role:  'vendedor',
-          // company_id intentionally omitted (nullable FK — defaults to NULL)
+          id:                  userId,
+          email:               normalizedEmail,
+          name:                normalizedName,
+          role:                'vendedor',
+          company_id:          demoCompanyId,   // ← isolated per-lead
+          is_demo_data:        true,
+          preferred_language:  language ?? 'en',
+          preferred_currency:  'AUD',
         });
 
       if (insertError) {
-        console.error('[signup-showcase] profile INSERT failed:', insertError.message, insertError.code);
-        // Not returning error — user can still sign in, profile may load on retry
+        // Try without optional columns in case migration 037/038 not yet applied
+        console.warn('[signup-showcase] full insert failed, trying minimal:', insertError.message);
+        await supabaseAdmin.from('profiles').insert({
+          id:         userId,
+          email:      normalizedEmail,
+          name:       normalizedName,
+          role:       'vendedor',
+          company_id: demoCompanyId,
+        });
       } else {
-        console.log('[signup-showcase] profile inserted manually for:', userId);
+        console.log('[signup-showcase] ✅ Profile inserted with company_id:', demoCompanyId);
       }
     } else {
-      console.log('[signup-showcase] profile already exists (trigger ran), updating role...');
-      // Ensure role is set correctly
-      await supabaseAdmin.from('profiles').update({ role: 'vendedor' }).eq('id', userId);
+      // Trigger ran — ensure company_id is set (trigger may have left it NULL)
+      const needsUpdate = !existingProfile.company_id;
+      if (needsUpdate) {
+        await supabaseAdmin.from('profiles').update({
+          company_id:          demoCompanyId,
+          is_demo_data:        true,
+          preferred_language:  language ?? 'en',
+          preferred_currency:  'AUD',
+        }).eq('id', userId);
+        console.log('[signup-showcase] ✅ Profile updated with company_id:', demoCompanyId);
+      } else {
+        console.log('[signup-showcase] ✅ Profile OK (trigger ran with company_id)');
+      }
     }
 
     // ─── Step 4: Save lead in contacts ───────────────────────────────────────
     const { error: contactError } = await supabaseAdmin
       .from('contacts')
       .insert({
-        name:         name.trim(),
-        email:        email.trim().toLowerCase(),
+        name:         normalizedName,
+        email:        normalizedEmail,
         source:       'showcase_lp',
         stage:        'LEAD',
         status:       'ACTIVE',
+        company_id:   demoCompanyId,    // ← contact belongs to this lead's space
         tags:         ['showcase', 'demo-lead', 'portal-cadastro'],
         is_demo_data: true,
         briefing_json: {
-          origem:    'ShowcaseLP/portal',
-          idioma:    language ?? 'pt',
-          timestamp: new Date().toISOString(),
-          user_id:   userId,
+          origem:           'ShowcaseLP/portal',
+          idioma:           language ?? 'en',
+          timestamp:        new Date().toISOString(),
+          user_id:          userId,
+          demo_company_id:  demoCompanyId,
         },
       });
 
     if (contactError) {
-      // Non-fatal — lead capture failure shouldn't block sign-in
       console.warn('[signup-showcase] contact insert warning:', contactError.message);
     }
 
-    // ─── Return success ────────────────────────────────────────────────────────
+    // ─── Return success ───────────────────────────────────────────────────────
     return new Response(JSON.stringify({
       success:  true,
       user_id:  userId,
-      email:    email.trim().toLowerCase(),
+      email:    normalizedEmail,
       message:  language === 'pt'
         ? 'Conta criada! Fazendo login...'
         : 'Account created! Logging in...',
