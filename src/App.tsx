@@ -71,6 +71,9 @@ const ManifestoPage = lazy(() =>
 const ClientPortalPage = lazy(() =>
   import('@/pages/ClientPortalPage').then(m => ({ default: m.ClientPortalPage }))
 );
+const ShowcaseLP = lazy(() =>
+  import('@/features/showcase/ShowcaseLP').then(m => ({ default: m.ShowcaseLP }))
+);
 
 
 
@@ -181,6 +184,8 @@ const App: React.FC = () => {
                       <Routes>
                         {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
                         <Route path="/" element={<LandingPage />} />
+                        {/* ── PROVA D'ÁGUA: Showcase LP — entry point for demo branch ── */}
+                        <Route path="/showcase" element={<ShowcaseLP />} />
                         <Route path="/login" element={<Login />} />
                         {/* Invite Only - Redirect register to landing page */}
                         <Route path="/register" element={<Navigate to="/?action=apply" replace />} />

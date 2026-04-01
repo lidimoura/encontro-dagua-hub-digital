@@ -35,7 +35,22 @@ export const DEFAULT_LANG: 'pt' | 'en' = IS_DEMO ? 'en' : 'pt';
  */
 export const DEMO_ALLOWED_EMAILS   = ['lidi@teste.com'];
 export const DEMO_ALLOWED_PHONES   = ['0000000000'];
-export const DEMO_ALLOWED_TAGS     = ['test', 'QA', 'Gamer pc', 'Lilas', 'amazo-sdr', '🤖 sdr'];
+export const DEMO_ALLOWED_TAGS     = ['test', 'QA', 'Gamer pc', 'Lilas', 'amazo-sdr', '🤖 sdr', 'showcase', 'demo-lead'];
+
+/**
+ * ── SHOWCASE LP ISOLATION WALL ──────────────────────────────────────────────
+ *
+ * Leads captured in ShowcaseLP (/showcase) are ALWAYS saved with:
+ *   - is_demo_data: true          → fast-path inclusion in isDemoVisible()
+ *   - tags: ['showcase','demo-lead'] → also covered by DEMO_ALLOWED_TAGS above
+ *   - source: 'showcase_lp'
+ *
+ * This guarantees that any user arriving from this LP only ever sees
+ * is_demo_data: true records in any view that uses contactsService.getAll()
+ * or isDemoVisible().
+ *
+ * DO NOT remove is_demo_data: true from the ShowcaseLP form submit payload.
+ */
 
 /**
  * Retorna true se um contato deve ser exibido.

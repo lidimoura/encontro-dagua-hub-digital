@@ -56,3 +56,10 @@ secrets.json
 .secrets
 supabase/.env
 .env.supabase
+
+# Temp migration/admin scripts — NEVER commit
+fixup_*.mjs
+apply_*.mjs
+grand_finale_*.mjs
+*_migrations.mjs
+*.secret.mjs

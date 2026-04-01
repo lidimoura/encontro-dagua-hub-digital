@@ -1,4 +1,4 @@
-export type Language = 'pt' | 'en';
+export type Language = 'pt' | 'en' | 'es';
 
 export const translations = {
     pt: {
@@ -9,7 +9,7 @@ export const translations = {
         navContacts: "Contatos",
         navActivities: "Atividades",
         navReports: "Relatórios",
-        navQR: "QR D'água",
+        navQR: "Páginas Pontes",
         navPrompts: "PromptLab",
         navAdmin: "Admin",
         logout: "Sair",
@@ -181,6 +181,7 @@ export const translations = {
         // Link d'Água Section
         qrTitle: "Link d'Água",
         qrWaterTitle: "Link d'Água: Portal de Presença Integrada",
+        qrWater: "Páginas Pontes",
         qrTag: "Link d'Água",
         qrHeadline: "Gerador de Identidade Digital",
         qrDesc: "Conecte seu negócio através de Código Físico (QR impresso) ou Link Digital (WhatsApp/Bio). Fidelidade total: o que você vê é o que seus clientes recebem.",
@@ -331,20 +332,10 @@ export const translations = {
         mazoDesc: "Focada em retenção, empatia e saúde do cliente. Previne churn proativamente.",
         juryDesc: "Gera contratos usando templates da biblioteca. Garante compliance e segurança.",
 
-        // --- MÓDULO LINK D'ÁGUA --- (Merged)
-        qrPageTitle: "Gerador de Link d'Água",
+        // --- MÓDULO BRIDGE PAGES (antes: Link d'Água / QR d'Água) ---
+        qrPageTitle: "Gerador de Páginas Pontes",
         qrPageSubtitle: "Crie pontes entre o físico e o digital.",
-        configTab: "Configuração",
-        designTab: "Design",
-        contentTab: "Conteúdo",
-        previewTab: "Visualização",
-
-        // Form Fields
-        qrType: "Tipo de Link",
-        typeLink: "Link / Código Externo",
-        typeWhatsapp: "WhatsApp",
-        typePix: "PIX",
-        typeBridge: "Cartão Digital",
+        typeBridge: "Cartão Digital (Página Ponte)",
 
         targetUrl: "URL de Destino",
         urlPlaceholder: "https://seunsite.com.br",
@@ -717,8 +708,8 @@ export const translations = {
         navContacts: "Contacts",
         navActivities: "Activities",
         navReports: "Reports",
-        navQR: "QR D'água",
-        navPrompts: "PromptLab",
+        navQR: "Bridge Pages",
+        navPrompts: "Prompt Lab",
         navAdmin: "Admin",
         logout: "Logout",
         profile: "Profile",
@@ -736,7 +727,7 @@ export const translations = {
         boards: "Boards",
         contacts: "Contacts",
         activities: "Activities",
-        qrWater: "QR D'água",
+        qrWater: "Bridge Pages",
         promptLab: "Prompt Lab",
         reports: "Reports",
         aiHub: "AI Hub",
@@ -991,11 +982,14 @@ export const translations = {
 
 
         // --- TEAM MANAGEMENT ---
-        teamMembers: "Membros da Equipe",
-        teamMembersDesc: "Gerencie membros e suas permissões",
-        member: "Membro",
-        role: "Função",
-        // Keys email, access, teamMember, note, teamMembersNote removed (duplicates)
+        teamMembers: "Team Members",
+        teamMembersDesc: "Manage team members and their permissions",
+        member: "Member",
+        role: "Role",
+        email: "Email",
+        access: "Access",
+        note: "Note",
+        teamMembersNote: "This is the core Hub team. New members can be added via the Admin Panel.",
 
 
         // --- CRM CORE (KANBAN) ---
@@ -1054,9 +1048,47 @@ export const translations = {
         perfectCreateBoard: "✅ Perfect! Create Board",
         boardName: "Board Name",
 
-        // --- MÓDULO LINK D'ÁGUA ---
-        createQR: "Create New Link",
-        downloadQR: "Download Link",
+        // --- BRIDGE PAGES MODULE (formerly QR d'Água) ---
+        qrPageTitle: "Bridge Pages Generator",
+        qrPageSubtitle: "Create bridges between the physical and digital world.",
+        createQR: "Create New Bridge Page",
+        downloadQR: "Download PNG",
+        saveProject: "Save Project",
+        updateProject: "Update Project",
+        cancelEdit: "Cancel Edit",
+        savedSuccess: "Project saved successfully!",
+        configTab: "Configuration",
+        designTab: "Design",
+        contentTab: "Content",
+        previewTab: "Preview",
+        qrType: "Link Type",
+        typeLink: "External Link / Code",
+        typeWhatsapp: "WhatsApp",
+        typePix: "PIX",
+        typeBridge: "Digital Card (Bridge Page)",
+        targetUrl: "Destination URL",
+        urlPlaceholder: "https://yoursite.com",
+        waNumber: "WhatsApp Number",
+        waPlaceholder: "5592999999999",
+        waMessage: "Default Message",
+        waMessagePlaceholder: "Hello! I'd like to know more...",
+        pixKey: "PIX Key",
+        pixPlaceholder: "CPF, Email or Random",
+        pixName: "Beneficiary Name",
+        pixCity: "City",
+        pixAmount: "Amount (Optional)",
+        bridgeTitle: "Page Title",
+        bridgeTitlePlaceholder: "Your Business or Name",
+        bridgeDesc: "Description / Bio",
+        bridgeDescPlaceholder: "Brief description of your business...",
+        bridgeButton: "Main Button Text",
+        bridgeButtonPlaceholder: "Contact Us",
+        bridgeLink: "Button Link",
+        colorPrimary: "Primary Color",
+        colorSecondary: "Background Color",
+        logoUpload: "Logo (URL or Upload)",
+        logoPlaceholder: "https://...",
+        generateQR: "Generate Link",
 
         // --- PROMPTLAB MODULE ---
         promptTitle: "Prompt Laboratory",
@@ -1321,6 +1353,141 @@ export const translations = {
         start: "Start",
 
 
-    }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // ESPAÑOL (ES) — Infraestrutura Trilíngue
+    // Status: Placeholders prontos. Preencher incrementalmente.
+    // Fallback: ES → EN → PT (garantido pelo LanguageContext v3)
+    // Padrão: Seguindo convenções da Amazon i18n para SaaS B2B
+    // ─────────────────────────────────────────────────────────────────────────
+    es: {
+        // --- NAVEGACIÓN GLOBAL ---
+        navHome: "Inicio",
+        navCRM: "Gestión (CRM)",
+        navBoards: "Tableros",
+        navContacts: "Contactos",
+        navActivities: "Actividades",
+        navReports: "Informes",
+        navQR: "Bridge Pages",
+        navPrompts: "Prompt Lab",
+        navAdmin: "Admin",
+        logout: "Cerrar sesión",
+        profile: "Perfil",
+        login: "Ingresar",
+        enter: "Ingresar",
+        home: "Inicio",
+
+        // --- DASHBOARD ---
+        dashboard: "Dashboard",
+        dashboardTitle: "Dashboard",
+        dashboardSubtitle: "El pulso de tu negocio en tiempo real.",
+        thisMonth: "Este Mes",
+        lastQuarter: "Último Trimestre",
+        thisYear: "Este Año",
+        totalPipeline: "Pipeline Total",
+        activeDeals: "Negocios Activos",
+        conversionRate: "Conversión",
+        revenueWon: "Ingresos (Ganados)",
+
+        // --- INBOX ---
+        inboxTitle: "Bandeja de Entrada",
+        inboxSubtitle: "Tu mesa de trabajo.",
+
+        // --- CRM CORE ---
+        addDeal: "Agregar Negocio",
+        newDeal: "Nuevo Negocio",
+        allDeals: "Todos los Negocios",
+        myDeals: "Mis Negocios",
+        lead: "Lead",
+        qualified: "Calificado",
+        proposal: "Propuesta",
+        negotiation: "Negociación",
+        closedWon: "Cerrado Ganado",
+        closedLost: "Cerrado Perdido",
+
+        // --- ONBOARDING ---
+        createBoardTitle: "Crear Nuevo Tablero",
+        boardName: "Nombre del Tablero",
+        aiGeneration: "Crear con IA",
+        templates: "Plantillas Listas",
+        blankBoard: "Tablero en blanco",
+        perfectCreateBoard: "✅ ¡Perfecto! Crear Tablero",
+
+        // --- GENERAL ---
+        save: "Guardar",
+        cancel: "Cancelar",
+        close: "Cerrar",
+        loading: "Cargando...",
+        search: "Buscar",
+        filter: "Filtrar",
+        sort: "Ordenar",
+        edit: "Editar",
+        delete: "Eliminar",
+        add: "Agregar",
+        viewAll: "Ver todos",
+
+        // --- LOGIN ---
+        welcomeBack: "Bienvenido de vuelta",
+        loginSubtitle: "Ingresa a tu cuenta para continuar.",
+        password: "Contraseña",
+        forgotPassword: "Olvidé mi contraseña",
+        signIn: "Ingresar",
+
+        // --- AGENTS ---
+        pricingEngineer: "Ingeniera de Precios",
+        legalAnalyst: "Analista Legal",
+        internalCS: "Éxito del Cliente Interno",
+
+        // --- BRIDGE PAGES (formerly QR d'Água) ---
+        qrPageTitle: "Generador de Bridge Pages",
+        qrPageSubtitle: "Crea puentes entre el mundo físico y digital.",
+        typeBridge: "Tarjeta Digital (Bridge Page)",
+        qrWater: "Bridge Pages",
+
+        // --- NOTIFICATIONS ---
+        notifications: "Notificaciones",
+        notificationsEmpty: "¡Todo al día!",
+        notificationsEmptyDesc: "Sin nuevas notificaciones",
+
+        // --- SETTINGS ---
+        general: "General",
+        data: "Datos",
+        team: "Equipo",
+        settings: "Configuración",
+
+        // --- LANDING PAGE (ES) ---
+        saasPitch: "Infraestructura SaaS White Label",
+        mobileFirst: "Mobile First",
+        aiFirst: "IA First",
+        realImpact: "Impacto Real",
+        heroSubtitleLanding: "Un ecosistema digital que ofrece las mejores soluciones tecnológicas para resolver problemas reales y garantizar resultados y prosperidad para todos.",
+        knowHub: "Descubrir el Hub",
+        ourSolutions: "Nuestras Soluciones",
+
+        // --- AMAZO ---
+        amazoTag: "Agente de IA",
+        amazoTitle: "Amazô IA",
+        amazoDesc: "Amazô ayuda con el diagnóstico. Atención 24/7 para CS y Ventas directo en WhatsApp.",
+        talkToAmazo: "Habla con Amazô",
+        chatWithAmazo: "Hablar con Amazô ahora",
+
+        // --- FOOTER ---
+        footerText: "Inspirado en la naturaleza, codificado para el mundo.",
+        footerRights: "Todos los derechos reservados",
+
+        // --- PROMPT LAB ---
+        promptLabTitle: "Laboratorio de Prompts",
+        promptLabSubtitle: "Transforma ideas brutas en prompts perfectos con IA",
+        optimize: "✨ Optimizar",
+        optimizing: "⏳ Optimizando...",
+        copy: "Copiar",
+
+        // --- TOUR ---
+        skipTour: "Omitir tour",
+        previous: "Anterior",
+        next: "Siguiente",
+        start: "Comenzar",
+    },
 };
 

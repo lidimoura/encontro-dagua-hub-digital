@@ -341,14 +341,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
             </button>
 
-            {/* Language Toggle Button - FORCED VISIBILITY */}
+            {/* Language Toggle - Trilingual cycle: PT → EN → ES → PT */}
             <button
-              onClick={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
+              onClick={() => {
+                const cycle: Record<string, 'pt' | 'en' | 'es'> = { pt: 'en', en: 'es', es: 'pt' };
+                setLanguage(cycle[language] ?? 'en');
+              }}
               className="p-2.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95 z-[70] relative ring-2 ring-slate-200 dark:ring-slate-700"
-              title={language === 'pt' ? 'Switch to English' : 'Mudar para Português'}
+              title={language === 'pt' ? 'Switch to English' : language === 'en' ? 'Cambiar a Español' : 'Mudar para Português'}
               style={{ display: 'block', visibility: 'visible' }}
             >
-              <span className="text-lg leading-none block">{language === 'pt' ? '🇧🇷' : '🇺🇸'}</span>
+              <span className="text-lg leading-none block">
+                {language === 'pt' ? '🇧🇷' : language === 'en' ? '🇺🇸' : '🇪🇸'}
+              </span>
             </button>
 
             {/* Notification Bell */}
