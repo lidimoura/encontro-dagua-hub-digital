@@ -1,491 +1,696 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface Translation {
-  hero_badge: string;
-  hero_title: string;
+  nav_login: string;
+  hero_eyebrow: string;
+  hero_title_1: string;
+  hero_title_2: string;
   hero_title_accent: string;
   hero_subtitle: string;
   hero_cta_primary: string;
   hero_cta_secondary: string;
-  metrics_label: string;
-  metrics: Array<{ value: string; label: string }>;
+  hero_cta_sub: string;
+  trust_label: string;
+  specialties: string[];
+  metrics: Array<{ value: string; label: string; icon: string }>;
+  pain_title: string;
+  pain_subtitle: string;
+  pain_items: Array<{ icon: string; title: string; desc: string }>;
   modules_title: string;
   modules_subtitle: string;
+  modules: Array<{ icon: string; name: string; desc: string; badge: string }>;
+  qa_eyebrow: string;
   qa_title: string;
   qa_subtitle: string;
   qa_items: Array<{ icon: string; title: string; status: string; desc: string }>;
-  modules: Array<{ icon: string; name: string; desc: string; status: string }>;
   tech_title: string;
-  tech_stack: Array<{ name: string; category: string }>;
-  cta_title: string;
-  cta_subtitle: string;
-  cta_button: string;
+  tech_stack: Array<{ icon: string; name: string; category: string }>;
+  trial_title: string;
+  trial_subtitle: string;
+  trial_features: string[];
+  trial_cta: string;
+  trial_sub: string;
   footer_built: string;
   footer_version: string;
+  footer_privacy: string;
 }
+
+// ─── SVG Icon Components ───────────────────────────────────────────────────
+const ShieldIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
+);
+const ArrowIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+);
 
 // ─── i18n Content ─────────────────────────────────────────────────────────
 const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
   pt: {
-    hero_badge: '🚀 Provadágua V3.0 — Missão Concluída',
-    hero_title: 'O CRM que nasceu',
-    hero_title_accent: 'na floresta.',
+    nav_login: 'Entrar no Hub',
+    hero_eyebrow: 'Para Médicos · Fisioterapeutas · Psicólogos',
+    hero_title_1: 'O CRM com IA que',
+    hero_title_2: 'protege seus pacientes',
+    hero_title_accent: 'e faz crescer seu consultório.',
     hero_subtitle:
-      'Encontro D\'Água Hub é o sistema operacional de vendas para empreendedores amazônicos e mercados internacionais. SDR automatizado, IA embarcada, isolamento de dados por empresa e deploy em produção real.',
-    hero_cta_primary: 'Solicitar Acesso',
-    hero_cta_secondary: 'Ver Demonstração',
-    metrics_label: 'Operando desde 2025',
+      'Encontro D\'Água Hub é o sistema operacional de gestão para clínicas e consultórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
+    hero_cta_primary: 'Experimente por 7 dias grátis',
+    hero_cta_secondary: 'Ver demonstração ao vivo',
+    hero_cta_sub: 'Sem cartão de crédito · Cancele a qualquer momento · Dados 100% isolados',
+    trust_label: 'Confiado por profissionais de saúde',
+    specialties: ['Medicina', 'Fisioterapia', 'Psicologia', 'Nutrição', 'Odontologia'],
     metrics: [
-      { value: '100%', label: 'Dados Isolados por Empresa' },
-      { value: '9', label: 'Módulos em Produção' },
-      { value: '4', label: 'Agentes de IA Ativos' },
-      { value: '24/7', label: 'SDR Automatizado' },
+      { value: '100%', label: 'Dados Isolados por Empresa', icon: '🔒' },
+      { value: '9', label: 'Módulos em Produção', icon: '⚡' },
+      { value: '4', label: 'Agentes de IA Ativos', icon: '🤖' },
+      { value: '24/7', label: 'SDR Automatizado', icon: '📡' },
+    ],
+    pain_title: 'Você reconhece esses problemas?',
+    pain_subtitle: 'Criamos soluções específicas para a realidade do profissional de saúde',
+    pain_items: [
+      {
+        icon: '📁',
+        title: 'Dados de pacientes espalhados',
+        desc: 'Planilhas, WhatsApp, e-mail e papel — impossível acompanhar sem um sistema centralizado e seguro.',
+      },
+      {
+        icon: '⏰',
+        title: 'Tempo perdido em tarefas manuais',
+        desc: 'Agendamentos, follow-ups e lembretes consomem horas que deveriam ser dedicadas ao paciente.',
+      },
+      {
+        icon: '🚫',
+        title: 'Risco de vazamento de dados (LGPD)',
+        desc: 'Softwares genéricos não foram projetados para a privacidade que a saúde exige. Sua clínica está vulnerável.',
+      },
     ],
     modules_title: 'Módulos em Produção',
-    modules_subtitle: 'Todos os módulos ativos e operacionais em hub.encontrodagua.com',
+    modules_subtitle: 'Todos os módulos ativos em hub.encontrodagua.com — operando 24/7',
+    modules: [
+      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
+      { icon: '👥', name: 'Contatos', desc: 'Base de pacientes com sync bidirecional', badge: 'Ativo' },
+      { icon: '📬', name: 'Inbox / Mazô', desc: 'Agente IA de Customer Success', badge: 'IA' },
+      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo' },
+      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', badge: 'IA' },
+      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo' },
+    ],
+    qa_eyebrow: 'Auditoria V3.0 — Abril 2026',
     qa_title: 'Relatório de QA & Segurança',
-    qa_subtitle: 'Auditoria V3.0 — Abril 2026',
+    qa_subtitle: 'Transparência técnica é parte da nossa proposta de valor',
     qa_items: [
       {
-        icon: '🔒',
+        icon: 'shield',
         title: 'Isolamento Multi-Tenant',
-        status: 'PASS',
-        desc: 'company_id RLS ativo em todas as tabelas críticas. Leads Amanda, Médica e SDR completamente separados.',
+        status: 'APROVADO',
+        desc: 'company_id RLS ativo em todas as tabelas críticas. Dados de cada clínica completamente separados.',
       },
       {
-        icon: '🛡️',
-        title: 'Chaves de API',
-        status: 'PASS',
-        desc: 'SUPABASE_SERVICE_ROLE_KEY rotacionada e armazenada apenas no Vercel Secrets. Nunca exposta no repositório.',
+        icon: 'shield',
+        title: 'Chaves de API Seguras',
+        status: 'APROVADO',
+        desc: 'SUPABASE_SERVICE_ROLE_KEY rotacionada e armazenada apenas em Vercel Secrets. Nunca exposta no repositório.',
       },
       {
-        icon: '👑',
+        icon: 'shield',
         title: 'Super Admin (Migration 038)',
-        status: 'PASS',
-        desc: 'lidimfc@gmail.com promovida a Super Admin (is_super_admin=true). Bypass de RLS para operações cross-tenant.',
+        status: 'APROVADO',
+        desc: 'Controle de acesso por hierarquia. is_super_admin com bypass de RLS apenas para operações autorizadas.',
       },
       {
-        icon: '🌐',
+        icon: 'shield',
         title: 'Bilinguismo PT/EN',
-        status: 'PASS',
-        desc: 'Showcase page bilingue com toggle. Sistema de i18n via LanguageContext em todos os módulos.',
+        status: 'APROVADO',
+        desc: 'Interface completa em português e inglês. Toggle nativo em todos os módulos.',
       },
       {
-        icon: '⏱️',
-        title: 'access_expires_at',
-        status: 'PASS',
-        desc: 'Coluna adicionada em profiles. Leads temporários expiram automaticamente. Admin pode estender.',
+        icon: 'shield',
+        title: 'Validade de Acesso',
+        status: 'APROVADO',
+        desc: 'access_expires_at por usuário. Acesso temporário com expiração automática. Controle total do admin.',
       },
       {
-        icon: '🧹',
-        title: 'Demo Isolation',
-        status: 'PASS',
-        desc: 'IS_DEMO guard em todos os services. Dados de produção nunca vazam para o ambiente Provadágua.',
+        icon: 'shield',
+        title: 'Isolamento Demo',
+        status: 'APROVADO',
+        desc: 'is_demo_data guard em todos os services. Dados de produção nunca vazam para o ambiente de demonstração.',
       },
     ],
-    modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'SDR leads auto-mapeados ao primeiro estágio', status: 'Ativo' },
-      { icon: '👥', name: 'Contatos', desc: 'Base completa com sync bidirecional', status: 'Ativo' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'Agente IA de Customer Success', status: 'Ativo' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', status: 'Ativo' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', status: 'Ativo' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', status: 'Ativo' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', status: 'Ativo' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', status: 'Ativo' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', status: 'Ativo' },
-    ],
-    tech_title: 'Stack Técnica',
+    tech_title: 'Arquitetura Técnica',
     tech_stack: [
-      { name: 'React 18 + TypeScript', category: 'Frontend' },
-      { name: 'Supabase + PostgreSQL', category: 'Backend' },
-      { name: 'RLS Multi-Tenant', category: 'Segurança' },
-      { name: 'Google Gemini', category: 'IA Principal' },
-      { name: 'Vite + TailwindCSS', category: 'Build' },
-      { name: 'Vercel Edge', category: 'Deploy' },
-      { name: 'TanStack Query', category: 'State' },
-      { name: 'Edge Functions', category: 'Serverless' },
+      { icon: '⚛', name: 'React 18 + TypeScript', category: 'Frontend' },
+      { icon: '🗄', name: 'Supabase + PostgreSQL', category: 'Backend' },
+      { icon: '🔐', name: 'RLS Multi-Tenant', category: 'Segurança' },
+      { icon: '🤖', name: 'Google Gemini', category: 'IA Principal' },
+      { icon: '⚡', name: 'Vite + TailwindCSS', category: 'Build' },
+      { icon: '🌐', name: 'Vercel Edge', category: 'Deploy Global' },
+      { icon: '🔄', name: 'TanStack Query', category: 'State' },
+      { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
-    cta_title: 'Quer o seu Hub?',
-    cta_subtitle:
-      'Transforme sua operação de vendas com IA embarcada, SDR automatizado e dados 100% isolados por empresa.',
-    cta_button: 'Falar com a Equipe',
-    footer_built: 'Construído com ❤️ pela equipe Encontro D\'Água',
+    trial_title: 'Experimente a Provadágua por 7 dias',
+    trial_subtitle: 'O CRM com IA e Privacidade OCI. Feito para profissionais de saúde que levam seus dados a sério.',
+    trial_features: [
+      'Isolamento total de dados por clínica',
+      '4 Agentes de IA inclusos',
+      'SDR automatizado 24/7',
+      'Relatório de QA/Segurança',
+      'Suporte dedicado',
+      'Cancele a qualquer momento',
+    ],
+    trial_cta: 'Começar meu teste gratuito',
+    trial_sub: 'Sem cartão de crédito · Setup em menos de 5 minutos',
+    footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
     footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_privacy: 'Privacidade · LGPD · Termos',
   },
   en: {
-    hero_badge: '🚀 Provadágua V3.0 — Mission Complete',
-    hero_title: 'The CRM born in',
-    hero_title_accent: 'the Amazon.',
+    nav_login: 'Enter Hub',
+    hero_eyebrow: 'For Physicians · Physiotherapists · Psychologists',
+    hero_title_1: 'The AI-powered CRM that',
+    hero_title_2: 'protects your patients',
+    hero_title_accent: 'and grows your practice.',
     hero_subtitle:
-      'Encontro D\'Água Hub is the sales operating system for Amazonian entrepreneurs and international markets. Automated SDR, embedded AI, per-company data isolation, and live production deployment.',
-    hero_cta_primary: 'Request Access',
-    hero_cta_secondary: 'Watch Demo',
-    metrics_label: 'Operating since 2025',
+      'Encontro D\'Água Hub is the practice management operating system for clinics and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
+    hero_cta_primary: 'Try free for 7 days',
+    hero_cta_secondary: 'Watch live demo',
+    hero_cta_sub: 'No credit card · Cancel anytime · 100% isolated data',
+    trust_label: 'Trusted by health professionals',
+    specialties: ['Medicine', 'Physiotherapy', 'Psychology', 'Nutrition', 'Dentistry'],
     metrics: [
-      { value: '100%', label: 'Data Isolated by Company' },
-      { value: '9', label: 'Modules in Production' },
-      { value: '4', label: 'Active AI Agents' },
-      { value: '24/7', label: 'Automated SDR' },
+      { value: '100%', label: 'Data Isolated per Company', icon: '🔒' },
+      { value: '9', label: 'Modules in Production', icon: '⚡' },
+      { value: '4', label: 'Active AI Agents', icon: '🤖' },
+      { value: '24/7', label: 'Automated SDR', icon: '📡' },
+    ],
+    pain_title: 'Do you recognize these problems?',
+    pain_subtitle: 'We built specific solutions for the real challenges of healthcare professionals',
+    pain_items: [
+      {
+        icon: '📁',
+        title: 'Patient data scattered everywhere',
+        desc: 'Spreadsheets, WhatsApp, email, and paper — impossible to track without a centralized, secure system.',
+      },
+      {
+        icon: '⏰',
+        title: 'Time wasted on manual tasks',
+        desc: 'Scheduling, follow-ups, and reminders consume hours that should be dedicated to your patients.',
+      },
+      {
+        icon: '🚫',
+        title: 'Data breach risk (GDPR/LGPD)',
+        desc: 'Generic software wasn\'t designed for the privacy healthcare requires. Your practice is vulnerable.',
+      },
     ],
     modules_title: 'Production Modules',
-    modules_subtitle: 'All modules active at hub.encontrodagua.com',
+    modules_subtitle: 'All modules live at hub.encontrodagua.com — running 24/7',
+    modules: [
+      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
+      { icon: '👥', name: 'Contacts', desc: 'Patient database with bidirectional sync', badge: 'Live' },
+      { icon: '📬', name: 'Inbox / Mazô', desc: 'AI Customer Success Agent', badge: 'AI' },
+      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live' },
+      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', badge: 'AI' },
+      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live' },
+    ],
+    qa_eyebrow: 'V3.0 Audit — April 2026',
     qa_title: 'QA & Security Report',
-    qa_subtitle: 'V3.0 Audit — April 2026',
+    qa_subtitle: 'Technical transparency is part of our value proposition',
     qa_items: [
       {
-        icon: '🔒',
+        icon: 'shield',
         title: 'Multi-Tenant Isolation',
-        status: 'PASS',
-        desc: 'company_id RLS active on all critical tables. Amanda, Médica and SDR leads fully separated.',
+        status: 'PASSED',
+        desc: 'company_id RLS active on all critical tables. Each clinic\'s data is completely separated.',
       },
       {
-        icon: '🛡️',
-        title: 'API Keys',
-        status: 'PASS',
-        desc: 'SUPABASE_SERVICE_ROLE_KEY rotated and stored only in Vercel Secrets. Never exposed in the repository.',
+        icon: 'shield',
+        title: 'Secure API Keys',
+        status: 'PASSED',
+        desc: 'SUPABASE_SERVICE_ROLE_KEY rotated and stored only in Vercel Secrets. Never exposed in repository.',
       },
       {
-        icon: '👑',
+        icon: 'shield',
         title: 'Super Admin (Migration 038)',
-        status: 'PASS',
-        desc: 'lidimfc@gmail.com promoted to Super Admin (is_super_admin=true). Cross-tenant RLS bypass enabled.',
+        status: 'PASSED',
+        desc: 'Hierarchical access control. is_super_admin with RLS bypass only for authorized operations.',
       },
       {
-        icon: '🌐',
+        icon: 'shield',
         title: 'Bilingualism PT/EN',
-        status: 'PASS',
-        desc: 'Showcase page bilingual with toggle. i18n via LanguageContext across all modules.',
+        status: 'PASSED',
+        desc: 'Full interface in Portuguese and English. Native toggle across all modules.',
       },
       {
-        icon: '⏱️',
-        title: 'access_expires_at',
-        status: 'PASS',
-        desc: 'Column added to profiles. Temporary leads expire automatically. Admin can extend.',
+        icon: 'shield',
+        title: 'Access Expiry Control',
+        status: 'PASSED',
+        desc: 'access_expires_at per user. Temporary access with automatic expiration. Admin has full control.',
       },
       {
-        icon: '🧹',
+        icon: 'shield',
         title: 'Demo Isolation',
-        status: 'PASS',
-        desc: 'IS_DEMO guard in all services. Production data never leaks to the Provadágua environment.',
+        status: 'PASSED',
+        desc: 'is_demo_data guard in all services. Production data never leaks into the demo environment.',
       },
     ],
-    modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'SDR leads auto-mapped to first stage', status: 'Active' },
-      { icon: '👥', name: 'Contacts', desc: 'Full base with bidirectional sync', status: 'Active' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'AI Customer Success Agent', status: 'Active' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', status: 'Active' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', status: 'Active' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', status: 'Active' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', status: 'Active' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', status: 'Active' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', status: 'Active' },
-    ],
-    tech_title: 'Tech Stack',
+    tech_title: 'Technical Architecture',
     tech_stack: [
-      { name: 'React 18 + TypeScript', category: 'Frontend' },
-      { name: 'Supabase + PostgreSQL', category: 'Backend' },
-      { name: 'RLS Multi-Tenant', category: 'Security' },
-      { name: 'Google Gemini', category: 'Primary AI' },
-      { name: 'Vite + TailwindCSS', category: 'Build' },
-      { name: 'Vercel Edge', category: 'Deploy' },
-      { name: 'TanStack Query', category: 'State' },
-      { name: 'Edge Functions', category: 'Serverless' },
+      { icon: '⚛', name: 'React 18 + TypeScript', category: 'Frontend' },
+      { icon: '🗄', name: 'Supabase + PostgreSQL', category: 'Backend' },
+      { icon: '🔐', name: 'RLS Multi-Tenant', category: 'Security' },
+      { icon: '🤖', name: 'Google Gemini', category: 'Primary AI' },
+      { icon: '⚡', name: 'Vite + TailwindCSS', category: 'Build' },
+      { icon: '🌐', name: 'Vercel Edge', category: 'Global Deploy' },
+      { icon: '🔄', name: 'TanStack Query', category: 'State' },
+      { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
-    cta_title: 'Want your own Hub?',
-    cta_subtitle:
-      'Transform your sales operation with embedded AI, automated SDR, and 100% per-company data isolation.',
-    cta_button: 'Talk to the Team',
-    footer_built: 'Built with ❤️ by the Encontro D\'Água team',
+    trial_title: 'Try Provadágua for 7 days',
+    trial_subtitle: 'The CRM with AI and OCI-grade Privacy. Built for health professionals who take their data seriously.',
+    trial_features: [
+      'Complete data isolation per clinic',
+      '4 AI Agents included',
+      'Automated SDR 24/7',
+      'QA/Security Report',
+      'Dedicated support',
+      'Cancel anytime',
+    ],
+    trial_cta: 'Start my free trial',
+    trial_sub: 'No credit card required · Setup in under 5 minutes',
+    footer_built: 'Built with ❤ by the Encontro D\'Água team',
     footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_privacy: 'Privacy · LGPD/GDPR · Terms',
   },
+};
+
+// ─── Shared style tokens ───────────────────────────────────────────────────
+const S = {
+  cyanBlue: 'linear-gradient(135deg, #0ea5e9, #0077ff)',
+  navy: '#080d1a',
+  surface: 'rgba(255,255,255,0.035)',
+  surfaceHover: 'rgba(14,165,233,0.08)',
+  border: 'rgba(255,255,255,0.07)',
+  borderHover: 'rgba(14,165,233,0.28)',
+  blue: '#0ea5e9',
+  emerald: '#10b981',
+  slate: '#94a3b8',
+  slateDim: '#475569',
 };
 
 // ─── ShowcasePage Component ────────────────────────────────────────────────
 const ShowcasePage: React.FC = () => {
   const [lang, setLang] = useState<'pt' | 'en'>('pt');
   const [scrolled, setScrolled] = useState(false);
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+  const observedRef = useRef<Set<string>>(new Set());
+  const [visible, setVisible] = useState<Set<string>>(new Set());
 
   const t = TRANSLATIONS[lang];
 
-  // Scroll effect for header
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
+    const handler = () => setScrolled(window.scrollY > 48);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  // Intersection observer for section animations
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const obs = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => new Set(prev).add(entry.target.id));
+        entries.forEach((e) => {
+          if (e.isIntersecting && e.target.id) {
+            setVisible((prev) => new Set(prev).add(e.target.id));
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.08 }
     );
-
-    document.querySelectorAll('[data-animate]').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    document.querySelectorAll('[data-obs]').forEach((el) => {
+      if (el.id && !observedRef.current.has(el.id)) {
+        obs.observe(el);
+        observedRef.current.add(el.id);
+      }
+    });
+    return () => obs.disconnect();
   }, []);
 
-  const isVisible = (id: string) => visibleSections.has(id);
+  const isVis = (id: string) => visible.has(id);
+
+  const fadeIn = (id: string, delay = 0): React.CSSProperties => ({
+    opacity: isVis(id) ? 1 : 0,
+    transform: isVis(id) ? 'translateY(0)' : 'translateY(36px)',
+    transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+  });
 
   return (
-    <div id="showcase-root" style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0e1a 0%, #0d1b2a 40%, #091521 100%)',
-      color: '#e2e8f0',
-      fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
-      overflowX: 'hidden',
-    }}>
+    <div
+      id="showcase-root"
+      style={{
+        minHeight: '100vh',
+        background: `radial-gradient(ellipse 120% 60% at 50% -10%, rgba(14,165,233,0.14) 0%, transparent 70%), ${S.navy}`,
+        color: '#e2e8f0',
+        fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
+        overflowX: 'hidden',
+      }}
+    >
       {/* Google Fonts */}
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@700;800;900&display=swap"
         rel="stylesheet"
       />
 
+      {/* ── CSS Keyframes ─────────────────────────────────── */}
+      <style>{`
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp   { from { opacity:0; transform:translateY(28px);  } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse    { 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
+        @keyframes shimmer  { 0%{ background-position:-200% center; } 100%{ background-position:200% center; } }
+        @keyframes float    { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        ::selection { background: rgba(14,165,233,0.35); }
+        a { text-decoration: none; }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+      `}</style>
+
       {/* ── Sticky Nav ─────────────────────────────────────── */}
-      <nav style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        padding: '0 2rem',
-        height: '64px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: scrolled ? 'rgba(10,14,26,0.92)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.07)' : 'none',
-        transition: 'all 0.3s ease',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px', height: '32px',
-            background: 'linear-gradient(135deg, #00d4ff, #0077ff)',
-            borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '16px',
-          }}>💧</div>
-          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#fff' }}>
+      <nav
+        role="navigation"
+        aria-label="Main navigation"
+        style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          zIndex: 50,
+          padding: '0 1.5rem',
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: scrolled ? 'rgba(8,13,26,0.88)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(24px) saturate(1.6)' : 'none',
+          borderBottom: scrolled ? `1px solid ${S.border}` : 'none',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {/* Logo */}
+        <a href="/#/" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+          <div
+            aria-hidden="true"
+            style={{
+              width: '34px', height: '34px',
+              background: S.cyanBlue,
+              borderRadius: '9px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '18px',
+              boxShadow: '0 0 18px rgba(14,165,233,0.4)',
+            }}
+          >
+            💧
+          </div>
+          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#f1f5f9', letterSpacing: '-0.01em' }}>
             Encontro D'Água Hub
           </span>
-        </div>
+        </a>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Language toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Lang toggle */}
           <button
             id="showcase-lang-toggle"
+            aria-label={`Switch to ${lang === 'pt' ? 'English' : 'Português'}`}
             onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
             style={{
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              background: S.surface,
+              border: `1px solid ${S.border}`,
               borderRadius: '20px',
               padding: '6px 14px',
-              color: '#94a3b8',
+              color: S.slate,
               cursor: 'pointer',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               fontWeight: 600,
               transition: 'all 0.2s',
+              minHeight: '36px',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.09)';
+              e.currentTarget.style.color = '#e2e8f0';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = S.surface;
+              e.currentTarget.style.color = S.slate;
+            }}
           >
             {lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
           </button>
 
           <a
             href="/#/login"
-            id="showcase-login-btn"
+            id="showcase-nav-login"
             style={{
-              background: 'linear-gradient(135deg, #0077ff, #00d4ff)',
-              border: 'none',
+              background: S.cyanBlue,
               borderRadius: '20px',
               padding: '8px 20px',
               color: '#fff',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
-              textDecoration: 'none',
               transition: 'all 0.2s',
-              boxShadow: '0 4px 15px rgba(0,119,255,0.3)',
+              boxShadow: '0 4px 14px rgba(14,165,233,0.32)',
+              minHeight: '36px',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 6px 22px rgba(14,165,233,0.52)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(14,165,233,0.32)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            {lang === 'pt' ? 'Entrar' : 'Login'}
+            {t.nav_login}
           </a>
         </div>
       </nav>
 
       {/* ── Hero Section ────────────────────────────────────── */}
-      <section id="showcase-hero" style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        padding: '8rem 2rem 6rem',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Animated background glow */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          left: '50%',
+      <section
+        id="showcase-hero"
+        aria-labelledby="hero-heading"
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: 'clamp(7rem, 14vw, 10rem) 1.5rem clamp(5rem, 10vw, 7rem)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background orbs */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '25%', left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '800px',
-          height: '800px',
-          background: 'radial-gradient(circle, rgba(0,119,255,0.12) 0%, transparent 70%)',
+          width: '720px', height: '720px',
+          background: 'radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 68%)',
           pointerEvents: 'none',
         }} />
-        <div style={{
-          position: 'absolute',
-          top: '60%',
-          left: '20%',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%)',
+        <div aria-hidden="true" style={{
+          position: 'absolute', bottom: '15%', right: '10%',
+          width: '380px', height: '380px',
+          background: 'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
-        {/* Badge */}
-        <div id="showcase-badge" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'rgba(0,119,255,0.1)',
-          border: '1px solid rgba(0,119,255,0.3)',
-          borderRadius: '24px',
-          padding: '8px 20px',
-          fontSize: '0.8rem',
-          fontWeight: 600,
-          color: '#60a5fa',
-          marginBottom: '2rem',
-          animation: 'fadeInDown 0.6s ease both',
+        {/* Specialty pills */}
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: '8px',
+          justifyContent: 'center',
+          marginBottom: '1.8rem',
+          animation: 'fadeDown 0.55s ease both',
         }}>
-          {t.hero_badge}
+          {t.specialties.map((s, i) => (
+            <span key={i} style={{
+              background: 'rgba(14,165,233,0.1)',
+              border: '1px solid rgba(14,165,233,0.22)',
+              borderRadius: '20px',
+              padding: '5px 14px',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              color: '#7dd3fc',
+            }}>{s}</span>
+          ))}
         </div>
 
-        {/* Title */}
-        <h1 style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: 'clamp(2.4rem, 6vw, 5rem)',
-          fontWeight: 900,
-          lineHeight: 1.1,
-          marginBottom: '1.5rem',
-          color: '#fff',
-          animation: 'fadeInUp 0.7s ease 0.1s both',
+        {/* Eyebrow */}
+        <div style={{
+          fontSize: '0.78rem',
+          fontWeight: 700,
+          color: S.blue,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          marginBottom: '1.2rem',
+          animation: 'fadeDown 0.6s ease 0.05s both',
         }}>
-          {t.hero_title}{' '}
+          {t.hero_eyebrow}
+        </div>
+
+        {/* H1 */}
+        <h1
+          id="hero-heading"
+          style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 'clamp(2.2rem, 5.5vw, 4.8rem)',
+            fontWeight: 900,
+            lineHeight: 1.08,
+            marginBottom: '1.6rem',
+            color: '#f8fafc',
+            animation: 'fadeUp 0.7s ease 0.1s both',
+            maxWidth: '820px',
+          }}
+        >
+          {t.hero_title_1}{' '}
           <span style={{
-            background: 'linear-gradient(135deg, #0077ff, #00d4ff, #0ea5e9)',
+            background: S.cyanBlue,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}>
-            {t.hero_title_accent}
+            {t.hero_title_2}
           </span>
+          <br />
+          {t.hero_title_accent}
         </h1>
 
         {/* Subtitle */}
         <p style={{
-          maxWidth: '640px',
-          fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+          maxWidth: '620px',
+          fontSize: 'clamp(1rem, 1.8vw, 1.15rem)',
           color: '#94a3b8',
-          lineHeight: 1.7,
+          lineHeight: 1.75,
           marginBottom: '3rem',
-          animation: 'fadeInUp 0.7s ease 0.2s both',
+          animation: 'fadeUp 0.7s ease 0.18s both',
         }}>
           {t.hero_subtitle}
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Group */}
         <div style={{
-          display: 'flex',
-          gap: '16px',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          animation: 'fadeInUp 0.7s ease 0.3s both',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
+          animation: 'fadeUp 0.7s ease 0.26s both',
         }}>
-          <a
-            href="/#/"
-            id="showcase-cta-primary"
-            style={{
-              background: 'linear-gradient(135deg, #0077ff, #0055cc)',
-              color: '#fff',
-              padding: '16px 36px',
-              borderRadius: '50px',
-              fontWeight: 700,
-              fontSize: '1rem',
-              textDecoration: 'none',
-              boxShadow: '0 8px 32px rgba(0,119,255,0.35)',
-              transition: 'all 0.25s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,119,255,0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,119,255,0.35)';
-            }}
-          >
-            {t.hero_cta_primary}
-          </a>
-          <a
-            href="/#/login"
-            id="showcase-cta-secondary"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              color: '#e2e8f0',
-              padding: '16px 36px',
-              borderRadius: '50px',
-              fontWeight: 600,
-              fontSize: '1rem',
-              textDecoration: 'none',
-              border: '1px solid rgba(255,255,255,0.12)',
-              transition: 'all 0.25s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
-          >
-            {t.hero_cta_secondary}
-          </a>
+          <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <a
+              href="/#/"
+              id="showcase-cta-primary"
+              style={{
+                background: S.cyanBlue,
+                color: '#fff',
+                padding: '16px 36px',
+                borderRadius: '50px',
+                fontWeight: 800,
+                fontSize: '1rem',
+                boxShadow: '0 8px 32px rgba(14,165,233,0.42)',
+                transition: 'all 0.25s',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                minHeight: '52px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 16px 48px rgba(14,165,233,0.58)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(14,165,233,0.42)';
+              }}
+            >
+              {t.hero_cta_primary}
+              <ArrowIcon />
+            </a>
+            <a
+              href="/#/login"
+              id="showcase-cta-secondary"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                color: '#e2e8f0',
+                padding: '16px 36px',
+                borderRadius: '50px',
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: `1px solid ${S.border}`,
+                transition: 'all 0.25s',
+                cursor: 'pointer',
+                minHeight: '52px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.09)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                e.currentTarget.style.borderColor = S.border;
+              }}
+            >
+              {t.hero_cta_secondary}
+            </a>
+          </div>
+          <p style={{ color: S.slateDim, fontSize: '0.8rem', fontWeight: 500 }}>
+            {t.hero_cta_sub}
+          </p>
         </div>
 
         {/* Metrics bar */}
         <div style={{
-          display: 'flex',
-          gap: '0',
           marginTop: '5rem',
-          background: 'rgba(255,255,255,0.04)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.03)',
+          backdropFilter: 'blur(16px)',
+          border: `1px solid ${S.border}`,
           borderRadius: '20px',
-          overflow: 'hidden',
+          display: 'flex',
           flexWrap: 'wrap',
-          animation: 'fadeInUp 0.7s ease 0.5s both',
+          overflow: 'hidden',
+          animation: 'fadeUp 0.7s ease 0.38s both',
+          maxWidth: '720px',
+          width: '100%',
         }}>
           {t.metrics.map((m, i) => (
-            <div key={i} style={{
-              padding: '24px 36px',
-              textAlign: 'center',
-              borderRight: i < t.metrics.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
-              minWidth: '140px',
-            }}>
+            <div
+              key={i}
+              style={{
+                padding: '22px 32px',
+                textAlign: 'center',
+                borderRight: i < t.metrics.length - 1 ? `1px solid ${S.border}` : 'none',
+                flex: '1 1 140px',
+              }}
+            >
               <div style={{
-                fontSize: '2rem',
-                fontWeight: 800,
+                fontSize: '1.9rem',
+                fontWeight: 900,
                 fontFamily: "'Outfit', sans-serif",
-                background: 'linear-gradient(135deg, #0077ff, #00d4ff)',
+                background: S.cyanBlue,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -493,7 +698,7 @@ const ShowcasePage: React.FC = () => {
               }}>
                 {m.value}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 500 }}>
+              <div style={{ fontSize: '0.75rem', color: S.slateDim, fontWeight: 500, lineHeight: 1.4 }}>
                 {m.label}
               </div>
             </div>
@@ -501,172 +706,270 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Modules Section ─────────────────────────────────── */}
+      {/* ── Pain Points ─────────────────────────────────────── */}
       <section
-        id="showcase-modules"
-        data-animate
+        id="sec-pain"
+        data-obs
+        aria-labelledby="pain-heading"
         style={{
-          padding: '6rem 2rem',
-          maxWidth: '1200px',
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          maxWidth: '1100px',
           margin: '0 auto',
-          opacity: isVisible('showcase-modules') ? 1 : 0,
-          transform: isVisible('showcase-modules') ? 'translateY(0)' : 'translateY(40px)',
-          transition: 'all 0.7s ease',
+          ...fadeIn('sec-pain'),
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <h2 style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-            fontWeight: 800,
-            color: '#fff',
-            marginBottom: '1rem',
-          }}>
-            {t.modules_title}
+          <h2
+            id="pain-heading"
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
+              fontWeight: 800,
+              color: '#f1f5f9',
+              marginBottom: '0.8rem',
+            }}
+          >
+            {t.pain_title}
           </h2>
-          <p style={{ color: '#64748b', fontSize: '1rem' }}>{t.modules_subtitle}</p>
+          <p style={{ color: S.slate, fontSize: '1rem' }}>{t.pain_subtitle}</p>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '16px',
         }}>
-          {t.modules.map((mod, i) => (
+          {t.pain_items.map((item, i) => (
             <div
               key={i}
-              id={`module-card-${i}`}
+              id={`pain-${i}`}
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: '16px',
-                padding: '24px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '16px',
+                background: S.surface,
+                border: `1px solid ${S.border}`,
+                borderRadius: '18px',
+                padding: '28px 24px',
                 transition: 'all 0.25s',
                 cursor: 'default',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0,119,255,0.07)';
-                e.currentTarget.style.borderColor = 'rgba(0,119,255,0.25)';
-                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.background = S.surfaceHover;
+                e.currentTarget.style.borderColor = S.borderHover;
+                e.currentTarget.style.transform = 'translateY(-4px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                e.currentTarget.style.background = S.surface;
+                e.currentTarget.style.borderColor = S.border;
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <div style={{
-                fontSize: '1.8rem',
-                width: '48px',
-                height: '48px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(0,119,255,0.1)',
-                borderRadius: '12px',
-                flexShrink: 0,
-              }}>
-                {mod.icon}
+                fontSize: '2rem',
+                width: '52px', height: '52px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(239,68,68,0.1)',
+                borderRadius: '14px',
+                marginBottom: '16px',
+              }} aria-hidden="true">
+                {item.icon}
               </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.95rem' }}>{mod.name}</span>
-                  <span style={{
-                    background: 'rgba(16,185,129,0.15)',
-                    color: '#10b981',
-                    borderRadius: '10px',
-                    padding: '2px 8px',
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                  }}>
-                    ✅ {mod.status}
-                  </span>
-                </div>
-                <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0 }}>{mod.desc}</p>
-              </div>
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem', marginBottom: '8px' }}>
+                {item.title}
+              </h3>
+              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.65, margin: 0 }}>
+                {item.desc}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── QA & Security Report ────────────────────────────── */}
+      {/* ── Modules ─────────────────────────────────────────── */}
       <section
-        id="showcase-qa"
-        data-animate
+        id="sec-modules"
+        data-obs
+        aria-labelledby="modules-heading"
         style={{
-          padding: '6rem 2rem',
-          background: 'rgba(0,0,0,0.2)',
-          opacity: isVisible('showcase-qa') ? 1 : 0,
-          transform: isVisible('showcase-qa') ? 'translateY(0)' : 'translateY(40px)',
-          transition: 'all 0.7s ease',
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          background: 'rgba(0,0,0,0.15)',
+          ...fadeIn('sec-modules'),
         }}
       >
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'rgba(16,185,129,0.1)',
-              border: '1px solid rgba(16,185,129,0.25)',
-              borderRadius: '20px',
-              padding: '6px 16px',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              color: '#10b981',
-              marginBottom: '1rem',
-            }}>
-              🛡️ {t.qa_subtitle}
-            </div>
-            <h2 style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-              fontWeight: 800,
-              color: '#fff',
-            }}>
-              {t.qa_title}
+            <h2
+              id="modules-heading"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
+                fontWeight: 800,
+                color: '#f1f5f9',
+                marginBottom: '0.8rem',
+              }}
+            >
+              {t.modules_title}
             </h2>
+            <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.modules_subtitle}</p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '16px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+            gap: '14px',
+          }}>
+            {t.modules.map((mod, i) => (
+              <div
+                key={i}
+                id={`mod-${i}`}
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: '16px',
+                  padding: '22px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  transition: 'all 0.22s',
+                  cursor: 'default',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = S.surfaceHover;
+                  e.currentTarget.style.borderColor = S.borderHover;
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = S.surface;
+                  e.currentTarget.style.borderColor = S.border;
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={{
+                  fontSize: '1.6rem',
+                  width: '44px', height: '44px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(14,165,233,0.1)',
+                  borderRadius: '11px',
+                  flexShrink: 0,
+                }} aria-hidden="true">
+                  {mod.icon}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
+                    <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{mod.name}</span>
+                    <span style={{
+                      background: mod.badge === 'AI' ? 'rgba(139,92,246,0.2)' : 'rgba(16,185,129,0.15)',
+                      color: mod.badge === 'AI' ? '#a78bfa' : S.emerald,
+                      borderRadius: '8px',
+                      padding: '2px 7px',
+                      fontSize: '0.66rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.04em',
+                    }}>
+                      {mod.badge === 'AI' ? '✦ AI' : `✓ ${mod.badge}`}
+                    </span>
+                  </div>
+                  <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>{mod.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── QA & Security Report ────────────────────────────── */}
+      <section
+        id="sec-qa"
+        data-obs
+        aria-labelledby="qa-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          ...fadeIn('sec-qa'),
+        }}
+      >
+        <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '7px',
+              background: 'rgba(16,185,129,0.1)',
+              border: '1px solid rgba(16,185,129,0.25)',
+              borderRadius: '20px',
+              padding: '6px 16px',
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              color: S.emerald,
+              marginBottom: '1.2rem',
+              letterSpacing: '0.06em',
+            }}>
+              <ShieldIcon />
+              {t.qa_eyebrow}
+            </div>
+            <h2
+              id="qa-heading"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
+                fontWeight: 800,
+                color: '#f1f5f9',
+                marginBottom: '0.8rem',
+              }}
+            >
+              {t.qa_title}
+            </h2>
+            <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.qa_subtitle}</p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
+            gap: '14px',
           }}>
             {t.qa_items.map((item, i) => (
               <div
                 key={i}
-                id={`qa-item-${i}`}
+                id={`qa-${i}`}
                 style={{
                   background: 'rgba(16,185,129,0.04)',
                   border: '1px solid rgba(16,185,129,0.15)',
                   borderRadius: '16px',
                   padding: '24px',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(16,185,129,0.08)';
+                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(16,185,129,0.04)';
+                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.15)';
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '1.6rem' }}>{item.icon}</span>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px' }}>
+                  <div style={{ color: S.emerald, marginTop: '2px', flexShrink: 0 }}>
+                    <ShieldIcon />
+                  </div>
                   <div>
-                    <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{item.title}</div>
+                    <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem', marginBottom: '5px' }}>
+                      {item.title}
+                    </div>
                     <div style={{
                       background: 'rgba(16,185,129,0.15)',
-                      color: '#10b981',
+                      color: S.emerald,
                       borderRadius: '8px',
-                      padding: '2px 10px',
-                      fontSize: '0.7rem',
+                      padding: '2px 9px',
+                      fontSize: '0.66rem',
                       fontWeight: 800,
-                      display: 'inline-block',
-                      marginTop: '2px',
-                      letterSpacing: '0.05em',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      letterSpacing: '0.06em',
                     }}>
-                      ✓ {item.status}
+                      <CheckIcon />
+                      {item.status}
                     </div>
                   </div>
                 </div>
-                <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ color: S.slateDim, fontSize: '0.84rem', lineHeight: 1.65, margin: 0 }}>
                   {item.desc}
                 </p>
               </div>
@@ -677,149 +980,228 @@ const ShowcasePage: React.FC = () => {
 
       {/* ── Tech Stack ──────────────────────────────────────── */}
       <section
-        id="showcase-tech"
-        data-animate
+        id="sec-tech"
+        data-obs
+        aria-labelledby="tech-heading"
         style={{
-          padding: '6rem 2rem',
-          maxWidth: '900px',
-          margin: '0 auto',
-          opacity: isVisible('showcase-tech') ? 1 : 0,
-          transform: isVisible('showcase-tech') ? 'translateY(0)' : 'translateY(40px)',
-          transition: 'all 0.7s ease',
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          background: 'rgba(0,0,0,0.15)',
+          ...fadeIn('sec-tech'),
         }}
       >
-        <h2 style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
-          fontWeight: 800,
-          color: '#fff',
-          textAlign: 'center',
-          marginBottom: '3rem',
-        }}>
-          {t.tech_title}
-        </h2>
-
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '12px',
-          justifyContent: 'center',
-        }}>
-          {t.tech_stack.map((tech, i) => (
-            <div
-              key={i}
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '12px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0,119,255,0.08)';
-                e.currentTarget.style.borderColor = 'rgba(0,119,255,0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-              }}
-            >
-              <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{tech.name}</span>
-              <span style={{ color: '#475569', fontSize: '0.72rem', fontWeight: 600 }}>{tech.category}</span>
-            </div>
-          ))}
+        <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
+          <h2
+            id="tech-heading"
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.5rem, 3vw, 2.2rem)',
+              fontWeight: 800,
+              color: '#f1f5f9',
+              marginBottom: '3rem',
+            }}
+          >
+            {t.tech_title}
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+            {t.tech_stack.map((tech, i) => (
+              <div
+                key={i}
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: '12px',
+                  padding: '12px 18px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'all 0.2s',
+                  cursor: 'default',
+                  minWidth: '130px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = S.surfaceHover;
+                  e.currentTarget.style.borderColor = S.borderHover;
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = S.surface;
+                  e.currentTarget.style.borderColor = S.border;
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>{tech.name}</span>
+                <span style={{ color: S.slateDim, fontSize: '0.7rem', fontWeight: 600 }}>{tech.category}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── CTA Section ─────────────────────────────────────── */}
+      {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
       <section
-        id="showcase-cta"
-        data-animate
+        id="sec-trial"
+        data-obs
+        aria-labelledby="trial-heading"
         style={{
-          padding: '8rem 2rem',
-          textAlign: 'center',
-          opacity: isVisible('showcase-cta') ? 1 : 0,
-          transform: isVisible('showcase-cta') ? 'translateY(0)' : 'translateY(40px)',
-          transition: 'all 0.7s ease',
+          padding: 'clamp(5rem, 10vw, 8rem) 1.5rem',
+          ...fadeIn('sec-trial'),
         }}
       >
-        <div style={{
-          maxWidth: '600px',
-          margin: '0 auto',
-          background: 'rgba(0,119,255,0.06)',
-          border: '1px solid rgba(0,119,255,0.2)',
-          borderRadius: '28px',
-          padding: '4rem 3rem',
-        }}>
-          <h2 style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-            fontWeight: 900,
-            color: '#fff',
-            marginBottom: '1rem',
+        <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+          {/* Glassmorphism card */}
+          <div style={{
+            background: 'rgba(14,165,233,0.07)',
+            backdropFilter: 'blur(28px)',
+            border: '1px solid rgba(14,165,233,0.22)',
+            borderRadius: '28px',
+            padding: 'clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3.5rem)',
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden',
           }}>
-            {t.cta_title}
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2.5rem' }}>
-            {t.cta_subtitle}
-          </p>
-          <a
-            href="/#/"
-            id="showcase-final-cta"
-            style={{
-              display: 'inline-block',
-              background: 'linear-gradient(135deg, #0077ff, #00d4ff)',
-              color: '#fff',
-              padding: '18px 48px',
-              borderRadius: '50px',
-              fontWeight: 800,
-              fontSize: '1.1rem',
-              textDecoration: 'none',
-              boxShadow: '0 12px 40px rgba(0,119,255,0.4)',
-              transition: 'all 0.25s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
-              e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,119,255,0.55)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,119,255,0.4)';
-            }}
-          >
-            {t.cta_button} →
-          </a>
+            {/* Inner glow */}
+            <div aria-hidden="true" style={{
+              position: 'absolute',
+              top: '-60%', left: '50%',
+              transform: 'translateX(-50%)',
+              width: '500px', height: '300px',
+              background: 'radial-gradient(ellipse, rgba(14,165,233,0.15) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }} />
+
+            {/* Stars */}
+            <div style={{
+              display: 'flex', justifyContent: 'center', gap: '3px',
+              marginBottom: '1.2rem',
+              color: '#fbbf24',
+            }} aria-label="5 stars">
+              {[...Array(5)].map((_, i) => <StarIcon key={i} />)}
+            </div>
+
+            <h2
+              id="trial-heading"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+                fontWeight: 900,
+                color: '#f8fafc',
+                marginBottom: '1rem',
+                lineHeight: 1.15,
+                position: 'relative',
+              }}
+            >
+              {t.trial_title}
+            </h2>
+            <p style={{
+              color: '#94a3b8',
+              fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)',
+              lineHeight: 1.7,
+              marginBottom: '2.4rem',
+              maxWidth: '560px',
+              margin: '0 auto 2.4rem',
+              position: 'relative',
+            }}>
+              {t.trial_subtitle}
+            </p>
+
+            {/* Feature checklist */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: '10px',
+              marginBottom: '2.8rem',
+              textAlign: 'left',
+              position: 'relative',
+            }}>
+              {t.trial_features.map((feat, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  fontSize: '0.88rem',
+                  color: '#cbd5e1',
+                  fontWeight: 500,
+                }}>
+                  <div style={{
+                    width: '20px', height: '20px',
+                    borderRadius: '50%',
+                    background: 'rgba(16,185,129,0.2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: S.emerald,
+                    flexShrink: 0,
+                  }}>
+                    <CheckIcon />
+                  </div>
+                  {feat}
+                </div>
+              ))}
+            </div>
+
+            {/* Primary CTA */}
+            <a
+              href="/#/"
+              id="showcase-trial-cta"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: S.cyanBlue,
+                color: '#fff',
+                padding: '18px 52px',
+                borderRadius: '50px',
+                fontWeight: 800,
+                fontSize: 'clamp(1rem, 2vw, 1.15rem)',
+                boxShadow: '0 12px 48px rgba(14,165,233,0.48)',
+                transition: 'all 0.28s',
+                cursor: 'pointer',
+                marginBottom: '1rem',
+                position: 'relative',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)';
+                e.currentTarget.style.boxShadow = '0 22px 64px rgba(14,165,233,0.65)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 12px 48px rgba(14,165,233,0.48)';
+              }}
+            >
+              {t.trial_cta}
+              <ArrowIcon />
+            </a>
+
+            <p style={{
+              color: S.slateDim,
+              fontSize: '0.8rem',
+              margin: 0,
+              position: 'relative',
+            }}>
+              {t.trial_sub}
+            </p>
+          </div>
         </div>
       </section>
 
       {/* ── Footer ──────────────────────────────────────────── */}
       <footer style={{
-        padding: '3rem 2rem',
+        padding: '2.5rem 1.5rem',
         textAlign: 'center',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
+        borderTop: `1px solid ${S.border}`,
       }}>
-        <p style={{ color: '#334155', fontSize: '0.85rem', margin: 0 }}>{t.footer_built}</p>
-        <p style={{ color: '#1e293b', fontSize: '0.75rem', margin: '4px 0 0' }}>{t.footer_version}</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+          <div aria-hidden="true" style={{
+            width: '24px', height: '24px',
+            background: S.cyanBlue,
+            borderRadius: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '12px',
+          }}>💧</div>
+          <span style={{ color: S.slate, fontSize: '0.82rem', fontWeight: 500 }}>{t.footer_built}</span>
+        </div>
+        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>{t.footer_version}</p>
+        <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
       </footer>
-
-      {/* ── CSS Animations ──────────────────────────────────── */}
-      <style>{`
-        @keyframes fadeInDown {
-          from { opacity: 0; transform: translateY(-20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        a { text-decoration: none; }
-      `}</style>
     </div>
   );
 };

@@ -71,9 +71,7 @@ const ManifestoPage = lazy(() =>
 const ClientPortalPage = lazy(() =>
   import('@/pages/ClientPortalPage').then(m => ({ default: m.ClientPortalPage }))
 );
-const ShowcaseLP = lazy(() =>
-  import('@/features/showcase/ShowcaseLP').then(m => ({ default: m.ShowcaseLP }))
-);
+// Showcase LP — High Ticket pitch for health professionals (unified V3.0)
 const ShowcasePage = lazy(() => import('@/pages/ShowcasePage'));
 
 
@@ -185,9 +183,8 @@ const App: React.FC = () => {
                       <Routes>
                         {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
                         <Route path="/" element={<LandingPage />} />
-                        {/* ── PROVA D'ÁGUA: Showcase LP — entry point for demo branch ── */}
-                        <Route path="/showcase" element={<ShowcaseLP />} />
-                        {/* Hub Showcase — premium bilingual page V3.0 */}
+                        {/* ── Showcase LP: High Ticket pitch — Provadágua V3.0 ── */}
+                        <Route path="/showcase" element={<ShowcasePage />} />
                         <Route path="/showcase-hub" element={<ShowcasePage />} />
                         <Route path="/login" element={<Login />} />
                         {/* Invite Only - Redirect register to landing page */}
