@@ -68,9 +68,9 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     hero_title_accent: 'e faz crescer seu consultório.',
     hero_subtitle:
       'Encontro D\'Água Hub é o sistema operacional de gestão para clínicas e consultórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
-    hero_cta_primary: 'Experimente por 7 dias grátis',
+    hero_cta_primary: 'Experimente a Provadágua por 7 dias',
     hero_cta_secondary: 'Ver demonstração ao vivo',
-    hero_cta_sub: 'Sem cartão de crédito · Cancele a qualquer momento · Dados 100% isolados',
+    hero_cta_sub: 'Gestão de Elite com Privacidade OCI · Sem cartão de crédito · Dados 100% isolados',
     trust_label: 'Confiado por profissionais de saúde',
     specialties: ['Medicina', 'Fisioterapia', 'Psicologia', 'Nutrição', 'Odontologia'],
     metrics: [
@@ -164,7 +164,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Experimente a Provadágua por 7 dias',
-    trial_subtitle: 'O CRM com IA e Privacidade OCI. Feito para profissionais de saúde que levam seus dados a sério.',
+    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM feito para profissionais de saúde que não abrem mão da segurança dos seus pacientes.',
     trial_features: [
       'Isolamento total de dados por clínica',
       '4 Agentes de IA inclusos',
@@ -173,8 +173,8 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       'Suporte dedicado',
       'Cancele a qualquer momento',
     ],
-    trial_cta: 'Começar meu teste gratuito',
-    trial_sub: 'Sem cartão de crédito · Setup em menos de 5 minutos',
+    trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
+    trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
     footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
     footer_version: 'V3.0 — Provadágua Mission Complete',
     footer_privacy: 'Privacidade · LGPD · Termos',
@@ -187,9 +187,9 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     hero_title_accent: 'and grows your practice.',
     hero_subtitle:
       'Encontro D\'Água Hub is the practice management operating system for clinics and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
-    hero_cta_primary: 'Try free for 7 days',
+    hero_cta_primary: 'Try Provadágua for 7 days',
     hero_cta_secondary: 'Watch live demo',
-    hero_cta_sub: 'No credit card · Cancel anytime · 100% isolated data',
+    hero_cta_sub: 'Elite Management with OCI Privacy · No credit card · 100% isolated data',
     trust_label: 'Trusted by health professionals',
     specialties: ['Medicine', 'Physiotherapy', 'Psychology', 'Nutrition', 'Dentistry'],
     metrics: [
@@ -283,7 +283,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Try Provadágua for 7 days',
-    trial_subtitle: 'The CRM with AI and OCI-grade Privacy. Built for health professionals who take their data seriously.',
+    trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM built for health professionals who demand the highest standard of patient data security.',
     trial_features: [
       'Complete data isolation per clinic',
       '4 AI Agents included',
@@ -292,8 +292,8 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       'Dedicated support',
       'Cancel anytime',
     ],
-    trial_cta: 'Start my free trial',
-    trial_sub: 'No credit card required · Setup in under 5 minutes',
+    trial_cta: 'Try Provadágua for 7 days — Free',
+    trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
     footer_built: 'Built with ❤ by the Encontro D\'Água team',
     footer_version: 'V3.0 — Provadágua Mission Complete',
     footer_privacy: 'Privacy · LGPD/GDPR · Terms',
