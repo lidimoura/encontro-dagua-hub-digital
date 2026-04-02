@@ -74,6 +74,7 @@ const ClientPortalPage = lazy(() =>
 const ShowcaseLP = lazy(() =>
   import('@/features/showcase/ShowcaseLP').then(m => ({ default: m.ShowcaseLP }))
 );
+const ShowcasePage = lazy(() => import('@/pages/ShowcasePage'));
 
 
 
@@ -186,6 +187,8 @@ const App: React.FC = () => {
                         <Route path="/" element={<LandingPage />} />
                         {/* ── PROVA D'ÁGUA: Showcase LP — entry point for demo branch ── */}
                         <Route path="/showcase" element={<ShowcaseLP />} />
+                        {/* Hub Showcase — premium bilingual page V3.0 */}
+                        <Route path="/showcase-hub" element={<ShowcasePage />} />
                         <Route path="/login" element={<Login />} />
                         {/* Invite Only - Redirect register to landing page */}
                         <Route path="/register" element={<Navigate to="/?action=apply" replace />} />
@@ -194,7 +197,6 @@ const App: React.FC = () => {
                         <Route path="/v/:slug" element={<BridgePage />} />
                         <Route path="/r/:slug" element={<BridgePage />} /> {/* NEW SHORT LINK ROUTE */}
                         <Route path="/manifesto" element={<ManifestoPage />} />
-
 
                         {/* PROTECTED ROUTES - REQUIRE AUTH */}
                         <Route element={<ProtectedLayout />}>

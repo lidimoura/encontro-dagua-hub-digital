@@ -1,169 +1,90 @@
-# Encontro D'Água Hub — Showcase Portfolio
-### Branch `provadagua` | Live Demo: [prova.encontrodagua.com](https://prova.encontrodagua.com)
+# Encontro d'Água Hub — CRM de Produção `v3.0`
 
-> **Prova d'Água** is our zero-friction demo environment. Any visitor can sign up with the keyword **"provadagua"** and immediately experience a production-grade AI CRM — with full data isolation, trilingual support, and all AI agents active.
+> **Branch `main` → hub.encontrodagua.com**
+> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
+> 🚀 **V3.0**: Super Admin · company_id isolation · ShowcasePage · access_expires_at
 
 ---
 
-## 🏆 Why This Matters
+## 🚀 Sobre o Hub
 
-This is not a mockup. It is a **real, production-grade SaaS** running on enterprise infrastructure:
+O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Água. Centraliza todos os leads reais capturados via Link d'Água (webhook WhatsApp/Typebot), gerencia os deals no Board Kanban e automatiza o follow-up com a IA Mazô.
 
-| Dimension | Implementation |
+---
+
+## ✨ Funcionalidades Principais
+
+| Módulo | Descrição |
 |---|---|
-| **Isolation** | Triple-wall RLS: Branch/Env → JWT → `is_demo_data` column |
-| **Security** | LGPD/GDPR by design. Demo data never leaks to production |
-| **AI Agents** | Precy (Pricing), Jury (Legal), Mazô (CS), Amazô (Sales) |
-| **Languages** | PT 🇧🇷 · EN 🇺🇸 · ES 🇪🇸 — trilingual with auto-fallback chain |
-| **Infrastructure** | Supabase + Vercel + Google Gemini 2.5 Flash |
-| **OCI Readiness** | Architecture follows Oracle Cloud Infrastructure patterns: stateless Edge Functions, connection pooling, and row-level security equivalent to OCI IAM policies |
-
----
-
-## ✨ Feature Matrix
-
-| Module | Status | Demo Value |
-|---|---|---|
-| **Showcase LP (Portal Gate)** | ✅ Live | Keyword-protected access — keyword `provadagua` |
-| **Signup Flow (Zero Friction)** | ✅ Live | No email confirmation needed — `admin.createUser` bypass |
-| **Kanban Boards** | ✅ Demo data | SDR pipeline with AI deal analysis |
-| **Contacts** | ✅ Isolated | `is_demo_data = true` filter at RLS level |
-| **AI Hub (Mazô)** | ✅ Active | Gemini 2.5 Flash — real-time CRM insights |
-| **Decision Center** | ✅ Active | Proactive AI decisions: critical/important/moderate/low |
-| **Precy (Pricing AI)** | ✅ Active | AUD/USD/BRL — multilingual commercial proposals |
-| **Jury (Legal AI)** | ✅ Active | Contract generation with PDF export |
-| **Bridge Pages** | ✅ Active | Digital card generator (formerly "QR d'Água") |
-| **Prompt Lab** | ✅ Active | AI prompt engineering — save to localStorage |
-| **Trilingual UI** | ✅ Live | PT → EN → ES → PT cycle with DB-persisted preferences |
-| **Reports** | ✅ Demo metrics | Revenue trend, Win/Loss, Sales Cycle |
-
----
-
-## 🔒 Security Architecture
-
-### Triple Isolation Wall
-
-```
-┌─ WALL 1: Environment ──────────────────────────────────────┐
-│  VITE_APP_MODE = DEMO                                       │
-│  → DEFAULT_LANG = 'en'  |  DEFAULT_CURRENCY = 'AUD'        │
-└────────────────────────────────────────────────────────────┘
-        ↓
-┌─ WALL 2: Authentication (JWT) ──────────────────────────────┐
-│  Every query scoped to auth.uid()                           │
-│  Email confirmation bypassed via admin.createUser()         │
-└─────────────────────────────────────────────────────────────┘
-        ↓
-┌─ WALL 3: Database RLS + is_demo_data ──────────────────────┐
-│  contacts, deals, activities, qr_codes, saved_prompts,     │
-│  products → all filtered by is_demo_data = true            │
-│  Production data: is_demo_data = false → NEVER visible      │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### OCI Cloud-Readiness
-
-This architecture maps directly to Oracle Cloud Infrastructure (OCI) patterns:
-
-- **Stateless Edge Functions** → OCI Functions (Fn Project)
-- **Row Level Security** → OCI IAM Policy equivalent at data layer
-- **Connection pooling** → OCI Database Connection Pool
-- **Multi-tenant isolation** → OCI Compartments (simulated via `company_id`)
-- **Audit trail** → `app_source` column traces every write by origin
-
----
-
-## 🤖 AI Agent Ecosystem
-
-```
-PO (Lidi) — Heutagogic Mode
-    │ defines: Vision · Ethics · Boundaries · Approvals
-    │
-    ├── Antigravity (CTO AI)    → Architecture, code, migrations
-    ├── Mazô (CS AI)            → Retention, customer health, churn
-    ├── Precy (Finance AI)      → Fair pricing with social impact layer
-    ├── Jury (Legal AI)         → Contracts, compliance, PDF generation
-    └── Amazô (Sales AI)        → External diagnosis via WhatsApp
-
-Principle: AI NEVER makes irreversible decisions alone.
-           Every approval, payment, or signature requires human review.
-```
-
----
-
-## 🌍 Trilingual Architecture
-
-```typescript
-// Fallback chain: ES → EN → PT
-// Zero empty strings guaranteed
-// DB-persisted preferences (profiles.preferred_language)
-
-Language type: 'pt' | 'en' | 'es'
-Storage: localStorage (instant) + Supabase profiles (cross-device)
-```
-
-| When user selects language | What happens |
-|---|---|
-| Immediately | UI updates (localStorage) |
-| Background | `profiles.preferred_language` updated in DB |
-| Next login (any device) | DB value restores preference automatically |
-
----
-
-## ⚙️ Environment Variables
-
-```env
-# Vercel (branch: provadagua)
-VITE_APP_MODE=DEMO
-VITE_SUPABASE_URL=https://bcdyxnauokxikrtmhnlm.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
-VITE_GEMINI_API_KEY=AIza...
-```
-
----
-
-## 🚀 Signup Flow (Zero Friction)
-
-```
-1. Visit prova.encontrodagua.com
-2. Enter keyword: "provadagua" → form revealed
-3. Fill name + email + password
-4. Click "Criar Conta e Entrar" → Edge Function signup-showcase
-5. Account created (email_confirm: true — no email sent)
-6. Auto-login → redirect to /boards
-7. OnboardingModal opens: "Welcome to your CRM! 👋"
-```
-
-No credit card. No email confirmation. No friction.
+| **Board Kanban** | Leads SDR (`🤖 sdr`) aparecem no primeiro estágio automaticamente |
+| **Contatos** | Todos os leads reais sincronizados — isolamento por `company_id` |
+| **Atividades / Inbox** | Tarefas e compromissos reais com briefing da Mazô |
+| **Mazô (IA)** | Agente de vendas com contexto completo dos leads |
+| **Jury (IA)** | Geração de contratos com visualização de PDF |
+| **Precy (IA)** | Precificação em BRL/USD/EUR com conversão automática |
+| **QRDágua** | Geração e gestão de QR Codes / Cartões Digitais |
+| **Catálogo** | Produtos salvos em BRL (preço canônico) |
+| **Reports** | Top Oportunidades, ciclo de vendas, win/loss real |
+| **Showcase** | Landing page pública bilingue em `/#/showcase` |
+| **Admin** | Super Admin (`lidimfc@gmail.com`), `access_expires_at`, Tech Stack |
 
 ---
 
 ## 🛠️ Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + TypeScript + Vite |
-| Styling | Vanilla CSS + custom design tokens |
-| State | React Context (Auth, Language, CRM, Theme) |
-| Backend | Supabase (PostgreSQL + Row Level Security) |
-| Edge Functions | Deno (signup-showcase, fix-trigger, chat-ai) |
-| AI | Google Gemini 2.5 Flash |
-| Deploy | Vercel (provadagua branch → prova.encontrodagua.com) |
-| Monitoring | Supabase Dashboard + Vercel Analytics |
+- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
+- **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
+- **IA**: Google Gemini (principal), OpenAI, Anthropic
+- **Deploy**: Vercel (branch `main` → `hub.encontrodagua.com`)
+- **Webhook SDR**: Supabase Edge Function `form-lp-lead`
 
 ---
 
-## 📊 Migration History
+## ⚙️ Variáveis de Ambiente
 
-| # | File | Purpose |
-|---|---|---|
-| 000 | `schema.sql` | Base schema — multi-tenant by design |
-| 034 | `add_is_demo_data_column.sql` | Isolation column for all tables |
-| 035 | `push_app_source_and_currency.sql` | Currency preferences |
-| 036 | `bulletproof_handle_new_user.sql` | Trigger hardening (Fix 500 error) |
-| 037 | `profiles_preferences.sql` | DB-persistent language + currency |
+```env
+VITE_APP_MODE=PRODUCTION
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_GEMINI_API_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   # Apenas Vercel Secrets — nunca commitar
+VITE_CRM_API_KEY=...            # Opcional: Nexus Bridge (Agility OS webhook)
+```
 
 ---
 
-*Encontro D'Água Hub · Branch provadagua · Powered by Antigravity AI CTO*  
-*Architecture: Privacy by Design · Ethics by Default · Scale by Intention*
+## 🔑 Fluxo SDR (Link d'Água → Board)
+
+1. Lead preenche formulário no Typebot / WhatsApp
+2. Webhook `form-lp-lead` chama `capture_amazo_lead` no Supabase
+3. Contato criado com tag `🤖 sdr`
+4. Board auto-mapeia o contato para o **primeiro estágio**
+5. Mazô analisa e sugere follow-up no Inbox
+
+---
+
+## 🏗️ Estrutura
+
+```
+src/
+  features/       # Pages e módulos (boards, contacts, admin, ...)
+  lib/
+    supabase/     # Services com IS_DEMO guards
+    query/hooks/  # TanStack Query hooks
+    appConfig.ts  # IS_DEMO = false em PRODUCTION
+  hooks/
+    useTranslation.ts  # i18n (pt-BR padrão em PRODUCTION)
+```
+
+---
+
+## 📦 Deploy
+
+```bash
+git push origin main
+# Vercel detecta e faz build automático → hub.encontrodagua.com
+```
+
+---
+
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI*
