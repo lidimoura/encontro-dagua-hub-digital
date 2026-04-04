@@ -40,15 +40,19 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             const { data: { session } } = await supabase.auth.getSession();
             
             // Build the payload mapping our form to the typebot/webhook expectations
+            // O campo "whatsapp" é OBRIGATÓRIO na Edge Function (valida: !name || !whatsapp)
             const payload = {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone || '',
+                whatsapp: formData.phone || `sem-tel-${Date.now()}`, // campo obrigatório para criar card
                 businessType: formData.interest,
                 services: [formData.interest],
                 landedVia: 'Hub LP',
-                source: source === 'cta' ? 'Hub LP' : source,
+                source: source === 'cta' ? 'Hub LP' : source === 'prompt_optimizer' ? 'Prompt Lab' : 'Hub LP',
+                origin: source === 'cta' ? 'Hub-lp' : source,
                 message: formData.company ? `Empresa: ${formData.company}` : '',
+                tags: ['Hub-lp'],
                 ...prefilledData
             };
 

@@ -73,8 +73,9 @@ const ClientPortalPage = lazy(() =>
 );
 // Showcase LP — High Ticket pitch for health professionals (unified V3.0)
 const ShowcasePage = lazy(() => import('@/pages/ShowcasePage'));
-
-
+// ── V4.1 Checkout pages (Stripe + WhatsApp fallback) ───────────────────────
+const CheckoutSuccessPage = lazy(() => import('@/pages/CheckoutSuccessPage'));
+const CheckoutCancelPage = lazy(() => import('@/pages/CheckoutCancelPage'));
 
 // Layout wrapper for protected routes
 const ProtectedLayout: React.FC = () => (
@@ -187,6 +188,9 @@ const App: React.FC = () => {
                         <Route path="/showcase" element={<ShowcasePage />} />
                         <Route path="/showcase-hub" element={<ShowcasePage />} />
                         <Route path="/login" element={<Login />} />
+                        {/* ── V4.1 Checkout pages ─────────────────────────────── */}
+                        <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
+                        <Route path="/checkout-cancel" element={<CheckoutCancelPage />} />
                         {/* Invite Only - Redirect register to landing page */}
                         <Route path="/register" element={<Navigate to="/?action=apply" replace />} />
                         <Route path="/join" element={<JoinPage />} />

@@ -4,7 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
   Sparkles, Zap, Users, TrendingUp, QrCode, Menu, X, ChevronLeft, ChevronRight, ArrowRight,
-  Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, ThumbsUp, ThumbsDown
+  Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, ThumbsUp, ThumbsDown,
+  Heart, Briefcase, Link as LinkIcon, ChevronDown, Leaf, ShieldCheck, Target, BarChart3, Filter
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { QRCode } from 'react-qrcode-logo';
@@ -13,8 +14,59 @@ import { PhoneSimulator } from '@/components/PhoneSimulator';
 import { CRMSimulator } from '@/components/CRMSimulator';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useTranslation } from '@/hooks/useTranslation';
+import { handleStripeCheckout } from '@/lib/stripe';
 
-// TEAM_MEMBERS MOVED INSIDE COMPONENT TO USE TRANSLATION
+
+// ── IcebergDetails: detalhes técnicos ocultos (Earth-Neon V4.1) ─────────────
+// Visíveis apenas para quem quer explorar mais — não polui o copy acessível
+function IcebergDetails() {
+  const [open, setOpen] = React.useState(false);
+  const items = [
+    {
+      title: 'Infraestrutura Oracle Cloud (OCI)',
+      content: 'Backend seguro em Supabase (PaaS sobre OCI). Row Level Security (RLS) ativo em todas as tabelas. Isolamento por company_id — nenhum dado de um cliente vaza para outro.',
+    },
+    {
+      title: 'API & Webhooks',
+      content: 'API REST completa via Supabase. Webhooks configuráveis para integrar com WhatsApp, n8n, Zapier ou qualquer outro sistema. Edge Functions para lógica serverless.',
+    },
+    {
+      title: 'Segurança & Conformidade',
+      content: 'RLS (Row Level Security) PostgreSQL, variáveis de ambiente no Vercel, chaves rotacionadas por ambiente. LGPD-ready por design.',
+    },
+    {
+      title: 'Stack Técnica',
+      content: 'React 19 + TypeScript + Vite · Supabase (PostgreSQL + Auth + Realtime) · Google Gemini AI · TailwindCSS · Vercel CDN · Stripe Payments',
+    },
+  ];
+
+  return (
+    <div className="mt-10 text-center">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-xs font-medium transition-colors group"
+      >
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
+        {open ? 'Ocultar detalhes técnicos' : 'Ver detalhes técnicos (para avaliadores)'}
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
+      </button>
+
+      {open && (
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-left animate-in fade-in slide-in-from-top-2 duration-300">
+          {items.map(item => (
+            <div key={item.title} className="bg-slate-900/40 border border-white/5 rounded-2xl p-5">
+              <h4 className="text-white font-semibold text-sm mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
+                {item.title}
+              </h4>
+              <p className="text-slate-500 text-xs leading-relaxed">{item.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -469,6 +521,108 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
+        {/* ════════════════════════════════════════════════════ */}
+        {/* SEGMENTAÇÃO: 3 Nichos (Earth-Neon) V4.1            */}
+        {/* ════════════════════════════════════════════════════ */}
+        <section className="py-16 px-6 bg-gradient-to-b from-[#02040a] to-[#04080a]">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-slate-400 text-sm mb-2">Para quem é o Hub?</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white">Escolha o seu caminho</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              {/* Card 1: Saúde & Psi */}
+              <div className="group relative bg-gradient-to-br from-[#0a1a14] to-[#051008] border border-teal-500/20 rounded-3xl p-7 hover:border-teal-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/10"
+                onClick={() => navigate('/login')}>
+                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-teal-500/20 transition-colors">
+                  <Heart className="w-6 h-6 text-teal-400" />
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase tracking-wider mb-3">
+                  Psicólogos & Saúde
+                </span>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-teal-300 transition-colors">
+                  Cuide melhor de quem você cuida
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  CRM desenhado para a realidade do consultório: organiza encaminhamentos
+                  e automatiza o contato com respeito e ética.
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {['Funil de captação de clientes', 'Cartão digital profissional', 'Automação ética de follow-up'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <CheckCircle className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center gap-1 text-teal-400 text-xs font-bold group-hover:gap-2 transition-all">
+                  Explorar <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+
+              {/* Card 2: Empreendedores */}
+              <div className="group relative bg-gradient-to-br from-[#1a0f00] to-[#0a0800] border border-amber-600/20 rounded-3xl p-7 hover:border-amber-500/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10"
+                onClick={() => navigate('/login')}>
+                <div className="w-12 h-12 bg-amber-600/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-amber-500/20 transition-colors">
+                  <Briefcase className="w-6 h-6 text-amber-400" />
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-600/10 text-amber-400 text-[10px] font-bold uppercase tracking-wider mb-3">
+                  Empreendedores
+                </span>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-300 transition-colors">
+                  Seu negócio todo num lugar só
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  Do primeiro contato ao pós-venda: gerencie clientes, acompanhe vendas
+                  e deixa a IA trabalhar enquanto você foca no que ama.
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {['Pipeline visual de vendas', 'IA que escreve proposta por você', 'Relatórios em tempo real'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <CheckCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center gap-1 text-amber-400 text-xs font-bold group-hover:gap-2 transition-all">
+                  Explorar <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+
+              {/* Card 3: Link d'Água */}
+              <div className="group relative bg-gradient-to-br from-[#050a1a] to-[#020510] border border-cyan-500/20 rounded-3xl p-7 hover:border-cyan-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-500/10"
+                onClick={() => window.open('https://link.encontrodagua.com/vitrine', '_blank')}>
+                <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-cyan-500/20 transition-colors">
+                  <QrCode className="w-6 h-6 text-cyan-400" />
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-3">
+                  Link d'Água • Cartão Digital
+                </span>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                  Sua presença digital num QR
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  Um link único e bonito com tudo que as pessoas precisam saber de você.
+                  Simples de compartilhar, fácil de atualizar.
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {['QR Code personalizado', 'Links ilimitados', 'Estatísticas de acesso'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <CheckCircle className="w-3.5 h-3.5 text-cyan-500 flex-shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center gap-1 text-cyan-400 text-xs font-bold group-hover:gap-2 transition-all">
+                  Ver vitrine <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+
+            </div>
+
+            {/* ICEBERG: detalhes técnicos ocultos (OCI, RLS, API, Webhooks) */}
+            <IcebergDetails />
+          </div>
+        </section>
+
         {/* ────────────────────────────────────────────────── */}
         {/* SOLUÇÃO #1 — LINK D'ÁGUA (DESTAQUE PRINCIPAL)     */}
         {/* ────────────────────────────────────────────────── */}
@@ -634,20 +788,38 @@ Agora, gere o prompt perfeito:`;
             )}
 
 
-            <div className="mt-8 p-6 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-xl max-w-2xl mx-auto">
-              <p className="text-lg font-bold text-fuchsia-300 mb-3">{t('wantJustPromptLab')}</p>
-              <ul className="text-sm text-slate-300 space-y-2 mb-4">
-                <li className="flex items-start gap-2">
-                  <span className="text-amber-400">🔥</span>
-                  <span><strong>{t('promptLabBenefits')}</strong></span>
-                </li>
-              </ul>
-              <button
-                onClick={() => window.open('https://wa.me/5592992943998?text=Quero o plano Pro Mensal por R$ 3,00', '_blank')}
-                className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:from-fuchsia-500 hover:to-purple-500 transition-all shadow-lg"
-              >
-                {t('subscribePro')}
-              </button>
+            <div className="mt-8 p-6 bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 border border-fuchsia-500/30 rounded-2xl max-w-2xl mx-auto">
+              <p className="text-lg font-bold text-fuchsia-300 mb-2">{t('wantJustPromptLab')}</p>
+              <p className="text-slate-400 text-sm mb-5">{t('promptLabBenefits')}</p>
+
+              {/* ══ CHECKOUT BUTTONS ═════════════════════════════ */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <button
+                  id="btn-checkout-monthly"
+                  onClick={() => handleStripeCheckout('monthly')}
+                  className="flex flex-col items-center py-4 px-5 bg-gradient-to-br from-fuchsia-700 to-purple-700 hover:from-fuchsia-600 hover:to-purple-600 rounded-xl font-bold text-white transition-all shadow-lg shadow-fuchsia-500/20 active:scale-[0.98]"
+                >
+                  <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Mensal</span>
+                  <span className="text-2xl font-black">R$ 3,00</span>
+                  <span className="text-xs opacity-70">/mês</span>
+                </button>
+                <button
+                  id="btn-checkout-annual"
+                  onClick={() => handleStripeCheckout('annual')}
+                  className="flex flex-col items-center py-4 px-5 bg-gradient-to-br from-amber-700 to-orange-700 hover:from-amber-600 hover:to-orange-600 rounded-xl font-bold text-white transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98] relative"
+                >
+                  <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide">
+                    MELHOR OPÇÃO
+                  </span>
+                  <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Anual</span>
+                  <span className="text-2xl font-black">R$ 29,90</span>
+                  <span className="text-xs opacity-70">/ano • economia R$ 6</span>
+                </button>
+              </div>
+
+              <p className="text-[10px] text-slate-500 text-center">
+                ★ Lógica de indicação: 20% + 20% (máx 50%) &nbsp;|&nbsp; 60% off Impacto Social
+              </p>
             </div>
           </div>
         </section>
@@ -838,9 +1010,22 @@ Agora, gere o prompt perfeito:`;
 
         {/* FOOTER */}
         <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] border-t border-white/5">
-          <p className="mb-2 text-white font-bold">Encontro D'água .hub 🌀</p>
-          <p>Base CRM developed for students... Powered by Encontro D'água Hub</p>
-          <p className="mt-2 text-slate-700">{t('footerRights')}</p>
+          <div className="max-w-4xl mx-auto px-6">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Leaf className="w-4 h-4 text-teal-500" />
+              <p className="text-white font-bold">Encontro D'água Hub</p>
+            </div>
+            <p className="text-slate-500 mb-1">Fundado por Lidi Moura — Manauara, Psicóloga, Dev Fullstack Lowcode & Especialista em Dados.</p>
+            <p className="text-slate-600 mb-4">"Reflorestar o Digital" — Tecnologia acessível com impacto social real.</p>
+            <div className="flex items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
+              <span>20% + 20% desconto por indicação (máx 50%)</span>
+              <span>•</span>
+              <span>60% off para Impacto Social</span>
+              <span>•</span>
+              <span>100% upfront ou 50/50</span>
+            </div>
+            <p className="text-slate-700">{t('footerRights')}</p>
+          </div>
         </footer>
       </div>
 

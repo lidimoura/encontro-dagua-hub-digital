@@ -561,6 +561,63 @@ export const AdminUsersPage: React.FC = () => {
                                     Super Admin (acesso global)
                                 </label>
                             </div>
+
+                            {/* ── Tags / Access Level ────────────────────────── */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    Tags de Acesso
+                                    <span className="ml-1 text-xs text-slate-400 font-normal">(Enter para adicionar)</span>
+                                </label>
+                                <div className="bg-slate-50 dark:bg-rionegro-900 border border-slate-200 dark:border-rionegro-800 rounded-lg p-3">
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {(formData.access_level || []).map(tag => (
+                                            <span key={tag} className="flex items-center gap-1 bg-acai-900/10 dark:bg-acai-900/30 text-acai-700 dark:text-acai-400 px-2 py-0.5 rounded-full text-xs font-bold border border-acai-900/20">
+                                                {tag}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({
+                                                        ...formData,
+                                                        access_level: formData.access_level.filter(t => t !== tag)
+                                                    })}
+                                                    className="hover:text-red-500 transition-colors ml-0.5"
+                                                    title="Remover tag"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </span>
+                                        ))}
+                                        {(formData.access_level || []).length === 0 && (
+                                            <span className="text-xs text-slate-400 italic">Nenhuma tag adicionada</span>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Nova tag + Enter (ex: beta, saude, psi)..."
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const val = e.currentTarget.value.trim().toLowerCase();
+                                                if (val && !formData.access_level?.includes(val)) {
+                                                    setFormData({
+                                                        ...formData,
+                                                        access_level: [...(formData.access_level || []), val]
+                                                    });
+                                                    e.currentTarget.value = '';
+                                                }
+                                            }
+                                        }}
+                                        className="w-full text-xs bg-transparent outline-none text-slate-700 dark:text-white border-t border-slate-100 dark:border-white/5 pt-2 placeholder-slate-400"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-slate-400 mt-1">
+                                    Tags pré-definidas: <button type="button" onClick={() => {
+                                        const tags = ['beta', 'saude', 'psi', 'empreendedor', 'impacto-social', 'pro', 'trial'];
+                                        const currentTags = formData.access_level || [];
+                                        const first = tags.find(t => !currentTags.includes(t));
+                                        if (first) setFormData({ ...formData, access_level: [...currentTags, first] });
+                                    }} className="text-acai-600 hover:underline">+ sugestão</button>
+                                </p>
+                            </div>
                         </div>
 
                         <div className="flex gap-3 mt-6">
@@ -583,3 +640,4 @@ export const AdminUsersPage: React.FC = () => {
         </div>
     );
 };
+
