@@ -98,6 +98,14 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
 }
 
 const App: React.FC = () => {
+  // ── Host-based routing: prova.encontrodagua.com → ShowcasePage ───────────
+  // Detecta o subdomínio no load. HashRouter continua funcionando normalmente;
+  // apenas a rota `"/"` muda de LandingPage para ShowcasePage no domínio prova.
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isProvaHost =
+    hostname === 'prova.encontrodagua.com' ||
+    hostname.startsWith('prova.');
+
   // STRICT ENFORCEMENT: Force English for International Demo
   React.useEffect(() => {
     const saved = localStorage.getItem('app_language');
@@ -183,12 +191,15 @@ const App: React.FC = () => {
                     <ErrorBoundary>
                       <Routes>
                         {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
-                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/" element={isProvaHost ? <ShowcasePage /> : <LandingPage />} />
                         {/* ── Showcase LP: High Ticket pitch — Provadágua V3.0 ── */}
                         <Route path="/showcase" element={<ShowcasePage />} />
                         <Route path="/showcase-hub" element={<ShowcasePage />} />
                         <Route path="/login" element={<Login />} />
                         {/* ── V4.1 Checkout pages ─────────────────────────────── */}
+                        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+                        <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+                        {/* legacy aliases sem barra */}
                         <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
                         <Route path="/checkout-cancel" element={<CheckoutCancelPage />} />
                         {/* Invite Only - Redirect register to landing page */}

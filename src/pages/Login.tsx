@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
 import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff } from 'lucide-react';
 import { AiflowSupport } from '@/components/AiflowSupport';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // ── Lead Gate Config ─────────────────────────────────────────────────────────
