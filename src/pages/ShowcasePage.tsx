@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface Translation {
@@ -320,6 +321,7 @@ const ShowcasePage: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const observedRef = useRef<Set<string>>(new Set());
   const [visible, setVisible] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const t = TRANSLATIONS[lang];
 
@@ -598,9 +600,9 @@ const ShowcasePage: React.FC = () => {
           animation: 'fadeUp 0.7s ease 0.26s both',
         }}>
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <a
-              href="/#/"
+              <button
               id="showcase-cta-primary"
+              onClick={() => setIsModalOpen(true)}
               style={{
                 background: S.cyanBlue,
                 color: '#fff',
@@ -615,6 +617,7 @@ const ShowcasePage: React.FC = () => {
                 alignItems: 'center',
                 gap: '8px',
                 minHeight: '52px',
+                border: 'none',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
@@ -627,7 +630,7 @@ const ShowcasePage: React.FC = () => {
             >
               {t.hero_cta_primary}
               <ArrowIcon />
-            </a>
+            </button>
             <a
               href="/#/login"
               id="showcase-cta-secondary"
@@ -703,6 +706,244 @@ const ShowcasePage: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── SEGMENTAÇÃO: Escolha seu caminho ───────────────────────────── */}
+      <section
+        id="sec-segmentacao"
+        data-obs
+        aria-labelledby="segmentacao-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 5rem) 1.5rem',
+          maxWidth: '1100px',
+          margin: '0 auto',
+          ...fadeIn('sec-segmentacao'),
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{
+            display: 'inline-block',
+            background: 'rgba(16,185,129,0.1)',
+            border: '1px solid rgba(16,185,129,0.25)',
+            borderRadius: '20px',
+            padding: '6px 18px',
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            color: S.emerald,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            marginBottom: '1rem',
+          }}>
+            {lang === 'pt' ? 'Para quem é' : 'Who it\'s for'}
+          </div>
+          <h2
+            id="segmentacao-heading"
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+              fontWeight: 800,
+              color: '#f8fafc',
+              marginBottom: '1rem',
+            }}
+          >
+            {lang === 'pt' ? 'Escolha seu caminho' : 'Choose your path'}
+          </h2>
+          <p style={{ color: S.slate, fontSize: '1rem', maxWidth: '520px', margin: '0 auto' }}>
+            {lang === 'pt'
+              ? 'Cada profissional tem uma necessidade. Aqui vai a sua.'
+              : 'Every professional has unique needs. Here\'s yours.'}
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '20px',
+        }}>
+          {/* Card 1: Saúde */}
+          <div
+            id="segment-saude"
+            style={{
+              background: 'rgba(14,165,233,0.05)',
+              border: '1px solid rgba(14,165,233,0.2)',
+              borderRadius: '22px',
+              padding: '32px 28px',
+              transition: 'all 0.28s',
+              cursor: 'default',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(14,165,233,0.45)';
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.background = 'rgba(14,165,233,0.09)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(14,165,233,0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = 'rgba(14,165,233,0.05)';
+            }}
+          >
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🩺</div>
+            <div>
+              <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
+                {lang === 'pt' ? 'Saúde & Consultório' : 'Health & Clinic'}
+              </h3>
+              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
+                {lang === 'pt'
+                  ? 'Para Psicólogos, Médicos, Fisioterapeutas e terapeutas. Gestão de leads com privacidade LGPD nativa, sem misturar dados de pacientes.'
+                  : 'For Psychologists, Physicians, Physiotherapists. Lead management with native LGPD privacy, no patient data mixing.'}
+              </p>
+            </div>
+            <div style={{ marginTop: 'auto' }}>
+              <button
+                id="segment-saude-cta"
+                onClick={() => setIsModalOpen(true)}
+                style={{
+                  background: S.cyanBlue,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '30px',
+                  padding: '12px 24px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  width: '100%',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              >
+                {lang === 'pt' ? '🩺 Quero testar 7 dias' : '🩺 Try 7 days free'}
+              </button>
+            </div>
+          </div>
+
+          {/* Card 2: Empreendedores */}
+          <div
+            id="segment-empreendedor"
+            style={{
+              background: 'rgba(16,185,129,0.05)',
+              border: '1px solid rgba(16,185,129,0.2)',
+              borderRadius: '22px',
+              padding: '32px 28px',
+              transition: 'all 0.28s',
+              cursor: 'default',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(16,185,129,0.45)';
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.background = 'rgba(16,185,129,0.09)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(16,185,129,0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = 'rgba(16,185,129,0.05)';
+            }}
+          >
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">💼</div>
+            <div>
+              <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
+                {lang === 'pt' ? 'Empreendedores & Times' : 'Entrepreneurs & Teams'}
+              </h3>
+              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
+                {lang === 'pt'
+                  ? 'CRM com pipeline visual, IA para qualificação de leads, automação SDR e dashboards de conversão. Foco em vender mais, não em planilhas.'
+                  : 'Visual pipeline CRM, AI lead qualification, SDR automation, and conversion dashboards. Focus on selling, not spreadsheets.'}
+              </p>
+            </div>
+            <div style={{ marginTop: 'auto' }}>
+              <button
+                id="segment-empreendedor-cta"
+                onClick={() => setIsModalOpen(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '30px',
+                  padding: '12px 24px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  width: '100%',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              >
+                {lang === 'pt' ? '💼 Quero testar 7 dias' : '💼 Try 7 days free'}
+              </button>
+            </div>
+          </div>
+
+          {/* Card 3: Kit Básico / Link d'Água */}
+          <div
+            id="segment-linkdagua"
+            style={{
+              background: 'rgba(251,191,36,0.05)',
+              border: '1px solid rgba(251,191,36,0.2)',
+              borderRadius: '22px',
+              padding: '32px 28px',
+              transition: 'all 0.28s',
+              cursor: 'default',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.45)';
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.background = 'rgba(251,191,36,0.09)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.background = 'rgba(251,191,36,0.05)';
+            }}
+          >
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
+            <div>
+              <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
+                {lang === 'pt' ? 'Kit Básico — Link d’Água' : 'Basic Kit — Link d’Água'}
+              </h3>
+              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
+                {lang === 'pt'
+                  ? 'Cartão digital profissional + QR Code personalizado + microsite com sua bio e links. Simples, rápido, impactante.'
+                  : 'Professional digital card + custom QR Code + bio microsite. Simple, fast, impactful.'}
+              </p>
+            </div>
+            <div style={{ marginTop: 'auto' }}>
+              <a
+                id="segment-linkdagua-cta"
+                href="https://link.encontrodagua.com/vitrine"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '30px',
+                  padding: '12px 24px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  width: '100%',
+                  transition: 'all 0.2s',
+                  display: 'block',
+                  textAlign: 'center',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              >
+                {lang === 'pt' ? '🔗 Ver Link d’Água' : '🔗 See Link d’Água'}
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1202,6 +1443,13 @@ const ShowcasePage: React.FC = () => {
         <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>{t.footer_version}</p>
         <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
       </footer>
+      {/* ── Lead Capture Modal ────────────────────────────────────────────── */}
+      <LeadCaptureModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        source="provadagua"
+        prefilledData={{ interest: 'provadagua_trial' }}
+      />
     </div>
   );
 };

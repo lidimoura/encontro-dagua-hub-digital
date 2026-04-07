@@ -1,19 +1,21 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
-import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff, Beaker, Briefcase, HeartPulse, ExternalLink } from 'lucide-react';
 import { AiflowSupport } from '@/components/AiflowSupport';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // ── Lead Gate Config ─────────────────────────────────────────────────────────
-// A palavra-chave é validada client-side (proteção leve) e futuramente
-// pode ser movida para uma Edge Function para maior segurança.
-const ACCESS_KEYWORD = import.meta.env.VITE_ACCESS_KEYWORD || 'ReflorestarDigital';
+// Palavra-chave: controlada pela env var (padrão: provadagua)
+const ACCESS_KEYWORD = import.meta.env.VITE_ACCESS_KEYWORD || 'provadagua';
 const WHATSAPP_NUMBER = '5592992943998';
+const PROVA_URL = 'https://prova.encontrodagua.com/#/showcase';
 
 // ── God Mode trigger: URL param ?god=true ou triplo clique no logo
 // ─────────────────────────────────────────────────────────────────────────────
+
+type GateView = 'choose' | 'keyword' | 'lead_form';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -40,11 +42,11 @@ const Login: React.FC = () => {
     }
   };
 
-  // ── Lead Gate state ────────────────────────────────────────────────────
+  // ── Gate view state ────────────────────────────────────────────────────
+  const [gateView, setGateView] = useState<GateView>('choose');
   const [keyword, setKeyword] = useState('');
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
-  const [showKeywordInput, setShowKeywordInput] = useState(false);
   const [keywordLoading, setKeywordLoading] = useState(false);
   const [keywordError, setKeywordError] = useState<string | null>(null);
   const [keywordSuccess, setKeywordSuccess] = useState(false);
@@ -56,13 +58,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // ── Handlers: Lead Gate ───────────────────────────────────────────────
+  // ── Handlers: Lead Gate — Keyword ────────────────────────────────────
   const handleKeywordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setKeywordLoading(true);
     setKeywordError(null);
 
-    // Normaliza: remove espaços, case-insensitive
     const normalizedInput = keyword.trim().toLowerCase().replace(/\s+/g, '');
     const normalizedKeyword = ACCESS_KEYWORD.toLowerCase().replace(/\s+/g, '');
 
@@ -79,8 +80,6 @@ const Login: React.FC = () => {
     }
 
     try {
-      // Registra o lead no Supabase (tabela profiles / leads)
-      // Cria usuário com senha temporária baseada no email para isolamento
       const tempPassword = `Hub${Date.now()}!`;
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: leadEmail.trim().toLowerCase(),
@@ -89,25 +88,20 @@ const Login: React.FC = () => {
           data: {
             full_name: leadName.trim(),
             lead_source: 'keyword_gate',
-            keyword_used: 'ReflorestarDigital',
+            keyword_used: ACCESS_KEYWORD,
           },
           emailRedirectTo: `${window.location.origin}/#/login`,
         },
       });
 
       if (signUpError && signUpError.message.includes('already registered')) {
-        // Usuário já existe → sugere login (admin pode ter criado)
         setKeywordSuccess(true);
         setKeywordLoading(false);
         return;
       }
 
       if (signUpError) throw signUpError;
-
       setKeywordSuccess(true);
-
-      // Notifica via WhatsApp (opcional)
-      // Em produção, substituir por webhook/Edge Function
     } catch (err: any) {
       setKeywordError(err.message || 'Erro ao registrar. Tente novamente.');
     } finally {
@@ -313,29 +307,37 @@ const Login: React.FC = () => {
             Bem-vinda ao Hub 🌿
           </h1>
           <p className="text-slate-400 text-sm">
-            Acesso por convite. Use sua palavra-chave para entrar.
+            Acesso exclusivo por convite ou palavra-chave.
           </p>
         </div>
 
         <div className="bg-slate-900/60 border border-white/8 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
-          {!showKeywordInput ? (
-            // ── Tela inicial ──
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-600 to-green-600 rounded-2xl flex items-center justify-center shadow-xl shadow-teal-500/20 mb-2">
-                <Key className="w-8 h-8 text-white" />
+          {/* ── TELA 1: Escolha o caminho ── */}
+          {gateView === 'choose' && (
+            <div className="space-y-4">
+              <div className="text-center mb-2">
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Como você chegou aqui?
+                </p>
               </div>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                O Hub Digital funciona por <strong className="text-white">acesso exclusivo</strong>.
-                Se você possui uma palavra-chave, clique em continuar.
-              </p>
 
+              {/* Opção 1: Lead / Curioso — vai testar */}
               <button
-                onClick={() => setShowKeywordInput(true)}
-                className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 transition-all shadow-lg shadow-teal-500/10 gap-2"
+                id="btn-lead-trial"
+                onClick={() => window.open(PROVA_URL, '_blank')}
+                className="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 hover:border-emerald-400/50 hover:from-emerald-900/60 hover:to-teal-900/60 transition-all group text-left"
               >
-                <Key className="w-4 h-4" /> Tenho a palavra-chave
+                <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500/30 transition-colors">
+                  <Beaker className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-white text-sm">Lead ou Curioso?</p>
+                  <p className="text-emerald-400/80 text-xs mt-0.5">Quero testar o CRM por 7 dias grátis →</p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-emerald-500/60 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
               </button>
 
+              {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-white/5" />
@@ -345,21 +347,30 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Quero entrar no Hub Digital. Como funciona?')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex justify-center items-center py-3 px-4 rounded-xl text-sm font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/8 transition-all gap-2"
+              {/* Opção 2: Tenho a palavra-chave */}
+              <button
+                id="btn-keyword"
+                onClick={() => setGateView('keyword')}
+                className="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/8 hover:bg-white/10 hover:border-white/15 transition-all group text-left"
               >
-                Solicitar acesso pelo WhatsApp
-              </a>
+                <div className="w-10 h-10 bg-teal-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500/20 transition-colors">
+                  <Key className="w-5 h-5 text-teal-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-white text-sm">Tenho a palavra-chave</p>
+                  <p className="text-slate-500 text-xs mt-0.5">Acesso exclusivo por indicação</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0" />
+              </button>
 
-              <p className="text-xs text-slate-600 pt-2">
-                Profissionais de Saúde e Empreendedores &mdash; acesso por indicação.
+              <p className="text-xs text-slate-600 text-center pt-2">
+                Profissionais de Saúde e Empreendedores
               </p>
             </div>
-          ) : (
-            // ── Formulário Lead Gate ──
+          )}
+
+          {/* ── TELA 2: Formulário com palavra-chave ── */}
+          {gateView === 'keyword' && (
             <form onSubmit={handleKeywordSubmit} className="space-y-5">
               <div className="text-center mb-2">
                 <h2 className="text-lg font-bold text-white mb-1">Cadastro de Acesso</h2>
@@ -425,12 +436,15 @@ const Login: React.FC = () => {
                   />
                 </div>
                 <p className="text-xs text-slate-600 mt-1">
-                  Não tem? <a
+                  Não tem?{' '}
+                  <a
                     href={`https://wa.me/${WHATSAPP_NUMBER}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-teal-500 hover:text-teal-400 underline"
-                  >Solicite ao admin</a>
+                  >
+                    Solicite ao admin
+                  </a>
                 </p>
               </div>
 
@@ -454,7 +468,7 @@ const Login: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setShowKeywordInput(false)}
+                onClick={() => setGateView('choose')}
                 className="w-full text-slate-500 hover:text-slate-300 text-xs transition-colors py-1"
               >
                 ← Voltar

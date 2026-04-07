@@ -23,7 +23,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         email: '',
         company: '',
         phone: '',
-        interest: 'hub_completo',
+        interest: 'provadagua_trial',
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -41,6 +41,13 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             
             // Build the payload mapping our form to the typebot/webhook expectations
             // O campo "whatsapp" é OBRIGATÓRIO na Edge Function (valida: !name || !whatsapp)
+            // Auto-tag e source baseados no interesse selecionado
+            const isTrial = formData.interest === 'provadagua_trial';
+            const autoTags = ['Hub-lp'];
+            if (isTrial) autoTags.push('provadagua-trial');
+            if (formData.interest === 'crm_saude') autoTags.push('saude');
+            if (formData.interest === 'automacoes_saas') autoTags.push('saas');
+
             const payload = {
                 name: formData.name,
                 email: formData.email,
@@ -48,11 +55,12 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 whatsapp: formData.phone || `sem-tel-${Date.now()}`, // campo obrigatório para criar card
                 businessType: formData.interest,
                 services: [formData.interest],
-                landedVia: 'Hub LP',
-                source: source === 'cta' ? 'Hub LP' : source === 'prompt_optimizer' ? 'Prompt Lab' : 'Hub LP',
-                origin: source === 'cta' ? 'Hub-lp' : source,
+                landedVia: isTrial ? 'Provadágua Trial' : 'Hub LP',
+                source: isTrial ? 'provadagua' : source === 'cta' ? 'Hub LP' : source === 'prompt_optimizer' ? 'Prompt Lab' : 'Hub LP',
+                origin: isTrial ? 'provadagua-trial' : source === 'cta' ? 'Hub-lp' : source,
                 message: formData.company ? `Empresa: ${formData.company}` : '',
-                tags: ['Hub-lp'],
+                tags: autoTags,
+                trial_requested: isTrial,
                 ...prefilledData
             };
 
@@ -201,6 +209,9 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                                         onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
                                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
                                     >
+                                        <option value="provadagua_trial">🧪 Quero testar o CRM por 7 dias (Provadágua)</option>
+                                        <option value="crm_saude">🩺 CRM para Saúde / Consultório</option>
+                                        <option value="automacoes_saas">⚙️ Automações & SaaS</option>
                                         <option value="hub_completo">Hub Completo (CRM + IA + Link d'Água)</option>
                                         <option value="linkdagua">Link d'Água (Sites e QR Codes)</option>
                                         <option value="crm_only">CRM com IA</option>

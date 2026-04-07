@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Edit2, Shield, Building2, Mail, UserCog, UserPlus, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Users, Edit2, Shield, Building2, Mail, UserCog, UserPlus, Eye, EyeOff, Loader2, Clock, CheckCircle, XCircle, Filter } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
@@ -17,6 +17,7 @@ interface User {
     plan?: 'free' | 'pro' | 'enterprise';
     status?: string;
     access_level?: string[];
+    access_expires_at?: string | null;
 }
 
 interface Company {
@@ -46,6 +47,9 @@ export const AdminUsersPage: React.FC = () => {
     const [newUserData, setNewUserData] = useState({ name: '', email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [creatingUser, setCreatingUser] = useState(false);
+
+    // ── Trial filter ────────────────────────────────────────────────────────
+    const [showOnlyTrials, setShowOnlyTrials] = useState(false);
 
     // ── Todos os hooks ANTES de qualquer return condicional ────────────────
     useEffect(() => {
@@ -98,6 +102,7 @@ export const AdminUsersPage: React.FC = () => {
           plan,
           status,
           access_level,
+          access_expires_at,
           companies:company_id (name)
         `)
                 .order('created_at', { ascending: false });
@@ -234,6 +239,54 @@ export const AdminUsersPage: React.FC = () => {
         }
     };
 
+    // ── Trial Access Management ──────────────────────────────────────────────
+    const handleTrialAccess = async (userId: string, action: 'grant' | 'revoke') => {
+        try {
+            const expiresAt = action === 'grant'
+                ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // +7 dias
+                : new Date(Date.now() - 1000).toISOString(); // expirado agora
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ access_expires_at: expiresAt })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            if (action === 'grant') {
+                addToast(`✅ Trial liberado por 7 dias`, 'success');
+            } else {
+                addToast(`🚫 Acesso trial bloqueado`, 'success');
+            }
+            fetchUsers();
+        } catch (error: any) {
+            addToast(`Erro: ${error.message}`, 'error');
+        }
+    };
+
+    // ── Trial status badge helper ────────────────────────────────────────────
+    const getTrialBadge = (user: User) => {
+        const isTrial = user.access_level?.includes('provadagua-trial') || user.access_level?.includes('trial');
+        if (!isTrial) return null;
+
+        if (!user.access_expires_at) {
+            return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-700/50 text-slate-400"><Clock className="w-3 h-3" /> Sem expiração</span>;
+        }
+
+        const expiry = new Date(user.access_expires_at);
+        const now = new Date();
+        const diffMs = expiry.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffMs < 0) {
+            return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-900/30 text-red-400"><XCircle className="w-3 h-3" /> Expirado</span>;
+        }
+        if (diffDays <= 1) {
+            return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-900/30 text-amber-400"><Clock className="w-3 h-3" /> Expira hoje</span>;
+        }
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-900/30 text-emerald-400"><CheckCircle className="w-3 h-3" /> Ativo ({diffDays}d)</span>;
+    };
+
     const handlePlanChange = async (userId: string, newPlan: 'free' | 'pro' | 'enterprise') => {
         try {
             let validUntil: string | null = null;
@@ -287,6 +340,21 @@ export const AdminUsersPage: React.FC = () => {
                 <p className="text-slate-600 dark:text-slate-400">
                     Gerencie todos os usuários do sistema (Super Admin)
                 </p>
+            </div>
+
+            {/* ── FILTRO TRIAL ─────────────────────────────────────────────── */}
+            <div className="mb-4 flex items-center gap-3">
+                <button
+                    onClick={() => setShowOnlyTrials(v => !v)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                        showOnlyTrials
+                            ? 'bg-emerald-900/20 border-emerald-500/40 text-emerald-400'
+                            : 'bg-white dark:bg-rionegro-950 border-slate-200 dark:border-rionegro-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                >
+                    <Filter className="w-4 h-4" />
+                    {showOnlyTrials ? 'Mostrando apenas trials' : 'Filtrar: só trials'}
+                </button>
             </div>
 
             {/* ── CADASTRO DIRETO ─────────────────────────────────────────── */}
@@ -407,6 +475,9 @@ export const AdminUsersPage: React.FC = () => {
                                     Empresa
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                    📎 Trial
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                                     💎 Plano
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
@@ -415,7 +486,12 @@ export const AdminUsersPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-rionegro-800">
-                            {users.map((user) => (
+                            {users
+                                .filter(u => showOnlyTrials
+                                    ? (u.access_level?.includes('provadagua-trial') || u.access_level?.includes('trial'))
+                                    : true
+                                )
+                                .map((user) => (
                                 <tr
                                     key={user.id}
                                     className="hover:bg-slate-50 dark:hover:bg-rionegro-900 transition-colors"
@@ -463,6 +539,30 @@ export const AdminUsersPage: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
+                                        {/* Trial badge + botões de controle */}
+                                        <div className="flex flex-col gap-1.5">
+                                            {getTrialBadge(user)}
+                                            {(user.access_level?.includes('provadagua-trial') || user.access_level?.includes('trial')) && (
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => handleTrialAccess(user.id, 'grant')}
+                                                        title="Liberar 7 dias"
+                                                        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/40 rounded-lg transition-colors"
+                                                    >
+                                                        <CheckCircle className="w-3 h-3" /> +7d
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleTrialAccess(user.id, 'revoke')}
+                                                        title="Bloquear acesso"
+                                                        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-900/20 text-red-400 hover:bg-red-900/40 rounded-lg transition-colors"
+                                                    >
+                                                        <XCircle className="w-3 h-3" /> Block
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
                                         <select
                                             value={user.plan || 'free'}
                                             onChange={(e) => handlePlanChange(user.id, e.target.value as 'free' | 'pro' | 'enterprise')}
@@ -484,9 +584,12 @@ export const AdminUsersPage: React.FC = () => {
                                     </td>
                                 </tr>
                             ))}
-                            {users.length === 0 && (
+                            {users.filter(u => showOnlyTrials
+                                ? (u.access_level?.includes('provadagua-trial') || u.access_level?.includes('trial'))
+                                : true
+                            ).length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
                                         Nenhum usuário encontrado.
                                     </td>
                                 </tr>
