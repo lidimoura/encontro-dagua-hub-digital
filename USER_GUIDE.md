@@ -96,3 +96,28 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 
 ## Suporte
 Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** no canto inferior esquerdo. Selecione **"Reportar Bug / Feedback"** para enviar uma mensagem direta à nossa equipe de engenharia.
+
+---
+
+## 7. Pagamentos & Acesso (Stripe + Provadágua)
+
+### Palavra-chave de Acesso Trial
+- **Keyword:** `provadagua`
+- Inserida na tela de Login para liberar acesso ao ambiente de trial
+- Redireciona para `prova.encontrodagua.com` — 7 dias de acesso isolado por empresa
+
+### Planos Disponíveis
+
+| Plano | Valor | Stripe Product ID |
+|---|---|---|
+| Mensal | R$ 3,00/mês | `prod_UGWT3Pm4ztKmcU` |
+| Anual (Oferta) | R$ 29,90/ano | `prod_UGVFdr4qUVufSu` |
+
+> **Fallback:** Se o checkout Stripe falhar, redirecionar para WhatsApp: `https://wa.me/5592992943998`
+
+### Gerenciar Trials (SuperAdmin)
+1. Acesse **Admin → Usuários**
+2. Identifique usuários com badge **📎 Trial**
+3. Use botão **+7d** para liberar mais 7 dias ou **Block** para revogar acesso
+4. O campo `access_expires_at` controla o vencimento automaticamente
+

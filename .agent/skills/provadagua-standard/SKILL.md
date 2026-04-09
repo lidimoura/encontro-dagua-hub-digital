@@ -157,6 +157,7 @@ client-side inserts directly.
 
 ---
 
+
 ## 6. Commit Style
 
 ```

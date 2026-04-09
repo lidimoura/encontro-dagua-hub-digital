@@ -1,5 +1,37 @@
-# DEVLOG — Encontro d'Água Hub (main)
+﻿# DEVLOG — Encontro d'Água Hub (main)
 
+
+## 2026-04-07 — V4.2: Trial Multi-Tenant + Lead Gate + Build Verde
+
+### Lead Gate V2 (Login.tsx)
+- Fluxo de 3 caminhos: Lead (→ prova.), Palavra-chave provadagua, God Mode (triplo clique)
+- Palavra-chave padrão via VITE_ACCESS_KEYWORD=provadagua
+
+### ShowcasePage — Segmentação de Público
+- Nova seção "Escolha seu caminho" com 3 cards: Saúde & Consultório, Empreendedores & Times, Kit Básico (Link d'Água)
+- CTA primário abre LeadCaptureModal em vez de navegar
+- Integração LeadCaptureModal com prefilledData={interest:'provadagua_trial'}
+
+### AdminUsersPage — Gestão de Trials
+- Coluna ccess_expires_at com badges ATIVO/EXPIRA/EXPIRADO
+- Filtro "Apenas trials" ativo
+- Botões +7d (grant) e Block (revoke) por usuário trial
+- JSX corrigido: <thead> estava dentro de <button> — reestruturado
+
+### LeadCaptureModal
+- Opções de interesse: provadagua_trial, crm_saude, utomacoes_saas
+- Auto-tagging provadagua-trial + source correto para trials
+
+### Stripe
+- Mensal R$ 3,00: prod_UGWT3Pm4ztKmcU
+- Anual R$ 29,90: prod_UGVFdr4qUVufSu
+
+### Correções Técnicas
+- Deno Edge Functions: .vscode/settings.json com deno.enablePaths + supabase/functions/deno.json
+- qr-redirect/index.ts: erro unknown no catch → error instanceof Error ? error.message : String(error)
+- Build Vite: EXIT 0 ✅ (3m11s, 913KB)
+
+---
 > Branch `main` | CRM de Produção
 
 ---
@@ -68,3 +100,4 @@
 ---
 
 *Atualizado automaticamente pelo Manager (Antigravity AI)*
+

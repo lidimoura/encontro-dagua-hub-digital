@@ -1,8 +1,8 @@
-# Encontro d'Água Hub — CRM de Produção `v3.0`
+﻿# Encontro d'Água Hub — CRM de Produção `v4.2`
 
 > **Branch `main` → hub.encontrodagua.com**
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> 🚀 **V3.0**: Super Admin · company_id isolation · ShowcasePage · access_expires_at
+> 🚀 **V4.2**: Super Admin · company_id isolation · ShowcasePage · access_expires_at
 
 ---
 
@@ -88,3 +88,4 @@ git push origin main
 ---
 
 *Mantido pela equipe Encontro d'Água | Manager: Antigravity AI*
+
