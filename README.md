@@ -1,4 +1,15 @@
-﻿# Encontro d'Água Hub — CRM de Produção `v4.2`
+
+<div align="center">
+
+  <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="150">
+
+  <h1>Encontro D'água Hub & CRM</h1>
+
+  <p>Ecossistema de Inteligência Aplicada a Data Science</p>
+
+</div>
+
+  ### CRM de Produção `v4.2`
 
 > **Branch `main` → hub.encontrodagua.com**
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
