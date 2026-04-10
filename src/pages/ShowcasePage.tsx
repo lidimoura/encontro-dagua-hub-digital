@@ -1308,170 +1308,6 @@ const ShowcasePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* ── QA & Security Report ────────────────────────────── */}
-      <section
-        id="sec-qa"
-        data-obs
-        aria-labelledby="qa-heading"
-        style={{
-          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
-          ...fadeIn('sec-qa'),
-        }}
-      >
-        <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '7px',
-              background: 'rgba(16,185,129,0.1)',
-              border: '1px solid rgba(16,185,129,0.25)',
-              borderRadius: '20px',
-              padding: '6px 16px',
-              fontSize: '0.74rem',
-              fontWeight: 700,
-              color: S.emerald,
-              marginBottom: '1.2rem',
-              letterSpacing: '0.06em',
-            }}>
-              <ShieldIcon />
-              {t.qa_eyebrow}
-            </div>
-            <h2
-              id="qa-heading"
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
-                fontWeight: 800,
-                color: '#f1f5f9',
-                marginBottom: '0.8rem',
-              }}
-            >
-              {t.qa_title}
-            </h2>
-            <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.qa_subtitle}</p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
-            gap: '14px',
-          }}>
-            {t.qa_items.map((item, i) => (
-              <div
-                key={i}
-                id={`qa-${i}`}
-                style={{
-                  background: 'rgba(16,185,129,0.04)',
-                  border: '1px solid rgba(16,185,129,0.15)',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(16,185,129,0.08)';
-                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(16,185,129,0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.15)';
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px' }}>
-                  <div style={{ color: S.emerald, marginTop: '2px', flexShrink: 0 }}>
-                    <ShieldIcon />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem', marginBottom: '5px' }}>
-                      {item.title}
-                    </div>
-                    <div style={{
-                      background: 'rgba(16,185,129,0.15)',
-                      color: S.emerald,
-                      borderRadius: '8px',
-                      padding: '2px 9px',
-                      fontSize: '0.66rem',
-                      fontWeight: 800,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      letterSpacing: '0.06em',
-                    }}>
-                      <CheckIcon />
-                      {item.status}
-                    </div>
-                  </div>
-                </div>
-                <p style={{ color: S.slateDim, fontSize: '0.84rem', lineHeight: 1.65, margin: 0 }}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Tech Stack ──────────────────────────────────────── */}
-      <section
-        id="sec-tech"
-        data-obs
-        aria-labelledby="tech-heading"
-        style={{
-          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
-          background: 'rgba(0,0,0,0.15)',
-          ...fadeIn('sec-tech'),
-        }}
-      >
-        <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
-          <h2
-            id="tech-heading"
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(1.5rem, 3vw, 2.2rem)',
-              fontWeight: 800,
-              color: '#f1f5f9',
-              marginBottom: '3rem',
-            }}
-          >
-            {t.tech_title}
-          </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-            {t.tech_stack.map((tech, i) => (
-              <div
-                key={i}
-                style={{
-                  background: S.surface,
-                  border: `1px solid ${S.border}`,
-                  borderRadius: '12px',
-                  padding: '12px 18px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  transition: 'all 0.2s',
-                  cursor: 'default',
-                  minWidth: '130px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = S.surfaceHover;
-                  e.currentTarget.style.borderColor = S.borderHover;
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = S.surface;
-                  e.currentTarget.style.borderColor = S.border;
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>{tech.name}</span>
-                <span style={{ color: S.slateDim, fontSize: '0.7rem', fontWeight: 600 }}>{tech.category}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Pricing Section ─────────────────────────────────── */}
       <section
         id="sec-pricing"
@@ -1517,7 +1353,8 @@ const ShowcasePage: React.FC = () => {
           {/* Pricing Cards Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 350px))',
+            justifyContent: 'center',
             gap: '20px',
             alignItems: 'stretch',
           }}>
@@ -1687,88 +1524,6 @@ const ShowcasePage: React.FC = () => {
               </a>
             </div>
 
-            {/* Card 3 — Agente de IA (SDR/SAC Simplificado) */}
-            <div
-              id="pricing-agente-ia"
-              style={{
-                background: 'rgba(212,168,83,0.05)',
-                border: `1px solid ${S.borderGold}`,
-                borderRadius: '24px',
-                padding: '36px 28px',
-                display: 'flex', flexDirection: 'column', gap: '20px',
-                transition: 'all 0.28s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = S.borderGoldHov;
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.background = 'rgba(212,168,83,0.09)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = S.borderGold;
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.background = 'rgba(212,168,83,0.05)';
-              }}
-            >
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(212,168,83,0.15)', border: '1px solid rgba(212,168,83,0.35)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: S.gold,
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}>🤖 Agente IA</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
-                  <span style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: '3.2rem', fontWeight: 900,
-                    background: S.earthWarm, WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1,
-                  }}>R$&nbsp;80</span>
-                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
-                    {lang === 'pt' ? '/mês' : '/month'}
-                  </span>
-                </div>
-                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  {lang === 'pt'
-                    ? 'Agente SDR/SAC configurado e pronto para sua empresa. Atende leads 24/7, qualifica e encaminha para o CRM.'
-                    : 'Configured SDR/SAC Agent ready for your business. Handles leads 24/7, qualifies and routes to CRM.'}
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {(lang === 'pt'
-                  ? ['Agente Amazô configurado', 'Integração WhatsApp/Typebot', 'Captação de leads 24/7', 'Relatórios de conversão', 'Onboarding personalizado'
-                  ]
-                  : ['Configured Amazô Agent', 'WhatsApp/Typebot integration', '24/7 lead capture', 'Conversion reports', 'Personalized onboarding']
-                ).map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(212,168,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.gold, flexShrink: 0 }}>
-                      <CheckIcon />
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                id="pricing-agente-ia-cta"
-                href="https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackShowcaseCTA('pricing_agente_ia_r80')}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  background: S.earthWarm,
-                  borderRadius: '14px', padding: '16px 24px',
-                  color: '#1A0F00', fontWeight: 800, fontSize: '0.92rem',
-                  transition: 'all 0.22s', cursor: 'pointer',
-                  boxShadow: '0 8px 28px rgba(212,168,83,0.3)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(212,168,83,0.5)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(212,168,83,0.3)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-              >
-                {lang === 'pt' ? 'Contratar Agente IA' : 'Hire AI Agent'} <ArrowIcon />
-              </a>
-            </div>
-
           </div>
 
           {/* Nota de rodapé pricing */}
@@ -1925,23 +1680,16 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────── */}
       <footer style={{
         padding: '2.5rem 1.5rem',
         textAlign: 'center',
         borderTop: `1px solid ${S.border}`,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-          <div aria-hidden="true" style={{
-            width: '24px', height: '24px',
-            background: S.cyanBlue,
-            borderRadius: '6px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '12px',
-          }}>💧</div>
+          <img src="/logos/logo-icon.png" alt="Hub Icon" style={{ height: '24px' }} />
           <span style={{ color: S.slate, fontSize: '0.82rem', fontWeight: 500 }}>{t.footer_built}</span>
         </div>
-        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>V4.3 — MVP Provadágua</p>
+        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>Lidi Moura: Formada em Psicologia e Especialista em Dados</p>
         <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
       </footer>
       {/* ── Lead Capture Modal ────────────────────────────────────────────── */}

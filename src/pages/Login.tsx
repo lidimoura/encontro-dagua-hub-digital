@@ -340,7 +340,7 @@ const Login: React.FC = () => {
                 </p>
               </div>
 
-              {/* Opção 1: Experimentar Ecossistema */}
+              {/* Opção 1: Solicitar Acesso / Ver Demo */}
               <button
                 id="btn-lead-trial"
                 onClick={() => window.open(PROVA_URL, '_blank')}
@@ -350,8 +350,8 @@ const Login: React.FC = () => {
                   <ExternalLink className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white text-sm">Experimentar Ecossistema</p>
-                  <p className="text-emerald-400/80 text-xs mt-0.5">Acesse a vitrine da Provadágua — 7 dias grátis →</p>
+                  <p className="font-bold text-white text-sm">Solicitar Acesso / Ver Demo</p>
+                  <p className="text-emerald-400/80 text-xs mt-0.5">Conheça o Hub sem compromisso — vitrine Provadágua →</p>
                 </div>
                 <ExternalLink className="w-4 h-4 text-emerald-500/60 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
               </button>
@@ -383,7 +383,7 @@ const Login: React.FC = () => {
               </button>
 
               <p className="text-xs text-slate-600 text-center pt-2">
-                Profissionais de Saúde e Empreendedores
+                Acesso exclusivo. Sem cartão de crédito.
               </p>
             </div>
           )}
@@ -392,8 +392,8 @@ const Login: React.FC = () => {
           {gateView === 'keyword' && (
             <form onSubmit={handleKeywordSubmit} className="space-y-5">
               <div className="text-center mb-2">
-                <h2 className="text-lg font-bold text-white mb-1">Cadastro de Acesso</h2>
-                <p className="text-slate-400 text-xs">Preencha seus dados e a palavra-chave</p>
+                <h2 className="text-lg font-bold text-white mb-1">Acesso via Palavra-chave</h2>
+                <p className="text-slate-400 text-xs">Para clientes com acesso liberado pelo administrador</p>
               </div>
 
               <div>

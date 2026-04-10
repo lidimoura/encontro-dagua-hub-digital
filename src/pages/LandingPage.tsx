@@ -638,11 +638,11 @@ Agora, gere o prompt perfeito:`;
         <section
           id="sec-agente-ia-launch"
           aria-labelledby="agente-ia-heading"
-          className="py-20 px-6 bg-gradient-to-br from-[#0f0500] via-[#1a0a00] to-[#0a0300] border-y border-amber-500/15 relative overflow-hidden"
+          className="py-20 px-6 bg-gradient-to-br from-[#0f0c0b] via-[#2d1b2e] to-[#4a2e21] border-y border-[#b07f59]/20 relative overflow-hidden"
         >
           {/* Glow de fundo */}
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-600/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-900/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#b07f59]/10 rounded-full blur-2xl pointer-events-none" />
 
           <div className="max-w-5xl mx-auto relative z-10">
 
@@ -697,9 +697,9 @@ Agora, gere o prompt perfeito:`;
                   <button
                     id="btn-agente-ia-launch"
                     onClick={openAgenteIAModal}
-                    className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black rounded-2xl transition-all shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
+                    className="group relative px-8 py-4 bg-teal-500 hover:bg-teal-400 text-[#02040a] font-black rounded-2xl transition-all shadow-2xl shadow-teal-500/30 hover:shadow-teal-500/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
                   >
-                    🤖 Quero meu Agente IA
+                    Quero meu Agente IA
                     <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mês</span>
                   </button>
                   <a
@@ -721,8 +721,8 @@ Agora, gere o prompt perfeito:`;
 
                     {/* Bot avatar */}
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-2xl shadow-lg">
-                        🤖
+                      <div className="w-14 h-14 rounded-2xl bg-[#0f0c0b] border border-white/10 flex items-center justify-center shadow-lg overflow-hidden p-2">
+                        <img src="/logos/logo-icon.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
                       </div>
                       <div>
                         <p className="font-bold text-white">Agente de IA</p>
