@@ -1,5 +1,42 @@
-﻿# DEVLOG — Encontro d'Água Hub (main)
+# DEVLOG — Encontro d'Água Hub
 
+---
+
+## 2026-04-10 — V4.3: MVP Provadágua — Branch `provadagua` 🚀
+
+### ShowcasePage — Seção de Pricing (NOVO)
+- 3 cards de preço com paleta Earth-Neon (glassmorphism dark):
+  - **Prompt Lab Mensal**: R$ 3,00/mês → fallback `/#/login`
+  - **Prompt Lab Anual**: R$ 29,90/ano → fallback `/#/login` (badge "Mais Popular")
+  - **Agente IA (SDR/SAC)**: R$ 80,00/mês → link Stripe real: `https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02`
+- Tracking GA4: `trackShowcaseCTA('pricing_agente_ia_r80')` no clique do botão Stripe
+- Nota de rodapé: "Sem fidelidade · Cancele a qualquer momento · Suporte via WhatsApp"
+
+### ShowcasePage — Correções V4.3
+- CSS `.screen-mock` + `.scanline` + `@keyframes scanAnim` adicionados inline (eram dependência de Tailwind não carregada)
+- Trial CTA link corrigido: `/#/` → `/#/login`
+- Footer version atualizado: `V3.0` → `V4.3 — MVP Provadágua`
+- `::selection` color atualizado para paleta neon-green
+
+### Identidade Visual Confirmada
+- Paleta Earth-Neon: Fundo `#070D09` · Verde `#00C97B` · Ciano `#00E5FF` · Dourado `#D4A853`
+- Founder badge: "Lidi Moura: Formada em Psicologia e Especialista em Dados"
+- Bilinguismo PT/EN mantido em todos os novos componentes
+
+### Lógica de Acesso (já estava completa — confirmada V4.3)
+- Palavra-chave `provadagua` → Edge Function `signup-showcase` → `email_confirm: true`
+- Trial de 7 dias via `access_expires_at` ativo imediatamente no Dashboard
+- Sem barreira de confirmação de e-mail (flow V4.3 end-to-end)
+
+### GA4 (já estava completo — confirmado)
+- ID: `G-MHH0WSX5QS` injetado em `index.html` + `analytics.ts`
+- Novos eventos: `pricing_agente_ia_r80`, `trial_start`, `showcase_cta_click`
+
+### Git
+- Branch `provadagua` criada localmente e sincronizada com remoto
+- Commit: `feat(showcase): add pricing section + fix trial CTA + V4.3 footer`
+
+---
 
 ## 2026-04-07 — V4.2: Trial Multi-Tenant + Lead Gate + Build Verde
 

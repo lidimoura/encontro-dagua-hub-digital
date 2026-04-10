@@ -99,21 +99,24 @@ Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** 
 
 ---
 
-## 7. Pagamentos & Acesso (Stripe + Provadágua)
+## 7. Pagamentos & Acesso (Stripe + Provadágua) — V4.3
 
-### Palavra-chave de Acesso Trial
+### Trial Keyword — Acesso Imediato
 - **Keyword:** `provadagua`
-- Inserida na tela de Login para liberar acesso ao ambiente de trial
-- Redireciona para `prova.encontrodagua.com` — 7 dias de acesso isolado por empresa
+- Inserida na tela de Login → campo "Palavra-chave de acesso"
+- Flow: nome + e-mail + keyword → Edge Function `signup-showcase` → Dashboard imediato
+- **7 dias de acesso** sem confirmação de e-mail (`email_confirm: true`)
+- Dados isolados por empresa (`company_id` único por lead)
 
 ### Planos Disponíveis
 
-| Plano | Valor | Stripe Product ID |
+| Plano | Valor | Ação |
 |---|---|---|
-| Mensal | R$ 3,00/mês | `prod_UGWT3Pm4ztKmcU` |
-| Anual (Oferta) | R$ 29,90/ano | `prod_UGVFdr4qUVufSu` |
+| Prompt Lab Mensal | R$ 3,00/mês | Entrar via `/#/login` |
+| Prompt Lab Anual | R$ 29,90/ano | Entrar via `/#/login` (≈ R$2,49/mês) |
+| **Agente IA (SDR/SAC)** | **R$ 80,00/mês** | **[buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02](https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02)** |
 
-> **Fallback:** Se o checkout Stripe falhar, redirecionar para WhatsApp: `https://wa.me/5592992943998`
+> **Fallback Stripe:** Se o checkout falhar, redirecionar para WhatsApp: `https://wa.me/5592992943998`
 
 ### Gerenciar Trials (SuperAdmin)
 1. Acesse **Admin → Usuários**
@@ -121,3 +124,40 @@ Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** 
 3. Use botão **+7d** para liberar mais 7 dias ou **Block** para revogar acesso
 4. O campo `access_expires_at` controla o vencimento automaticamente
 
+---
+
+## 8. Checklist de Backup — Acer Go (Novo Hardware)
+
+> Use este checklist sempre que configurar um novo ambiente de desenvolvimento.
+
+### Ambiente de Dev
+- [ ] Node.js v20+ instalado (`node -v`)
+- [ ] NPM v10+ instalado (`npm -v`)
+- [ ] Git configurado (`git config --global user.email`)
+- [ ] Repositório clonado: `git clone [repo-url] c:\PROJETOS\encontro-dagua-hub-digital`
+- [ ] `npm install` executado na pasta do projeto
+- [ ] `.env` copiado do Vercel Dashboard ou do backup seguro
+- [ ] Build verde: `npm run build` (EXIT 0)
+
+### Env Vars Essenciais (.env)
+```env
+VITE_APP_MODE=PRODUCTION
+VITE_SUPABASE_URL=https://[projeto].supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+VITE_GEMINI_API_KEY=AIza...
+VITE_GA4_MEASUREMENT_ID=G-MHH0WSX5QS
+VITE_ACCESS_KEYWORD=provadagua
+SUPABASE_SERVICE_ROLE_KEY=eyJ...  # Nunca commitar!
+```
+
+### Verificação Pós-Setup
+- [ ] `npm run dev` inicia em `localhost:5173`
+- [ ] `/#/login` carrega Lead Gate
+- [ ] Keyword `provadagua` redireciona para Dashboard
+- [ ] `/#/showcase` carrega ShowcasePage com Pricing
+- [ ] GA4 ativo no Network tab (googletagmanager.com)
+- [ ] Stripe link do Agente IA abre: `https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02`
+
+---
+
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V4.3 MVP Provadágua*
