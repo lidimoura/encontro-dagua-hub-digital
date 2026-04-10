@@ -1093,6 +1093,177 @@ Agora, gere o prompt perfeito:`;
         {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
 
+      {/* ── Pricing Section (Checkout) ─────────────────────────────────── */}
+      <section
+        id="sec-pricing"
+        className="py-24 px-6 bg-[#02040a] relative z-10 border-t border-white/5"
+      >
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: 'rgba(212,168,83,0.1)',
+              border: '1px solid rgba(212,168,83,0.28)',
+              borderRadius: '20px', padding: '6px 18px',
+              fontSize: '0.74rem', fontWeight: 700, color: '#f59e0b',
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              marginBottom: '1rem',
+            }}>
+              💰 Planos & Preços
+            </div>
+            <h2
+              id="pricing-heading"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+                fontWeight: 800, color: '#f8fafc',
+                marginBottom: '1rem',
+              }}
+            >
+              Comece agora. Cancele quando quiser.
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '1rem', maxWidth: '520px', margin: '0 auto' }}>
+              Acesse tecnologias revolucionárias para o seu negócio crescer.
+            </p>
+          </div>
+
+          {/* Pricing Cards Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            justifyContent: 'center',
+            gap: '20px',
+            alignItems: 'stretch',
+          }}>
+
+            {/* Card 1 — Prompt Lab Mensal */}
+            <div
+              style={{
+                background: '#0f0518', border: `1px solid rgba(255,255,255,0.1)`, borderRadius: '24px',
+                padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.28s',
+              }}
+            >
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(0,201,123,0.1)', border: '1px solid rgba(0,201,123,0.25)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: '#10b981',
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}>🧪 Prompt Lab Mensal</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>R$&nbsp;3</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/mês</span>
+                </div>
+                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  Acesso completo ao Prompt Lab com IA Gemini. Crie, salve e otimize seus prompts profissionais.
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {['Prompt Lab completo', 'IA Gemini Pro', 'Salvar prompts favoritos'].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}><CheckCircle size={12} /></div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-col gap-3 mt-4">
+                <a href="https://wa.me/5541992557600?text=Quero%20assinar%20o%20Prompt%20Lab%20Mensal" target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3 bg-transparent border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
+                  <Zap size={16} /> Pagar via Pix (WhatsApp)
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2 — Prompt Lab Anual */}
+            <div
+              style={{
+                background: 'linear-gradient(145deg, rgba(0,201,123,0.1), rgba(0,229,255,0.06))',
+                border: `2px solid #10b981`, borderRadius: '24px', padding: '36px 28px',
+                display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative',
+                boxShadow: '0 0 40px rgba(0,201,123,0.1)',
+              }}
+            >
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(0,201,123,0.15)', border: '1px solid rgba(0,201,123,0.4)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: '#10b981',
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}>⭐ Prompt Lab Anual</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#10b981', lineHeight: 1 }}>R$&nbsp;29,90</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/ano</span>
+                </div>
+                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  Todo o poder do Prompt Lab por um ano inteiro. Ideal para profissionais de saúde e empreendedores.
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {['Tudo do Plano Mensal', 'Desconto em upgrades', '30 dias de garantia'].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}><CheckCircle size={12} /></div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-col gap-3 mt-4">
+                <a href="https://wa.me/5541992557600?text=Quero%20pagar%20via%20Pix%20o%20Prompt%20Lab%20Anual" target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3 bg-[#10b981] hover:bg-[#059669] text-black font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
+                  <Zap size={16} /> Pagar via Pix (WhatsApp)
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3 — Agente de IA */}
+            <div
+              style={{
+                background: 'linear-gradient(145deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05))',
+                border: `1px solid rgba(245,158,11,0.5)`, borderRadius: '24px',
+                padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.28s',
+              }}
+            >
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: '#f59e0b',
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}><img src="/logos/logo-icon.png" alt="Hub AI" style={{ height: '12px', filter: 'brightness(0) invert(1)' }} /> Agente IA</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#f59e0b', lineHeight: 1 }}>R$&nbsp;80</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/mês</span>
+                </div>
+                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  Agente SDR/SAC configurado e pronto para sua empresa. Atende leads 24/7, qualifica e encaminha.
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {['Agente Amazô configurado', 'Integração WhatsApp/Site', 'Captação de leads 24/7'].map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}><CheckCircle size={12} /></div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-col gap-3 mt-4">
+                <a href="https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02" target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3 bg-[#f59e0b] hover:bg-[#d97706] text-black font-bold rounded-xl text-center text-sm transition-colors mb-1">
+                  💳 Contratar via Cartão
+                </a>
+                <a href="https://wa.me/5541992557600?text=Quero%20pagar%20via%20Pix%20o%20Agente%20de%20IA%20de%20R$80" target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3 bg-transparent border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b]/10 font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
+                  <Zap size={16} /> Pagar via Pix (WhatsApp)
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
         {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
 

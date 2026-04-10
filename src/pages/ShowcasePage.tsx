@@ -1308,232 +1308,7 @@ const ShowcasePage: React.FC = () => {
           </div>
         </div>
       </section>
-      {/* ── Pricing Section ─────────────────────────────────── */}
-      <section
-        id="sec-pricing"
-        data-obs
-        aria-labelledby="pricing-heading"
-        style={{
-          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
-          ...fadeIn('sec-pricing'),
-        }}
-      >
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: 'rgba(212,168,83,0.1)',
-              border: '1px solid rgba(212,168,83,0.28)',
-              borderRadius: '20px', padding: '6px 18px',
-              fontSize: '0.74rem', fontWeight: 700, color: S.gold,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: '1rem',
-            }}>
-              💰 {lang === 'pt' ? 'Planos & Preços' : 'Plans & Pricing'}
-            </div>
-            <h2
-              id="pricing-heading"
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
-                fontWeight: 800, color: '#f8fafc',
-                marginBottom: '1rem',
-              }}
-            >
-              {lang === 'pt' ? 'Comece agora. Cancele quando quiser.' : 'Start now. Cancel anytime.'}
-            </h2>
-            <p style={{ color: S.textSecondary, fontSize: '1rem', maxWidth: '520px', margin: '0 auto' }}>
-              {lang === 'pt'
-                ? 'Sem cartão de crédito para o trial. Planos acessíveis para cada estágio do seu negócio.'
-                : 'No credit card for trial. Affordable plans for every stage of your business.'}
-            </p>
-          </div>
 
-          {/* Pricing Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 350px))',
-            justifyContent: 'center',
-            gap: '20px',
-            alignItems: 'stretch',
-          }}>
-
-            {/* Card 1 — Prompt Lab Mensal */}
-            <div
-              id="pricing-mensal"
-              style={{
-                background: S.surface,
-                border: `1px solid ${S.border}`,
-                borderRadius: '24px',
-                padding: '36px 28px',
-                display: 'flex', flexDirection: 'column', gap: '20px',
-                transition: 'all 0.28s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = S.borderHover;
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.background = S.surfaceHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = S.border;
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.background = S.surface;
-              }}
-            >
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(0,201,123,0.1)', border: '1px solid rgba(0,201,123,0.25)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: S.neonGreen,
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}>🧪 Prompt Lab</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
-                  <span style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: '3.2rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1,
-                  }}>R$&nbsp;3</span>
-                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
-                    {lang === 'pt' ? '/mês' : '/month'}
-                  </span>
-                </div>
-                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  {lang === 'pt'
-                    ? 'Acesso completo ao Prompt Lab com IA Gemini. Crie, salve e otimize seus prompts profissionais.'
-                    : 'Full access to Prompt Lab with Gemini AI. Create, save, and optimize your professional prompts.'}
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {(lang === 'pt'
-                  ? ['Prompt Lab completo', 'IA Gemini Pro', 'Salvar prompts favoritos', 'Histórico de gerações', 'Cancele a qualquer momento']
-                  : ['Full Prompt Lab', 'Gemini Pro AI', 'Save favorite prompts', 'Generation history', 'Cancel anytime']
-                ).map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.neonGreen, flexShrink: 0 }}>
-                      <CheckIcon />
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                id="pricing-mensal-cta"
-                href="/#/login"
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  background: S.surface, border: `1px solid ${S.borderHover}`,
-                  borderRadius: '14px', padding: '14px 24px',
-                  color: S.neonGreen, fontWeight: 700, fontSize: '0.9rem',
-                  transition: 'all 0.22s', cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.15)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = S.surface; }}
-              >
-                {lang === 'pt' ? 'Começar Trial Grátis' : 'Start Free Trial'} <ArrowIcon />
-              </a>
-            </div>
-
-            {/* Card 2 — Prompt Lab Anual (DESTAQUE) */}
-            <div
-              id="pricing-anual"
-              style={{
-                background: 'linear-gradient(145deg, rgba(0,201,123,0.1), rgba(0,229,255,0.06))',
-                border: `2px solid ${S.neonGreen}`,
-                borderRadius: '24px',
-                padding: '36px 28px',
-                display: 'flex', flexDirection: 'column', gap: '20px',
-                transition: 'all 0.28s',
-                position: 'relative',
-                boxShadow: '0 0 40px rgba(0,201,123,0.18)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 0 60px rgba(0,201,123,0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 0 40px rgba(0,201,123,0.18)';
-              }}
-            >
-              {/* Badge Mais Popular */}
-              <div style={{
-                position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
-                background: S.earthNeon, borderRadius: '20px', padding: '5px 18px',
-                fontSize: '0.72rem', fontWeight: 800, color: '#060C08',
-                letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-              }}>
-                ⭐ {lang === 'pt' ? 'Mais Popular' : 'Most Popular'}
-              </div>
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(0,201,123,0.15)', border: '1px solid rgba(0,201,123,0.4)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: S.neonGreen,
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}>🧪 Prompt Lab Anual</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: '3.2rem', fontWeight: 900,
-                    background: S.earthNeon, WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1,
-                  }}>R$&nbsp;29,90</span>
-                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
-                    {lang === 'pt' ? '/ano' : '/year'}
-                  </span>
-                </div>
-                <p style={{ color: S.neonGreen, fontSize: '0.78rem', fontWeight: 700, marginBottom: '8px' }}>
-                  {lang === 'pt' ? '≈ R$ 2,49/mês — Economia de 17%' : '≈ R$ 2.49/month — Save 17%'}
-                </p>
-                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  {lang === 'pt'
-                    ? 'Todo o poder do Prompt Lab por um ano inteiro. Ideal para profissionais de saúde e empreendedores.'
-                    : 'Full Prompt Lab power for an entire year. Ideal for health professionals and entrepreneurs.'}
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {(lang === 'pt'
-                  ? ['Tudo do Plano Mensal', 'Prioridade no suporte', 'Acesso a novos módulos', 'Desconto em upgrades', '30 dias de garantia']
-                  : ['Everything in Monthly', 'Priority support', 'Access to new modules', 'Upgrade discounts', '30-day money-back guarantee']
-                ).map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#e2e8f0' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.neonGreen, flexShrink: 0 }}>
-                      <CheckIcon />
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                id="pricing-anual-cta"
-                href="/#/login"
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  background: S.earthNeon,
-                  borderRadius: '14px', padding: '16px 24px',
-                  color: '#060C08', fontWeight: 800, fontSize: '0.92rem',
-                  transition: 'all 0.22s', cursor: 'pointer',
-                  boxShadow: '0 8px 28px rgba(0,201,123,0.4)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,201,123,0.6)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,201,123,0.4)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-              >
-                {lang === 'pt' ? 'Assinar Agora — Melhor Custo' : 'Subscribe Now — Best Value'} <ArrowIcon />
-              </a>
-            </div>
-
-          </div>
-
-          {/* Nota de rodapé pricing */}
-          <p style={{ textAlign: 'center', color: S.textMuted, fontSize: '0.78rem', marginTop: '2rem' }}>
-            {lang === 'pt'
-              ? '✓ Sem fidelidade · ✓ Cancele a qualquer momento · ✓ Suporte humano via WhatsApp'
-              : '✓ No lock-in · ✓ Cancel anytime · ✓ Human support via WhatsApp'}
-          </p>
-        </div>
-      </section>
 
       {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
       <section
@@ -1635,38 +1410,111 @@ const ShowcasePage: React.FC = () => {
               ))}
             </div>
 
-            {/* Primary CTA */}
-            <a
-              href="/#/login"
-              id="showcase-trial-cta"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: S.cyanBlue,
-                color: '#fff',
-                padding: '18px 52px',
-                borderRadius: '50px',
-                fontWeight: 800,
-                fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-                boxShadow: '0 12px 48px rgba(14,165,233,0.48)',
-                transition: 'all 0.28s',
-                cursor: 'pointer',
-                marginBottom: '1rem',
-                position: 'relative',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)';
-                e.currentTarget.style.boxShadow = '0 22px 64px rgba(14,165,233,0.65)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 12px 48px rgba(14,165,233,0.48)';
-              }}
-            >
-              {t.trial_cta}
-              <ArrowIcon />
-            </a>
+            {/* CTAs Wrapper */}
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              marginBottom: '1rem',
+              position: 'relative'
+            }}>
+              {/* Primary CTA 1 - Trial */}
+              <a
+                href="/#/login"
+                id="showcase-trial-cta"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: S.cyanBlue,
+                  color: '#fff',
+                  padding: '16px 36px',
+                  borderRadius: '50px',
+                  fontWeight: 800,
+                  fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+                  boxShadow: '0 12px 48px rgba(14,165,233,0.48)',
+                  transition: 'all 0.28s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)';
+                  e.currentTarget.style.boxShadow = '0 22px 64px rgba(14,165,233,0.65)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 12px 48px rgba(14,165,233,0.48)';
+                }}
+              >
+                {t.trial_cta || 'Experimentar 7 dias'}
+                <ArrowIcon />
+              </a>
+
+              {/* Primary CTA 2 - Amazô */}
+              <button
+                onClick={() => {
+                   if (typeof window !== 'undefined' && (window as any).Typebot) {
+                      try { (window as any).Typebot.open(); } catch(e){}
+                   }
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: S.emerald,
+                  color: '#060C08',
+                  padding: '16px 36px',
+                  borderRadius: '50px',
+                  fontWeight: 800,
+                  fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+                  boxShadow: '0 12px 48px rgba(16, 185, 129, 0.4)',
+                  transition: 'all 0.28s',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)';
+                  e.currentTarget.style.boxShadow = '0 22px 64px rgba(16, 185, 129, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 12px 48px rgba(16, 185, 129, 0.4)';
+                }}
+              >
+                <img src="/logos/logo-icon.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0)' }} /> Falar com a Amazô 
+              </button>
+
+              {/* Secondary CTA - WhatsApp */}
+              <a
+                href="https://wa.me/5541992557600"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'transparent',
+                  border: `2px solid ${S.emerald}`,
+                  color: S.emerald,
+                  padding: '14px 34px',
+                  borderRadius: '50px',
+                  fontWeight: 800,
+                  fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+                  transition: 'all 0.28s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)';
+                  e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                WhatsApp Suporte
+              </a>
+            </div>
 
             <p style={{
               color: S.slateDim,
