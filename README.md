@@ -9,12 +9,12 @@
 
 </div>
 
-  ### CRM de Produção `v4.3` — MVP Provadágua
+  ### CRM de Produção `v4.4` — Lançamento Agente IA
 
 > **Branch `main` → hub.encontrodagua.com**
 > **Branch `provadagua` → prova.encontrodagua.com**
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V4.3**: Pricing Section · Agente IA R$80 (Stripe) · Trial gate `provadagua` · ShowcasePage redesign · GA4 ativo
+> **V4.4**: Agente IA R$80 (oferta de lançamento) · LeadCaptureModal com redirect Stripe · source hub-lp-launch
 
 ---
 
@@ -40,6 +40,7 @@ O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Águ
 | **Showcase LP** | Landing page pública bilingue com Pricing em `/#/showcase` |
 | **Pricing** | 3 planos: Mensal R$3 · Anual R$29,90 · Agente IA R$80 (Stripe) |
 | **Trial Gate** | Keyword `provadagua` → signup imediato sem email confirm · 7d trial |
+| **Agente IA** | Produto de lançamento R$80/mês — banner na HomePage + modal + redirect Stripe |
 | **Admin** | Super Admin (`lidimfc@gmail.com`), `access_expires_at`, Tech Stack |
 
 ---
@@ -75,9 +76,9 @@ VITE_CRM_API_KEY=...                    # Opcional: Nexus Bridge
 |---|---|---|
 | Prompt Lab Mensal | R$ 3,00/mês | fallback `/#/login` |
 | Prompt Lab Anual | R$ 29,90/ano | fallback `/#/login` |
-| Agente IA (SDR/SAC) | R$ 80,00/mês | [buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02](https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02) |
+| Agente IA (SDR/SAC) | R$ 80,00/mês | [buy.stripe.com/...](https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02) — via LeadCaptureModal |
 
-> Trial de 7 dias via keyword `provadagua` — sem cartão de crédito.
+> V4.4: Leads do Agente IA entram no Board com tags `agente-ia-80`, `launch-offer` e source `hub-lp-launch`.
 
 ---
 

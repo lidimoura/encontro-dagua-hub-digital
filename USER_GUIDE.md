@@ -160,4 +160,41 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...  # Nunca commitar!
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI) — V4.3 MVP Provadágua*
+## 9. Gerenciando Leads da Oferta Agente IA (V4.4)
+
+### Como chegam esses leads
+
+Leads captados via **botão "Quero meu Agente IA"** na HomePage entram no CRM com:
+- **Source:** `hub-lp-launch`
+- **Tags:** `agente-ia-80`, `launch-offer`, `Hub-lp`
+- **Campo:** `agente_ia_offer: true` no `briefing_json`
+- Após o cadastro: Stripe abre automaticamente em nova aba para o lead finalizar o checkout
+
+### Identificando no Board
+
+1. Acesse **Boards → primeiro estágio**
+2. Filtrar por tag `agente-ia-80` ou `launch-offer`
+3. Leads com badge `🤖 Agente IA` ou source `hub-lp-launch` são da oferta de lançamento
+
+### Consulta SQL rápida (Supabase SQL Editor)
+
+```sql
+SELECT name, email, source, tags, created_at
+FROM contacts
+WHERE 'agente-ia-80' = ANY(tags)
+ORDER BY created_at DESC;
+```
+
+### Follow-up recomendado
+
+| Situação | Ação |
+|---|---|
+| Lead cadastrou mas não pagou | Enviar WhatsApp em até 2h com link Stripe |
+| Lead pagou no Stripe | Iniciar onboarding (Typebot ou direto) |
+| Lead tirou dúvida via WhatsApp | Direcionar para `buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02` |
+
+> **Prazo de onboarding**: Agente configurado em até 48h úteis após pagamento confirmado.
+
+---
+
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V4.4 Oferta Agente IA*

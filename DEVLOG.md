@@ -2,7 +2,49 @@
 
 ---
 
+## 2026-04-10 — V4.4: Lançamento do Agente de IA R$ 80 🤖🔥
+
+### Novo Produto — Agente de IA (SAC/FAQ) para Sites
+
+- **Oferta de Lançamento**: Agente de IA configurado para SAC/FAQ → R$ 80,00/mês
+- Igual à Amazô — treinado com a voz e identidade do negócio do cliente
+- Atende leads 24/7 no WhatsApp e sites
+- Link Stripe: `https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02`
+
+### LandingPage (HomePage) — Seção de Lançamento (NOVA)
+
+- **Seção `#sec-agente-ia-launch`** inserida após os 3 cards de segmentação
+- Badge pulsante: "🔥 Oferta de Lançamento — Vagas Limitadas"
+- Copy: "Seu próprio Agente de IA 24/7 — igual à Amazô"
+- Bio: "Por Lidi Moura — Formada em Psicologia e Especialista em Dados"
+- Mockup de chat interativo (balões de conversa) com preço e botão "Contratar"
+- CTA principal: `btn-agente-ia-launch` → `openAgenteIAModal()`
+- CTA secundário: WhatsApp Lidi (`wa.me/5592992943998`)
+
+### LeadCaptureModal — V4.4 Upgrades
+
+- `source` expandido: `'hub-lp-launch' | 'provadagua'` adicionados ao tipo
+- `prefilledData.interest` agora aceita pré-seleção de interesse ao abrir o modal
+- **Novo interest**: `agente_ia_80` → "🤖 Agente de IA (SAC/FAQ) — R$ 80/mês 🔥 LANÇAMENTO"
+- **Auto-tags**: `agente-ia-80`, `launch-offer` aplicadas quando `interest === agente_ia_80`
+- **Source**: `hub-lp-launch` para leads de Agente IA
+- **Redirect automático**: Após submit bem-sucedido com `agente_ia_80`, abre Stripe em nova aba após 2s
+
+### CRM — Roteamento de Leads
+
+- Tag `agente-ia-80` + `launch-offer` → lead entra no Board automaticamente via `form-lp-lead`
+- Source `hub-lp-launch` identificável no painel de contatos/CRM
+- Campo `agente_ia_offer: true` no payload da Edge Function para segmentação futura
+
+### Varredura de Segurança
+
+- ✅ Zero `eyJhbGci`, `sb_secret_`, `sk_live_` hardcoded
+- ✅ Todas as keys via `Deno.env.get()` (Edge) ou `import.meta.env.VITE_...` (frontend)
+
+---
+
 ## 2026-04-10 — V4.3: MVP Provadágua — Branch `provadagua` 🚀
+
 
 ### ShowcasePage — Seção de Pricing (NOVO)
 - 3 cards de preço com paleta Earth-Neon (glassmorphism dark):
