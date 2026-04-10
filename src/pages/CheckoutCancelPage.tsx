@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { XCircle, ArrowLeft, MessageCircle, RefreshCcw } from 'lucide-react';
+import { initGA4, trackCheckoutCancel } from '@/lib/analytics';
 
 export default function CheckoutCancelPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    initGA4();
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan') ?? undefined;
+    trackCheckoutCancel(plan);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#02040a] flex items-center justify-center px-6">
