@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
-import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff, Beaker, Briefcase, HeartPulse, ExternalLink } from 'lucide-react';
+import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { AiflowSupport } from '@/components/AiflowSupport';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/hooks/useTranslation';
+import { initGA4, trackTrialStart, trackLogin, trackSignUp } from '@/lib/analytics';
 
 // ── Lead Gate Config ─────────────────────────────────────────────────────────
 // Palavra-chave: controlada pela env var (padrão: provadagua)
@@ -58,7 +59,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // ── Handlers: Lead Gate — Keyword ────────────────────────────────────
+  // ── Handlers: Lead Gate — Keyword (V4.3: trial imediato via Edge Function) ─
   const handleKeywordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setKeywordLoading(true);
@@ -80,28 +81,46 @@ const Login: React.FC = () => {
     }
 
     try {
-      const tempPassword = `Hub${Date.now()}!`;
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: leadEmail.trim().toLowerCase(),
-        password: tempPassword,
-        options: {
-          data: {
-            full_name: leadName.trim(),
-            lead_source: 'keyword_gate',
-            keyword_used: ACCESS_KEYWORD,
-          },
-          emailRedirectTo: `${window.location.origin}/#/login`,
+      // ── V4.3: Chama signup-showcase → cria user com email_confirm:true ─────
+      // Sem barreiras de aprovação manual. Trial de 7 dias liberado na hora.
+      const tempPassword = `Prova${Date.now()}!`;
+      const normalizedEmail = leadEmail.trim().toLowerCase();
+
+      const { data: signupData, error: signupError } = await supabase.functions.invoke('signup-showcase', {
+        body: {
+          name:     leadName.trim(),
+          email:    normalizedEmail,
+          password: tempPassword,
+          language: 'pt',
         },
       });
 
-      if (signUpError && signUpError.message.includes('already registered')) {
-        setKeywordSuccess(true);
-        setKeywordLoading(false);
-        return;
+      // Trata email já cadastrado: tenta login direto
+      if (signupError || signupData?.error === 'email_already_registered') {
+        if (signupData?.error === 'email_already_registered') {
+          // Usuário já existe — informa e direciona para login admin
+          setKeywordError('E-mail já cadastrado. Entre pelo acesso administrativo ou use outro e-mail.');
+          setKeywordLoading(false);
+          return;
+        }
+        throw new Error(signupError?.message || signupData?.error || 'Erro ao criar conta.');
       }
 
-      if (signUpError) throw signUpError;
-      setKeywordSuccess(true);
+      // ── Auto-login imediato (email já confirmado pela Edge Function) ──────
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email:    normalizedEmail,
+        password: tempPassword,
+      });
+
+      if (loginError) throw loginError;
+
+      // ── Tracking GA4 ─────────────────────────────────────────────────────
+      initGA4();
+      trackSignUp('keyword_provadagua');
+      trackTrialStart('keyword');
+
+      // ── Redireciona direto para o dashboard — trial ativo! ────────────────
+      navigate('/dashboard');
     } catch (err: any) {
       setKeywordError(err.message || 'Erro ao registrar. Tente novamente.');
     } finally {
@@ -321,18 +340,18 @@ const Login: React.FC = () => {
                 </p>
               </div>
 
-              {/* Opção 1: Lead / Curioso — vai testar */}
+              {/* Opção 1: Experimentar Ecossistema */}
               <button
                 id="btn-lead-trial"
                 onClick={() => window.open(PROVA_URL, '_blank')}
                 className="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 hover:border-emerald-400/50 hover:from-emerald-900/60 hover:to-teal-900/60 transition-all group text-left"
               >
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500/30 transition-colors">
-                  <Beaker className="w-5 h-5 text-emerald-400" />
+                  <ExternalLink className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white text-sm">Lead ou Curioso?</p>
-                  <p className="text-emerald-400/80 text-xs mt-0.5">Quero testar o CRM por 7 dias grátis →</p>
+                  <p className="font-bold text-white text-sm">Experimentar Ecossistema</p>
+                  <p className="text-emerald-400/80 text-xs mt-0.5">Acesse a vitrine da Provadágua — 7 dias grátis →</p>
                 </div>
                 <ExternalLink className="w-4 h-4 text-emerald-500/60 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
               </button>
@@ -347,7 +366,7 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Opção 2: Tenho a palavra-chave */}
+              {/* Opção 2: Entrar no Hub (via palavra-chave) */}
               <button
                 id="btn-keyword"
                 onClick={() => setGateView('keyword')}
@@ -357,8 +376,8 @@ const Login: React.FC = () => {
                   <Key className="w-5 h-5 text-teal-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white text-sm">Tenho a palavra-chave</p>
-                  <p className="text-slate-500 text-xs mt-0.5">Acesso exclusivo por indicação</p>
+                  <p className="font-bold text-white text-sm">Entrar no Hub</p>
+                  <p className="text-slate-500 text-xs mt-0.5">Acesso com palavra-chave — trial imediato</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors flex-shrink-0" />
               </button>
@@ -460,9 +479,9 @@ const Login: React.FC = () => {
                 className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] gap-2"
               >
                 {keywordLoading ? (
-                  <Loader2 className="animate-spin h-5 w-5" />
+                  <><Loader2 className="animate-spin h-5 w-5" /><span>Abrindo acesso...</span></>
                 ) : (
-                  <><Leaf className="w-4 h-4" /> Solicitar acesso</>
+                  <><Leaf className="w-4 h-4" /> Entrar no Hub — Acesso Imediato</>
                 )}
               </button>
 

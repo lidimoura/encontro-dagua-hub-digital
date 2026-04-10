@@ -100,6 +100,9 @@ serve(async (req) => {
 
     const userId = authData.user.id;
 
+    // ─── Trial expiry: +7 days from now ──────────────────────────────────────
+    const trialExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
     // ─── Step 3: Wait for trigger to settle, then upsert profile ─────────────
     await new Promise(resolve => setTimeout(resolve, 400));
 
@@ -120,37 +123,35 @@ serve(async (req) => {
           role:                'vendedor',
           company_id:          demoCompanyId,   // ← isolated per-lead
           is_demo_data:        true,
-          preferred_language:  language ?? 'en',
-          preferred_currency:  'AUD',
+          preferred_language:  language ?? 'pt',
+          preferred_currency:  'BRL',
+          access_expires_at:   trialExpiresAt,  // ← 7-day trial imediato
         });
 
       if (insertError) {
         // Try without optional columns in case migration 037/038 not yet applied
         console.warn('[signup-showcase] full insert failed, trying minimal:', insertError.message);
         await supabaseAdmin.from('profiles').insert({
-          id:         userId,
-          email:      normalizedEmail,
-          name:       normalizedName,
-          role:       'vendedor',
-          company_id: demoCompanyId,
+          id:                userId,
+          email:             normalizedEmail,
+          name:              normalizedName,
+          role:              'vendedor',
+          company_id:        demoCompanyId,
+          access_expires_at: trialExpiresAt,
         });
       } else {
-        console.log('[signup-showcase] ✅ Profile inserted with company_id:', demoCompanyId);
+        console.log('[signup-showcase] ✅ Profile inserted | trial expires:', trialExpiresAt);
       }
     } else {
-      // Trigger ran — ensure company_id is set (trigger may have left it NULL)
-      const needsUpdate = !existingProfile.company_id;
-      if (needsUpdate) {
-        await supabaseAdmin.from('profiles').update({
-          company_id:          demoCompanyId,
-          is_demo_data:        true,
-          preferred_language:  language ?? 'en',
-          preferred_currency:  'AUD',
-        }).eq('id', userId);
-        console.log('[signup-showcase] ✅ Profile updated with company_id:', demoCompanyId);
-      } else {
-        console.log('[signup-showcase] ✅ Profile OK (trigger ran with company_id)');
-      }
+      // Trigger ran — ensure company_id and trial expiry are set
+      await supabaseAdmin.from('profiles').update({
+        company_id:          existingProfile.company_id ?? demoCompanyId,
+        is_demo_data:        true,
+        preferred_language:  language ?? 'pt',
+        preferred_currency:  'BRL',
+        access_expires_at:   trialExpiresAt,  // ← sempre garante 7d trial
+      }).eq('id', userId);
+      console.log('[signup-showcase] ✅ Profile updated | trial expires:', trialExpiresAt);
     }
 
     // ─── Step 4: Save lead in contacts ───────────────────────────────────────
@@ -159,24 +160,27 @@ serve(async (req) => {
       .insert({
         name:         normalizedName,
         email:        normalizedEmail,
-        source:       'showcase_lp',
+        source:       'provadagua',
         stage:        'LEAD',
         status:       'ACTIVE',
         company_id:   demoCompanyId,    // ← contact belongs to this lead's space
-        tags:         ['showcase', 'demo-lead', 'portal-cadastro'],
+        tags:         ['showcase', 'provadagua', 'provadagua-trial', 'trial-7d'],
         is_demo_data: true,
         briefing_json: {
-          origem:           'ShowcaseLP/portal',
-          idioma:           language ?? 'en',
+          origem:           'provadagua/keyword-gate',
+          idioma:           language ?? 'pt',
           timestamp:        new Date().toISOString(),
           user_id:          userId,
           demo_company_id:  demoCompanyId,
+          trial_expires_at: trialExpiresAt,
+          acesso_imediato:  true,
         },
       });
 
     if (contactError) {
       console.warn('[signup-showcase] contact insert warning:', contactError.message);
     }
+
 
     // ─── Return success ───────────────────────────────────────────────────────
     return new Response(JSON.stringify({

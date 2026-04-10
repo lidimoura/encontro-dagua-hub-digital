@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowRight, Sparkles, Home } from 'lucide-react';
+import { initGA4, trackCheckoutSuccess } from '@/lib/analytics';
 
 export default function CheckoutSuccessPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // GA4 event tracking
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'purchase', {
-        currency: 'BRL',
-        transaction_id: Date.now().toString(),
-      });
-    }
+    initGA4();
+    // Inferir plano da URL (Stripe redireciona com ?plan=mensal|anual)
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan') ?? 'unknown';
+    const value = plan === 'anual' ? 29.9 : 3;
+    trackCheckoutSuccess(plan, value);
   }, []);
 
   return (
