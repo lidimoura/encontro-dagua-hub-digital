@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { X, Sparkles, Mail, Building2, Target, Phone } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
+// ── Stripe Agente IA — Oferta de Lançamento V4.4
+const STRIPE_AGENTE_IA_URL = 'https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02';
+
 interface LeadCaptureModalProps {
     isOpen: boolean;
     onClose: () => void;
-    source: 'prompt_optimizer' | 'cta' | 'other';
+    source: 'prompt_optimizer' | 'cta' | 'other' | 'hub-lp-launch' | 'provadagua';
     prefilledData?: {
         generatedPrompt?: string;
         userInput?: string;
+        interest?: string;
     };
 }
 
@@ -23,7 +27,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         email: '',
         company: '',
         phone: '',
-        interest: 'provadagua_trial',
+        interest: prefilledData?.interest ?? 'provadagua_trial',
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -42,25 +46,35 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             // Build the payload mapping our form to the typebot/webhook expectations
             // O campo "whatsapp" é OBRIGATÓRIO na Edge Function (valida: !name || !whatsapp)
             // Auto-tag e source baseados no interesse selecionado
-            const isTrial = formData.interest === 'provadagua_trial';
+            const isTrial    = formData.interest === 'provadagua_trial';
+            const isAgenteIA = formData.interest === 'agente_ia_80';
             const autoTags = ['Hub-lp'];
-            if (isTrial) autoTags.push('provadagua-trial');
-            if (formData.interest === 'crm_saude') autoTags.push('saude');
+            if (isTrial)    autoTags.push('provadagua-trial');
+            if (isAgenteIA) autoTags.push('agente-ia-80', 'launch-offer');
+            if (formData.interest === 'crm_saude')       autoTags.push('saude');
             if (formData.interest === 'automacoes_saas') autoTags.push('saas');
+
+            const resolvedSource = isAgenteIA   ? 'hub-lp-launch'
+                                 : isTrial       ? 'provadagua'
+                                 : source === 'cta' ? 'Hub LP'
+                                 : source === 'prompt_optimizer' ? 'Prompt Lab'
+                                 : source === 'hub-lp-launch' ? 'hub-lp-launch'
+                                 : 'Hub LP';
 
             const payload = {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone || '',
-                whatsapp: formData.phone || `sem-tel-${Date.now()}`, // campo obrigatório para criar card
+                whatsapp: formData.phone || `sem-tel-${Date.now()}`,
                 businessType: formData.interest,
                 services: [formData.interest],
-                landedVia: isTrial ? 'Provadágua Trial' : 'Hub LP',
-                source: isTrial ? 'provadagua' : source === 'cta' ? 'Hub LP' : source === 'prompt_optimizer' ? 'Prompt Lab' : 'Hub LP',
-                origin: isTrial ? 'provadagua-trial' : source === 'cta' ? 'Hub-lp' : source,
+                landedVia: isAgenteIA ? 'Hub LP — Oferta Lançamento Agente IA R$80' : isTrial ? 'Provadágua Trial' : 'Hub LP',
+                source: resolvedSource,
+                origin: isAgenteIA ? 'launch-offer-agente-ia' : isTrial ? 'provadagua-trial' : source === 'cta' ? 'Hub-lp' : source,
                 message: formData.company ? `Empresa: ${formData.company}` : '',
                 tags: autoTags,
                 trial_requested: isTrial,
+                agente_ia_offer: isAgenteIA,
                 ...prefilledData
             };
 
@@ -74,11 +88,22 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             }
 
             setSuccess(true);
-            setTimeout(() => {
-                onClose();
-                setSuccess(false);
-                setFormData({ name: '', email: '', company: '', phone: '', interest: 'hub_completo' });
-            }, 2500);
+
+            // ── Agente IA: redirecionar para Stripe após 2s de feedback visual
+            if (isAgenteIA) {
+                setTimeout(() => {
+                    window.open(STRIPE_AGENTE_IA_URL, '_blank', 'noopener,noreferrer');
+                    onClose();
+                    setSuccess(false);
+                    setFormData({ name: '', email: '', company: '', phone: '', interest: 'provadagua_trial' });
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    onClose();
+                    setSuccess(false);
+                    setFormData({ name: '', email: '', company: '', phone: '', interest: 'provadagua_trial' });
+                }, 2500);
+            }
         } catch (err: any) {
             console.error('[LeadCapture] Error saving lead:', err);
             setError(err.message || 'Erro desconhecido. Tente novamente.');
@@ -98,11 +123,20 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                             <Sparkles className="w-8 h-8 text-green-600 dark:text-green-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                            Recebido! 🎉
+                            {formData.interest === 'agente_ia_80' ? 'Lead registrado! 🤖' : 'Recebido! 🎉'}
                         </h2>
                         <p className="text-slate-600 dark:text-slate-400">
-                            Seu acesso está sendo processado. Entraremos em contato em breve!
+                            {formData.interest === 'agente_ia_80'
+                                ? 'Redirecionando para o checkout do Agente IA...'
+                                : 'Seu acesso está sendo processado. Entraremos em contato em breve!'}
                         </p>
+                        {formData.interest === 'agente_ia_80' && (
+                            <div className="mt-4 flex items-center justify-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" style={{ animationDelay: '0.4s' }} />
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <>
@@ -209,6 +243,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                                         onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
                                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none text-slate-900 dark:text-white"
                                     >
+                                        <option value="agente_ia_80">🤖 Agente de IA (SAC/FAQ) — R$ 80/mês 🔥 LANÇAMENTO</option>
                                         <option value="provadagua_trial">🧪 Quero testar o CRM por 7 dias (Provadágua)</option>
                                         <option value="crm_saude">🩺 CRM para Saúde / Consultório</option>
                                         <option value="automacoes_saas">⚙️ Automações & SaaS</option>
