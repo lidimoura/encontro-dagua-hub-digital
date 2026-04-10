@@ -16,6 +16,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useTranslation } from '@/hooks/useTranslation';
 import { handleStripeCheckout } from '@/lib/stripe';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
+import { translations } from '@/lib/translations';
 
 
 // ── IcebergDetails: detalhes técnicos ocultos (Earth-Neon V4.1) ─────────────
@@ -78,6 +79,7 @@ export default function LandingPage() {
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [prefilledInterest, setPrefilledInterest] = useState<string | undefined>(undefined);
+  const [isAgenteIAExpanded, setIsAgenteIAExpanded] = useState(false);
 
   // Helper: abrir LeadCaptureModal pré-configurado para Agente IA
   const openAgenteIAModal = () => {
@@ -635,11 +637,34 @@ Agora, gere o prompt perfeito:`;
         {/* ══════════════════════════════════════════════ */}
         {/* 🔥 OFERTA DE LANÇAMENTO — Agente de IA R$80 (V4.4)             */}
         {/* ══════════════════════════════════════════════ */}
+        {!isAgenteIAExpanded ? (
+          <section className="py-8 px-6 bg-gradient-to-r from-[#0f0c0b] to-[#1a100a] border-y border-[#b07f59]/20 text-center cursor-pointer hover:bg-[#1a100a] transition-colors" onClick={() => setIsAgenteIAExpanded(true)}>
+            <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 text-left">
+                <div className="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-6 h-6 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">Agente de IA 24/7 <span className="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Lançamento</span></h3>
+                  <p className="text-slate-400 text-sm">Seu próprio SAC/SDR automatizado igual à Amazô.</p>
+                </div>
+              </div>
+              <button className="px-6 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2">
+                Ver Detalhes (R$ 80/mês) <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+          </section>
+        ) : (
         <section
           id="sec-agente-ia-launch"
           aria-labelledby="agente-ia-heading"
           className="py-20 px-6 bg-gradient-to-br from-[#0f0c0b] via-[#2d1b2e] to-[#4a2e21] border-y border-[#b07f59]/20 relative overflow-hidden"
         >
+          <div className="absolute top-4 right-4 z-20">
+            <button onClick={() => setIsAgenteIAExpanded(false)} className="p-3 bg-black/40 hover:bg-black/60 border border-white/10 rounded-full text-slate-300 transition-colors backdrop-blur-md">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
           {/* Glow de fundo */}
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-900/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#b07f59]/10 rounded-full blur-2xl pointer-events-none" />
@@ -773,6 +798,7 @@ Agora, gere o prompt perfeito:`;
             </p>
           </div>
         </section>
+        )}
 
         {/* ────────────────────────────────────────────────── */}
         {/* SOLUÇÃO #1 — LINK D'ÁGUA (DESTAQUE PRINCIPAL)     */}
@@ -1093,177 +1119,7 @@ Agora, gere o prompt perfeito:`;
         {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
 
-      {/* ── Pricing Section (Checkout) ─────────────────────────────────── */}
-      <section
-        id="sec-pricing"
-        className="py-24 px-6 bg-[#02040a] relative z-10 border-t border-white/5"
-      >
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: 'rgba(212,168,83,0.1)',
-              border: '1px solid rgba(212,168,83,0.28)',
-              borderRadius: '20px', padding: '6px 18px',
-              fontSize: '0.74rem', fontWeight: 700, color: '#f59e0b',
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: '1rem',
-            }}>
-              💰 Planos & Preços
-            </div>
-            <h2
-              id="pricing-heading"
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
-                fontWeight: 800, color: '#f8fafc',
-                marginBottom: '1rem',
-              }}
-            >
-              Comece agora. Cancele quando quiser.
-            </h2>
-            <p style={{ color: '#94a3b8', fontSize: '1rem', maxWidth: '520px', margin: '0 auto' }}>
-              Acesse tecnologias revolucionárias para o seu negócio crescer.
-            </p>
-          </div>
 
-          {/* Pricing Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            justifyContent: 'center',
-            gap: '20px',
-            alignItems: 'stretch',
-          }}>
-
-            {/* Card 1 — Prompt Lab Mensal */}
-            <div
-              style={{
-                background: '#0f0518', border: `1px solid rgba(255,255,255,0.1)`, borderRadius: '24px',
-                padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.28s',
-              }}
-            >
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(0,201,123,0.1)', border: '1px solid rgba(0,201,123,0.25)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: '#10b981',
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}>🧪 Prompt Lab Mensal</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
-                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1 }}>R$&nbsp;3</span>
-                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/mês</span>
-                </div>
-                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  Acesso completo ao Prompt Lab com IA Gemini. Crie, salve e otimize seus prompts profissionais.
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {['Prompt Lab completo', 'IA Gemini Pro', 'Salvar prompts favoritos'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}><CheckCircle size={12} /></div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-col gap-3 mt-4">
-                <a href="https://wa.me/5541992557600?text=Quero%20assinar%20o%20Prompt%20Lab%20Mensal" target="_blank" rel="noopener noreferrer"
-                  className="w-full py-3 bg-transparent border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
-                  <Zap size={16} /> Pagar via Pix (WhatsApp)
-                </a>
-              </div>
-            </div>
-
-            {/* Card 2 — Prompt Lab Anual */}
-            <div
-              style={{
-                background: 'linear-gradient(145deg, rgba(0,201,123,0.1), rgba(0,229,255,0.06))',
-                border: `2px solid #10b981`, borderRadius: '24px', padding: '36px 28px',
-                display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative',
-                boxShadow: '0 0 40px rgba(0,201,123,0.1)',
-              }}
-            >
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(0,201,123,0.15)', border: '1px solid rgba(0,201,123,0.4)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: '#10b981',
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}>⭐ Prompt Lab Anual</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
-                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#10b981', lineHeight: 1 }}>R$&nbsp;29,90</span>
-                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/ano</span>
-                </div>
-                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  Todo o poder do Prompt Lab por um ano inteiro. Ideal para profissionais de saúde e empreendedores.
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {['Tudo do Plano Mensal', 'Desconto em upgrades', '30 dias de garantia'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}><CheckCircle size={12} /></div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-col gap-3 mt-4">
-                <a href="https://wa.me/5541992557600?text=Quero%20pagar%20via%20Pix%20o%20Prompt%20Lab%20Anual" target="_blank" rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#10b981] hover:bg-[#059669] text-black font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
-                  <Zap size={16} /> Pagar via Pix (WhatsApp)
-                </a>
-              </div>
-            </div>
-
-            {/* Card 3 — Agente de IA */}
-            <div
-              style={{
-                background: 'linear-gradient(145deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05))',
-                border: `1px solid rgba(245,158,11,0.5)`, borderRadius: '24px',
-                padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.28s',
-              }}
-            >
-              <div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)',
-                  borderRadius: '12px', padding: '4px 12px',
-                  fontSize: '0.7rem', fontWeight: 800, color: '#f59e0b',
-                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
-                }}><img src="/logos/logo-icon.png" alt="Hub AI" style={{ height: '12px', filter: 'brightness(0) invert(1)' }} /> Agente IA</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
-                  <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: '3.2rem', fontWeight: 900, color: '#f59e0b', lineHeight: 1 }}>R$&nbsp;80</span>
-                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', paddingBottom: '6px' }}>/mês</span>
-                </div>
-                <p style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
-                  Agente SDR/SAC configurado e pronto para sua empresa. Atende leads 24/7, qualifica e encaminha.
-                </p>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-                {['Agente Amazô configurado', 'Integração WhatsApp/Site', 'Captação de leads 24/7'].map((f, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}><CheckCircle size={12} /></div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-col gap-3 mt-4">
-                <a href="https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02" target="_blank" rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#f59e0b] hover:bg-[#d97706] text-black font-bold rounded-xl text-center text-sm transition-colors mb-1">
-                  💳 Contratar via Cartão
-                </a>
-                <a href="https://wa.me/5541992557600?text=Quero%20pagar%20via%20Pix%20o%20Agente%20de%20IA%20de%20R$80" target="_blank" rel="noopener noreferrer"
-                  className="w-full py-3 bg-transparent border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b]/10 font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2">
-                  <Zap size={16} /> Pagar via Pix (WhatsApp)
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
         {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
 
@@ -1283,7 +1139,7 @@ Agora, gere o prompt perfeito:`;
         <section className="py-24 px-6 bg-[#02040a] text-center">
           <div className="max-w-5xl mx-auto">
             <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('techForAll')}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{translations.en.techForAll}</h2>
 
             <div className="flex flex-wrap justify-center gap-3 mb-12">
               {["Atypical Parents", "Neurodivergent", "Indigenous & Reclaiming", "Entrepreneur Parents", "Local Businesses", "Riverside Communities", "PwD", "LGBTQIAPN+", "Black & Brown People", "Communities", "NGOs"].map((tag) => (
@@ -1292,14 +1148,14 @@ Agora, gere o prompt perfeito:`;
             </div>
 
             <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-white mb-2">{t('noOneLeftBehind')}</h3>
-              <p className="text-slate-400 text-sm mb-6">{t('socialImpact')}</p>
+              <h3 className="text-xl font-bold text-white mb-2">{translations.en.noOneLeftBehind}</h3>
+              <p className="text-slate-400 text-sm mb-6">{translations.en.socialImpact}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
                 <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <MessageCircle size={18} /> {t('socialConsult')}
+                  <MessageCircle size={18} /> {translations.en.socialConsult}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <Bot size={18} /> {t('chatWithAmazo')}
+                  <Bot size={18} /> {translations.en.chatWithAmazo}
                 </button>
               </div>
             </div>
@@ -1337,7 +1193,7 @@ Agora, gere o prompt perfeito:`;
               <Leaf className="w-4 h-4 text-teal-500" />
               <p className="text-white font-bold">Encontro D'água Hub</p>
             </div>
-            <p className="text-slate-500 mb-1">Fundado por Lidi Moura — Manauara, Psicóloga, Dev Fullstack Lowcode & Especialista em Dados.</p>
+            <p className="text-slate-500 mb-1">Lidi Moura: Formada em Psicologia e Especialista em Dados</p>
             <p className="text-slate-600 mb-4">"Reflorestar o Digital" — Tecnologia acessível com impacto social real.</p>
             <div className="flex items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
               <span>20% + 20% desconto por indicação (máx 50%)</span>

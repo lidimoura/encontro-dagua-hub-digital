@@ -165,7 +165,7 @@ export const translations = {
         promptLabHeadline: "Transforme ideias brutas em",
         promptLabHeadlineHighlight: "prompts estruturados e eficientes",
         promptLabSub: "usando engenharia de prompts profissional.",
-        promptLabDesc: "Nossa IA analisa sua intenção e cria prompts otimizados prontos para usar em qualquer LLM (ChatGPT, Claude, Gemini). Teste gratuitamente abaixo e veja a diferença na qualidade das respostas.",
+        promptLabDesc: "Nossa IA analisa sua intenção e cria prompts otimizados prontos para usar em qualquer LLM (ChatGPT, Gemini, Deepseek). Inclui especialistas em Personalização de LLMs e estruturação de Prompts para Agentes de IA e RPA.",
         inputPlaceholder: "Ex: Criar legenda para foto de produto...",
         optimizing: "⏳ Otimizando...",
         optimize: "✨ Otimizar",
@@ -175,7 +175,7 @@ export const translations = {
         testPrompt: "🧪 Testar Prompt",
         testing: "⏳ Testando...",
         wantJustPromptLab: "💡 Quer apenas o Prompt Lab?",
-        promptLabBenefits: "Agentes de IA & Personalização de LLMs",
+        promptLabBenefits: "Especialistas em IA, Agentes e RPA",
         subscribePro: "Assinar Pro Mensal (R$ 3,00)",
 
         // Link d'Água Section
@@ -885,7 +885,7 @@ export const translations = {
         promptLabHeadline: "Transform raw ideas into",
         promptLabHeadlineHighlight: "structured and efficient prompts",
         promptLabSub: "using professional prompt engineering.",
-        promptLabDesc: "Our AI analyzes your intent and creates optimized prompts ready to use in any LLM (ChatGPT, Claude, Gemini). Test for free below and see the difference in response quality.",
+        promptLabDesc: "Our AI analyzes your intent and creates optimized prompts ready to use in any LLM (ChatGPT, Gemini, Deepseek). Includes experts in LLM Personalization and structuring Prompts for AI Agents and RPA.",
         inputPlaceholder: "Ex: Create caption for product photo...",
         optimizing: "⏳ Optimizing...",
         optimize: "✨ Optimize",
@@ -895,7 +895,7 @@ export const translations = {
         testPrompt: "🧪 Test Prompt",
         testing: "⏳ Testing...",
         wantJustPromptLab: "💡 Want just Prompt Lab?",
-        promptLabBenefits: "AI Agents & LLM Personalization",
+        promptLabBenefits: "AI, Agents and RPA Experts",
         subscribePro: "Subscribe Pro Monthly ($1.00)",
 
         // QR Section
