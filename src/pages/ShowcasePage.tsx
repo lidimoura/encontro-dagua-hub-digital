@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
+import { initGA4, trackShowcaseCTA, trackLeadCapture } from '@/lib/analytics';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface Translation {
@@ -301,18 +302,42 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
   },
 };
 
-// ─── Shared style tokens ───────────────────────────────────────────────────
+// ─── Shared style tokens — Paleta Earth-Neon V4.3 ─────────────────────────
+// Earth: Floresta Amazônica + Terra + Dourado | Neon: Verde + Cyan
 const S = {
-  cyanBlue: 'linear-gradient(135deg, #0ea5e9, #0077ff)',
-  navy: '#080d1a',
-  surface: 'rgba(255,255,255,0.035)',
-  surfaceHover: 'rgba(14,165,233,0.08)',
-  border: 'rgba(255,255,255,0.07)',
-  borderHover: 'rgba(14,165,233,0.28)',
-  blue: '#0ea5e9',
-  emerald: '#10b981',
-  slate: '#94a3b8',
-  slateDim: '#475569',
+  // ── Gradientes principais
+  earthNeon:     'linear-gradient(135deg, #00C97B, #00E5FF)',
+  earthWarm:     'linear-gradient(135deg, #D4A853, #E8C97A)',
+  forestDeep:    'linear-gradient(135deg, #1A3A2A, #2D5A3D)',
+  // ── Fundos
+  obsidian:      '#070D09',
+  // ── Superficies glassmorphism
+  surface:       'rgba(0, 201, 123, 0.04)',
+  surfaceHover:  'rgba(0, 201, 123, 0.09)',
+  surfaceWarm:   'rgba(212, 168, 83, 0.06)',
+  // ── Bordas
+  border:        'rgba(0, 201, 123, 0.1)',
+  borderHover:   'rgba(0, 201, 123, 0.35)',
+  borderGold:    'rgba(212, 168, 83, 0.2)',
+  borderGoldHov: 'rgba(212, 168, 83, 0.45)',
+  // ── Cores de destaque
+  neonGreen:     '#00C97B',
+  neonCyan:      '#00E5FF',
+  gold:          '#D4A853',
+  goldLight:     '#F0D080',
+  earth:         '#8B5E3C',
+  moss:          '#4A7C59',
+  // ── Tipografia
+  textPrimary:   '#F0F7F2',
+  textSecondary: '#8BA99A',
+  textMuted:     '#4A6358',
+  // ── Compat legado (mantém seções não-migradas compilando)
+  cyanBlue:      'linear-gradient(135deg, #00C97B, #00E5FF)',
+  navy:          '#070D09',
+  blue:          '#00C97B',
+  emerald:       '#00C97B',
+  slate:         '#8BA99A',
+  slateDim:      '#4A6358',
 };
 
 // ─── ShowcasePage Component ────────────────────────────────────────────────
@@ -364,8 +389,13 @@ const ShowcasePage: React.FC = () => {
       id="showcase-root"
       style={{
         minHeight: '100vh',
-        background: `radial-gradient(ellipse 120% 60% at 50% -10%, rgba(14,165,233,0.14) 0%, transparent 70%), ${S.navy}`,
-        color: '#e2e8f0',
+        background: `
+          radial-gradient(ellipse 100% 50% at 20% 0%, rgba(0,201,123,0.12) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 40% at 80% 10%, rgba(212,168,83,0.08) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 30% at 50% 80%, rgba(0,229,255,0.06) 0%, transparent 70%),
+          #070D09
+        `,
+        color: S.textPrimary,
         fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
         overflowX: 'hidden',
       }}
@@ -383,10 +413,37 @@ const ShowcasePage: React.FC = () => {
         @keyframes pulse    { 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
         @keyframes shimmer  { 0%{ background-position:-200% center; } 100%{ background-position:200% center; } }
         @keyframes float    { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+        @keyframes scanAnim { 0%{ transform:translateY(-100%); } 100%{ transform:translateY(400%); } }
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        ::selection { background: rgba(14,165,233,0.35); }
+        ::selection { background: rgba(0,201,123,0.35); }
         a { text-decoration: none; }
+        .screen-mock {
+          position: relative;
+          background: #0D1F16;
+          border: 1px solid rgba(0,201,123,0.22);
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,201,123,0.08);
+        }
+        .screen-mock::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 28px;
+          background: #0A1A10;
+          border-bottom: 1px solid rgba(0,201,123,0.12);
+          z-index: 3;
+        }
+        .scanline {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(0,201,123,0.4), transparent);
+          animation: scanAnim 3s linear infinite;
+          z-index: 5;
+          pointer-events: none;
+        }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
@@ -426,8 +483,8 @@ const ShowcasePage: React.FC = () => {
           >
             💧
           </div>
-          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-            Encontro D'Água Hub
+          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: S.textPrimary, letterSpacing: '-0.01em' }}>
+            Encontro D’Água Hub
           </span>
         </a>
 
@@ -440,22 +497,20 @@ const ShowcasePage: React.FC = () => {
             style={{
               background: S.surface,
               border: `1px solid ${S.border}`,
-              borderRadius: '20px',
-              padding: '6px 14px',
-              color: S.slate,
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              transition: 'all 0.2s',
-              minHeight: '36px',
+              borderRadius: '20px', padding: '6px 14px',
+              color: S.textSecondary,
+              cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+              transition: 'all 0.2s', minHeight: '36px',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.09)';
-              e.currentTarget.style.color = '#e2e8f0';
+              e.currentTarget.style.background = S.surfaceHover;
+              e.currentTarget.style.color = S.textPrimary;
+              e.currentTarget.style.borderColor = S.borderHover;
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = S.surface;
-              e.currentTarget.style.color = S.slate;
+              e.currentTarget.style.color = S.textSecondary;
+              e.currentTarget.style.borderColor = S.border;
             }}
           >
             {lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
@@ -465,24 +520,20 @@ const ShowcasePage: React.FC = () => {
             href="/#/login"
             id="showcase-nav-login"
             style={{
-              background: S.cyanBlue,
-              borderRadius: '20px',
-              padding: '8px 20px',
-              color: '#fff',
-              fontSize: '0.82rem',
-              fontWeight: 700,
+              background: S.earthNeon,
+              borderRadius: '20px', padding: '8px 20px',
+              color: '#060C08',
+              fontSize: '0.82rem', fontWeight: 800,
               transition: 'all 0.2s',
-              boxShadow: '0 4px 14px rgba(14,165,233,0.32)',
-              minHeight: '36px',
-              display: 'flex',
-              alignItems: 'center',
+              boxShadow: '0 4px 18px rgba(0,201,123,0.35)',
+              minHeight: '36px', display: 'flex', alignItems: 'center',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 22px rgba(14,165,233,0.52)';
+              e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,201,123,0.55)';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(14,165,233,0.32)';
+              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,201,123,0.35)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
@@ -693,7 +744,7 @@ const ShowcasePage: React.FC = () => {
                 fontSize: '1.9rem',
                 fontWeight: 900,
                 fontFamily: "'Outfit', sans-serif",
-                background: S.cyanBlue,
+                background: S.earthNeon,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -701,11 +752,153 @@ const ShowcasePage: React.FC = () => {
               }}>
                 {m.value}
               </div>
-              <div style={{ fontSize: '0.75rem', color: S.slateDim, fontWeight: 500, lineHeight: 1.4 }}>
+              <div style={{ fontSize: '0.75rem', color: S.textMuted, fontWeight: 500, lineHeight: 1.4 }}>
                 {m.label}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* ── Founder Credibility Badge ──────────────────────────────────── */}
+        <div style={{
+          marginTop: '3rem',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '10px',
+          background: 'rgba(212,168,83,0.08)',
+          border: '1px solid rgba(212,168,83,0.25)',
+          borderRadius: '40px',
+          padding: '10px 20px',
+          animation: 'fadeUp 0.7s ease 0.5s both',
+        }}>
+          <span style={{ fontSize: '20px' }}>🌿</span>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '0.73rem', fontWeight: 800, color: S.gold, letterSpacing: '0.04em' }}>
+              {lang === 'pt' ? 'Criado por' : 'Built by'}
+            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: S.textPrimary }}>
+              {lang === 'pt'
+                ? 'Lidi Moura: Formada em Psicologia e Especialista em Dados'
+                : 'Lidi Moura: Psychology Graduate & Data Specialist'}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Demo Video Placeholder ─────────────────────────────────────── */}
+        <div style={{
+          marginTop: '4rem',
+          width: '100%',
+          maxWidth: '860px',
+          animation: 'fadeUp 0.8s ease 0.6s both',
+        }}>
+          <div className="screen-mock">
+            <div className="scanline" />
+            {/* Fake window chrome */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px',
+              position: 'absolute', top: 0, left: 0, right: 0,
+              height: '28px', zIndex: 4,
+            }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF5F57' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FEBC2E' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28C840' }} />
+              <span style={{ marginLeft: '8px', fontSize: '0.64rem', color: S.textMuted, fontFamily: 'monospace' }}>
+                hub.encontrodagua.com — CRM Dashboard
+              </span>
+            </div>
+            {/* Video body */}
+            <div style={{
+              height: '300px', paddingTop: '28px',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: '14px',
+              background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+              position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: `
+                  linear-gradient(rgba(0,201,123,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0,201,123,0.04) 1px, transparent 1px)
+                `,
+                backgroundSize: '32px 32px',
+              }} />
+              <button
+                id="showcase-video-play"
+                onClick={() => { trackShowcaseCTA('video_play'); setIsModalOpen(true); }}
+                style={{
+                  width: '72px', height: '72px', borderRadius: '50%',
+                  background: 'rgba(0,201,123,0.12)',
+                  border: '2px solid rgba(0,201,123,0.5)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', transition: 'all 0.3s',
+                  position: 'relative', zIndex: 2,
+                  boxShadow: '0 0 40px rgba(0,201,123,0.2)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.28)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.12)'; e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#00C97B">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+              </button>
+              <p style={{ color: S.textSecondary, fontSize: '0.84rem', fontWeight: 500, position: 'relative', zIndex: 2 }}>
+                {lang === 'pt' ? '🌱 Demo interativa disponível — clique para agendar' : '🌱 Interactive demo available — click to schedule'}
+              </p>
+              <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
+                {['Contatos', 'Board SDR', 'IA Mazô', 'Reports'].map((label, i) => (
+                  <div key={i} style={{
+                    flex: 1, height: '3px', borderRadius: '2px',
+                    background: i === 0 ? S.neonGreen : `rgba(0,201,123,${0.12 + i * 0.1})`,
+                  }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <p style={{ color: S.textMuted, fontSize: '0.72rem', marginTop: '10px', textAlign: 'center' }}>
+            {lang === 'pt' ? 'Vídeo completo em produção · Clique para agendar demo ao vivo' : 'Full video in production · Click to schedule a live demo'}
+          </p>
+        </div>
+
+        {/* ── CRM Screenshots Grid ───────────────────────────────────────── */}
+        <div style={{
+          marginTop: '2.5rem',
+          maxWidth: '860px', width: '100%',
+          animation: 'fadeUp 0.8s ease 0.7s both',
+        }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            {[
+              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: S.neonGreen },
+              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: S.neonCyan },
+              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: S.gold },
+            ].map((screen, i) => (
+              <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
+                onClick={() => { trackShowcaseCTA(`screenshot_${screen.label}`); setIsModalOpen(true); }}
+              >
+                <div className="scanline" />
+                <div style={{
+                  height: '110px', paddingTop: '28px',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+                }}>
+                  <div style={{ fontSize: '1.8rem' }}>{screen.icon}</div>
+                  <span style={{ fontSize: '0.68rem', color: screen.color, fontWeight: 600 }}>{screen.label}</span>
+                  <div style={{ display: 'flex', gap: '2px', alignItems: 'flex-end', height: '16px' }}>
+                    {[60,90,45,75,100,65,80].map((h, j) => (
+                      <div key={j} style={{
+                        width: '3px', height: `${h * 0.16}px`, borderRadius: '2px',
+                        background: `rgba(0,201,123,${0.2 + h / 200})`,
+                      }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ color: S.textMuted, fontSize: '0.72rem', marginTop: '8px', textAlign: 'center' }}>
+            {lang === 'pt' ? 'Prints reais do CRM em produção · hub.encontrodagua.com' : 'Real screenshots from production CRM · hub.encontrodagua.com'}
+          </p>
         </div>
       </section>
 
@@ -1279,6 +1472,314 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
+      {/* ── Pricing Section ─────────────────────────────────── */}
+      <section
+        id="sec-pricing"
+        data-obs
+        aria-labelledby="pricing-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          ...fadeIn('sec-pricing'),
+        }}
+      >
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: 'rgba(212,168,83,0.1)',
+              border: '1px solid rgba(212,168,83,0.28)',
+              borderRadius: '20px', padding: '6px 18px',
+              fontSize: '0.74rem', fontWeight: 700, color: S.gold,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              marginBottom: '1rem',
+            }}>
+              💰 {lang === 'pt' ? 'Planos & Preços' : 'Plans & Pricing'}
+            </div>
+            <h2
+              id="pricing-heading"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+                fontWeight: 800, color: '#f8fafc',
+                marginBottom: '1rem',
+              }}
+            >
+              {lang === 'pt' ? 'Comece agora. Cancele quando quiser.' : 'Start now. Cancel anytime.'}
+            </h2>
+            <p style={{ color: S.textSecondary, fontSize: '1rem', maxWidth: '520px', margin: '0 auto' }}>
+              {lang === 'pt'
+                ? 'Sem cartão de crédito para o trial. Planos acessíveis para cada estágio do seu negócio.'
+                : 'No credit card for trial. Affordable plans for every stage of your business.'}
+            </p>
+          </div>
+
+          {/* Pricing Cards Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '20px',
+            alignItems: 'stretch',
+          }}>
+
+            {/* Card 1 — Prompt Lab Mensal */}
+            <div
+              id="pricing-mensal"
+              style={{
+                background: S.surface,
+                border: `1px solid ${S.border}`,
+                borderRadius: '24px',
+                padding: '36px 28px',
+                display: 'flex', flexDirection: 'column', gap: '20px',
+                transition: 'all 0.28s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = S.borderHover;
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.background = S.surfaceHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = S.border;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = S.surface;
+              }}
+            >
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(0,201,123,0.1)', border: '1px solid rgba(0,201,123,0.25)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: S.neonGreen,
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}>🧪 Prompt Lab</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                  <span style={{
+                    fontFamily: "'Outfit', sans-serif",
+                    fontSize: '3.2rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1,
+                  }}>R$&nbsp;3</span>
+                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
+                    {lang === 'pt' ? '/mês' : '/month'}
+                  </span>
+                </div>
+                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  {lang === 'pt'
+                    ? 'Acesso completo ao Prompt Lab com IA Gemini. Crie, salve e otimize seus prompts profissionais.'
+                    : 'Full access to Prompt Lab with Gemini AI. Create, save, and optimize your professional prompts.'}
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {(lang === 'pt'
+                  ? ['Prompt Lab completo', 'IA Gemini Pro', 'Salvar prompts favoritos', 'Histórico de gerações', 'Cancele a qualquer momento']
+                  : ['Full Prompt Lab', 'Gemini Pro AI', 'Save favorite prompts', 'Generation history', 'Cancel anytime']
+                ).map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.neonGreen, flexShrink: 0 }}>
+                      <CheckIcon />
+                    </div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a
+                id="pricing-mensal-cta"
+                href="/#/login"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  background: S.surface, border: `1px solid ${S.borderHover}`,
+                  borderRadius: '14px', padding: '14px 24px',
+                  color: S.neonGreen, fontWeight: 700, fontSize: '0.9rem',
+                  transition: 'all 0.22s', cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.15)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = S.surface; }}
+              >
+                {lang === 'pt' ? 'Começar Trial Grátis' : 'Start Free Trial'} <ArrowIcon />
+              </a>
+            </div>
+
+            {/* Card 2 — Prompt Lab Anual (DESTAQUE) */}
+            <div
+              id="pricing-anual"
+              style={{
+                background: 'linear-gradient(145deg, rgba(0,201,123,0.1), rgba(0,229,255,0.06))',
+                border: `2px solid ${S.neonGreen}`,
+                borderRadius: '24px',
+                padding: '36px 28px',
+                display: 'flex', flexDirection: 'column', gap: '20px',
+                transition: 'all 0.28s',
+                position: 'relative',
+                boxShadow: '0 0 40px rgba(0,201,123,0.18)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 0 60px rgba(0,201,123,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 0 40px rgba(0,201,123,0.18)';
+              }}
+            >
+              {/* Badge Mais Popular */}
+              <div style={{
+                position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
+                background: S.earthNeon, borderRadius: '20px', padding: '5px 18px',
+                fontSize: '0.72rem', fontWeight: 800, color: '#060C08',
+                letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+              }}>
+                ⭐ {lang === 'pt' ? 'Mais Popular' : 'Most Popular'}
+              </div>
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(0,201,123,0.15)', border: '1px solid rgba(0,201,123,0.4)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: S.neonGreen,
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}>🧪 Prompt Lab Anual</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '4px' }}>
+                  <span style={{
+                    fontFamily: "'Outfit', sans-serif",
+                    fontSize: '3.2rem', fontWeight: 900,
+                    background: S.earthNeon, WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1,
+                  }}>R$&nbsp;29,90</span>
+                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
+                    {lang === 'pt' ? '/ano' : '/year'}
+                  </span>
+                </div>
+                <p style={{ color: S.neonGreen, fontSize: '0.78rem', fontWeight: 700, marginBottom: '8px' }}>
+                  {lang === 'pt' ? '≈ R$ 2,49/mês — Economia de 17%' : '≈ R$ 2.49/month — Save 17%'}
+                </p>
+                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  {lang === 'pt'
+                    ? 'Todo o poder do Prompt Lab por um ano inteiro. Ideal para profissionais de saúde e empreendedores.'
+                    : 'Full Prompt Lab power for an entire year. Ideal for health professionals and entrepreneurs.'}
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {(lang === 'pt'
+                  ? ['Tudo do Plano Mensal', 'Prioridade no suporte', 'Acesso a novos módulos', 'Desconto em upgrades', '30 dias de garantia']
+                  : ['Everything in Monthly', 'Priority support', 'Access to new modules', 'Upgrade discounts', '30-day money-back guarantee']
+                ).map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#e2e8f0' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(0,201,123,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.neonGreen, flexShrink: 0 }}>
+                      <CheckIcon />
+                    </div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a
+                id="pricing-anual-cta"
+                href="/#/login"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  background: S.earthNeon,
+                  borderRadius: '14px', padding: '16px 24px',
+                  color: '#060C08', fontWeight: 800, fontSize: '0.92rem',
+                  transition: 'all 0.22s', cursor: 'pointer',
+                  boxShadow: '0 8px 28px rgba(0,201,123,0.4)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,201,123,0.6)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,201,123,0.4)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                {lang === 'pt' ? 'Assinar Agora — Melhor Custo' : 'Subscribe Now — Best Value'} <ArrowIcon />
+              </a>
+            </div>
+
+            {/* Card 3 — Agente de IA (SDR/SAC Simplificado) */}
+            <div
+              id="pricing-agente-ia"
+              style={{
+                background: 'rgba(212,168,83,0.05)',
+                border: `1px solid ${S.borderGold}`,
+                borderRadius: '24px',
+                padding: '36px 28px',
+                display: 'flex', flexDirection: 'column', gap: '20px',
+                transition: 'all 0.28s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = S.borderGoldHov;
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.background = 'rgba(212,168,83,0.09)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = S.borderGold;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(212,168,83,0.05)';
+              }}
+            >
+              <div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: 'rgba(212,168,83,0.15)', border: '1px solid rgba(212,168,83,0.35)',
+                  borderRadius: '12px', padding: '4px 12px',
+                  fontSize: '0.7rem', fontWeight: 800, color: S.gold,
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '16px',
+                }}>🤖 Agente IA</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                  <span style={{
+                    fontFamily: "'Outfit', sans-serif",
+                    fontSize: '3.2rem', fontWeight: 900,
+                    background: S.earthWarm, WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1,
+                  }}>R$&nbsp;80</span>
+                  <span style={{ color: S.textSecondary, fontSize: '0.9rem', paddingBottom: '6px' }}>
+                    {lang === 'pt' ? '/mês' : '/month'}
+                  </span>
+                </div>
+                <p style={{ color: S.textSecondary, fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                  {lang === 'pt'
+                    ? 'Agente SDR/SAC configurado e pronto para sua empresa. Atende leads 24/7, qualifica e encaminha para o CRM.'
+                    : 'Configured SDR/SAC Agent ready for your business. Handles leads 24/7, qualifies and routes to CRM.'}
+                </p>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                {(lang === 'pt'
+                  ? ['Agente Amazô configurado', 'Integração WhatsApp/Typebot', 'Captação de leads 24/7', 'Relatórios de conversão', 'Onboarding personalizado'
+                  ]
+                  : ['Configured Amazô Agent', 'WhatsApp/Typebot integration', '24/7 lead capture', 'Conversion reports', 'Personalized onboarding']
+                ).map((f, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#cbd5e1' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(212,168,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.gold, flexShrink: 0 }}>
+                      <CheckIcon />
+                    </div>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a
+                id="pricing-agente-ia-cta"
+                href="https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackShowcaseCTA('pricing_agente_ia_r80')}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  background: S.earthWarm,
+                  borderRadius: '14px', padding: '16px 24px',
+                  color: '#1A0F00', fontWeight: 800, fontSize: '0.92rem',
+                  transition: 'all 0.22s', cursor: 'pointer',
+                  boxShadow: '0 8px 28px rgba(212,168,83,0.3)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(212,168,83,0.5)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(212,168,83,0.3)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                {lang === 'pt' ? 'Contratar Agente IA' : 'Hire AI Agent'} <ArrowIcon />
+              </a>
+            </div>
+
+          </div>
+
+          {/* Nota de rodapé pricing */}
+          <p style={{ textAlign: 'center', color: S.textMuted, fontSize: '0.78rem', marginTop: '2rem' }}>
+            {lang === 'pt'
+              ? '✓ Sem fidelidade · ✓ Cancele a qualquer momento · ✓ Suporte humano via WhatsApp'
+              : '✓ No lock-in · ✓ Cancel anytime · ✓ Human support via WhatsApp'}
+          </p>
+        </div>
+      </section>
+
       {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
       <section
         id="sec-trial"
@@ -1381,7 +1882,7 @@ const ShowcasePage: React.FC = () => {
 
             {/* Primary CTA */}
             <a
-              href="/#/"
+              href="/#/login"
               id="showcase-trial-cta"
               style={{
                 display: 'inline-flex',
@@ -1440,7 +1941,7 @@ const ShowcasePage: React.FC = () => {
           }}>💧</div>
           <span style={{ color: S.slate, fontSize: '0.82rem', fontWeight: 500 }}>{t.footer_built}</span>
         </div>
-        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>{t.footer_version}</p>
+        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>V4.3 — MVP Provadágua</p>
         <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
       </footer>
       {/* ── Lead Capture Modal ────────────────────────────────────────────── */}

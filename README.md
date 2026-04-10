@@ -9,21 +9,22 @@
 
 </div>
 
-  ### CRM de Produção `v4.2`
+  ### CRM de Produção `v4.3` — MVP Provadágua
 
 > **Branch `main` → hub.encontrodagua.com**
+> **Branch `provadagua` → prova.encontrodagua.com**
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> 🚀 **V4.2**: Super Admin · company_id isolation · ShowcasePage · access_expires_at
+> **V4.3**: Pricing Section · Agente IA R$80 (Stripe) · Trial gate `provadagua` · ShowcasePage redesign · GA4 ativo
 
 ---
 
-## 🚀 Sobre o Hub
+##  Sobre o Hub
 
 O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Água. Centraliza todos os leads reais capturados via Link d'Água (webhook WhatsApp/Typebot), gerencia os deals no Board Kanban e automatiza o follow-up com a IA Mazô.
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
 | Módulo | Descrição |
 |---|---|
@@ -36,12 +37,14 @@ O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Águ
 | **QRDágua** | Geração e gestão de QR Codes / Cartões Digitais |
 | **Catálogo** | Produtos salvos em BRL (preço canônico) |
 | **Reports** | Top Oportunidades, ciclo de vendas, win/loss real |
-| **Showcase** | Landing page pública bilingue em `/#/showcase` |
+| **Showcase LP** | Landing page pública bilingue com Pricing em `/#/showcase` |
+| **Pricing** | 3 planos: Mensal R$3 · Anual R$29,90 · Agente IA R$80 (Stripe) |
+| **Trial Gate** | Keyword `provadagua` → signup imediato sem email confirm · 7d trial |
 | **Admin** | Super Admin (`lidimfc@gmail.com`), `access_expires_at`, Tech Stack |
 
 ---
 
-## 🛠️ Stack
+## Stack
 
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
 - **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
@@ -51,20 +54,34 @@ O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Águ
 
 ---
 
-## ⚙️ Variáveis de Ambiente
+## Variáveis de Ambiente
 
 ```env
 VITE_APP_MODE=PRODUCTION
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 VITE_GEMINI_API_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...   # Apenas Vercel Secrets — nunca commitar
-VITE_CRM_API_KEY=...            # Opcional: Nexus Bridge (Agility OS webhook)
+VITE_GA4_MEASUREMENT_ID=G-MHH0WSX5QS   # GA4 (também injetado em index.html)
+VITE_ACCESS_KEYWORD=provadagua          # Palavra-chave do Lead Gate
+SUPABASE_SERVICE_ROLE_KEY=...           # Apenas Vercel Secrets — nunca commitar
+VITE_CRM_API_KEY=...                    # Opcional: Nexus Bridge
 ```
 
 ---
 
-## 🔑 Fluxo SDR (Link d'Água → Board)
+## Planos & Preços
+
+| Plano | Valor | Stripe / Ação |
+|---|---|---|
+| Prompt Lab Mensal | R$ 3,00/mês | fallback `/#/login` |
+| Prompt Lab Anual | R$ 29,90/ano | fallback `/#/login` |
+| Agente IA (SDR/SAC) | R$ 80,00/mês | [buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02](https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02) |
+
+> Trial de 7 dias via keyword `provadagua` — sem cartão de crédito.
+
+---
+
+## Fluxo SDR (Link d'Água → Board)
 
 1. Lead preenche formulário no Typebot / WhatsApp
 2. Webhook `form-lp-lead` chama `capture_amazo_lead` no Supabase
@@ -74,7 +91,7 @@ VITE_CRM_API_KEY=...            # Opcional: Nexus Bridge (Agility OS webhook)
 
 ---
 
-## 🏗️ Estrutura
+## Estrutura
 
 ```
 src/
@@ -89,7 +106,7 @@ src/
 
 ---
 
-## 📦 Deploy
+## Deploy
 
 ```bash
 git push origin main
