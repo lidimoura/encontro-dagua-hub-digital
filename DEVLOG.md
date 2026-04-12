@@ -70,9 +70,18 @@
 - Trial de 7 dias via `access_expires_at` ativo imediatamente no Dashboard
 - Sem barreira de confirmação de e-mail (flow V4.3 end-to-end)
 
-### GA4 (já estava completo — confirmado)
-- ID: `YOUR_GA4_ID_HERE` injetado em `index.html` + `analytics.ts`
-- Novos eventos: `pricing_agente_ia_r80`, `trial_start`, `showcase_cta_click`
+### GA4 (ATIVO — V4.3)
+- ID: `G-MHH0WSX5QS` — configurado em `src/lib/analytics.ts` + `.env`
+- Eventos ativos: `showcase_cta_click`, `trial_start`, `lead_capture`, `checkout_success`, `checkout_cancel`, `sign_up`, `login`
+- `initGA4()` chamado em: `Login.tsx` (após trial), `CheckoutSuccessPage`, `CheckoutCancelPage`
+- `trackShowcaseCTA()` em hero CTAs, video placeholder e screenshots da ShowcasePage
+
+### Login V4.3 — Fluxo Keyword Refatorado
+- **"Entrar no Hub"** (era: "Tenho a palavra-chave") → trial imediato
+- **"Experimentar Ecossistema"** (era: "Lead ou Curioso?") → showcase externo
+- `handleKeywordSubmit`: substituiu `supabase.auth.signUp()` por `supabase.functions.invoke('signup-showcase')` → sem barreira de e-mail
+- Auto-login com `signInWithPassword()` após criação do usuário
+- Redirecionamento direto para `/dashboard` — trial ativo na hora
 
 ### Git
 - Branch `provadagua` criada localmente e sincronizada com remoto

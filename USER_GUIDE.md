@@ -126,6 +126,76 @@ Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** 
 
 ---
 
+## 8. MVP V4.3 — Lançamento Provadágua
+
+> *Atualizado: 12 Abril 2026 · Build V4.3*
+
+### Identidade da Fundadora
+- **Nome:** Lidi Moura
+- **Formação:** Formada em Psicologia e Especialista em Dados
+- **Público-alvo:** Profissionais de Saúde e Empreendedores
+
+### Fluxo de Acesso pela Palavra-Chave (CHAVE: `provadagua`)
+
+| Etapa | Ação |
+|---|---|
+| 1 | Usuário acessa `/#/login` e clica **"Entrar no Hub"** |
+| 2 | Preenche nome, e-mail e digita `provadagua` |
+| 3 | Clique em **"Entrar no Hub — Acesso Imediato"** |
+| 4 | Edge Function `signup-showcase` cria conta com `email_confirm: true` |
+| 5 | Sistema seta `access_expires_at = now() + 7 dias` automaticamente |
+| 6 | Auto-login com `signInWithPassword()` — sem confirmação de e-mail |
+| 7 | Redirecionamento direto para `/dashboard` — trial ativo |
+| 8 | Lead cai nos Contatos e Boards do CRM com tags `provadagua`, `provadagua-trial`, `trial-7d` |
+
+> **Zero barreiras de aprovação manual** para quem tem a palavra-chave.
+
+### CTAs do Login (V4.3)
+
+| Botão | Ação |
+|---|---|
+| **Experimentar Ecossistema** | Abre vitrine da Provadágua (`prova.encontrodagua.com`) em nova aba |
+| **Entrar no Hub** | Abre formulário de palavra-chave → trial imediato |
+
+### Identidade Visual — Paleta Earth-Neon
+
+| Token | Cor | Uso |
+|---|---|---|
+| `earthNeon` | `#00C97B → #00E5FF` | CTAs, gradientes principais |
+| `gold` | `#D4A853` | Título accent, badges fundadora |
+| `obsidian` | `#070D09` | Background principal |
+| `neonGreen` | `#00C97B` | Pills, bordas hover |
+| `neonCyan` | `#00E5FF` | Eyebrow, acentos |
+
+### Showcase LP (`/#/showcase`)
+
+Nova Hero Section com:
+- Badge fundadora: *"Lidi Moura · Formada em Psicologia e Especialista em Dados"*
+- Copy: *"O CRM Personalizado que Cresce com Você"*
+- Placeholder de vídeo demo interativo
+- Grid de 3 screenshots mockup do CRM (Kanban · Contatos IA · Dashboard)
+
+### Link d'Água — Vitrine Externa
+- Card "Kit Básico" na ShowcasePage → `https://link.encontrodagua.com/vitrine`
+
+### Google Analytics 4
+- **ID:** `G-MHH0WSX5QS`
+- Helper: `src/lib/analytics.ts`
+- Eventos rastreados: `showcase_cta_click`, `trial_start`, `lead_capture`, `checkout_success`, `checkout_cancel`, `sign_up`, `login`
+
+### Stripe — Planos
+| Plano | Valor | Product ID |
+|---|---|---|
+| Mensal | R$ 3,00/mês | `prod_UGWT3Pm4ztKmcU` |
+| Anual | R$ 29,90/ano | `prod_UGVFdr4qUVufSu` |
+| Agente IA | R$ 80,00/mês | Link Stripe direto |
+
+### Deploy
+- Branch de produção: `provadagua`
+- Domínio: `prova.encontrodagua.com`
+- Hub principal: `hub.encontrodagua.com`
+---
+
 ## 8. Checklist de Backup — Acer Go (Novo Hardware)
 
 > Use este checklist sempre que configurar um novo ambiente de desenvolvimento.
