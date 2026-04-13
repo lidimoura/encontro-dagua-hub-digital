@@ -2,7 +2,50 @@
 
 ---
 
+## 2026-04-13 — V5.3: Provadágua Rebranding Completo 🌊💜
+
+### Identidade Visual — Rio Negro + Açaí + Solimões
+- Paleta migrada: Earth-Neon → **Rio Negro** `#040308` / **Açaí** `#6D28A8` / **Solimões** `#C8933A`
+- `ShowcasePage.tsx` tokens `S`: `acaiGrad`, `solimoesGrad`, `border`, `surface` — todos em Açaí/Solimões
+- Hero: orbs roxo+dourado, scanline violeta, CTA com `acaiPulse` animation, metrics bar alternando gradientes
+- Nav: logo `logo-icon-gold-transp.png` substituindo emoji; botão de acesso cor Açaí
+- Footer: `logo-icon-gold-transp.png`, bio Lidi c/ certificações OCI/IA/MySQL, links GitHub Org + LinkedIn + WA Suporte
+
+### ShowcasePage — Conteúdo V5.3
+- **Badge fundadora REMOVIDO** da Hero Section (contexto errado — movido para footer)
+- **4º Pain Card**: "Não conseguir gerenciar seus clientes e projetos?" → ecossistema Provadágua centraliza tudo (PT + EN)
+- **Card 3 Link d'Água → Accordion**: badge "Bônus Incluso", seta toggle, lista features, CTA vitrine externa; contexto "Start Digital"
+- `footer_version`: `V3.0` → `V5.3`
+
+### Login V5.3 — Separação Hub / Provadágua (Regra de Negócio PO)
+- **WA Curitiba Business**: `5541992557600` em TODO frontend (antigo `5592992943998` extirpado)
+- **Logo**: `logo-icon-gold-transp.png` no header do Lead Gate
+- **Hub bloqueado para não-admins**: God Mode verifica `is_super_admin`. Se falso → signOut + msg "Acesso administrativo restrito. Entre pela página da Provadágua."
+- **i18n**: textos hardcoded migrados para objeto `txt` local com PT/EN completo
+- **Bugfix loading infinito**: `AbortController` com timeout 15s na Edge Function `signup-showcase`
+
+### TrialExpiredPage (NOVA) — `/trial-expired`
+- Paleta Rio Negro+Açaí+Solimões (inline styles)
+- **Step 1**: NPS 0–10 + "O que gostou" + sugestão + consent LGPD → salva em `trial_feedback`
+- **Step 2**: CTA "Fechar Negócio" → WA `5541992557600`; CTA "Indica e Ganha 20%"
+
+### ProtectedRoute — Guard Trial Expirado
+- Verifica `access_level` (`provadagua-trial`, `trial-7d`, `provadagua`) + `access_expires_at`
+- Se expirado e não `is_super_admin` → redirect `/trial-expired`
+
+### AuthContext + App.tsx
+- `Profile`: novo campo `access_expires_at?: string | null`
+- `App.tsx`: rota `/trial-expired` (lazy `TrialExpiredPage`) adicionada
+
+### Git — Commit `92e21de` — Branch `provadagua`
+```
+feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpiredPage, Login V5.3 WA Curitiba+logo-gold+timeout+hub-block, ShowcasePage accordion LinkdAgua + 4th pain card + footer social links, App.tsx /trial-expired route, AuthContext access_expires_at, ProtectedRoute trial check
+```
+
+---
+
 ## 2026-04-10 — V4.4: Lançamento do Agente de IA R$ 80 🤖🔥
+
 
 ### Novo Produto — Agente de IA (SAC/FAQ) para Sites
 

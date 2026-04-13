@@ -77,13 +77,11 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 - **Biblioteca**: Gerencie templates de contratos e assets.
 - **Decisões**: Insights de IA sobre deals estagnados.
 
-### 6. Prova D'água (Demo Gratuito)
-- **Conceito**: Ambiente seguro para testar o poder do Hub sem compromisso.
-- **Como Acessar**: Clique em "Quero o meu" na Landing Page.
-- **Funcionalidades**:
-    - **Prompt Lab**: Teste suas ideias com persona "Engenheiro" ou "Especialista em Marketing".
-    - **Kanban Demo**: Mova cards em um fluxo simulado de negociação.
-- **Privacidade**: Nenhum dado é salvo permanentemente no modo Demo.
+### 6. Provadágua (CRM Customizado — Trial)
+- **Conceito**: Sandbox realista para testar o ecossistema CRM da Lidi Moura ("O seu software deveria trabalhar para você, não o contrário").
+- **Como Acessar**: Inserir palavra-chave `provadagua` na página de Login. Acesso de 7 dias liberado imediatamente.
+- **Isolamento de Dados**: Leads de trial caem em um `company_id` próprio. Eles nunca verão os dados do Hub administrativo.
+- **Pós-Trial (V5.3)**: Quando o tempo acaba (`access_expires_at`), o acesso é bloqueado e o sistema força o roteamento para a tela `/trial-expired`, contendo NPS, consentimento LGPD e fluxo de Upsell focado em vendas via WhatsApp.
 
 ---
 
@@ -94,18 +92,21 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 4. **Explore os Agentes**: Abra um card de Deal e clique na aba "Agentes" para interagir com Jury e Precy.
 5. **Configure seu Link d'Água**: Acesse `/qrdagua` e crie sua vitrine digital.
 
-## Suporte
-Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** no canto inferior esquerdo. Selecione **"Reportar Bug / Feedback"** para enviar uma mensagem direta à nossa equipe de engenharia.
-
+## Suporte e Contato
+Para suporte técnico, feedback ou encerramento de trial, entre em contato exclusivo pelo **WhatsApp Business (Administrativo Hub e Provadágua)**: `+55 (41) 99255-7600`.
 ---
 
-## 7. Pagamentos & Acesso (Stripe + Provadágua) — V4.3
+## 7. Acesso, God Mode e Upsell (V5.3)
 
-### Trial Keyword — Acesso Imediato
+### Hub vs Provadágua — Separação Estrita
+A nova estrutura divide o acesso:
+- **Hub (Admin)**: Somente `is_super_admin` consegue acesso. Qualquer tentativa de lead entrar no Hub resulta em logout automático e bloqueio com a mensagem "Acesso administrativo restrito".
+- **God Mode**: Para login administrativo, é exigido dar triplo clique no logotipo (na tela de `/login`). Isso libera o botão de acesso admin bypassando o formulário Provadágua.
+
+### Trial Keyword — Acesso Imediato Leads Provadágua
 - **Keyword:** `provadagua`
-- Inserida na tela de Login → campo "Palavra-chave de acesso"
-- Flow: nome + e-mail + keyword → Edge Function `signup-showcase` → Dashboard imediato
-- **7 dias de acesso** sem confirmação de e-mail (`email_confirm: true`)
+- Inserida pelo Lead. Flow: nome + e-mail + keyword → Edge Function `signup-showcase` (timeout 15s) → Dashboard imediato
+- **7 dias de acesso** marcados no `access_expires_at` do Profile
 - Dados isolados por empresa (`company_id` único por lead)
 
 ### Planos Disponíveis
