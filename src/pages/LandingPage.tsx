@@ -795,7 +795,7 @@ Agora, gere o prompt perfeito:`;
             <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-fuchsia-500/40 relative">
               <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-2 focus:ring-fuchsia-500 rounded-xl text-lg" />
               <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50 flex items-center gap-2">
-                {isOptimizing ? t('optimizing') : <><Sparkles size={16} /> {lang === 'en' ? 'Optimize' : 'Otimizar'}</>}
+                {isOptimizing ? t('optimizing') : <><Sparkles size={16} /> {language === 'en' ? 'Optimize' : 'Otimizar'}</>}
               </button>
             </div>
 
