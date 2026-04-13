@@ -101,23 +101,25 @@ export default function LandingPage() {
       name: "Precy",
       role: t('techLeadRole'),
       type: "ai",
+      image: "/logos/logo-icon-gold-transp.png",
       color: "border-blue-500 text-blue-400",
       pitch: t('precyPitch')
     },
     {
-      id: 'amazo',
-      name: "Amazô",
+      id: 'jury',
+      name: "Jury",
       role: t('csRole'),
       type: "ai",
-      image: "/avatar-amazo.jpeg",
+      image: "/logos/logo-icon-gold-transp.png",
       color: "border-fuchsia-500 text-fuchsia-400",
-      pitch: t('amazoPitch')
+      pitch: t('juryPitch')
     },
     {
       id: 'antigravity',
       name: "Antigravity",
       role: t('devRole'),
       type: "ai",
+      image: "/logos/logo-icon-gold-transp.png",
       color: "border-purple-500 text-purple-400",
       pitch: t('antigravityPitch')
     }
@@ -531,102 +533,10 @@ Agora, gere o prompt perfeito:`;
         </section>
 
         {/* ════════════════════════════════════════════════════ */}
-        {/* SEGMENTAÇÃO: 3 Nichos (Earth-Neon) V4.1            */}
+        {/* SEGMENTAÇÃO: Removida na V5.3 (Agora no Showcase)  */}
         {/* ════════════════════════════════════════════════════ */}
         <section className="py-16 px-6 bg-gradient-to-b from-[#02040a] to-[#04080a]">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <p className="text-slate-400 text-sm mb-2">Para quem é o Hub?</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Escolha o seu caminho</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-              {/* Card 1: Saúde & Psi */}
-              <div className="group relative bg-gradient-to-br from-[#0a1a14] to-[#051008] border border-teal-500/20 rounded-3xl p-7 hover:border-teal-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/10"
-                onClick={() => navigate('/login')}>
-                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-teal-500/20 transition-colors">
-                  <Heart className="w-6 h-6 text-teal-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Psicólogos & Saúde
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-teal-300 transition-colors">
-                  Cuide melhor de quem você cuida
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  CRM desenhado para a realidade do consultório: organiza encaminhamentos
-                  e automatiza o contato com respeito e ética.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['Funil de captação de clientes', 'Cartão digital profissional', 'Automação ética de follow-up'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-teal-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Explorar <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-              {/* Card 2: Empreendedores */}
-              <div className="group relative bg-gradient-to-br from-[#1a0f00] to-[#0a0800] border border-amber-600/20 rounded-3xl p-7 hover:border-amber-500/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10"
-                onClick={() => navigate('/login')}>
-                <div className="w-12 h-12 bg-amber-600/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-amber-500/20 transition-colors">
-                  <Briefcase className="w-6 h-6 text-amber-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-600/10 text-amber-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Empreendedores
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-300 transition-colors">
-                  Seu negócio todo num lugar só
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  Do primeiro contato ao pós-venda: gerencie clientes, acompanhe vendas
-                  e deixa a IA trabalhar enquanto você foca no que ama.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['Pipeline visual de vendas', 'IA que escreve proposta por você', 'Relatórios em tempo real'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-amber-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Explorar <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-              {/* Card 3: Link d'Água */}
-              <div className="group relative bg-gradient-to-br from-[#050a1a] to-[#020510] border border-cyan-500/20 rounded-3xl p-7 hover:border-cyan-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-500/10"
-                onClick={() => window.open('https://link.encontrodagua.com/vitrine', '_blank')}>
-                <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-cyan-500/20 transition-colors">
-                  <QrCode className="w-6 h-6 text-cyan-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Link d'Água • Cartão Digital
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
-                  Sua presença digital num QR
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  Um link único e bonito com tudo que as pessoas precisam saber de você.
-                  Simples de compartilhar, fácil de atualizar.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['QR Code personalizado', 'Links ilimitados', 'Estatísticas de acesso'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-cyan-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-cyan-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Ver vitrine <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-            </div>
-
             {/* ICEBERG: detalhes técnicos ocultos (OCI, RLS, API, Webhooks) */}
             <IcebergDetails />
           </div>
@@ -882,10 +792,10 @@ Agora, gere o prompt perfeito:`;
               {t('promptLabDesc')}
             </p>
 
-            <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
-              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
-              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
-                {isOptimizing ? t('optimizing') : t('optimize')}
+            <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-fuchsia-500/40 relative">
+              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-2 focus:ring-fuchsia-500 rounded-xl text-lg" />
+              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50 flex items-center gap-2">
+                {isOptimizing ? t('optimizing') : <><Sparkles size={16} /> {lang === 'en' ? 'Optimize' : 'Otimizar'}</>}
               </button>
             </div>
 
@@ -941,7 +851,14 @@ Agora, gere o prompt perfeito:`;
 
             <div className="mt-8 p-6 bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 border border-fuchsia-500/30 rounded-2xl max-w-2xl mx-auto">
               <p className="text-lg font-bold text-fuchsia-300 mb-2">{t('wantJustPromptLab')}</p>
-              <p className="text-slate-400 text-sm mb-5">{t('promptLabBenefits')}</p>
+              <div className="mb-5">
+                <p className="text-slate-400 text-sm mb-3">{t('promptLabBenefits')}</p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {[t('softwareEngineer'), t('productManager'), t('dataScientist'), t('designer'), t('marketer'), t('teacher'), t('botArchitect'), t('llmTrainer'), t('webArchitect')].map((role) => (
+                    <span key={role} className="bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300 text-[10px] font-bold px-2 py-1 rounded-md">{role}</span>
+                  ))}
+                </div>
+              </div>
 
               {/* ══ CHECKOUT BUTTONS ═════════════════════════════ */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
