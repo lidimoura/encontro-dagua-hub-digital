@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import { initGA4, trackShowcaseCTA, trackLeadCapture } from '@/lib/analytics';
 
@@ -99,9 +99,14 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         title: 'Risco de vazamento de dados (LGPD)',
         desc: 'Softwares genéricos não foram projetados para a privacidade que a saúde exige. Sua clínica está vulnerável.',
       },
+      {
+        icon: '📊',
+        title: 'Não conseguir gerenciar seus clientes e projetos?',
+        desc: 'Sem visibilidade do pipeline, sem follow-up automático e sem relatórios — você perde negócios sem nem perceber. O ecossistema Provadágua centraliza tudo.',
+      },
     ],
-    modules_title: 'Módulos em Produção',
-    modules_subtitle: 'Todos os módulos ativos em hub.encontrodagua.com — operando 24/7',
+    modules_title: 'Funcionalidades',
+    modules_subtitle: 'Todas as funcionalidades ativas em hub.encontrodagua.com — operando 24/7',
     modules: [
       { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
       { icon: '👥', name: 'Contatos', desc: 'Base de pacientes com sync bidirecional', badge: 'Ativo' },
@@ -178,7 +183,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
     trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
     footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
-    footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_version: 'V5.3 — Provadágua Rebranding Completo',
     footer_privacy: 'Privacidade · LGPD · Termos',
   },
   en: {
@@ -218,9 +223,14 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         title: 'Data breach risk (GDPR/LGPD)',
         desc: 'Generic software wasn\'t designed for the privacy healthcare requires. Your practice is vulnerable.',
       },
+      {
+        icon: '📊',
+        title: 'Can\'t manage your clients and projects?',
+        desc: 'No pipeline visibility, no automated follow-up, no reports — you lose business without realizing it. Provadágua centralizes everything.',
+      },
     ],
-    modules_title: 'Production Modules',
-    modules_subtitle: 'All modules live at hub.encontrodagua.com — running 24/7',
+    modules_title: 'Features',
+    modules_subtitle: 'All features live at hub.encontrodagua.com — running 24/7',
     modules: [
       { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
       { icon: '👥', name: 'Contacts', desc: 'Patient database with bidirectional sync', badge: 'Live' },
@@ -297,47 +307,53 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Try Provadágua for 7 days — Free',
     trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
     footer_built: 'Built with ❤ by the Encontro D\'Água team',
-    footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_version: 'V5.3 — Provadágua Rebranding Complete',
     footer_privacy: 'Privacy · LGPD/GDPR · Terms',
   },
 };
 
-// ─── Shared style tokens — Paleta Earth-Neon V4.3 ─────────────────────────
-// Earth: Floresta Amazônica + Terra + Dourado | Neon: Verde + Cyan
+// ─── Shared style tokens — Paleta V5.3: Rio Negro + Açaí + Solimões ─────────
+// Rio Negro: preto profundo | Açaí: roxo neon | Solimões: dourado/argila
 const S = {
   // ── Gradientes principais
-  earthNeon:     'linear-gradient(135deg, #00C97B, #00E5FF)',
-  earthWarm:     'linear-gradient(135deg, #D4A853, #E8C97A)',
-  forestDeep:    'linear-gradient(135deg, #1A3A2A, #2D5A3D)',
+  acaiGrad:      'linear-gradient(135deg, #6D28A8, #A855F7)',
+  solimoesGrad:  'linear-gradient(135deg, #C8933A, #F59E0B)',
+  acaiSolimoes:  'linear-gradient(135deg, #6D28A8, #A855F7, #C8933A)',
+  // ── Compat earthNeon → Açaí (manter compilação de seções antigas)
+  earthNeon:     'linear-gradient(135deg, #6D28A8, #A855F7)',
+  earthWarm:     'linear-gradient(135deg, #C8933A, #F59E0B)',
+  forestDeep:    'linear-gradient(135deg, #1A0A2E, #2D1B55)',
   // ── Fundos
-  obsidian:      '#070D09',
+  obsidian:      '#040308',    // Rio Negro profundo
   // ── Superficies glassmorphism
-  surface:       'rgba(0, 201, 123, 0.04)',
-  surfaceHover:  'rgba(0, 201, 123, 0.09)',
-  surfaceWarm:   'rgba(212, 168, 83, 0.06)',
+  surface:       'rgba(109, 40, 168, 0.05)',
+  surfaceHover:  'rgba(109, 40, 168, 0.12)',
+  surfaceWarm:   'rgba(200, 147, 58, 0.06)',
   // ── Bordas
-  border:        'rgba(0, 201, 123, 0.1)',
-  borderHover:   'rgba(0, 201, 123, 0.35)',
-  borderGold:    'rgba(212, 168, 83, 0.2)',
-  borderGoldHov: 'rgba(212, 168, 83, 0.45)',
+  border:        'rgba(109, 40, 168, 0.12)',
+  borderHover:   'rgba(109, 40, 168, 0.40)',
+  borderGold:    'rgba(200, 147, 58, 0.20)',
+  borderGoldHov: 'rgba(200, 147, 58, 0.48)',
   // ── Cores de destaque
-  neonGreen:     '#00C97B',
-  neonCyan:      '#00E5FF',
-  gold:          '#D4A853',
-  goldLight:     '#F0D080',
-  earth:         '#8B5E3C',
-  moss:          '#4A7C59',
+  acai:          '#6D28A8',    // Açaí roxo
+  acaiLight:     '#A855F7',    // Neon violeta
+  solimoes:      '#C8933A',    // Solimões dourado/argila
+  solimoesLight: '#F59E0B',    // Neon dourado
+  neonGreen:     '#00C97B',    // Verde manutenção (CTA secondary)
+  neonCyan:      '#A855F7',    // Redirecionado para violeta
+  gold:          '#C8933A',
+  goldLight:     '#F59E0B',
   // ── Tipografia
-  textPrimary:   '#F0F7F2',
-  textSecondary: '#8BA99A',
-  textMuted:     '#4A6358',
-  // ── Compat legado (mantém seções não-migradas compilando)
-  cyanBlue:      'linear-gradient(135deg, #00C97B, #00E5FF)',
-  navy:          '#070D09',
-  blue:          '#00C97B',
-  emerald:       '#00C97B',
-  slate:         '#8BA99A',
-  slateDim:      '#4A6358',
+  textPrimary:   '#F8FAFC',
+  textSecondary: '#94a3b8',
+  textMuted:     '#64748b',
+  // ── Compat legado
+  cyanBlue:      'linear-gradient(135deg, #6D28A8, #A855F7)',
+  navy:          '#040308',
+  blue:          '#A855F7',
+  emerald:       '#A855F7',
+  slate:         '#94a3b8',
+  slateDim:      '#64748b',
 };
 
 // ─── ShowcasePage Component ────────────────────────────────────────────────
@@ -347,6 +363,7 @@ const ShowcasePage: React.FC = () => {
   const observedRef = useRef<Set<string>>(new Set());
   const [visible, setVisible] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [linkDaguaOpen, setLinkDaguaOpen] = useState(false); // Accordion: Bônus Link d'Água
 
   const t = TRANSLATIONS[lang];
 
@@ -390,10 +407,10 @@ const ShowcasePage: React.FC = () => {
       style={{
         minHeight: '100vh',
         background: `
-          radial-gradient(ellipse 100% 50% at 20% 0%, rgba(0,201,123,0.12) 0%, transparent 60%),
-          radial-gradient(ellipse 80% 40% at 80% 10%, rgba(212,168,83,0.08) 0%, transparent 60%),
-          radial-gradient(ellipse 60% 30% at 50% 80%, rgba(0,229,255,0.06) 0%, transparent 70%),
-          #070D09
+          radial-gradient(ellipse 100% 50% at 20% 0%, rgba(109,40,168,0.16) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 40% at 80% 10%, rgba(200,147,58,0.09) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 30% at 50% 80%, rgba(168,85,247,0.07) 0%, transparent 70%),
+          #040308
         `,
         color: S.textPrimary,
         fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
@@ -414,32 +431,33 @@ const ShowcasePage: React.FC = () => {
         @keyframes shimmer  { 0%{ background-position:-200% center; } 100%{ background-position:200% center; } }
         @keyframes float    { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
         @keyframes scanAnim { 0%{ transform:translateY(-100%); } 100%{ transform:translateY(400%); } }
+        @keyframes acaiPulse { 0%,100%{ box-shadow:0 0 20px rgba(109,40,168,0.3); } 50%{ box-shadow:0 0 40px rgba(168,85,247,0.5); } }
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        ::selection { background: rgba(0,201,123,0.35); }
+        ::selection { background: rgba(109,40,168,0.4); }
         a { text-decoration: none; }
         .screen-mock {
           position: relative;
-          background: #0D1F16;
-          border: 1px solid rgba(0,201,123,0.22);
+          background: #0D0820;
+          border: 1px solid rgba(109,40,168,0.25);
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,201,123,0.08);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(109,40,168,0.08);
         }
         .screen-mock::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 28px;
-          background: #0A1A10;
-          border-bottom: 1px solid rgba(0,201,123,0.12);
+          background: #080412;
+          border-bottom: 1px solid rgba(109,40,168,0.15);
           z-index: 3;
         }
         .scanline {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(0,201,123,0.4), transparent);
+          background: linear-gradient(90deg, transparent, rgba(168,85,247,0.5), transparent);
           animation: scanAnim 3s linear infinite;
           z-index: 5;
           pointer-events: none;
@@ -520,20 +538,20 @@ const ShowcasePage: React.FC = () => {
             href="/#/login"
             id="showcase-nav-login"
             style={{
-              background: S.earthNeon,
+              background: S.acaiGrad,
               borderRadius: '20px', padding: '8px 20px',
-              color: '#060C08',
+              color: '#fff',
               fontSize: '0.82rem', fontWeight: 800,
               transition: 'all 0.2s',
-              boxShadow: '0 4px 18px rgba(0,201,123,0.35)',
+              boxShadow: '0 4px 18px rgba(109,40,168,0.40)',
               minHeight: '36px', display: 'flex', alignItems: 'center',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,201,123,0.55)';
+              e.currentTarget.style.boxShadow = '0 6px 28px rgba(168,85,247,0.60)';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,201,123,0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 18px rgba(109,40,168,0.40)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
@@ -558,22 +576,28 @@ const ShowcasePage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Background orbs */}
+        {/* Background orbs — Açaí + Solimões */}
         <div aria-hidden="true" style={{
           position: 'absolute', top: '25%', left: '50%',
           transform: 'translate(-50%, -50%)',
           width: '720px', height: '720px',
-          background: 'radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 68%)',
+          background: 'radial-gradient(circle, rgba(109,40,168,0.14) 0%, transparent 68%)',
           pointerEvents: 'none',
         }} />
         <div aria-hidden="true" style={{
           position: 'absolute', bottom: '15%', right: '10%',
           width: '380px', height: '380px',
-          background: 'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(200,147,58,0.10) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '60%', left: '5%',
+          width: '320px', height: '320px',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
-        {/* Specialty pills */}
+        {/* Specialty pills — Açaí palette */}
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: '8px',
           justifyContent: 'center',
@@ -582,22 +606,22 @@ const ShowcasePage: React.FC = () => {
         }}>
           {t.specialties.map((s, i) => (
             <span key={i} style={{
-              background: 'rgba(14,165,233,0.1)',
-              border: '1px solid rgba(14,165,233,0.22)',
+              background: 'rgba(109,40,168,0.10)',
+              border: '1px solid rgba(168,85,247,0.25)',
               borderRadius: '20px',
               padding: '5px 14px',
               fontSize: '0.74rem',
               fontWeight: 600,
-              color: '#7dd3fc',
+              color: '#c4b5fd',
             }}>{s}</span>
           ))}
         </div>
 
-        {/* Eyebrow */}
+        {/* Eyebrow — Solimões */}
         <div style={{
           fontSize: '0.78rem',
           fontWeight: 700,
-          color: S.blue,
+          color: S.solimoesLight,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           marginBottom: '1.2rem',
@@ -622,7 +646,7 @@ const ShowcasePage: React.FC = () => {
         >
           {t.hero_title_1}{' '}
           <span style={{
-            background: S.cyanBlue,
+            background: S.acaiGrad,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -630,7 +654,12 @@ const ShowcasePage: React.FC = () => {
             {t.hero_title_2}
           </span>
           <br />
-          {t.hero_title_accent}
+          <span style={{
+            background: S.solimoesGrad,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>{t.hero_title_accent}</span>
         </h1>
 
         {/* Subtitle */}
@@ -655,13 +684,13 @@ const ShowcasePage: React.FC = () => {
               id="showcase-cta-primary"
               onClick={() => setIsModalOpen(true)}
               style={{
-                background: S.cyanBlue,
+                background: S.acaiGrad,
                 color: '#fff',
                 padding: '16px 36px',
                 borderRadius: '50px',
                 fontWeight: 800,
                 fontSize: '1rem',
-                boxShadow: '0 8px 32px rgba(14,165,233,0.42)',
+                boxShadow: '0 8px 32px rgba(109,40,168,0.50)',
                 transition: 'all 0.25s',
                 cursor: 'pointer',
                 display: 'flex',
@@ -669,14 +698,15 @@ const ShowcasePage: React.FC = () => {
                 gap: '8px',
                 minHeight: '52px',
                 border: 'none',
+                animation: 'acaiPulse 3s ease-in-out infinite',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 16px 48px rgba(14,165,233,0.58)';
+                e.currentTarget.style.boxShadow = '0 16px 48px rgba(168,85,247,0.65)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 32px rgba(14,165,233,0.42)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(109,40,168,0.50)';
               }}
             >
               {t.hero_cta_primary}
@@ -716,12 +746,12 @@ const ShowcasePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Metrics bar */}
+        {/* Metrics bar — Açaí */}
         <div style={{
           marginTop: '5rem',
-          background: 'rgba(255,255,255,0.03)',
+          background: 'rgba(109,40,168,0.05)',
           backdropFilter: 'blur(16px)',
-          border: `1px solid ${S.border}`,
+          border: '1px solid rgba(109,40,168,0.18)',
           borderRadius: '20px',
           display: 'flex',
           flexWrap: 'wrap',
@@ -736,7 +766,7 @@ const ShowcasePage: React.FC = () => {
               style={{
                 padding: '22px 32px',
                 textAlign: 'center',
-                borderRight: i < t.metrics.length - 1 ? `1px solid ${S.border}` : 'none',
+                borderRight: i < t.metrics.length - 1 ? '1px solid rgba(109,40,168,0.15)' : 'none',
                 flex: '1 1 140px',
               }}
             >
@@ -744,7 +774,7 @@ const ShowcasePage: React.FC = () => {
                 fontSize: '1.9rem',
                 fontWeight: 900,
                 fontFamily: "'Outfit', sans-serif",
-                background: S.earthNeon,
+                background: i % 2 === 0 ? S.acaiGrad : S.solimoesGrad,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -759,30 +789,7 @@ const ShowcasePage: React.FC = () => {
           ))}
         </div>
 
-        {/* ── Founder Credibility Badge ──────────────────────────────────── */}
-        <div style={{
-          marginTop: '3rem',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '10px',
-          background: 'rgba(212,168,83,0.08)',
-          border: '1px solid rgba(212,168,83,0.25)',
-          borderRadius: '40px',
-          padding: '10px 20px',
-          animation: 'fadeUp 0.7s ease 0.5s both',
-        }}>
-          <span style={{ fontSize: '20px' }}>🌿</span>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '0.73rem', fontWeight: 800, color: S.gold, letterSpacing: '0.04em' }}>
-              {lang === 'pt' ? 'Criado por' : 'Built by'}
-            </div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: S.textPrimary }}>
-              {lang === 'pt'
-                ? 'Lidi Moura: Formada em Psicologia e Especialista em Dados'
-                : 'Lidi Moura: Psychology Graduate & Data Specialist'}
-            </div>
-          </div>
-        </div>
+        {/* V5.3: Badge de credibilidade removido da Hero — exibido no footer com contexto correto. */}
 
         {/* ── Demo Video Placeholder ─────────────────────────────────────── */}
         <div style={{
@@ -807,19 +814,19 @@ const ShowcasePage: React.FC = () => {
                 hub.encontrodagua.com — CRM Dashboard
               </span>
             </div>
-            {/* Video body */}
+            {/* Video body — Açaí theme */}
             <div style={{
               height: '300px', paddingTop: '28px',
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center', gap: '14px',
-              background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+              background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
               position: 'relative', overflow: 'hidden',
             }}>
               <div style={{
                 position: 'absolute', inset: 0,
                 backgroundImage: `
-                  linear-gradient(rgba(0,201,123,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0,201,123,0.04) 1px, transparent 1px)
+                  linear-gradient(rgba(109,40,168,0.06) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(109,40,168,0.06) 1px, transparent 1px)
                 `,
                 backgroundSize: '32px 32px',
               }} />
@@ -828,28 +835,28 @@ const ShowcasePage: React.FC = () => {
                 onClick={() => { trackShowcaseCTA('video_play'); setIsModalOpen(true); }}
                 style={{
                   width: '72px', height: '72px', borderRadius: '50%',
-                  background: 'rgba(0,201,123,0.12)',
-                  border: '2px solid rgba(0,201,123,0.5)',
+                  background: 'rgba(109,40,168,0.15)',
+                  border: '2px solid rgba(168,85,247,0.55)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', transition: 'all 0.3s',
                   position: 'relative', zIndex: 2,
-                  boxShadow: '0 0 40px rgba(0,201,123,0.2)',
+                  boxShadow: '0 0 40px rgba(109,40,168,0.25)',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.28)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.12)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.35)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.15)'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#00C97B">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#A855F7">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
               </button>
               <p style={{ color: S.textSecondary, fontSize: '0.84rem', fontWeight: 500, position: 'relative', zIndex: 2 }}>
-                {lang === 'pt' ? '🌱 Demo interativa disponível — clique para agendar' : '🌱 Interactive demo available — click to schedule'}
+                {lang === 'pt' ? '💜 Demo interativa disponível — clique para agendar' : '💜 Interactive demo available — click to schedule'}
               </p>
               <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
                 {['Contatos', 'Board SDR', 'IA Mazô', 'Reports'].map((label, i) => (
                   <div key={i} style={{
                     flex: 1, height: '3px', borderRadius: '2px',
-                    background: i === 0 ? S.neonGreen : `rgba(0,201,123,${0.12 + i * 0.1})`,
+                    background: i === 0 ? '#A855F7' : `rgba(168,85,247,${0.15 + i * 0.12})`,
                   }} />
                 ))}
               </div>
@@ -868,9 +875,9 @@ const ShowcasePage: React.FC = () => {
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: S.neonGreen },
-              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: S.neonCyan },
-              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: S.gold },
+              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: '#A855F7' },
+              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: '#C4B5FD' },
+              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: '#F59E0B' },
             ].map((screen, i) => (
               <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
                 onClick={() => { trackShowcaseCTA(`screenshot_${screen.label}`); setIsModalOpen(true); }}
@@ -880,7 +887,7 @@ const ShowcasePage: React.FC = () => {
                   height: '110px', paddingTop: '28px',
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', gap: '6px',
-                  background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+                  background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
                 }}>
                   <div style={{ fontSize: '1.8rem' }}>{screen.icon}</div>
                   <span style={{ fontSize: '0.68rem', color: screen.color, fontWeight: 600 }}>{screen.label}</span>
@@ -888,7 +895,7 @@ const ShowcasePage: React.FC = () => {
                     {[60,90,45,75,100,65,80].map((h, j) => (
                       <div key={j} style={{
                         width: '3px', height: `${h * 0.16}px`, borderRadius: '2px',
-                        background: `rgba(0,201,123,${0.2 + h / 200})`,
+                        background: `rgba(168,85,247,${0.2 + h / 200})`,
                       }} />
                     ))}
                   </div>
@@ -1074,68 +1081,66 @@ const ShowcasePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 3: Kit Básico / Link d'Água */}
+          {/* Card 3: Bonus — Link d'Agua (Accordion) */}
           <div
             id="segment-linkdagua"
+            role="button"
+            tabIndex={0}
+            aria-expanded={linkDaguaOpen}
+            onClick={() => setLinkDaguaOpen(v => !v)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLinkDaguaOpen(v => !v); }}
             style={{
-              background: 'rgba(251,191,36,0.05)',
-              border: '1px solid rgba(251,191,36,0.2)',
+              background: linkDaguaOpen ? 'rgba(200,147,58,0.09)' : 'rgba(200,147,58,0.05)',
+              border: linkDaguaOpen ? '1px solid rgba(200,147,58,0.42)' : '1px solid rgba(200,147,58,0.20)',
               borderRadius: '22px',
               padding: '32px 28px',
-              transition: 'all 0.28s',
-              cursor: 'default',
+              transition: 'all 0.3s',
+              cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.45)';
-              e.currentTarget.style.transform = 'translateY(-5px)';
-              e.currentTarget.style.background = 'rgba(251,191,36,0.09)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.2)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'rgba(251,191,36,0.05)';
+              gap: '14px',
+              userSelect: 'none' as const,
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
-            <div>
-              <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
-                {lang === 'pt' ? 'Kit Básico — Link d’Água' : 'Basic Kit — Link d’Água'}
-              </h3>
-              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
-                {lang === 'pt'
-                  ? 'Cartão digital profissional + QR Code personalizado + microsite com sua bio e links. Simples, rápido, impactante.'
-                  : 'Professional digital card + custom QR Code + bio microsite. Simple, fast, impactful.'}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
+                <div>
+                  <div style={{ display: 'inline-block', background: 'rgba(200,147,58,0.12)', border: '1px solid rgba(200,147,58,0.30)', borderRadius: '12px', padding: '3px 10px', fontSize: '0.68rem', fontWeight: 800, color: '#F59E0B', letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: '5px' }}>
+                    🎁 {lang === 'pt' ? 'Bonus Incluso' : 'Bonus Included'}
+                  </div>
+                  <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.05rem', margin: 0 }}>
+                    {lang === 'pt' ? "Link d\u2019\u00c1gua \u2014 Cart\u00e3o Digital" : "Link d\u2019\u00c1gua \u2014 Digital Card"}
+                  </h3>
+                </div>
+              </div>
+              <span style={{ fontSize: '1rem', color: '#F59E0B', fontWeight: 700, transform: linkDaguaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.32s ease', flexShrink: 0 }}>▼</span>
+            </div>
+            {!linkDaguaOpen && (
+              <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>
+                {lang === 'pt' ? 'Clique para ver o bonus' : "Click to see the bonus"}
               </p>
-            </div>
-            <div style={{ marginTop: 'auto' }}>
-              <a
-                id="segment-linkdagua-cta"
-                href="https://link.encontrodagua.com/vitrine"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '30px',
-                  padding: '12px 24px',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  width: '100%',
-                  transition: 'all 0.2s',
-                  display: 'block',
-                  textAlign: 'center',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-              >
-                {lang === 'pt' ? '🔗 Ver Link d’Água' : '🔗 See Link d’Água'}
-              </a>
-            </div>
+            )}
+            {linkDaguaOpen && (
+              <div onClick={e => e.stopPropagation()} style={{ borderTop: '1px solid rgba(200,147,58,0.15)', paddingTop: '14px', cursor: 'default' }}>
+                <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, marginBottom: '14px' }}>
+                  {lang === 'pt'
+                    ? "Cart\u00e3o digital profissional + QR Code personalizado + microsite. Iniciativa de Start Digital."
+                    : "Professional digital card + custom QR Code + bio microsite. A Start Digital initiative."}
+                </p>
+                <a
+                  id="segment-linkdagua-cta"
+                  href="https://link.encontrodagua.com/vitrine"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ background: S.solimoesGrad, color: '#000', border: 'none', borderRadius: '30px', padding: '12px 24px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'all 0.2s', display: 'block', textAlign: 'center' as const }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  {lang === 'pt' ? "🔗 Conhecer o Link d\u2019\u00c1gua" : "🔗 Learn about Link d\u2019\u00c1gua"}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1529,16 +1534,62 @@ const ShowcasePage: React.FC = () => {
       </section>
 
       <footer style={{
-        padding: '2.5rem 1.5rem',
+        padding: '3rem 1.5rem',
         textAlign: 'center',
         borderTop: `1px solid ${S.border}`,
+        background: 'rgba(0,0,0,0.15)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-          <img src="/logos/logo-icon.png" alt="Hub Icon" style={{ height: '24px' }} />
-          <span style={{ color: S.slate, fontSize: '0.82rem', fontWeight: 500 }}>{t.footer_built}</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
+          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
+          <span style={{ color: S.textSecondary, fontSize: '0.88rem', fontWeight: 600 }}>{t.footer_built}</span>
         </div>
-        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>Lidi Moura: Formada em Psicologia e Especialista em Dados</p>
+        {/* Bio contextualizada — lugar correto */}
+        <p style={{ color: S.slateDim, fontSize: '0.78rem', margin: '4px 0 12px' }}>
+          🎓 Lidi Moura — Formada em Psicologia e Especialista em Dados · Certificações OCI, IA &amp; MySQL
+        </p>
+        {/* Links sociais */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <a
+            href="https://github.com/encontro-dagua-hub"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            ⚙ GitHub Org
+          </a>
+          <a
+            href="https://github.com/lidimoura"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            👩‍💻 GitHub (Lidi)
+          </a>
+          <a
+            href="https://www.linkedin.com/company/encontro-d-agua-hub/"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💼 LinkedIn
+          </a>
+          <a
+            href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá! Estou na página Provadágua e preciso de suporte.')}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#25D366'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💬 Suporte
+          </a>
+        </div>
         <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
+        <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: '4px 0 0' }}>
+          {t.footer_version}
+        </p>
       </footer>
       {/* ── Lead Capture Modal ────────────────────────────────────────────── */}
       <LeadCaptureModal

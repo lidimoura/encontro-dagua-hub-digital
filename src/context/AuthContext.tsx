@@ -19,6 +19,7 @@ interface Profile {
     is_super_admin?: boolean; // Super admin flag for global access
     status?: string; // God Mode: User status (active, inactive, etc)
     access_level?: string[]; // God Mode: Access permissions array
+    access_expires_at?: string | null; // Trial expiry timestamp (ISO)
 }
 
 interface AuthContextType {
