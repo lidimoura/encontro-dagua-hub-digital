@@ -11,7 +11,8 @@ import { initGA4, trackTrialStart, trackLogin, trackSignUp } from '@/lib/analyti
 const ACCESS_KEYWORD = import.meta.env.VITE_ACCESS_KEYWORD || 'provadagua';
 // Número oficial de suporte (Curitiba Business)
 const WHATSAPP_SUPPORT = '5541992557600';
-const PROVA_URL = 'https://prova.encontrodagua.com/#/showcase';
+// Link direto WA para solicitar acesso (não redirecionar para a própria showcase)
+const WA_REQUEST_ACCESS = `https://wa.me/5541992557600?text=${encodeURIComponent('Olá! Gostaria de solicitar meu acesso à Provadágua.')}`;
 
 type GateView = 'choose' | 'keyword';
 
@@ -43,6 +44,8 @@ const Login: React.FC = () => {
   const [keyword, setKeyword] = useState('');
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
+  const [leadPassword, setLeadPassword] = useState('');
+  const [showLeadPassword, setShowLeadPassword] = useState(false);
   const [keywordLoading, setKeywordLoading] = useState(false);
   const [keywordError, setKeywordError] = useState<string | null>(null);
 
@@ -62,8 +65,8 @@ const Login: React.FC = () => {
     badge:       isEn ? '🌀 Reforesting the Digital' : '🌀 Reflorestar o Digital',
     welcome:     isEn ? 'Welcome to the Hub 🌿' : 'Bem-vinda ao Hub 🌿',
     subtitle:    isEn ? 'Exclusive access by invitation or keyword.' : 'Acesso exclusivo por convite ou palavra-chave.',
-    optTrialLbl: isEn ? 'Request Access / See Demo' : 'Solicitar Acesso / Ver Demo',
-    optTrialSub: isEn ? 'Explore the Hub without commitment — Provadágua showcase →' : 'Conheça o Hub sem compromisso — vitrine Provadágua →',
+    optTrialLbl: isEn ? 'Request Access via WhatsApp' : 'Solicitar Acesso via WhatsApp',
+    optTrialSub: isEn ? 'Talk to us directly — no commitment' : 'Fale conosco diretamente — sem compromisso',
     optHubLbl:   isEn ? 'Enter the Hub' : 'Entrar no Hub',
     optHubSub:   isEn ? 'Access with keyword — immediate trial' : 'Acesso com palavra-chave — trial imediato',
     noCard:      isEn ? 'Exclusive access. No credit card.' : 'Acesso exclusivo. Sem cartão de crédito.',
@@ -71,6 +74,7 @@ const Login: React.FC = () => {
     kwSub:       isEn ? 'For clients with admin-authorized access' : 'Para clientes com acesso liberado pelo administrador',
     kwName:      isEn ? 'Your full name' : 'Seu nome completo',
     kwEmail:     isEn ? 'Your professional email' : 'Seu e-mail profissional',
+    kwPass:      isEn ? 'Create a password (to sign in again later)' : 'Crie uma senha (para voltar a entrar depois)',
     kwField:     isEn ? 'Access keyword' : 'Palavra-chave de acesso',
     kwPlaceholder: isEn ? 'Your keyword...' : 'Sua palavra-chave...',
     kwNoKey:     isEn ? "Don't have one?" : 'Não tem?',
@@ -81,7 +85,7 @@ const Login: React.FC = () => {
     hubBlocked:  isEn
       ? 'Restricted administrative access. Please enter through the Provadágua page.'
       : 'Acesso administrativo restrito. Por favor, entre pela página da Provadágua.',
-    errMissing:  isEn ? 'Fill in your name and email to continue.' : 'Preencha seu nome e e-mail para continuar.',
+    errMissing:  isEn ? 'Fill in all fields to continue.' : 'Preencha todos os campos para continuar.',
     errKeyword:  isEn ? 'Wrong keyword. Request from admin.' : 'Palavra-chave incorreta. Solicite ao administrador.',
     errGeneric:  isEn ? 'Registration error. Try again.' : 'Erro ao registrar. Tente novamente.',
     errEmailUsed:isEn ? 'Email already registered. Contact admin.' : 'E-mail já cadastrado. Entre em contato com o administrador.',
@@ -106,15 +110,19 @@ const Login: React.FC = () => {
       return;
     }
 
-    if (!leadName.trim() || !leadEmail.trim()) {
+    if (!leadName.trim() || !leadEmail.trim() || !leadPassword.trim()) {
       setKeywordError(txt.errMissing);
+      setKeywordLoading(false);
+      return;
+    }
+    if (leadPassword.trim().length < 6) {
+      setKeywordError(isEn ? 'Password must be at least 6 characters.' : 'A senha deve ter pelo menos 6 caracteres.');
       setKeywordLoading(false);
       return;
     }
 
     try {
       // ── V5.3: Chama signup-showcase com timeout de 15s ────────────────────
-      const tempPassword = `Prova${Date.now()}!`;
       const normalizedEmail = leadEmail.trim().toLowerCase();
 
       // Timeout controller — evita loading infinito
@@ -129,7 +137,7 @@ const Login: React.FC = () => {
           body: {
             name:     leadName.trim(),
             email:    normalizedEmail,
-            password: tempPassword,
+            password: leadPassword.trim(),
             language: isEn ? 'en' : 'pt',
           },
         });
@@ -158,7 +166,7 @@ const Login: React.FC = () => {
       // ── Auto-login imediato ────────────────────────────────────────────────
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email:    normalizedEmail,
-        password: tempPassword,
+        password: leadPassword.trim(),
       });
 
       if (loginError) throw loginError;
@@ -352,7 +360,7 @@ const Login: React.FC = () => {
               {/* Opção 1: Ver Demo / Solicitar Acesso */}
               <button
                 id="btn-lead-trial"
-                onClick={() => window.open(PROVA_URL, '_blank')}
+                onClick={() => window.open(WA_REQUEST_ACCESS, '_blank')}
                 className="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 hover:border-emerald-400/50 hover:from-emerald-900/60 hover:to-teal-900/60 transition-all group text-left"
               >
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500/30 transition-colors">
@@ -434,6 +442,27 @@ const Login: React.FC = () => {
                     placeholder="seu@email.com"
                     value={leadEmail} onChange={e => setLeadEmail(e.target.value)}
                   />
+                </div>
+              </div>
+
+              {/* Campo Senha — para o lead poder voltar e entrar depois */}
+              <div>
+                <label htmlFor="lead-password" className="block text-sm font-medium text-slate-300 mb-1.5">
+                  {txt.kwPass}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="lead-password" type={showLeadPassword ? 'text' : 'password'} required minLength={6}
+                    className="block w-full pl-10 pr-10 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                    placeholder={isEn ? 'Min. 6 characters' : 'Mín. 6 caracteres'}
+                    value={leadPassword} onChange={e => setLeadPassword(e.target.value)}
+                  />
+                  <button type="button" onClick={() => setShowLeadPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                    {showLeadPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
