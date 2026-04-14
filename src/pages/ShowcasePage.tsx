@@ -2,7 +2,7 @@
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import { initGA4, trackShowcaseCTA, trackLeadCapture } from '@/lib/analytics';
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface Translation {
   nav_login: string;
   hero_eyebrow: string;
@@ -38,7 +38,7 @@ interface Translation {
   footer_privacy: string;
 }
 
-// ─── SVG Icon Components ───────────────────────────────────────────────────
+// â”€â”€â”€ SVG Icon Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ShieldIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -60,189 +60,193 @@ const ArrowIcon = () => (
   </svg>
 );
 
-// ─── i18n Content ─────────────────────────────────────────────────────────
+// â”€â”€â”€ i18n Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
   pt: {
     nav_login: 'Entrar no Hub',
-    hero_eyebrow: 'Para Médicos · Fisioterapeutas · Psicólogos',
+    hero_eyebrow: 'Para Empreendedores Â· Profissionais Liberais Â· Agentes e ConsultÃ³rios',
     hero_title_1: 'O CRM com IA que',
-    hero_title_2: 'protege seus pacientes',
-    hero_title_accent: 'e faz crescer seu consultório.',
+    hero_title_2: 'organiza seus clientes e projetos',
+    hero_title_accent: 'e faz sua operaÃ§Ã£o crescer.',
     hero_subtitle:
-      'Encontro D\'Água Hub é o sistema operacional de gestão para clínicas e consultórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
-    hero_cta_primary: 'Experimente a Provadágua por 7 dias',
-    hero_cta_secondary: 'Ver demonstração ao vivo',
-    hero_cta_sub: 'Gestão de Elite com Privacidade OCI · Sem cartão de crédito · Dados 100% isolados',
-    trust_label: 'Confiado por profissionais de saúde',
-    specialties: ['Medicina', 'Fisioterapia', 'Psicologia', 'Nutrição', 'Odontologia'],
+      'Encontro D\'Ãgua Hub Ã© o sistema operacional de gestÃ£o para profissionais e empreendedores. AutomaÃ§Ã£o de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD â€” tudo em um Ãºnico hub.',
+    hero_cta_primary: 'Experimente a ProvadÃ¡gua por 7 dias',
+    hero_cta_secondary: 'Ver demonstraÃ§Ã£o ao vivo',
+    hero_cta_sub: 'GestÃ£o de Elite com Privacidade OCI Â· Sem cartÃ£o de crÃ©dito Â· Dados 100% isolados',
+    trust_label: 'Confiado por profissionais e empreendedores',
+    specialties: ['SaÃºde', 'Consultoria', 'Empreendedores', 'Profissionais Liberais', 'AgÃªncias'],
     metrics: [
-      { value: '100%', label: 'Dados Isolados por Empresa', icon: '🔒' },
-      { value: '9', label: 'Módulos em Produção', icon: '⚡' },
-      { value: '4', label: 'Agentes de IA Ativos', icon: '🤖' },
-      { value: '24/7', label: 'SDR Automatizado', icon: '📡' },
+      { value: '100%', label: 'Dados Isolados por Empresa', icon: 'ðŸ”’' },
+      { value: '9', label: 'MÃ³dulos em ProduÃ§Ã£o', icon: 'âš¡' },
+      { value: '4', label: 'Agentes de IA Ativos', icon: 'ðŸ¤–' },
+      { value: '24/7', label: 'SDR Automatizado', icon: 'ðŸ“¡' },
     ],
-    pain_title: 'Você reconhece esses problemas?',
-    pain_subtitle: 'Criamos soluções específicas para a realidade do profissional de saúde',
+    pain_title: 'VocÃª reconhece esses problemas?',
+    pain_subtitle: 'Criamos soluÃ§Ãµes especÃ­ficas para a realidade de quem lidera um negÃ³cio ou carreira independente',
     pain_items: [
       {
-        icon: '📁',
-        title: 'Dados de pacientes espalhados',
-        desc: 'Planilhas, WhatsApp, e-mail e papel — impossível acompanhar sem um sistema centralizado e seguro.',
+        icon: 'ðŸ“',
+        title: 'Dados de clientes e leads espalhados',
+        desc: 'Planilhas, WhatsApp, e-mail e papel â€” impossÃ­vel acompanhar sem um sistema centralizado e seguro.',
       },
       {
-        icon: '⏰',
+        icon: 'â°',
         title: 'Tempo perdido em tarefas manuais',
-        desc: 'Agendamentos, follow-ups e lembretes consomem horas que deveriam ser dedicadas ao paciente.',
+        desc: 'Agendamentos, follow-ups e lembretes consomem horas que deveriam ser dedicadas a seus clientes e projetos.',
       },
       {
-        icon: '🚫',
+        icon: 'ðŸš«',
         title: 'Risco de vazamento de dados (LGPD)',
-        desc: 'Softwares genéricos não foram projetados para a privacidade que a saúde exige. Sua clínica está vulnerável.',
+        desc: 'Softwares genÃ©ricos nÃ£o foram projetados para a privacidade que seu negÃ³cio exige. Seus dados estÃ£o vulnerÃ¡veis.',
       },
       {
-        icon: '📊',
-        title: 'Não conseguir gerenciar seus clientes e projetos?',
-        desc: 'Sem visibilidade do pipeline, sem follow-up automático e sem relatórios — você perde negócios sem nem perceber. O ecossistema Provadágua centraliza tudo.',
+        icon: 'ðŸ“Š',
+        title: 'NÃ£o conseguir gerenciar seus clientes e projetos?',
+        desc: 'Sem visibilidade do pipeline, sem follow-up automÃ¡tico e sem relatÃ³rios â€” vocÃª perde negÃ³cios sem nem perceber. O ecossistema ProvadÃ¡gua centraliza tudo.',
       },
     ],
     modules_title: 'Funcionalidades',
-    modules_subtitle: 'Todas as funcionalidades ativas em hub.encontrodagua.com — operando 24/7',
+    modules_subtitle: 'Oferecemos uma base sÃ³lida de CRM que Ã© totalmente personalizada de acordo com a demanda de cada cliente. Usamos o prÃ³prio CRM do Hub como portfÃ³lio vivo dessa personalizaÃ§Ã£o.',
+    modules_group_native: 'Nativas do CRM Base',
+    modules_group_custom: 'ImplementaÃ§Ãµes Personalizadas do Hub',
     modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
-      { icon: '👥', name: 'Contatos', desc: 'Base de pacientes com sync bidirecional', badge: 'Ativo' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'Agente IA de Customer Success', badge: 'IA' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', badge: 'IA' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo' },
+      { icon: 'ðŸ“‹', name: 'Board Kanban', desc: 'Leads e oportunidades mapeados ao funil automaticamente', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ‘¥', name: 'Contatos', desc: 'Base de clientes e leads com sync bidirecional', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ’¬', name: 'Inbox / MazÃ´', desc: 'Agente IA de Customer Success para atender e qualificar', badge: 'IA', group: 'native' },
+      { icon: 'âš–ï¸', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ’°', name: 'Precy', desc: 'PrecificaÃ§Ã£o BRL/USD/EUR', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ“±', name: 'QR D\'Ã¡gua', desc: 'QR Codes + Bridge Pages para cartÃµes digitais', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ“Š', name: 'Reports', desc: 'Pipeline + Win/Loss em tempo real', badge: 'Ativo', group: 'native' },
+      { icon: 'ðŸ§ª', name: 'Prompt Lab', desc: 'IA multi-persona para criaÃ§Ã£o de prompts e conteÃºdo', badge: 'IA', group: 'custom' },
+      { icon: 'ðŸ”§', name: 'Admin', desc: 'UsuÃ¡rios, Tech Stack, Super Admin e multi-tenant', badge: 'Ativo', group: 'custom' },
     ],
-    qa_eyebrow: 'Auditoria V3.0 — Abril 2026',
-    qa_title: 'Relatório de QA & Segurança',
-    qa_subtitle: 'Transparência técnica é parte da nossa proposta de valor',
+    qa_eyebrow: 'Auditoria V3.0 â€” Abril 2026',
+    qa_title: 'RelatÃ³rio de QA & SeguranÃ§a',
+    qa_subtitle: 'TransparÃªncia tÃ©cnica Ã© parte da nossa proposta de valor',
     qa_items: [
       {
         icon: 'shield',
         title: 'Isolamento Multi-Tenant',
         status: 'APROVADO',
-        desc: 'company_id RLS ativo em todas as tabelas críticas. Dados de cada clínica completamente separados.',
+        desc: 'company_id RLS ativo em todas as tabelas crÃ­ticas. Dados de cada empresa completamente separados.',
       },
       {
         icon: 'shield',
         title: 'Chaves de API Seguras',
         status: 'APROVADO',
-        desc: 'SUPABASE_SERVICE_ROLE_KEY rotacionada e armazenada apenas em Vercel Secrets. Nunca exposta no repositório.',
+        desc: 'SUPABASE_SERVICE_ROLE_KEY rotacionada e armazenada apenas em Vercel Secrets. Nunca exposta no repositÃ³rio.',
       },
       {
         icon: 'shield',
         title: 'Super Admin (Migration 038)',
         status: 'APROVADO',
-        desc: 'Controle de acesso por hierarquia. is_super_admin com bypass de RLS apenas para operações autorizadas.',
+        desc: 'Controle de acesso por hierarquia. is_super_admin com bypass de RLS apenas para operaÃ§Ãµes autorizadas.',
       },
       {
         icon: 'shield',
         title: 'Bilinguismo PT/EN',
         status: 'APROVADO',
-        desc: 'Interface completa em português e inglês. Toggle nativo em todos os módulos.',
+        desc: 'Interface completa em portuguÃªs e inglÃªs. Toggle nativo em todos os mÃ³dulos.',
       },
       {
         icon: 'shield',
         title: 'Validade de Acesso',
         status: 'APROVADO',
-        desc: 'access_expires_at por usuário. Acesso temporário com expiração automática. Controle total do admin.',
+        desc: 'access_expires_at por usuÃ¡rio. Acesso temporÃ¡rio com expiraÃ§Ã£o automÃ¡tica. Controle total do admin.',
       },
       {
         icon: 'shield',
         title: 'Isolamento Demo',
         status: 'APROVADO',
-        desc: 'is_demo_data guard em todos os services. Dados de produção nunca vazam para o ambiente de demonstração.',
+        desc: 'is_demo_data guard em todos os services. Dados de produÃ§Ã£o nunca vazam para o ambiente de demonstraÃ§Ã£o.',
       },
     ],
-    tech_title: 'Arquitetura Técnica',
+    tech_title: 'Arquitetura TÃ©cnica',
     tech_stack: [
-      { icon: '⚛', name: 'React 18 + TypeScript', category: 'Frontend' },
-      { icon: '🗄', name: 'Supabase + PostgreSQL', category: 'Backend' },
-      { icon: '🔐', name: 'RLS Multi-Tenant', category: 'Segurança' },
-      { icon: '🤖', name: 'Google Gemini', category: 'IA Principal' },
-      { icon: '⚡', name: 'Vite + TailwindCSS', category: 'Build' },
-      { icon: '🌐', name: 'Vercel Edge', category: 'Deploy Global' },
-      { icon: '🔄', name: 'TanStack Query', category: 'State' },
-      { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
+      { icon: 'âš›', name: 'React 18 + TypeScript', category: 'Frontend' },
+      { icon: 'ðŸ—„', name: 'Supabase + PostgreSQL', category: 'Backend' },
+      { icon: 'ðŸ”', name: 'RLS Multi-Tenant', category: 'SeguranÃ§a' },
+      { icon: 'ðŸ¤–', name: 'Google Gemini', category: 'IA Principal' },
+      { icon: 'âš¡', name: 'Vite + TailwindCSS', category: 'Build' },
+      { icon: 'ðŸŒ', name: 'Vercel Edge', category: 'Deploy Global' },
+      { icon: 'ðŸ”„', name: 'TanStack Query', category: 'State' },
+      { icon: 'â˜', name: 'Edge Functions', category: 'Serverless' },
     ],
-    trial_title: 'Experimente a Provadágua por 7 dias',
-    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM feito para profissionais de saúde que não abrem mão da segurança dos seus pacientes.',
+    trial_title: 'Experimente a ProvadÃ¡gua por 7 dias',
+    trial_subtitle: 'GestÃ£o de Elite com Privacidade OCI. O CRM personalizado para o seu negÃ³cio, com seguranÃ§a e automaÃ§Ã£o.',
     trial_features: [
-      'Isolamento total de dados por clínica',
+      'Isolamento total de dados por empresa',
       '4 Agentes de IA inclusos',
       'SDR automatizado 24/7',
-      'Relatório de QA/Segurança',
+      'RelatÃ³rio de QA/SeguranÃ§a',
       'Suporte dedicado',
       'Cancele a qualquer momento',
     ],
-    trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
-    trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
-    footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
-    footer_version: 'V5.3 — Provadágua Rebranding Completo',
-    footer_privacy: 'Privacidade · LGPD · Termos',
+    trial_cta: 'Experimente a ProvadÃ¡gua por 7 dias â€” GrÃ¡tis',
+    trial_sub: 'GestÃ£o de Elite com Privacidade OCI Â· Setup em menos de 5 minutos Â· Cancele a qualquer momento',
+    footer_built: 'ConstruÃ­do com â¤ï¸ pela equipe Encontro D\'Ãgua',
+    footer_version: 'V5.4 â€” ProvadÃ¡gua',
+    footer_privacy: 'Privacidade Â· LGPD Â· Termos',
   },
   en: {
     nav_login: 'Enter Hub',
-    hero_eyebrow: 'For Physicians · Physiotherapists · Psychologists',
+    hero_eyebrow: 'For Entrepreneurs Â· Independent Professionals Â· Agencies',
     hero_title_1: 'The AI-powered CRM that',
-    hero_title_2: 'protects your patients',
-    hero_title_accent: 'and grows your practice.',
+    hero_title_2: 'organizes your clients and projects',
+    hero_title_accent: 'and makes your operation grow.',
     hero_subtitle:
-      'Encontro D\'Água Hub is the practice management operating system for clinics and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
-    hero_cta_primary: 'Try Provadágua for 7 days',
+      'Encontro D\'Ãgua Hub is the management operating system for professionals and entrepreneurs. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance â€” all in one hub.',
+    hero_cta_primary: 'Try ProvadÃ¡gua for 7 days',
     hero_cta_secondary: 'Watch live demo',
-    hero_cta_sub: 'Elite Management with OCI Privacy · No credit card · 100% isolated data',
-    trust_label: 'Trusted by health professionals',
-    specialties: ['Medicine', 'Physiotherapy', 'Psychology', 'Nutrition', 'Dentistry'],
+    hero_cta_sub: 'Elite Management with OCI Privacy Â· No credit card Â· 100% isolated data',
+    trust_label: 'Trusted by professionals and entrepreneurs',
+    specialties: ['Health', 'Consulting', 'Entrepreneurs', 'Freelancers', 'Agencies'],
     metrics: [
-      { value: '100%', label: 'Data Isolated per Company', icon: '🔒' },
-      { value: '9', label: 'Modules in Production', icon: '⚡' },
-      { value: '4', label: 'Active AI Agents', icon: '🤖' },
-      { value: '24/7', label: 'Automated SDR', icon: '📡' },
+      { value: '100%', label: 'Data Isolated per Company', icon: 'ðŸ”’' },
+      { value: '9', label: 'Modules in Production', icon: 'âš¡' },
+      { value: '4', label: 'Active AI Agents', icon: 'ðŸ¤–' },
+      { value: '24/7', label: 'Automated SDR', icon: 'ðŸ“¡' },
     ],
     pain_title: 'Do you recognize these problems?',
-    pain_subtitle: 'We built specific solutions for the real challenges of healthcare professionals',
+    pain_subtitle: 'We built specific solutions for the real challenges of business leaders and independent professionals',
     pain_items: [
       {
-        icon: '📁',
-        title: 'Patient data scattered everywhere',
-        desc: 'Spreadsheets, WhatsApp, email, and paper — impossible to track without a centralized, secure system.',
+        icon: 'ðŸ“',
+        title: 'Client and lead data scattered everywhere',
+        desc: 'Spreadsheets, WhatsApp, email, and paper â€” impossible to track without a centralized, secure system.',
       },
       {
-        icon: '⏰',
+        icon: 'â°',
         title: 'Time wasted on manual tasks',
-        desc: 'Scheduling, follow-ups, and reminders consume hours that should be dedicated to your patients.',
+        desc: 'Scheduling, follow-ups, and reminders consume hours that should be dedicated to your clients and projects.',
       },
       {
-        icon: '🚫',
-        title: 'Data breach risk (GDPR/LGPD)',
-        desc: 'Generic software wasn\'t designed for the privacy healthcare requires. Your practice is vulnerable.',
+        icon: 'ðŸš«',
+        title: 'Data breach risk (LGPD/GDPR)',
+        desc: 'Generic software wasn\'t designed for the privacy your business requires. Your data is vulnerable.',
       },
       {
-        icon: '📊',
-        title: 'Can\'t manage your clients and projects?',
-        desc: 'No pipeline visibility, no automated follow-up, no reports — you lose business without realizing it. Provadágua centralizes everything.',
+        icon: 'ðŸ“Š',
+        title: "Can't manage your clients and projects?",
+        desc: 'No pipeline visibility, no automatic follow-up, no reports â€” you lose business without even noticing. The ProvadÃ¡gua ecosystem centralizes everything.',
       },
     ],
     modules_title: 'Features',
-    modules_subtitle: 'All features live at hub.encontrodagua.com — running 24/7',
+    modules_subtitle: 'We provide a solid CRM base that is fully customized to each client\'s needs. We use the Hub CRM itself as a living portfolio of this customization.',
+    modules_group_native: 'Native CRM Base',
+    modules_group_custom: 'Hub Custom Implementations',
     modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
-      { icon: '👥', name: 'Contacts', desc: 'Patient database with bidirectional sync', badge: 'Live' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'AI Customer Success Agent', badge: 'AI' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', badge: 'AI' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live' },
+      { icon: 'ðŸ“‹', name: 'Kanban Board', desc: 'Leads and opportunities mapped to the funnel automatically', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ‘¥', name: 'Contacts', desc: 'Client and lead database with bidirectional sync', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ’¬', name: 'Inbox / MazÃ´', desc: 'AI Customer Success agent to attend and qualify leads', badge: 'AI', group: 'native' },
+      { icon: 'âš–ï¸', name: 'Jury', desc: 'BR Contracts + Common Law', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ’°', name: 'Precy', desc: 'Pricing in BRL/USD/EUR', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ“±', name: 'QR D\'Ã¡gua', desc: 'QR Codes + Digital Business Cards', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ“Š', name: 'Reports', desc: 'Real-time Pipeline + Win/Loss', badge: 'Active', group: 'native' },
+      { icon: 'ðŸ§ª', name: 'Prompt Lab', desc: 'Multi-persona AI for prompt and content creation', badge: 'AI', group: 'custom' },
+      { icon: 'ðŸ”§', name: 'Admin', desc: 'Users, Tech Stack, Super Admin and multi-tenant', badge: 'Active', group: 'custom' },
     ],
-    qa_eyebrow: 'V3.0 Audit — April 2026',
+    qa_eyebrow: 'V3.0 Audit â€” April 2026',
     qa_title: 'QA & Security Report',
     qa_subtitle: 'Technical transparency is part of our value proposition',
     qa_items: [
@@ -285,16 +289,16 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     ],
     tech_title: 'Technical Architecture',
     tech_stack: [
-      { icon: '⚛', name: 'React 18 + TypeScript', category: 'Frontend' },
-      { icon: '🗄', name: 'Supabase + PostgreSQL', category: 'Backend' },
-      { icon: '🔐', name: 'RLS Multi-Tenant', category: 'Security' },
-      { icon: '🤖', name: 'Google Gemini', category: 'Primary AI' },
-      { icon: '⚡', name: 'Vite + TailwindCSS', category: 'Build' },
-      { icon: '🌐', name: 'Vercel Edge', category: 'Global Deploy' },
-      { icon: '🔄', name: 'TanStack Query', category: 'State' },
-      { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
+      { icon: 'âš›', name: 'React 18 + TypeScript', category: 'Frontend' },
+      { icon: 'ðŸ—„', name: 'Supabase + PostgreSQL', category: 'Backend' },
+      { icon: 'ðŸ”', name: 'RLS Multi-Tenant', category: 'Security' },
+      { icon: 'ðŸ¤–', name: 'Google Gemini', category: 'Primary AI' },
+      { icon: 'âš¡', name: 'Vite + TailwindCSS', category: 'Build' },
+      { icon: 'ðŸŒ', name: 'Vercel Edge', category: 'Global Deploy' },
+      { icon: 'ðŸ”„', name: 'TanStack Query', category: 'State' },
+      { icon: 'â˜', name: 'Edge Functions', category: 'Serverless' },
     ],
-    trial_title: 'Try Provadágua for 7 days',
+    trial_title: 'Try ProvadÃ¡gua for 7 days',
     trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM built for health professionals who demand the highest standard of patient data security.',
     trial_features: [
       'Complete data isolation per clinic',
@@ -304,50 +308,50 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       'Dedicated support',
       'Cancel anytime',
     ],
-    trial_cta: 'Try Provadágua for 7 days — Free',
-    trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
-    footer_built: 'Built with ❤ by the Encontro D\'Água team',
-    footer_version: 'V5.3 — Provadágua Rebranding Complete',
-    footer_privacy: 'Privacy · LGPD/GDPR · Terms',
+    trial_cta: 'Try ProvadÃ¡gua for 7 days â€” Free',
+    trial_sub: 'Elite Management with OCI Privacy Â· Setup in under 5 minutes Â· Cancel anytime',
+    footer_built: 'Built with â¤ by the Encontro D\'Ãgua team',
+    footer_version: 'V5.3 â€” ProvadÃ¡gua Rebranding Complete',
+    footer_privacy: 'Privacy Â· LGPD/GDPR Â· Terms',
   },
 };
 
-// ─── Shared style tokens — Paleta V5.3: Rio Negro + Açaí + Solimões ─────────
-// Rio Negro: preto profundo | Açaí: roxo neon | Solimões: dourado/argila
+// â”€â”€â”€ Shared style tokens â€” Paleta V5.3: Rio Negro + AÃ§aÃ­ + SolimÃµes â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Rio Negro: preto profundo | AÃ§aÃ­: roxo neon | SolimÃµes: dourado/argila
 const S = {
-  // ── Gradientes principais
+  // â”€â”€ Gradientes principais
   acaiGrad:      'linear-gradient(135deg, #6D28A8, #A855F7)',
   solimoesGrad:  'linear-gradient(135deg, #C8933A, #F59E0B)',
   acaiSolimoes:  'linear-gradient(135deg, #6D28A8, #A855F7, #C8933A)',
-  // ── Compat earthNeon → Açaí (manter compilação de seções antigas)
+  // â”€â”€ Compat earthNeon â†’ AÃ§aÃ­ (manter compilaÃ§Ã£o de seÃ§Ãµes antigas)
   earthNeon:     'linear-gradient(135deg, #6D28A8, #A855F7)',
   earthWarm:     'linear-gradient(135deg, #C8933A, #F59E0B)',
   forestDeep:    'linear-gradient(135deg, #1A0A2E, #2D1B55)',
-  // ── Fundos
+  // â”€â”€ Fundos
   obsidian:      '#040308',    // Rio Negro profundo
-  // ── Superficies glassmorphism
+  // â”€â”€ Superficies glassmorphism
   surface:       'rgba(109, 40, 168, 0.05)',
   surfaceHover:  'rgba(109, 40, 168, 0.12)',
   surfaceWarm:   'rgba(200, 147, 58, 0.06)',
-  // ── Bordas
+  // â”€â”€ Bordas
   border:        'rgba(109, 40, 168, 0.12)',
   borderHover:   'rgba(109, 40, 168, 0.40)',
   borderGold:    'rgba(200, 147, 58, 0.20)',
   borderGoldHov: 'rgba(200, 147, 58, 0.48)',
-  // ── Cores de destaque
-  acai:          '#6D28A8',    // Açaí roxo
+  // â”€â”€ Cores de destaque
+  acai:          '#6D28A8',    // AÃ§aÃ­ roxo
   acaiLight:     '#A855F7',    // Neon violeta
-  solimoes:      '#C8933A',    // Solimões dourado/argila
+  solimoes:      '#C8933A',    // SolimÃµes dourado/argila
   solimoesLight: '#F59E0B',    // Neon dourado
-  neonGreen:     '#00C97B',    // Verde manutenção (CTA secondary)
+  neonGreen:     '#00C97B',    // Verde manutenÃ§Ã£o (CTA secondary)
   neonCyan:      '#A855F7',    // Redirecionado para violeta
   gold:          '#C8933A',
   goldLight:     '#F59E0B',
-  // ── Tipografia
+  // â”€â”€ Tipografia
   textPrimary:   '#F8FAFC',
   textSecondary: '#94a3b8',
   textMuted:     '#64748b',
-  // ── Compat legado
+  // â”€â”€ Compat legado
   cyanBlue:      'linear-gradient(135deg, #6D28A8, #A855F7)',
   navy:          '#040308',
   blue:          '#A855F7',
@@ -356,14 +360,14 @@ const S = {
   slateDim:      '#64748b',
 };
 
-// ─── ShowcasePage Component ────────────────────────────────────────────────
+// â”€â”€â”€ ShowcasePage Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ShowcasePage: React.FC = () => {
   const [lang, setLang] = useState<'pt' | 'en'>('pt');
   const [scrolled, setScrolled] = useState(false);
   const observedRef = useRef<Set<string>>(new Set());
   const [visible, setVisible] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [linkDaguaOpen, setLinkDaguaOpen] = useState(false); // Accordion: Bônus Link d'Água
+  const [linkDaguaOpen, setLinkDaguaOpen] = useState(false); // Accordion: BÃ´nus Link d'Ãgua
 
   const t = TRANSLATIONS[lang];
 
@@ -423,7 +427,7 @@ const ShowcasePage: React.FC = () => {
         rel="stylesheet"
       />
 
-      {/* ── CSS Keyframes ─────────────────────────────────── */}
+      {/* â”€â”€ CSS Keyframes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <style>{`
         @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeUp   { from { opacity:0; transform:translateY(28px);  } to { opacity:1; transform:translateY(0); } }
@@ -467,7 +471,7 @@ const ShowcasePage: React.FC = () => {
         }
       `}</style>
 
-      {/* ── Sticky Nav ─────────────────────────────────────── */}
+      {/* â”€â”€ Sticky Nav â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <nav
         role="navigation"
         aria-label="Main navigation"
@@ -499,10 +503,10 @@ const ShowcasePage: React.FC = () => {
               boxShadow: '0 0 18px rgba(14,165,233,0.4)',
             }}
           >
-            💧
+            ðŸ’§
           </div>
           <span style={{ fontWeight: 700, fontSize: '0.95rem', color: S.textPrimary, letterSpacing: '-0.01em' }}>
-            Encontro D’Água Hub
+            Encontro Dâ€™Ãgua Hub
           </span>
         </a>
 
@@ -510,7 +514,7 @@ const ShowcasePage: React.FC = () => {
           {/* Lang toggle */}
           <button
             id="showcase-lang-toggle"
-            aria-label={`Switch to ${lang === 'pt' ? 'English' : 'Português'}`}
+            aria-label={`Switch to ${lang === 'pt' ? 'English' : 'PortuguÃªs'}`}
             onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
             style={{
               background: S.surface,
@@ -531,7 +535,7 @@ const ShowcasePage: React.FC = () => {
               e.currentTarget.style.borderColor = S.border;
             }}
           >
-            {lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
+            {lang === 'pt' ? 'ðŸ‡ºðŸ‡¸ EN' : 'ðŸ‡§ðŸ‡· PT'}
           </button>
 
           <a
@@ -560,7 +564,7 @@ const ShowcasePage: React.FC = () => {
         </div>
       </nav>
 
-      {/* ── Hero Section ────────────────────────────────────── */}
+      {/* â”€â”€ Hero Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         id="showcase-hero"
         aria-labelledby="hero-heading"
@@ -576,7 +580,7 @@ const ShowcasePage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Background orbs — Açaí + Solimões */}
+        {/* Background orbs â€” AÃ§aÃ­ + SolimÃµes */}
         <div aria-hidden="true" style={{
           position: 'absolute', top: '25%', left: '50%',
           transform: 'translate(-50%, -50%)',
@@ -597,7 +601,7 @@ const ShowcasePage: React.FC = () => {
           pointerEvents: 'none',
         }} />
 
-        {/* Specialty pills — Açaí palette */}
+        {/* Specialty pills â€” AÃ§aÃ­ palette */}
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: '8px',
           justifyContent: 'center',
@@ -617,7 +621,7 @@ const ShowcasePage: React.FC = () => {
           ))}
         </div>
 
-        {/* Eyebrow — Solimões */}
+        {/* Eyebrow â€” SolimÃµes */}
         <div style={{
           fontSize: '0.78rem',
           fontWeight: 700,
@@ -746,7 +750,7 @@ const ShowcasePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Metrics bar — Açaí */}
+        {/* Metrics bar â€” AÃ§aÃ­ */}
         <div style={{
           marginTop: '5rem',
           background: 'rgba(109,40,168,0.05)',
@@ -789,9 +793,9 @@ const ShowcasePage: React.FC = () => {
           ))}
         </div>
 
-        {/* V5.3: Badge de credibilidade removido da Hero — exibido no footer com contexto correto. */}
+        {/* V5.3: Badge de credibilidade removido da Hero â€” exibido no footer com contexto correto. */}
 
-        {/* ── Demo Video Placeholder ─────────────────────────────────────── */}
+        {/* â”€â”€ Demo Video Placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{
           marginTop: '4rem',
           width: '100%',
@@ -811,10 +815,10 @@ const ShowcasePage: React.FC = () => {
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FEBC2E' }} />
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28C840' }} />
               <span style={{ marginLeft: '8px', fontSize: '0.64rem', color: S.textMuted, fontFamily: 'monospace' }}>
-                hub.encontrodagua.com — CRM Dashboard
+                hub.encontrodagua.com â€” CRM Dashboard
               </span>
             </div>
-            {/* Video body — Açaí theme */}
+            {/* Video body â€” AÃ§aÃ­ theme */}
             <div style={{
               height: '300px', paddingTop: '28px',
               display: 'flex', flexDirection: 'column',
@@ -850,10 +854,10 @@ const ShowcasePage: React.FC = () => {
                 </svg>
               </button>
               <p style={{ color: S.textSecondary, fontSize: '0.84rem', fontWeight: 500, position: 'relative', zIndex: 2 }}>
-                {lang === 'pt' ? '💜 Demo interativa disponível — clique para agendar' : '💜 Interactive demo available — click to schedule'}
+                {lang === 'pt' ? 'ðŸ’œ Demo interativa disponÃ­vel â€” clique para agendar' : 'ðŸ’œ Interactive demo available â€” click to schedule'}
               </p>
               <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
-                {['Contatos', 'Board SDR', 'IA Mazô', 'Reports'].map((label, i) => (
+                {['Contatos', 'Board SDR', 'IA MazÃ´', 'Reports'].map((label, i) => (
                   <div key={i} style={{
                     flex: 1, height: '3px', borderRadius: '2px',
                     background: i === 0 ? '#A855F7' : `rgba(168,85,247,${0.15 + i * 0.12})`,
@@ -863,11 +867,11 @@ const ShowcasePage: React.FC = () => {
             </div>
           </div>
           <p style={{ color: S.textMuted, fontSize: '0.72rem', marginTop: '10px', textAlign: 'center' }}>
-            {lang === 'pt' ? 'Vídeo completo em produção · Clique para agendar demo ao vivo' : 'Full video in production · Click to schedule a live demo'}
+            {lang === 'pt' ? 'VÃ­deo completo em produÃ§Ã£o Â· Clique para agendar demo ao vivo' : 'Full video in production Â· Click to schedule a live demo'}
           </p>
         </div>
 
-        {/* ── CRM Screenshots Grid ───────────────────────────────────────── */}
+        {/* â”€â”€ CRM Screenshots Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{
           marginTop: '2.5rem',
           maxWidth: '860px', width: '100%',
@@ -875,9 +879,9 @@ const ShowcasePage: React.FC = () => {
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: '#A855F7' },
-              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: '#C4B5FD' },
-              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: '#F59E0B' },
+              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: 'ðŸ“‹', color: '#A855F7' },
+              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: 'ðŸ§ ', color: '#C4B5FD' },
+              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: 'ðŸ“Š', color: '#F59E0B' },
             ].map((screen, i) => (
               <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
                 onClick={() => { trackShowcaseCTA(`screenshot_${screen.label}`); setIsModalOpen(true); }}
@@ -904,12 +908,12 @@ const ShowcasePage: React.FC = () => {
             ))}
           </div>
           <p style={{ color: S.textMuted, fontSize: '0.72rem', marginTop: '8px', textAlign: 'center' }}>
-            {lang === 'pt' ? 'Prints reais do CRM em produção · hub.encontrodagua.com' : 'Real screenshots from production CRM · hub.encontrodagua.com'}
+            {lang === 'pt' ? 'Prints reais do CRM em produÃ§Ã£o Â· hub.encontrodagua.com' : 'Real screenshots from production CRM Â· hub.encontrodagua.com'}
           </p>
         </div>
       </section>
 
-      {/* ── SEGMENTAÇÃO: Escolha seu caminho ───────────────────────────── */}
+      {/* â”€â”€ SEGMENTAÃ‡ÃƒO: Escolha seu caminho â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         id="sec-segmentacao"
         data-obs
@@ -935,7 +939,7 @@ const ShowcasePage: React.FC = () => {
             textTransform: 'uppercase',
             marginBottom: '1rem',
           }}>
-            {lang === 'pt' ? 'Para quem é' : 'Who it\'s for'}
+            {lang === 'pt' ? 'Para quem Ã©' : 'Who it\'s for'}
           </div>
           <h2
             id="segmentacao-heading"
@@ -961,7 +965,7 @@ const ShowcasePage: React.FC = () => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
         }}>
-          {/* Card 1: Saúde */}
+          {/* Card 1: SaÃºde */}
           <div
             id="segment-saude"
             style={{
@@ -986,14 +990,14 @@ const ShowcasePage: React.FC = () => {
               e.currentTarget.style.background = 'rgba(14,165,233,0.05)';
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🩺</div>
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">ðŸ©º</div>
             <div>
               <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
-                {lang === 'pt' ? 'Saúde & Consultório' : 'Health & Clinic'}
+                {lang === 'pt' ? 'SaÃºde & ConsultÃ³rio' : 'Health & Clinic'}
               </h3>
               <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
                 {lang === 'pt'
-                  ? 'Para Psicólogos, Médicos, Fisioterapeutas e terapeutas. Gestão de leads com privacidade LGPD nativa, sem misturar dados de pacientes.'
+                  ? 'Para PsicÃ³logos, MÃ©dicos, Fisioterapeutas e terapeutas. GestÃ£o de leads com privacidade LGPD nativa, sem misturar dados de pacientes.'
                   : 'For Psychologists, Physicians, Physiotherapists. Lead management with native LGPD privacy, no patient data mixing.'}
               </p>
             </div>
@@ -1016,7 +1020,7 @@ const ShowcasePage: React.FC = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
               >
-                {lang === 'pt' ? '🩺 Quero testar 7 dias' : '🩺 Try 7 days free'}
+                {lang === 'pt' ? 'ðŸ©º Quero testar 7 dias' : 'ðŸ©º Try 7 days free'}
               </button>
             </div>
           </div>
@@ -1046,14 +1050,14 @@ const ShowcasePage: React.FC = () => {
               e.currentTarget.style.background = 'rgba(16,185,129,0.05)';
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">💼</div>
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">ðŸ’¼</div>
             <div>
               <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
                 {lang === 'pt' ? 'Empreendedores & Times' : 'Entrepreneurs & Teams'}
               </h3>
               <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
                 {lang === 'pt'
-                  ? 'CRM com pipeline visual, IA para qualificação de leads, automação SDR e dashboards de conversão. Foco em vender mais, não em planilhas.'
+                  ? 'CRM com pipeline visual, IA para qualificaÃ§Ã£o de leads, automaÃ§Ã£o SDR e dashboards de conversÃ£o. Foco em vender mais, nÃ£o em planilhas.'
                   : 'Visual pipeline CRM, AI lead qualification, SDR automation, and conversion dashboards. Focus on selling, not spreadsheets.'}
               </p>
             </div>
@@ -1076,12 +1080,12 @@ const ShowcasePage: React.FC = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
               >
-                {lang === 'pt' ? '💼 Quero testar 7 dias' : '💼 Try 7 days free'}
+                {lang === 'pt' ? 'ðŸ’¼ Quero testar 7 dias' : 'ðŸ’¼ Try 7 days free'}
               </button>
             </div>
           </div>
 
-          {/* Card 3: Bonus — Link d'Agua (Accordion) */}
+          {/* Card 3: Bonus â€” Link d'Agua (Accordion) */}
           <div
             id="segment-linkdagua"
             role="button"
@@ -1104,17 +1108,17 @@ const ShowcasePage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
+                <div style={{ fontSize: '2.4rem' }} aria-hidden="true">ðŸ”—</div>
                 <div>
                   <div style={{ display: 'inline-block', background: 'rgba(200,147,58,0.12)', border: '1px solid rgba(200,147,58,0.30)', borderRadius: '12px', padding: '3px 10px', fontSize: '0.68rem', fontWeight: 800, color: '#F59E0B', letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: '5px' }}>
-                    🎁 {lang === 'pt' ? 'Bonus Incluso' : 'Bonus Included'}
+                    ðŸŽ {lang === 'pt' ? 'Bonus Incluso' : 'Bonus Included'}
                   </div>
                   <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.05rem', margin: 0 }}>
                     {lang === 'pt' ? "Link d\u2019\u00c1gua \u2014 Cart\u00e3o Digital" : "Link d\u2019\u00c1gua \u2014 Digital Card"}
                   </h3>
                 </div>
               </div>
-              <span style={{ fontSize: '1rem', color: '#F59E0B', fontWeight: 700, transform: linkDaguaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.32s ease', flexShrink: 0 }}>▼</span>
+              <span style={{ fontSize: '1rem', color: '#F59E0B', fontWeight: 700, transform: linkDaguaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.32s ease', flexShrink: 0 }}>â–¼</span>
             </div>
             {!linkDaguaOpen && (
               <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>
@@ -1137,7 +1141,7 @@ const ShowcasePage: React.FC = () => {
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
-                  {lang === 'pt' ? "🔗 Conhecer o Link d\u2019\u00c1gua" : "🔗 Learn about Link d\u2019\u00c1gua"}
+                  {lang === 'pt' ? "ðŸ”— Conhecer o Link d\u2019\u00c1gua" : "ðŸ”— Learn about Link d\u2019\u00c1gua"}
                 </a>
               </div>
             )}
@@ -1145,7 +1149,7 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Pain Points ─────────────────────────────────────── */}
+      {/* â”€â”€ Pain Points â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         id="sec-pain"
         data-obs
@@ -1222,7 +1226,7 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Modules ─────────────────────────────────────────── */}
+      {/* â”€â”€ Modules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         id="sec-modules"
         data-obs
@@ -1303,7 +1307,7 @@ const ShowcasePage: React.FC = () => {
                       fontWeight: 800,
                       letterSpacing: '0.04em',
                     }}>
-                      {mod.badge === 'AI' ? '✦ AI' : `✓ ${mod.badge}`}
+                      {mod.badge === 'AI' ? 'âœ¦ AI' : `âœ“ ${mod.badge}`}
                     </span>
                   </div>
                   <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>{mod.desc}</p>
@@ -1315,7 +1319,7 @@ const ShowcasePage: React.FC = () => {
       </section>
 
 
-      {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
+      {/* â”€â”€ 7-Day Trial CTA â€” The Hero Closer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         id="sec-trial"
         data-obs
@@ -1455,7 +1459,7 @@ const ShowcasePage: React.FC = () => {
                 <ArrowIcon />
               </a>
 
-              {/* Primary CTA 2 - Amazô */}
+              {/* Primary CTA 2 - AmazÃ´ */}
               <button
                 onClick={() => {
                    if (typeof window !== 'undefined' && (window as any).Typebot) {
@@ -1486,7 +1490,7 @@ const ShowcasePage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 12px 48px rgba(16, 185, 129, 0.4)';
                 }}
               >
-                <img src="/logos/logo-icon.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0)' }} /> Falar com a Amazô 
+                <img src="/logos/logo-icon.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0)' }} /> Falar com a AmazÃ´ 
               </button>
 
               {/* Secondary CTA - WhatsApp */}
@@ -1534,64 +1538,21 @@ const ShowcasePage: React.FC = () => {
       </section>
 
       <footer style={{
-        padding: '3rem 1.5rem',
-        textAlign: 'center',
-        borderTop: `1px solid ${S.border}`,
-        background: 'rgba(0,0,0,0.15)',
+        background: S.cardBg, borderTop: `1px solid ${S.border}`,
+        padding: '32px 24px', textAlign: 'center',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
-          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', maxWidth: '600px', margin: '0 auto' }}>
+          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro D'Ãgua" style={{ height: '40px', objectFit: 'contain', marginBottom: '4px' }} />
           <span style={{ color: S.textSecondary, fontSize: '0.88rem', fontWeight: 600 }}>{t.footer_built}</span>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <a href="https://github.com/encontro-dagua" target="_blank" rel="noreferrer" style={{ color: S.textDim, fontSize: '0.8rem', textDecoration: 'none' }}>GitHub Org</a>
+            <a href="https://www.linkedin.com/in/lidimoura" target="_blank" rel="noreferrer" style={{ color: S.textDim, fontSize: '0.8rem', textDecoration: 'none' }}>LinkedIn</a>
+          </div>
+          <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
+          <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: 0 }}>{t.footer_version}</p>
         </div>
-        {/* Bio contextualizada — lugar correto */}
-        <p style={{ color: S.slateDim, fontSize: '0.78rem', margin: '4px 0 12px' }}>
-          🎓 Lidi Moura — Formada em Psicologia e Especialista em Dados · Certificações OCI, IA &amp; MySQL
-        </p>
-        {/* Links sociais */}
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <a
-            href="https://github.com/encontro-dagua-hub"
-            target="_blank" rel="noopener noreferrer"
-            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
-            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-          >
-            ⚙ GitHub Org
-          </a>
-          <a
-            href="https://github.com/lidimoura"
-            target="_blank" rel="noopener noreferrer"
-            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
-            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-          >
-            👩‍💻 GitHub (Lidi)
-          </a>
-          <a
-            href="https://www.linkedin.com/company/encontro-d-agua-hub/"
-            target="_blank" rel="noopener noreferrer"
-            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-          >
-            💼 LinkedIn
-          </a>
-          <a
-            href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá! Estou na página Provadágua e preciso de suporte.')}`}
-            target="_blank" rel="noopener noreferrer"
-            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#25D366'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-          >
-            💬 Suporte
-          </a>
-        </div>
-        <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
-        <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: '4px 0 0' }}>
-          {t.footer_version}
-        </p>
       </footer>
-      {/* ── Lead Capture Modal ────────────────────────────────────────────── */}
+      {/* â”€â”€ Lead Capture Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <LeadCaptureModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

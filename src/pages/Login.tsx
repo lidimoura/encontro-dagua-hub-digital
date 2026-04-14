@@ -41,6 +41,7 @@ const Login: React.FC = () => {
 
   // ── Gate view state ────────────────────────────────────────────────────
   const [gateView, setGateView] = useState<GateView>('choose');
+  const [provaTab, setProvaTab] = useState<'signup' | 'signin'>('signup');
   const [keyword, setKeyword] = useState('');
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
@@ -82,6 +83,17 @@ const Login: React.FC = () => {
     kwSubmit:    isEn ? '🌿 Enter Hub — Immediate Access' : '🌿 Entrar no Hub — Acesso Imediato',
     kwLoading:   isEn ? 'Opening access...' : 'Abrindo acesso...',
     kwBack:      isEn ? '← Back' : '← Voltar',
+    // ── Sign In direto (leads que já têm conta) ──
+    signinTitle:    isEn ? 'Sign In' : 'Entrar',
+    signinSub:      isEn ? 'Enter with your registered email and password.' : 'Entre com seu e-mail e senha cadastrados.',
+    signinEmail:    isEn ? 'E-mail' : 'E-mail',
+    signinPass:     isEn ? 'Password' : 'Senha',
+    signinBtn:      isEn ? 'Sign In' : 'Entrar',
+    signinLoading:  isEn ? 'Signing in...' : 'Entrando...',
+    tabSignup:      isEn ? 'New Registration' : 'Novo Cadastro',
+    tabSignin:      isEn ? 'Already have account' : 'Já tenho conta',
+    alreadyHave:    isEn ? 'Already registered? Sign in →' : 'Já tem conta? Entrar →',
+    noAccount:      isEn ? 'Don’t have an account? Register' : 'Não tem conta? Cadastrar',
     hubBlocked:  isEn
       ? 'Restricted administrative access. Please enter through the Provadágua page.'
       : 'Acesso administrativo restrito. Por favor, entre pela página da Provadágua.',
@@ -181,6 +193,27 @@ const Login: React.FC = () => {
 
     } catch (err: any) {
       setKeywordError(err.message || txt.errGeneric);
+    } finally {
+      setKeywordLoading(false);
+    }
+  };
+
+  // ── Handler: SignIn direto para leads já cadastrados ──────────────────
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setKeywordLoading(true);
+    setKeywordError(null);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email:    leadEmail.trim().toLowerCase(),
+        password: leadPassword.trim(),
+      });
+      if (signInError) throw signInError;
+      initGA4();
+      trackLogin('provadagua_signin');
+      navigate('/dashboard');
+    } catch (err: any) {
+      setKeywordError(err.message || (isEn ? 'Login failed. Check your credentials.' : 'Falha no login. Verifique suas credenciais.'));
     } finally {
       setKeywordLoading(false);
     }
@@ -403,118 +436,153 @@ const Login: React.FC = () => {
             </div>
           )}
 
-          {/* ── TELA 2: Formulário com palavra-chave ── */}
+          {/* ── TELA 2: Formulário com palavra-chave (signup) ou login direto ── */}
           {gateView === 'keyword' && (
-            <form onSubmit={handleKeywordSubmit} className="space-y-5">
-              <div className="text-center mb-2">
-                <h2 className="text-lg font-bold text-white mb-1">{txt.kwTitle}</h2>
-                <p className="text-slate-400 text-xs">{txt.kwSub}</p>
+            <div>
+              {/* Abas SignUp / SignIn */}
+              <div className="flex rounded-xl overflow-hidden border border-white/10 mb-5">
+                <button
+                  type="button"
+                  onClick={() => { setProvaTab('signup'); setKeywordError(null); }}
+                  className={`flex-1 py-2.5 text-sm font-bold transition-all ${
+                    provaTab === 'signup'
+                      ? 'bg-teal-700 text-white'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                  }`}
+                >
+                  {txt.tabSignup}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setProvaTab('signin'); setKeywordError(null); }}
+                  className={`flex-1 py-2.5 text-sm font-bold transition-all ${
+                    provaTab === 'signin'
+                      ? 'bg-teal-700 text-white'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                  }`}
+                >
+                  {txt.tabSignin}
+                </button>
               </div>
 
-              <div>
-                <label htmlFor="lead-name" className="block text-sm font-medium text-slate-300 mb-1.5">
-                  {txt.kwName}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-4 w-4 text-slate-500" />
+              {/* ── Aba: Novo Cadastro ── */}
+              {provaTab === 'signup' && (
+                <form onSubmit={handleKeywordSubmit} className="space-y-4">
+                  <div className="text-center mb-1">
+                    <h2 className="text-base font-bold text-white mb-0.5">{txt.kwTitle}</h2>
+                    <p className="text-slate-500 text-xs">{txt.kwSub}</p>
                   </div>
-                  <input
-                    id="lead-name" type="text" required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
-                    placeholder={isEn ? 'Your name' : 'Seu nome'}
-                    value={leadName} onChange={e => setLeadName(e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <div>
-                <label htmlFor="lead-email" className="block text-sm font-medium text-slate-300 mb-1.5">
-                  {txt.kwEmail}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 text-slate-500" />
+                  <div>
+                    <label htmlFor="lead-name" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.kwName}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><User className="h-4 w-4 text-slate-500" /></div>
+                      <input id="lead-name" type="text" required
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder={isEn ? 'Your name' : 'Seu nome'}
+                        value={leadName} onChange={e => setLeadName(e.target.value)} />
+                    </div>
                   </div>
-                  <input
-                    id="lead-email" type="email" required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
-                    placeholder="seu@email.com"
-                    value={leadEmail} onChange={e => setLeadEmail(e.target.value)}
-                  />
-                </div>
-              </div>
 
-              {/* Campo Senha — para o lead poder voltar e entrar depois */}
-              <div>
-                <label htmlFor="lead-password" className="block text-sm font-medium text-slate-300 mb-1.5">
-                  {txt.kwPass}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-slate-500" />
+                  <div>
+                    <label htmlFor="lead-email" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.kwEmail}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Mail className="h-4 w-4 text-slate-500" /></div>
+                      <input id="lead-email" type="email" required
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder="seu@email.com"
+                        value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
+                    </div>
                   </div>
-                  <input
-                    id="lead-password" type={showLeadPassword ? 'text' : 'password'} required minLength={6}
-                    className="block w-full pl-10 pr-10 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
-                    placeholder={isEn ? 'Min. 6 characters' : 'Mín. 6 caracteres'}
-                    value={leadPassword} onChange={e => setLeadPassword(e.target.value)}
-                  />
-                  <button type="button" onClick={() => setShowLeadPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
-                    {showLeadPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+
+                  <div>
+                    <label htmlFor="lead-password" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.kwPass}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Lock className="h-4 w-4 text-slate-500" /></div>
+                      <input id="lead-password" type={showLeadPassword ? 'text' : 'password'} required minLength={6}
+                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder={isEn ? 'Min. 6 characters' : 'Mín. 6 caracteres'}
+                        value={leadPassword} onChange={e => setLeadPassword(e.target.value)} />
+                      <button type="button" onClick={() => setShowLeadPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                        {showLeadPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="keyword" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.kwField}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Key className="h-4 w-4 text-slate-500" /></div>
+                      <input id="keyword" type="text" required
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder={txt.kwPlaceholder}
+                        value={keyword} onChange={e => setKeyword(e.target.value)} />
+                    </div>
+                    <p className="text-xs text-slate-600 mt-1">{txt.kwNoKey}{' '}
+                      <a href={`https://wa.me/${WHATSAPP_SUPPORT}?text=${encodeURIComponent(isEn ? 'Hello! I need an access keyword for the Hub.' : 'Olá! Preciso de uma palavra-chave de acesso ao Hub.')}`}
+                        target="_blank" rel="noopener noreferrer" className="text-teal-500 hover:text-teal-400 underline">{txt.kwRequest}</a>
+                    </p>
+                  </div>
+
+                  {keywordError && (
+                    <div className="p-3 rounded-lg bg-red-900/20 border border-red-500/20 text-red-400 text-sm text-center">{keywordError}</div>
+                  )}
+
+                  <button type="submit" disabled={keywordLoading}
+                    className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] gap-2">
+                    {keywordLoading ? <><Loader2 className="animate-spin h-5 w-5" /><span>{txt.kwLoading}</span></> : <><Leaf className="w-4 h-4" /> {txt.kwSubmit}</>}
                   </button>
-                </div>
-              </div>
 
-              <div>
-                <label htmlFor="keyword" className="block text-sm font-medium text-slate-300 mb-1.5">
-                  {txt.kwField}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Key className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <input
-                    id="keyword" type="text" required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
-                    placeholder={txt.kwPlaceholder}
-                    value={keyword} onChange={e => setKeyword(e.target.value)}
-                  />
-                </div>
-                <p className="text-xs text-slate-600 mt-1">
-                  {txt.kwNoKey}{' '}
-                  <a
-                    href={`https://wa.me/${WHATSAPP_SUPPORT}?text=${encodeURIComponent(isEn ? 'Hello! I need an access keyword for the Hub.' : 'Olá! Preciso de uma palavra-chave de acesso ao Hub.')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-teal-500 hover:text-teal-400 underline"
-                  >
-                    {txt.kwRequest}
-                  </a>
-                </p>
-              </div>
-
-              {keywordError && (
-                <div className="p-3 rounded-lg bg-red-900/20 border border-red-500/20 text-red-400 text-sm text-center">
-                  {keywordError}
-                </div>
+                  <button type="button" onClick={() => setGateView('choose')} className="w-full text-slate-500 hover:text-slate-300 text-xs transition-colors py-1">{txt.kwBack}</button>
+                </form>
               )}
 
-              <button
-                type="submit"
-                disabled={keywordLoading}
-                className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] gap-2"
-              >
-                {keywordLoading
-                  ? <><Loader2 className="animate-spin h-5 w-5" /><span>{txt.kwLoading}</span></>
-                  : <><Leaf className="w-4 h-4" /> {txt.kwSubmit}</>
-                }
-              </button>
+              {/* ── Aba: Já tenho conta (SignIn) ── */}
+              {provaTab === 'signin' && (
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="text-center mb-1">
+                    <h2 className="text-base font-bold text-white mb-0.5">{txt.signinTitle}</h2>
+                    <p className="text-slate-500 text-xs">{txt.signinSub}</p>
+                  </div>
 
-              <button type="button" onClick={() => setGateView('choose')} className="w-full text-slate-500 hover:text-slate-300 text-xs transition-colors py-1">
-                {txt.kwBack}
-              </button>
-            </form>
+                  <div>
+                    <label htmlFor="signin-email" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.signinEmail}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Mail className="h-4 w-4 text-slate-500" /></div>
+                      <input id="signin-email" type="email" required autoComplete="email"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder="seu@email.com"
+                        value={leadEmail} onChange={e => setLeadEmail(e.target.value)} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="signin-password" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.signinPass}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Lock className="h-4 w-4 text-slate-500" /></div>
+                      <input id="signin-password" type={showLeadPassword ? 'text' : 'password'} required autoComplete="current-password"
+                        className="block w-full pl-10 pr-10 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all sm:text-sm"
+                        placeholder="••••••••"
+                        value={leadPassword} onChange={e => setLeadPassword(e.target.value)} />
+                      <button type="button" onClick={() => setShowLeadPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                        {showLeadPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {keywordError && (
+                    <div className="p-3 rounded-lg bg-red-900/20 border border-red-500/20 text-red-400 text-sm text-center">{keywordError}</div>
+                  )}
+
+                  <button type="submit" disabled={keywordLoading}
+                    className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] gap-2">
+                    {keywordLoading ? <><Loader2 className="animate-spin h-5 w-5" /><span>{txt.signinLoading}</span></> : txt.signinBtn}
+                  </button>
+
+                  <button type="button" onClick={() => setGateView('choose')} className="w-full text-slate-500 hover:text-slate-300 text-xs transition-colors py-1">{txt.kwBack}</button>
+                </form>
+              )}
+            </div>
           )}
         </div>
 
