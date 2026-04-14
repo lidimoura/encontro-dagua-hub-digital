@@ -18,26 +18,26 @@ import { handleStripeCheckout } from '@/lib/stripe';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 
 
-// â”€â”€ IcebergDetails: detalhes tÃ©cnicos ocultos (Earth-Neon V4.1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// VisÃ­veis apenas para quem quer explorar mais â€” nÃ£o polui o copy acessÃ­vel
+// ÔöÇÔöÇ IcebergDetails: detalhes t├®cnicos ocultos (Earth-Neon V4.1) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Vis├¡veis apenas para quem quer explorar mais ÔÇö n├úo polui o copy acess├¡vel
 function IcebergDetails() {
   const [open, setOpen] = React.useState(false);
   const items = [
     {
       title: 'Infraestrutura Oracle Cloud (OCI)',
-      content: 'Backend seguro em Supabase (PaaS sobre OCI). Row Level Security (RLS) ativo em todas as tabelas. Isolamento por company_id â€” nenhum dado de um cliente vaza para outro.',
+      content: 'Backend seguro em Supabase (PaaS sobre OCI). Row Level Security (RLS) ativo em todas as tabelas. Isolamento por company_id ÔÇö nenhum dado de um cliente vaza para outro.',
     },
     {
       title: 'API & Webhooks',
-      content: 'API REST completa via Supabase. Webhooks configurÃ¡veis para integrar com WhatsApp, n8n, Zapier ou qualquer outro sistema. Edge Functions para lÃ³gica serverless.',
+      content: 'API REST completa via Supabase. Webhooks configur├íveis para integrar com WhatsApp, n8n, Zapier ou qualquer outro sistema. Edge Functions para l├│gica serverless.',
     },
     {
-      title: 'SeguranÃ§a & Conformidade',
-      content: 'RLS (Row Level Security) PostgreSQL, variÃ¡veis de ambiente no Vercel, chaves rotacionadas por ambiente. LGPD-ready por design.',
+      title: 'Seguran├ºa & Conformidade',
+      content: 'RLS (Row Level Security) PostgreSQL, vari├íveis de ambiente no Vercel, chaves rotacionadas por ambiente. LGPD-ready por design.',
     },
     {
-      title: 'Stack TÃ©cnica',
-      content: 'React 19 + TypeScript + Vite Â· Supabase (PostgreSQL + Auth + Realtime) Â· Google Gemini AI Â· TailwindCSS Â· Vercel CDN Â· Stripe Payments',
+      title: 'Stack T├®cnica',
+      content: 'React 19 + TypeScript + Vite ┬À Supabase (PostgreSQL + Auth + Realtime) ┬À Google Gemini AI ┬À TailwindCSS ┬À Vercel CDN ┬À Stripe Payments',
     },
   ];
 
@@ -48,7 +48,7 @@ function IcebergDetails() {
         className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-xs font-medium transition-colors group"
       >
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
-        {open ? 'Ocultar detalhes tÃ©cnicos' : 'Ver detalhes tÃ©cnicos (para avaliadores)'}
+        {open ? 'Ocultar detalhes t├®cnicos' : 'Ver detalhes t├®cnicos (para avaliadores)'}
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
       </button>
 
@@ -79,7 +79,7 @@ export default function LandingPage() {
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [prefilledInterest, setPrefilledInterest] = useState<string | undefined>(undefined);
 
-  // Helper: abrir LeadCaptureModal prÃ©-configurado para Agente IA
+  // Helper: abrir LeadCaptureModal pr├®-configurado para Agente IA
   const openAgenteIAModal = () => {
     setPrefilledInterest('agente_ia_80');
     setIsLeadModalOpen(true);
@@ -88,12 +88,12 @@ export default function LandingPage() {
   const TEAM_MEMBERS = [
     {
       id: 'lidi',
-      name: "Lidi",
+      name: "Lidi Moura",
       role: t('founderRole'),
       type: "human",
-      image: "/profile.png",
+      image: "/logos/logo-icon-gold-transp.png",
       color: "border-amber-500 text-amber-400",
-      linkedin: "https://www.linkedin.com/in/lidimoura",
+      linkedin: "https://linkedin.com/in/lidimoura",
       github: "https://github.com/lidimoura",
       pitch: t('founderPitch')
     },
@@ -147,7 +147,7 @@ export default function LandingPage() {
     return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
   }, []);
 
-  // AMAZÃ” CHAT - Keep user on page (NO new tab)
+  // AMAZ├ö CHAT - Keep user on page (NO new tab)
   const openAmazoChat = () => {
     // Try Typebot.open() first
     if (typeof window !== 'undefined' && (window as any).Typebot) {
@@ -167,14 +167,14 @@ export default function LandingPage() {
 
       // Show visual indicator
       const indicator = document.createElement('div');
-      indicator.innerHTML = 'â¬‡ï¸ Chat AmazÃ´ no canto inferior direito';
+      indicator.innerHTML = 'Ô¼ç´©Å Chat Amaz├┤ no canto inferior direito';
       indicator.style.cssText = 'position: fixed; bottom: 100px; right: 20px; background: linear-gradient(135deg, #d946ef, #a855f7); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; z-index: 9999; animation: bounce 1s infinite; box-shadow: 0 4px 20px rgba(217, 70, 239, 0.5);';
       document.body.appendChild(indicator);
 
       setTimeout(() => indicator.remove(), 4000);
     } else {
       // Last resort: alert
-      alert('ðŸ¤– AmazÃ´ IA estÃ¡ carregando. Aguarde alguns segundos e tente novamente.');
+      alert('­ƒñû Amaz├┤ IA est├í carregando. Aguarde alguns segundos e tente novamente.');
     }
   };
 
@@ -186,7 +186,7 @@ export default function LandingPage() {
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error('API Key do Gemini nÃ£o configurada');
+      if (!apiKey) throw new Error('API Key do Gemini n├úo configurada');
 
       const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -205,7 +205,7 @@ export default function LandingPage() {
       setTestResponse(text);
     } catch (error) {
       console.error('Erro ao testar prompt:', error);
-      setTestResponse('âŒ Erro ao testar. Verifique sua conexÃ£o.');
+      setTestResponse('ÔØî Erro ao testar. Verifique sua conex├úo.');
     } finally {
       setIsTesting(false);
     }
@@ -236,7 +236,7 @@ export default function LandingPage() {
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error('API Key do Gemini nÃ£o configurada');
+        throw new Error('API Key do Gemini n├úo configurada');
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -249,24 +249,24 @@ export default function LandingPage() {
         model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       }
 
-      const systemPrompt = `Atue como um Engenheiro de Prompt SÃªnior especializado em otimizaÃ§Ã£o de prompts para LLMs.
+      const systemPrompt = `Atue como um Engenheiro de Prompt S├¬nior especializado em otimiza├º├úo de prompts para LLMs.
 
-Sua missÃ£o Ã© transformar ideias brutas em prompts estruturados, detalhados e prontos para obter o melhor resultado de uma LLM.
+Sua miss├úo ├® transformar ideias brutas em prompts estruturados, detalhados e prontos para obter o melhor resultado de uma LLM.
 
-REGRAS DE OTIMIZAÃ‡ÃƒO:
-1. Seja especÃ­fico e detalhado
+REGRAS DE OTIMIZA├ç├âO:
+1. Seja espec├¡fico e detalhado
 2. Defina claramente o papel/persona que a IA deve assumir
-3. Especifique o formato de saÃ­da desejado
+3. Especifique o formato de sa├¡da desejado
 4. Inclua exemplos quando relevante
-5. Adicione restriÃ§Ãµes e requisitos importantes
+5. Adicione restri├º├Áes e requisitos importantes
 6. Use linguagem clara e objetiva
-7. Estruture o prompt em seÃ§Ãµes quando necessÃ¡rio
+7. Estruture o prompt em se├º├Áes quando necess├írio
 
-FORMATO DE SAÃDA:
-Retorne APENAS o prompt otimizado, sem explicaÃ§Ãµes adicionais ou meta-comentÃ¡rios.
+FORMATO DE SA├ìDA:
+Retorne APENAS o prompt otimizado, sem explica├º├Áes adicionais ou meta-coment├írios.
 O prompt deve estar pronto para ser copiado e colado diretamente em uma LLM.
 
-IDEIA BRUTA DO USUÃRIO:
+IDEIA BRUTA DO USU├üRIO:
 ${idea}
 
 Agora, gere o prompt perfeito:`;
@@ -278,7 +278,7 @@ Agora, gere o prompt perfeito:`;
       setOptimizedResult(text);
     } catch (error) {
       console.error('Erro ao otimizar prompt:', error);
-      setOptimizedResult('âŒ Erro ao otimizar. Verifique sua conexÃ£o ou tente novamente.');
+      setOptimizedResult('ÔØî Erro ao otimizar. Verifique sua conex├úo ou tente novamente.');
     } finally {
       setIsOptimizing(false);
     }
@@ -342,7 +342,7 @@ Agora, gere o prompt perfeito:`;
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <img
               src="/logos/logo-icon-gold-transp.png"
-              alt="Encontro d'Ãgua Hub"
+              alt="Encontro d'Água Hub"
               className="h-10 object-contain"
             />
           </div>
@@ -357,9 +357,9 @@ Agora, gere o prompt perfeito:`;
             <button
               onClick={() => setLanguage(language === 'en' ? 'pt' : 'en')}
               className="p-2 text-slate-200 hover:text-amber-400 transition-all active:scale-95"
-              title={language === 'en' ? 'Mudar para PortuguÃªs' : 'Switch to English'}
+              title={language === 'en' ? 'Mudar para Portugu├¬s' : 'Switch to English'}
             >
-              <span className="text-base leading-none">{language === 'en' ? 'ðŸ‡ºðŸ‡¸' : 'ðŸ‡§ðŸ‡·'}</span>
+              <span className="text-base leading-none">{language === 'en' ? '­ƒç║­ƒç©' : '­ƒçº­ƒçÀ'}</span>
             </button>
 
             {user ? (
@@ -440,9 +440,9 @@ Agora, gere o prompt perfeito:`;
                     <button
                       onClick={() => setLanguage(language === 'en' ? 'pt' : 'en')}
                       className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
-                      title={language === 'en' ? 'Mudar para PortuguÃªs' : 'Switch to English'}
+                      title={language === 'en' ? 'Mudar para Portugu├¬s' : 'Switch to English'}
                     >
-                      <span className="text-xl leading-none">{language === 'en' ? 'ðŸ‡ºðŸ‡¸' : 'ðŸ‡§ðŸ‡·'}</span>
+                      <span className="text-xl leading-none">{language === 'en' ? '­ƒç║­ƒç©' : '­ƒçº­ƒçÀ'}</span>
                     </button>
                   </div>
 
@@ -519,9 +519,9 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* ========== B. NOSSAS SOLUÃ‡Ã•ES ========== */}
+        {/* ========== B. NOSSAS SOLU├ç├òES ========== */}
 
-        {/* INTRO: Nossas SoluÃ§Ãµes */}
+        {/* INTRO: Nossas Solu├º├Áes */}
         <section id="solucoes" className="py-16 px-6 bg-[#02040a] text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -533,19 +533,19 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-        {/* SEGMENTAÃ‡ÃƒO: Removida na V5.3 (Agora no Showcase)  */}
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        {/* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */}
+        {/* SEGMENTA├ç├âO: Removida na V5.3 (Agora no Showcase)  */}
+        {/* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */}
         <section className="py-16 px-6 bg-gradient-to-b from-[#02040a] to-[#04080a]">
           <div className="max-w-5xl mx-auto">
-            {/* ICEBERG: detalhes tÃ©cnicos ocultos (OCI, RLS, API, Webhooks) */}
+            {/* ICEBERG: detalhes t├®cnicos ocultos (OCI, RLS, API, Webhooks) */}
             <IcebergDetails />
           </div>
         </section>
 
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-        {/* ðŸ”¥ OFERTA DE LANÃ‡AMENTO â€” Agente de IA R$80 (V4.4)             */}
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        {/* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */}
+        {/* ­ƒöÑ OFERTA DE LAN├çAMENTO ÔÇö Agente de IA R$80 (V4.4)             */}
+        {/* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */}
         <section
           id="sec-agente-ia-launch"
           aria-labelledby="agente-ia-heading"
@@ -557,11 +557,11 @@ Agora, gere o prompt perfeito:`;
 
           <div className="max-w-5xl mx-auto relative z-10">
 
-            {/* Badge de urgÃªncia */}
+            {/* Badge de urg├¬ncia */}
             <div className="flex justify-center mb-6">
               <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-black uppercase tracking-widest animate-pulse">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
-                ðŸ”¥ Oferta de LanÃ§amento â€” Vagas Limitadas
+                ­ƒöÑ Oferta de Lan├ºamento ÔÇö Vagas Limitadas
               </span>
             </div>
 
@@ -574,27 +574,27 @@ Agora, gere o prompt perfeito:`;
                   id="agente-ia-heading"
                   className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight"
                 >
-                  Seu prÃ³prio<br />
+                  Seu pr├│prio<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
                     Agente de IA 24/7
                   </span>
                 </h2>
                 <p className="text-slate-300 text-lg mb-2 leading-relaxed">
-                  Igual Ã  <strong className="text-amber-400">AmazÃ´</strong> â€” um agente SAC/FAQ treinado com a voz do seu negÃ³cio,
-                  respondendo leads no WhatsApp e no site enquanto vocÃª dorme.
+                  Igual ├á <strong className="text-amber-400">Amaz├┤</strong> ÔÇö um agente SAC/FAQ treinado com a voz do seu neg├│cio,
+                  respondendo leads no WhatsApp e no site enquanto voc├¬ dorme.
                 </p>
                 <p className="text-slate-500 text-sm mb-8">
-                  Por <strong className="text-white text-base">Lidi Moura</strong> â€” Formada em Psicologia e Especialista em Dados.
+                  Por <strong className="text-white text-base">Lidi Moura</strong> ÔÇö Formada em Psicologia e Especialista em Dados.
                 </p>
 
                 {/* Feature checklist */}
                 <ul className="space-y-3 mb-10 text-left">
                   {[
-                    { icon: 'ðŸ’¬', text: 'Atendimento automÃ¡tico no WhatsApp e site' },
-                    { icon: 'ðŸ¤–', text: 'Configurado com a identidade e tom do seu negÃ³cio' },
-                    { icon: 'ðŸ—£ï¸', text: 'Qualifica leads e encaminha para o CRM automaticamente' },
-                    { icon: 'ðŸ“Š', text: 'RelatÃ³rios de conversÃ£o e histÃ³rico de atendimentos' },
-                    { icon: 'âœ…', text: 'Onboarding personalizado â€” pronto em atÃ© 48h' },
+                    { icon: '­ƒÆ¼', text: 'Atendimento autom├ítico no WhatsApp e site' },
+                    { icon: '­ƒñû', text: 'Configurado com a identidade e tom do seu neg├│cio' },
+                    { icon: '­ƒùú´©Å', text: 'Qualifica leads e encaminha para o CRM automaticamente' },
+                    { icon: '­ƒôè', text: 'Relat├│rios de convers├úo e hist├│rico de atendimentos' },
+                    { icon: 'Ô£à', text: 'Onboarding personalizado ÔÇö pronto em at├® 48h' },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex items-start gap-3 text-sm text-slate-300">
                       <span className="text-base flex-shrink-0">{icon}</span>
@@ -611,15 +611,15 @@ Agora, gere o prompt perfeito:`;
                     className="group relative px-8 py-4 bg-teal-500 hover:bg-teal-400 text-[#02040a] font-black rounded-2xl transition-all shadow-2xl shadow-teal-500/30 hover:shadow-teal-500/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
                   >
                     Quero meu Agente IA
-                    <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mÃªs</span>
+                    <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/m├¬s</span>
                   </button>
                   <a
-                    href="https://wa.me/5592992943998?text=Ol%C3%A1%20Lidi!%20Quero%20saber%20mais%20sobre%20o%20Agente%20de%20IA%20por%20R$80"
+                    href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi!%20Quero%20saber%20mais%20sobre%20o%20Agente%20de%20IA%20por%20R$80"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                   >
-                    <MessageCircle size={18} /> Tirar dÃºvidas no WhatsApp
+                    <MessageCircle size={18} /> Tirar d├║vidas no WhatsApp
                   </a>
                 </div>
               </div>
@@ -647,13 +647,13 @@ Agora, gere o prompt perfeito:`;
                     {/* Chat mockup */}
                     <div className="space-y-3 mb-6">
                       <div className="bg-white/5 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-300 max-w-[85%]">
-                        OlÃ¡! Posso ajudar com informaÃ§Ãµes sobre nossos serviÃ§os ðŸ˜Š
+                        Ol├í! Posso ajudar com informa├º├Áes sobre nossos servi├ºos ­ƒÿè
                       </div>
                       <div className="bg-amber-500/15 border border-amber-500/20 rounded-2xl rounded-tr-none px-4 py-3 text-sm text-amber-200 max-w-[85%] ml-auto text-right">
-                        Qual o preÃ§o da consulta?
+                        Qual o pre├ºo da consulta?
                       </div>
                       <div className="bg-white/5 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-300 max-w-[85%]">
-                        Nossa consulta inicial Ã© R$ 200. Posso agendar para vocÃª? ðŸ“…
+                        Nossa consulta inicial ├® R$ 200. Posso agendar para voc├¬? ­ƒôà
                       </div>
                     </div>
 
@@ -662,7 +662,7 @@ Agora, gere o prompt perfeito:`;
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-slate-500 text-xs">Plano Agente IA</p>
-                          <p className="text-white font-black text-2xl">R$ 80<span className="text-sm font-normal text-slate-400">/mÃªs</span></p>
+                          <p className="text-white font-black text-2xl">R$ 80<span className="text-sm font-normal text-slate-400">/m├¬s</span></p>
                         </div>
                         <button
                           onClick={openAgenteIAModal}
@@ -680,14 +680,14 @@ Agora, gere o prompt perfeito:`;
 
             {/* Social proof micro-line */}
             <p className="text-center text-slate-600 text-xs mt-12">
-              âœ“ Sem fidelidade Â· âœ“ Cancele quando quiser Â· âœ“ Suporte humano via WhatsApp
+              Ô£ô Sem fidelidade ┬À Ô£ô Cancele quando quiser ┬À Ô£ô Suporte humano via WhatsApp
             </p>
           </div>
         </section>
 
-        {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        {/* SOLUÃ‡ÃƒO #1 â€” LINK D'ÃGUA (DESTAQUE PRINCIPAL)     */}
-        {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */}
+        {/* SOLU├ç├âO #1 ÔÇö LINK D'├üGUA (DESTAQUE PRINCIPAL)     */}
+        {/* ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */}
         <section className="py-20 px-6 bg-gradient-to-br from-[#02040a] via-[#05021a] to-[#02040a] border-y border-teal-500/10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center gap-16">
@@ -760,7 +760,7 @@ Agora, gere o prompt perfeito:`;
               </div>
             </div>
 
-            {/* VÃDEO LINK D'ÃGUA DEMO */}
+            {/* V├ìDEO LINK D'├üGUA DEMO */}
             <div className="w-full mt-16 max-w-4xl mx-auto relative rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(20,184,166,0.15)] bg-slate-900 aspect-video group">
               <video
                 src="/assets/videos/link-dagua-demo.mp4"
@@ -773,15 +773,15 @@ Agora, gere o prompt perfeito:`;
               <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent opacity-80 pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between pointer-events-none">
                 <div>
-                  <h3 className="text-white font-bold text-xl drop-shadow-lg">Demo Link d'Ãgua</h3>
-                  <p className="text-slate-300 text-sm">Preview da ExperiÃªncia</p>
+                  <h3 className="text-white font-bold text-xl drop-shadow-lg">Demo Link d'├ügua</h3>
+                  <p className="text-slate-300 text-sm">Preview da Experi├¬ncia</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* PROMPT LAB (INTERATIVO) - SoluÃ§Ã£o #1 */}
+        {/* PROMPT LAB (INTERATIVO) - Solu├º├úo #1 */}
         <section className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-6"><Brain className="w-3 h-3" /> <span>{t('promptLabTag')}</span></div>
@@ -804,7 +804,7 @@ Agora, gere o prompt perfeito:`;
               <div className="text-left bg-[#0f0518] border border-fuchsia-500/20 p-6 rounded-2xl shadow-xl animate-fade-in relative">
                 <pre className="font-mono text-sm text-slate-300 whitespace-pre-wrap mb-6 p-4 bg-black/30 rounded-lg">{optimizedResult}</pre>
 
-                {/* BOTÃ•ES DE AÃ‡ÃƒO */}
+                {/* BOT├òES DE A├ç├âO */}
                 <div className="flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-white/10">
                   <div className="flex gap-2">
                     <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-green-400"><ThumbsUp size={18} /></button>
@@ -835,7 +835,7 @@ Agora, gere o prompt perfeito:`;
                   </div>
                 )}
 
-                {/* BOTÃƒO TESTAR */}
+                {/* BOT├âO TESTAR */}
                 {optimizedResult && !isTesting && (
                   <button onClick={handleTestPrompt} className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg flex items-center justify-center gap-2">
                     <Play size={18} /> {t('testPrompt')}
@@ -861,7 +861,7 @@ Agora, gere o prompt perfeito:`;
                 </div>
               </div>
 
-              {/* â•â• CHECKOUT BUTTONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+              {/* ÔòÉÔòÉ CHECKOUT BUTTONS ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 <button
                   id="btn-checkout-monthly"
@@ -870,7 +870,7 @@ Agora, gere o prompt perfeito:`;
                 >
                   <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Mensal</span>
                   <span className="text-2xl font-black">R$ 3,00</span>
-                  <span className="text-xs opacity-70">/mÃªs</span>
+                  <span className="text-xs opacity-70">/m├¬s</span>
                 </button>
                 <button
                   id="btn-checkout-annual"
@@ -878,16 +878,16 @@ Agora, gere o prompt perfeito:`;
                   className="flex flex-col items-center py-4 px-5 bg-gradient-to-br from-amber-700 to-orange-700 hover:from-amber-600 hover:to-orange-600 rounded-xl font-bold text-white transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98] relative"
                 >
                   <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide">
-                    MELHOR OPÃ‡ÃƒO
+                    MELHOR OP├ç├âO
                   </span>
                   <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Anual</span>
                   <span className="text-2xl font-black">R$ 29,90</span>
-                  <span className="text-xs opacity-70">/ano â€¢ economia R$ 6</span>
+                  <span className="text-xs opacity-70">/ano ÔÇó economia R$ 6</span>
                 </button>
               </div>
 
               <p className="text-[10px] text-slate-500 text-center">
-                â˜… LÃ³gica de indicaÃ§Ã£o: 20% + 20% (mÃ¡x 50%) &nbsp;|&nbsp; 60% off Impacto Social
+                Ôÿà L├│gica de indica├º├úo: 20% + 20% (m├íx 50%) &nbsp;|&nbsp; 60% off Impacto Social
               </p>
             </div>
           </div>
@@ -895,7 +895,7 @@ Agora, gere o prompt perfeito:`;
 
         {/* OLD QR SECTION REMOVED */}
 
-        {/* GALERIA DE CLIENTES DO HUB â€” hidden V5.4, reativar quando base real */}
+        {/* GALERIA DE CLIENTES DO HUB — hidden V5.5, reativar quando base real */}
         {false && (
         <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-6xl mx-auto">
@@ -954,7 +954,7 @@ Agora, gere o prompt perfeito:`;
                         />
                       </div>
                       <h3 className="font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">{project.client_name}</h3>
-                      <p className="text-xs text-slate-400 mb-3">{project.project_type || 'CartÃ£o Digital'}</p>
+                      <p className="text-xs text-slate-400 mb-3">{project.project_type || 'Cart├úo Digital'}</p>
                       <p className="text-xs text-slate-500 line-clamp-2">{project.description || project.page_title || 'QR Code personalizado'}</p>
                     </a>
                   ))
@@ -962,9 +962,9 @@ Agora, gere o prompt perfeito:`;
                   // Fallback mockups when no real data
                   <>
                     {[
-                      { name: 'Dra. Ana Silva', type: 'Advogada â€¢ Direito da FamÃ­lia', desc: 'CartÃ£o Digital com links para WhatsApp, Instagram e agendamento', slug: 'ana-silva', color: '#0ea5e9' },
-                      { name: 'Restaurante AmazÃ´nia', type: 'Gastronomia Regional', desc: 'QR Code no cardÃ¡pio para pedidos direto no WhatsApp', slug: 'restaurante-amazonia', color: '#f59e0b' },
-                      { name: 'JoÃ£o Consultor', type: 'Consultoria de NegÃ³cios', desc: 'Link Ãºnico para portfÃ³lio e redes sociais', slug: 'joao-consultor', color: '#a855f7' },
+                      { name: 'Dra. Ana Silva', type: 'Advogada ÔÇó Direito da Fam├¡lia', desc: 'Cart├úo Digital com links para WhatsApp, Instagram e agendamento', slug: 'ana-silva', color: '#0ea5e9' },
+                      { name: 'Restaurante Amaz├┤nia', type: 'Gastronomia Regional', desc: 'QR Code no card├ípio para pedidos direto no WhatsApp', slug: 'restaurante-amazonia', color: '#f59e0b' },
+                      { name: 'Jo├úo Consultor', type: 'Consultoria de Neg├│cios', desc: 'Link ├║nico para portf├│lio e redes sociais', slug: 'joao-consultor', color: '#a855f7' },
                     ].map((mock) => (
                       <div key={mock.slug} className="flex-shrink-0 w-[280px] bg-slate-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/50 transition snap-start">
                         <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl p-2.5 flex items-center justify-center shadow-xl" style={{ boxShadow: `0 4px 24px 0 ${mock.color}44` }}>
@@ -1006,54 +1006,12 @@ Agora, gere o prompt perfeito:`;
             </div>
           </div>
         </section>
-        )} {/* end hidden gallery */}
+        )} {/* end false gallery */}
 
-        {/* CRM NATIVO - SoluÃ§Ã£o #4 */}
+        {/* AMAZÔ IA BLOCK REMOVED AS CHAT BUBBLE IS ACTIVE */}
+
+        {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
-
-        {/* Pricing flutuante REMOVIDA V5.4 â€” checkout vive dentro de cada produto */}
-
-
-        {/* ========== C. SOBRE NÃ“S (INSTITUTIONAL) ========== */}
-
-        {/* 1. MANIFESTO (TEXTO) */}
-        <section id="sobre" className="py-20 px-6 bg-[#05020a]">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">{t('manifesto')}</h2>
-            <div className="prose prose-invert max-w-none">
-              <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                {t('manifestoText')}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 2. TECNOLOGIA PARA TODOS */}
-        <section className="py-24 px-6 bg-[#02040a] text-center">
-          <div className="max-w-5xl mx-auto">
-            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('techForAll')}</h2>
-
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {["Atypical Parents", "Neurodivergent", "Indigenous & Reclaiming", "Entrepreneur Parents", "Local Businesses", "Riverside Communities", "PwD", "LGBTQIAPN+", "Black & Brown People", "Communities", "NGOs"].map((tag) => (
-                <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-white mb-2">{t('noOneLeftBehind')}</h3>
-              <p className="text-slate-400 text-sm mb-6">{t('socialImpact')}</p>
-              <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1!%20Venho%20da%20LP%20Hub.%20Gostaria%20da%20consultoria%20de%20impacto%20social.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <MessageCircle size={18} /> {t('socialConsult')}
-                </button>
-                <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <Bot size={18} /> {t('chatWithAmazo')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* 3. EQUIPE */}
         <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10">
@@ -1063,30 +1021,33 @@ Agora, gere o prompt perfeito:`;
 
             <div className="text-center p-8 bg-[#0f0518] border border-white/10 rounded-3xl w-full mx-8 shadow-2xl flex flex-col items-center">
               <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden`}>
-                {TEAM_MEMBERS[activeTeamIndex].image ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" /> : 'ðŸ¤–'}
+                {TEAM_MEMBERS[activeTeamIndex].image ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" /> : '­ƒñû'}
               </div>
               <h3 className="text-2xl font-bold text-white mb-1">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
               <span className={`text-xs uppercase font-bold tracking-widest mb-4 block ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>{TEAM_MEMBERS[activeTeamIndex].role}</span>
               <p className="text-slate-300 text-sm italic mb-4">"{TEAM_MEMBERS[activeTeamIndex].pitch}"</p>
-              <div className="flex items-center gap-3">
-                {(TEAM_MEMBERS[activeTeamIndex] as any).linkedin && (
-                  <a href={(TEAM_MEMBERS[activeTeamIndex] as any).linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white" title="LinkedIn"><Linkedin size={20} /></a>
-                )}
-                {(TEAM_MEMBERS[activeTeamIndex] as any).github && (
-                  <a href={(TEAM_MEMBERS[activeTeamIndex] as any).github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white" title="GitHub"><Github size={20} /></a>
-                )}
-              </div>
+              {TEAM_MEMBERS[activeTeamIndex].linkedin && (
+                <div className="flex items-center justify-center gap-3 mt-1">
+                  <a href={TEAM_MEMBERS[activeTeamIndex].linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white transition-colors">
+                    <Linkedin size={20} />
+                  </a>
+                  {(TEAM_MEMBERS[activeTeamIndex] as any).github && (
+                    <a href={(TEAM_MEMBERS[activeTeamIndex] as any).github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
+                      <Github size={20} />
+                    </a>
+                  )}
+                </div>
+              )}
+              {activeTeamIndex === 0 && (
+                <div className="mt-4 text-center">
+                  <IcebergDetails />
+                </div>
+              )}
             </div>
 
             <button onClick={() => setActiveTeamIndex((p) => p === TEAM_MEMBERS.length - 1 ? 0 : p + 1)} className="absolute right-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronRight /></button>
           </div>
-
-          {/* IcebergDetails â€” movido para Team section V5.4 */}
-          <div className="max-w-5xl mx-auto mt-16">
-            <IcebergDetails />
-          </div>
         </section>
-
 
 
         {/* FOOTER */}
@@ -1094,15 +1055,15 @@ Agora, gere o prompt perfeito:`;
           <div className="max-w-4xl mx-auto px-6">
             <div className="flex items-center justify-center gap-2 mb-3">
               <Leaf className="w-4 h-4 text-teal-500" />
-              <p className="text-white font-bold">Encontro D'Ã¡gua Hub</p>
+              <p className="text-white font-bold">Encontro D'├ígua Hub</p>
             </div>
-            <p className="text-slate-500 mb-1">Fundado por Lidi Moura â€” Manauara, PsicÃ³loga, Dev Fullstack Lowcode & Especialista em Dados.</p>
-            <p className="text-slate-600 mb-4">"Reflorestar o Digital" â€” Tecnologia acessÃ­vel com impacto social real.</p>
+            <p className="text-slate-500 mb-1">Fundado por Lidi Moura ÔÇö Manauara, Psic├│loga, Dev Fullstack Lowcode & Especialista em Dados.</p>
+            <p className="text-slate-600 mb-4">"Reflorestar o Digital" ÔÇö Tecnologia acess├¡vel com impacto social real.</p>
             <div className="flex items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
-              <span>20% + 20% desconto por indicaÃ§Ã£o (mÃ¡x 50%)</span>
-              <span>â€¢</span>
+              <span>20% + 20% desconto por indica├º├úo (m├íx 50%)</span>
+              <span>ÔÇó</span>
               <span>60% off para Impacto Social</span>
-              <span>â€¢</span>
+              <span>ÔÇó</span>
               <span>100% upfront ou 50/50</span>
             </div>
             <p className="text-slate-700">{t('footerRights')}</p>
@@ -1116,7 +1077,7 @@ Agora, gere o prompt perfeito:`;
         onClose={() => setIsApplicationModalOpen(false)}
       />
 
-      {/* Lead Capture Modal â€” Oferta de LanÃ§amento Agente IA V4.4 */}
+      {/* Lead Capture Modal ÔÇö Oferta de Lan├ºamento Agente IA V4.4 */}
       <LeadCaptureModal
         isOpen={isLeadModalOpen}
         onClose={() => { setIsLeadModalOpen(false); setPrefilledInterest(undefined); }}
