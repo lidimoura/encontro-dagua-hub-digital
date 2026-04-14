@@ -91,7 +91,7 @@ export default function LandingPage() {
       name: "Lidi Moura",
       role: t('founderRole'),
       type: "human",
-      image: "/logos/logo-icon-gold-transp.png",
+      image: "/profile.png",
       color: "border-amber-500 text-amber-400",
       linkedin: "https://linkedin.com/in/lidimoura",
       github: "https://github.com/lidimoura",

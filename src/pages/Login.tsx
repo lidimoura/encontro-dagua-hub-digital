@@ -24,6 +24,16 @@ const Login: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const isGodModeUrl = urlParams.get('god') === 'true';
 
+  // ── Detecta se está no contexto Provadágua (showcase) ou Hub (admin) ──────
+  // Provadágua: domínio prova.*, rota /showcase, ou query ?mode=prova
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const pathname = typeof window !== 'undefined' ? window.location.hash : '';
+  const isProvaMode =
+    hostname.startsWith('prova.') ||
+    hostname === 'prova.encontrodagua.com' ||
+    pathname.includes('/showcase') ||
+    urlParams.get('mode') === 'prova';
+
   // ── God Mode toggle via triplo clique no logo ──────────────────────────
   const logoClickCountRef = useRef(0);
   const logoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,6 +76,14 @@ const Login: React.FC = () => {
     badge:       isEn ? '🌀 Reforesting the Digital' : '🌀 Reflorestar o Digital',
     welcome:     isEn ? 'Welcome to the Hub 🌿' : 'Bem-vinda ao Hub 🌿',
     subtitle:    isEn ? 'Exclusive access by invitation or keyword.' : 'Acesso exclusivo por convite ou palavra-chave.',
+    // ── Hub (admin only) ──
+    hubWelcome:      isEn ? 'Hub — Administrative Access' : 'Hub — Acesso Administrativo',
+    hubSubtitle:     isEn ? 'Restricted to authorized team members.' : 'Restrito a membros autorizados da equipe.',
+    hubSigninTitle:  isEn ? 'Sign In' : 'Entrar',
+    hubSigninSub:    isEn ? 'Enter with your admin credentials.' : 'Entre com suas credenciais de administradora.',
+    hubDemoLink:     isEn ? 'See the Provadágua showcase →' : 'Ver a vitrine da Provadágua →',
+    hubDemoSub:      isEn ? 'Looking for the CRM trial? Go to the showcase.' : 'Procurou o trial do CRM? Acesse a vitrine.',
+    // ── Provadágua (leads) ──
     optTrialLbl: isEn ? 'Request Access via WhatsApp' : 'Solicitar Acesso via WhatsApp',
     optTrialSub: isEn ? 'Talk to us directly — no commitment' : 'Fale conosco diretamente — sem compromisso',
     optHubLbl:   isEn ? 'Enter the Hub' : 'Entrar no Hub',
@@ -79,7 +97,7 @@ const Login: React.FC = () => {
     kwField:     isEn ? 'Access keyword' : 'Palavra-chave de acesso',
     kwPlaceholder: isEn ? 'Your keyword...' : 'Sua palavra-chave...',
     kwNoKey:     isEn ? "Don't have one?" : 'Não tem?',
-    kwRequest:   isEn ? 'Request from admin' : 'Solicitar ao admin',
+    kwRequest:   isEn ? 'Request from admin → WhatsApp' : 'Solicitar ao admin → WhatsApp',
     kwSubmit:    isEn ? '🌿 Enter Hub — Immediate Access' : '🌿 Entrar no Hub — Acesso Imediato',
     kwLoading:   isEn ? 'Opening access...' : 'Abrindo acesso...',
     kwBack:      isEn ? '← Back' : '← Voltar',
@@ -338,6 +356,119 @@ const Login: React.FC = () => {
           </p>
         </div>
         <AiflowSupport />
+      </div>
+    );
+  }
+
+  // ── Render: Hub Mode (admin SignIn only — não é Provadágua) ────────────────
+  if (!isProvaMode && !isGodMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#02040a] relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px]" />
+          <div className="absolute top-[40%] -left-[10%] w-[40%] h-[40%] bg-amber-600/8 rounded-full blur-[100px]" />
+        </div>
+
+        <div className="absolute top-4 right-4 z-20">
+          <LanguageSwitcher variant="compact" />
+        </div>
+
+        <div className="max-w-md w-full relative z-10 px-4">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <button
+              onClick={handleLogoTripleClick}
+              className="inline-block mb-4 opacity-90 hover:opacity-100 transition-opacity"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <img
+                src="/logos/logo-icon-gold-transp.png"
+                alt="Encontro d'Água Hub"
+                className="h-16 w-16 object-contain mx-auto"
+              />
+            </button>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-wider mb-4">
+              <Shield className="w-3 h-3" /> {txt.hubWelcome}
+            </div>
+            <h1 className="text-2xl font-extrabold text-white font-display tracking-tight mb-2">
+              {txt.hubSigninTitle}
+            </h1>
+            <p className="text-slate-400 text-sm">{txt.hubSigninSub}</p>
+          </div>
+
+          {/* Hub SignIn Form */}
+          <div className="bg-slate-900/60 border border-white/8 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              {error && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">
+                  {error}
+                </div>
+              )}
+              <div>
+                <label htmlFor="hub-email" className="block text-sm font-medium text-slate-300 mb-1.5">E-mail</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="hub-email"
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full bg-slate-800/80 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 text-sm"
+                    placeholder="admin@encontrodagua.com"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="hub-password" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.signinPass}</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="hub-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full bg-slate-800/80 border border-white/10 rounded-xl pl-10 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 text-sm"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(p => !p)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                {loading ? txt.signinLoading : txt.signinBtn}
+              </button>
+            </form>
+
+            {/* Link para Provadágua */}
+            <div className="mt-6 pt-5 border-t border-white/5 text-center">
+              <p className="text-slate-500 text-xs mb-2">{txt.hubDemoSub}</p>
+              <button
+                onClick={() => navigate('/showcase')}
+                className="text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
+              >
+                {txt.hubDemoLink}
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-slate-600 text-xs mt-6">{txt.footer}</p>
+        </div>
       </div>
     );
   }
