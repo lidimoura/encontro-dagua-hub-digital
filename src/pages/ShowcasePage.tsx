@@ -21,9 +21,9 @@ interface Translation {
   pain_items: Array<{ icon: string; title: string; desc: string }>;
   modules_title: string;
   modules_subtitle: string;
-  modules_group_native?: string;
-  modules_group_custom?: string;
-  modules: Array<{ icon: string; name: string; desc: string; badge: string; group?: string }>;
+  modules_group_native: string;
+  modules_group_custom: string;
+  modules: Array<{ icon: string; name: string; desc: string; badge: string; group: string }>;
   qa_eyebrow: string;
   qa_title: string;
   qa_subtitle: string;
@@ -66,17 +66,17 @@ const ArrowIcon = () => (
 const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
   pt: {
     nav_login: 'Entrar no Hub',
-    hero_eyebrow: 'Para Empreendedores · Profissionais Liberais · Agências e Consultórios',
+    hero_eyebrow: 'Para Empreendedores · Agências · Profissionais Liberais',
     hero_title_1: 'O CRM com IA que',
-    hero_title_2: 'organiza seus clientes e projetos',
+    hero_title_2: 'organiza seus negócios',
     hero_title_accent: 'e faz sua operação crescer.',
     hero_subtitle:
-      'Encontro D\'Água Hub é o sistema operacional de gestão para profissionais e empreendedores. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
+      'Encontro D\'Água Hub é o sistema operacional de gestão para negócios e escritórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
     hero_cta_primary: 'Experimente a Provadágua por 7 dias',
     hero_cta_secondary: 'Ver demonstração ao vivo',
     hero_cta_sub: 'Gestão de Elite com Privacidade OCI · Sem cartão de crédito · Dados 100% isolados',
-    trust_label: 'Confiado por profissionais e empreendedores',
-    specialties: ['Saúde', 'Consultoria', 'Empreendedores', 'Profissionais Liberais', 'Agências'],
+    trust_label: 'Confiado por empreendedores e agências',
+    specialties: ['Tech', 'Marketing', 'Vendas', 'Consultoria', 'Agências'],
     metrics: [
       { value: '100%', label: 'Dados Isolados por Empresa', icon: '🔒' },
       { value: '9', label: 'Módulos em Produção', icon: '⚡' },
@@ -84,44 +84,41 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { value: '24/7', label: 'SDR Automatizado', icon: '📡' },
     ],
     pain_title: 'Você reconhece esses problemas?',
-    pain_subtitle: 'Criamos soluções específicas para a realidade de quem lidera um negócio ou carreira independente',
+    pain_subtitle: 'Criamos soluções específicas para a realidade do profissional moderno',
     pain_items: [
       {
         icon: '📁',
-        title: 'Dados de clientes e leads espalhados',
+        title: 'Dados espalhados por toda parte',
         desc: 'Planilhas, WhatsApp, e-mail e papel — impossível acompanhar sem um sistema centralizado e seguro.',
       },
       {
         icon: '⏰',
         title: 'Tempo perdido em tarefas manuais',
-        desc: 'Agendamentos, follow-ups e lembretes consomem horas que deveriam ser dedicadas a clientes e projetos.',
+        desc: 'Follow-ups, propostas e lembretes consomem horas que deveriam ser dedicadas aos seus clientes e projetos.',
       },
       {
         icon: '🚫',
         title: 'Risco de vazamento de dados (LGPD)',
-        desc: 'Softwares genéricos não foram projetados para a privacidade que seu negócio exige. Seus dados estão vulneráveis.',
+        desc: 'Softwares genéricos não foram projetados para a privacidade que seu negócio exige. Você está vulnerável.',
       },
       {
         icon: '📊',
-        title: 'Não conseguir gerenciar seus clientes e projetos?',
+        title: 'Não consegue gerenciar seus clientes e projetos?',
         desc: 'Sem visibilidade do pipeline, sem follow-up automático e sem relatórios — você perde negócios sem nem perceber. O ecossistema Provadágua centraliza tudo.',
       },
     ],
     modules_title: 'Funcionalidades',
-    modules_subtitle: 'Oferecemos uma base sólida de CRM que é totalmente personalizada de acordo com a demanda de cada cliente. Usamos o próprio CRM do Hub como portfólio vivo dessa personalização.',
-    modules_group_native: 'Nativas do CRM Base',
-    modules_group_custom: 'Implementações Personalizadas do Hub',
+    modules_subtitle: 'Todas as funcionalidades ativas em hub.encontrodagua.com — operando 24/7',
     modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'Leads e oportunidades mapeados ao funil automaticamente', badge: 'Ativo', group: 'native' },
-      { icon: '👥', name: 'Contatos', desc: 'Base de clientes e leads com sync bidirecional', badge: 'Ativo', group: 'native' },
-      { icon: '💬', name: 'Inbox / Mazô', desc: 'Agente IA de Customer Success para atender e qualificar', badge: 'IA', group: 'native' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo', group: 'native' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo', group: 'native' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Cartões Digitais', badge: 'Ativo', group: 'native' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss em tempo real', badge: 'Ativo', group: 'native' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona para prompts e conteúdo', badge: 'IA', group: 'custom' },
-      { icon: '🤖', name: 'Amazô', desc: 'A representante digital do Hub. Dupla atuação: versão externa (CS e SDR ativo nas LPs para atendimento e qualificação de leads) e versão interna nativa no CRM, automatizando a gestão do ecossistema. Cada cliente tem sua própria equipe de IAs personalizada.', badge: 'IA', group: 'custom' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin e multi-tenant', badge: 'Ativo', group: 'custom' },
+      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
+      { icon: '👥', name: 'Contatos', desc: 'Base de clientes com sync bidirecional', badge: 'Ativo' },
+      { icon: '📬', name: 'Inbox / Amazô', desc: 'Dupla atuação: CS/SDR nas LPs (externa) + CRM nativo (interna)', badge: 'IA' },
+      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo' },
+      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', badge: 'IA' },
+      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo' },
     ],
     qa_eyebrow: 'Auditoria V3.0 — Abril 2026',
     qa_title: 'Relatório de QA & Segurança',
@@ -176,7 +173,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Experimente a Provadágua por 7 dias',
-    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM personalizado para o seu negócio — com segurança, automação e isolamento total.',
+    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM feito para empreendedores e agências que não abrem mão da segurança dos seus dados.',
     trial_features: [
       'Isolamento total de dados por empresa',
       '4 Agentes de IA inclusos',
@@ -187,23 +184,23 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     ],
     trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
     trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
-    footer_built: 'Construído com ❤️ pela equipe Encontro D\'Água',
-    footer_version: 'V5.5 — Provadágua',
+    footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
+    footer_version: 'V5.5 — Provadágua Hotfix Final',
     footer_privacy: 'Privacidade · LGPD · Termos',
   },
   en: {
     nav_login: 'Enter Hub',
-    hero_eyebrow: 'For Entrepreneurs · Independent Professionals · Agencies',
+    hero_eyebrow: 'For Entrepreneurs · Agencies · Consultants',
     hero_title_1: 'The AI-powered CRM that',
-    hero_title_2: 'organizes your clients and projects',
+    hero_title_2: 'organizes your business',
     hero_title_accent: 'and makes your operation grow.',
     hero_subtitle:
-      'Encontro D\'Água Hub is the management operating system for professionals and entrepreneurs. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
+      'Encontro D\'Água Hub is the business management operating system for businesses and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
     hero_cta_primary: 'Try Provadágua for 7 days',
     hero_cta_secondary: 'Watch live demo',
     hero_cta_sub: 'Elite Management with OCI Privacy · No credit card · 100% isolated data',
-    trust_label: 'Trusted by professionals and entrepreneurs',
-    specialties: ['Health', 'Consulting', 'Entrepreneurs', 'Freelancers', 'Agencies'],
+    trust_label: 'Trusted by entrepreneurs and agencies',
+    specialties: ['Tech', 'Marketing', 'Sales', 'Consulting', 'Agencies'],
     metrics: [
       { value: '100%', label: 'Data Isolated per Company', icon: '🔒' },
       { value: '9', label: 'Modules in Production', icon: '⚡' },
@@ -211,44 +208,41 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { value: '24/7', label: 'Automated SDR', icon: '📡' },
     ],
     pain_title: 'Do you recognize these problems?',
-    pain_subtitle: 'We built specific solutions for the real challenges of business leaders and independent professionals',
+    pain_subtitle: 'We built specific solutions for the real challenges of modern professionals',
     pain_items: [
       {
         icon: '📁',
-        title: 'Client and lead data scattered everywhere',
+        title: 'Client data scattered everywhere',
         desc: 'Spreadsheets, WhatsApp, email, and paper — impossible to track without a centralized, secure system.',
       },
       {
         icon: '⏰',
         title: 'Time wasted on manual tasks',
-        desc: 'Scheduling, follow-ups, and reminders consume hours that should be dedicated to your clients and projects.',
+        desc: 'Follow-ups, proposals, and reminders consume hours that should be dedicated to your clients and projects.',
       },
       {
         icon: '🚫',
-        title: 'Data breach risk (LGPD/GDPR)',
-        desc: 'Generic software wasn\'t designed for the privacy your business requires. Your data is vulnerable.',
+        title: 'Data breach risk (GDPR/LGPD)',
+        desc: 'Generic software wasn\'t designed for the privacy your business requires. You are vulnerable.',
       },
       {
         icon: '📊',
         title: 'Can\'t manage your clients and projects?',
-        desc: 'No pipeline visibility, no automatic follow-up, no reports — you lose business without even noticing. The Provadágua ecosystem centralizes everything.',
+        desc: 'No pipeline visibility, no automated follow-up, no reports — you lose business without realizing it. Provadágua centralizes everything.',
       },
     ],
     modules_title: 'Features',
-    modules_subtitle: 'We provide a solid CRM base that is fully customized to each client\'s needs. We use the Hub CRM itself as a living portfolio of this customization.',
-    modules_group_native: 'Native CRM Base',
-    modules_group_custom: 'Hub Custom Implementations',
+    modules_subtitle: 'All features live at hub.encontrodagua.com — running 24/7',
     modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'Leads and opportunities auto-mapped to the funnel', badge: 'Live', group: 'native' },
-      { icon: '👥', name: 'Contacts', desc: 'Client and lead database with bidirectional sync', badge: 'Live', group: 'native' },
-      { icon: '💬', name: 'Inbox / Mazô', desc: 'AI Customer Success agent to attend and qualify leads', badge: 'AI', group: 'native' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live', group: 'native' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live', group: 'native' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Digital Business Cards', badge: 'Live', group: 'native' },
-      { icon: '📊', name: 'Reports', desc: 'Real-time Pipeline + Win/Loss', badge: 'Live', group: 'native' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI for prompts and content', badge: 'AI', group: 'custom' },
-      { icon: '🤖', name: 'Amazô', desc: 'The Hub\'s digital representative. Dual role: external version (CS & active SDR on landing pages for lead attendance and qualification) and internal version native to the CRM, intelligently automating ecosystem management. Each client gets their own custom AI team.', badge: 'AI', group: 'custom' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin, multi-tenant', badge: 'Live', group: 'custom' },
+      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
+      { icon: '👥', name: 'Contacts', desc: 'Client database with bidirectional sync', badge: 'Live' },
+      { icon: '📬', name: 'Inbox / Amazô', desc: 'Dual role: CS/SDR on LPs (external) + native CRM agent (internal)', badge: 'AI' },
+      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live' },
+      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', badge: 'AI' },
+      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live' },
     ],
     qa_eyebrow: 'V3.0 Audit — April 2026',
     qa_title: 'QA & Security Report',
@@ -303,7 +297,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Try Provadágua for 7 days',
-    trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM customized for your business — with security, automation, and total isolation.',
+    trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM built for entrepreneurs and agencies who demand the highest standard of data security.',
     trial_features: [
       'Complete data isolation per company',
       '4 AI Agents included',
@@ -314,8 +308,8 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     ],
     trial_cta: 'Try Provadágua for 7 days — Free',
     trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
-    footer_built: 'Built with ❤️ by the Encontro D\'Água team',
-    footer_version: 'V5.5 — Provadágua',
+    footer_built: 'Built with ❤ by the Encontro D\'Água team',
+    footer_version: 'V5.5 — Provadágua Hotfix Final',
     footer_privacy: 'Privacy · LGPD/GDPR · Terms',
   },
 };
@@ -542,9 +536,7 @@ const ShowcasePage: React.FC = () => {
             {lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
           </button>
 
-          <a
-            href="/#/login"
-            id="showcase-nav-login"
+          <a href="/#/login?from=showcase" id="showcase-nav-login"
             style={{
               background: S.acaiGrad,
               borderRadius: '20px', padding: '8px 20px',
@@ -721,7 +713,7 @@ const ShowcasePage: React.FC = () => {
               <ArrowIcon />
             </button>
             <a
-              href="/#/login"
+              href="/#/login?from=showcase"
               id="showcase-cta-secondary"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -969,9 +961,9 @@ const ShowcasePage: React.FC = () => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
         }}>
-          {/* Card 1: Saúde */}
+          {/* Card 1: Negócios & Projetos */}
           <div
-            id="segment-saude"
+            id="segment-negocios"
             style={{
               background: 'rgba(14,165,233,0.05)',
               border: '1px solid rgba(14,165,233,0.2)',
@@ -994,20 +986,20 @@ const ShowcasePage: React.FC = () => {
               e.currentTarget.style.background = 'rgba(14,165,233,0.05)';
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🩺</div>
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🚀</div>
             <div>
               <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
-                {lang === 'pt' ? 'Saúde & Consultório' : 'Health & Clinic'}
+                {lang === 'pt' ? 'Negócios & Projetos' : 'Business & Projects'}
               </h3>
               <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
                 {lang === 'pt'
-                  ? 'Para Psicólogos, Médicos, Fisioterapeutas e terapeutas. Gestão de leads com privacidade LGPD nativa, sem misturar dados de pacientes.'
-                  : 'For Psychologists, Physicians, Physiotherapists. Lead management with native LGPD privacy, no patient data mixing.'}
+                  ? 'Para consultores, freelancers e startups. Gestão de leads com pipeline visual, automação SDR e privacidade LGPD nativa por empresa.'
+                  : 'For consultants, freelancers and startups. Lead management with visual pipeline, SDR automation and native LGPD privacy per company.'}
               </p>
             </div>
             <div style={{ marginTop: 'auto' }}>
               <button
-                id="segment-saude-cta"
+                id="segment-negocios-cta"
                 onClick={() => setIsModalOpen(true)}
                 style={{
                   background: S.cyanBlue,
@@ -1024,7 +1016,7 @@ const ShowcasePage: React.FC = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
               >
-                {lang === 'pt' ? '🩺 Quero testar 7 dias' : '🩺 Try 7 days free'}
+                {lang === 'pt' ? '🚀 Quero testar 7 dias' : '🚀 Try 7 days free'}
               </button>
             </div>
           </div>
@@ -1434,7 +1426,7 @@ const ShowcasePage: React.FC = () => {
             }}>
               {/* Primary CTA 1 - Trial */}
               <a
-                href="/#/login"
+                href="/#/login?from=showcase"
                 id="showcase-trial-cta"
                 style={{
                   display: 'inline-flex',
@@ -1542,37 +1534,62 @@ const ShowcasePage: React.FC = () => {
       </section>
 
       <footer style={{
-        padding: '2.5rem 1.5rem',
+        padding: '3rem 1.5rem',
         textAlign: 'center',
         borderTop: `1px solid ${S.border}`,
         background: 'rgba(0,0,0,0.15)',
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', maxWidth: '500px', margin: '0 auto' }}>
-          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '40px', width: '40px', objectFit: 'contain' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
+          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
           <span style={{ color: S.textSecondary, fontSize: '0.88rem', fontWeight: 600 }}>{t.footer_built}</span>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <a
-              href="https://github.com/encontro-dagua-hub"
-              target="_blank" rel="noopener noreferrer"
-              style={{ color: S.slateDim, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s', textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
-              onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-            >
-              ⚙ GitHub Org
-            </a>
-            <a
-              href="https://www.linkedin.com/company/encontro-d-agua-hub/"
-              target="_blank" rel="noopener noreferrer"
-              style={{ color: S.slateDim, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s', textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
-            >
-              💼 LinkedIn
-            </a>
-          </div>
-          <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
-          <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: '2px 0 0' }}>{t.footer_version}</p>
         </div>
+        {/* Bio contextualizada — lugar correto */}
+        <p style={{ color: S.slateDim, fontSize: '0.78rem', margin: '4px 0 12px' }}>
+          🎓 Lidi Moura — Formada em Psicologia e Especialista em Dados · Certificações OCI, IA &amp; MySQL
+        </p>
+        {/* Links sociais */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <a
+            href="https://github.com/encontro-dagua-hub"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            ⚙ GitHub Org
+          </a>
+          <a
+            href="https://github.com/lidimoura"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            👩‍💻 GitHub (Lidi)
+          </a>
+          <a
+            href="https://www.linkedin.com/company/encontro-d-agua-hub/"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💼 LinkedIn
+          </a>
+          <a
+            href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá! Estou na página Provadágua e preciso de suporte.')}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#25D366'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💬 Suporte
+          </a>
+        </div>
+        <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
+        <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: '4px 0 0' }}>
+          {t.footer_version}
+        </p>
       </footer>
       {/* ── Lead Capture Modal ────────────────────────────────────────────── */}
       <LeadCaptureModal
