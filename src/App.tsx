@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { sendNexusAlert } from '@/lib/nexusWebhook';
+import { initGA4 } from '@/lib/analytics';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { CRMProvider } from '@/context/CRMContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -108,16 +109,15 @@ const App: React.FC = () => {
     hostname === 'prova.encontrodagua.com' ||
     hostname.startsWith('prova.');
 
-  // STRICT ENFORCEMENT: Force English for International Demo
+  // ── V6.2 — Arquitetura de Canais ──────────────────────────────────────────
+  // • Amazô = IA de front-end (LPs e Showcase) — respostas automatizadas 24/7
+  // • WhatsApp Business (5541992557600) = gestão humana direta da Lidi Moura
+  // ──────────────────────────────────────────────────────────────────────────
   React.useEffect(() => {
-    const saved = localStorage.getItem('app_language');
-    if (saved !== 'en') {
-      localStorage.setItem('app_language', 'en');
-      if (saved === 'pt') window.location.reload();
-    }
+    // ── GA4: inicializa em todas as páginas na montagem do App ──────────────
+    initGA4();
 
-    // ── NEXUS BRIDGE: Heartbeat ─────────────────────────────────────────────
-    // Fires within 2s of app load — confirms the Agility OS bridge is ALIVE.
+    // ── NEXUS BRIDGE: Heartbeat (silent fail — nunca bloqueia a UI) ─────────
     sendNexusAlert({
       error_message: 'NEXUS_HEARTBEAT',
       component_context: 'App.tsx boot',
@@ -126,7 +126,6 @@ const App: React.FC = () => {
         timestamp: new Date().toISOString(),
       },
     });
-    // ───────────────────────────────────────────────────────────────────────
   }, []);
 
   // ── Service Worker & Push Notification registration ──────────

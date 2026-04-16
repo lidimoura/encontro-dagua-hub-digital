@@ -2,6 +2,53 @@
 
 ---
 
+## 2026-04-16 — V6.2: Final Release QA · Stripe · WA Business Lidi · GA4
+
+### Arquitetura de Canais (documentada)
+- **Amazô** = IA de front-end — atendimento automatizado 24/7 nas LPs e ShowcasePage
+- **WhatsApp Business `5541992557600`** = gestão humana direta da **Lidi Moura** (proprietária)
+- Nenhum bot acessa o WA Business — é canal exclusivo de conversão e suporte humano
+
+### Fix Crítico — NexusBridge (`nexusWebhook.ts`)
+- URL hardcoded `kfejaqwzgzlmuaodhwmf.supabase.co` era de projeto externo (Agility OS) morto
+- Agora deriva de `VITE_SUPABASE_URL` (este projeto). Se env vazia → desativado silenciosamente
+- `AbortController(3s)` impedindo DNS stale de travar a UI
+
+### Fix Crítico — ShowcasePage Branco (`fadeIn`)
+- `opacity: 0` no `fadeIn()` causava branco permanente se IntersectionObserver falhasse (race condition)
+- **Fix**: `opacity: 1` sempre — conteúdo nunca invisível. Animação só usa `translateY`
+- Observer com `setTimeout(200ms)` para garantir DOM montado antes de observar
+
+### Stripe Payments (`stripe.ts`) — V6.2
+- `whatsappFallback` corrigido: `5592992943998` → `5541992557600` (Lidi)
+- Mensagens WA todas Lidi-branded por produto (Prompt Lab Mensal/Anual, Agente IA, Consultoria)
+- Payment Links via env vars: `VITE_STRIPE_LINK_MONTHLY`, `VITE_STRIPE_LINK_ANNUAL`, `VITE_STRIPE_LINK_AGENTE_IA`
+- Fallback automático para WA Business se link Stripe não configurado
+
+### WhatsApp Business — Mensagens Estratégicas
+| Origem | Mensagem |
+|---|---|
+| Showcase — Keyword | "Olá, Lidi! Estou na vitrine da Provadágua e quero minha Palavra-Chave..." |
+| Showcase — Dúvida | "Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização..." |
+| Hub — Consultoria | "Olá, Lidi! Conheci o Hub e quero conversar sobre uma implementação sob medida..." |
+| Prompt Lab Mensal | "Olá, Lidi! Vi o Prompt Lab no Hub e quero assinar o Plano Mensal (R$ 3,00/mês)..." |
+| Agente de IA | "Olá, Lidi! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse..." |
+
+### GA4 (`App.tsx`)
+- `initGA4()` agora chamado no `useEffect` do `App.tsx` — rastreia **todas as páginas** desde o boot
+- Removida variável `initGA4` que era importada mas nunca chamada
+
+### Remoção: Forced English
+- `localStorage.setItem('app_language', 'en')` removido — app é **PT-BR** por padrão
+- Usuários podem alternar via LanguageSwitcher normalmente
+
+### Logo & Visual
+- Nav logo ShowcasePage: `href="/#/"` → `href="/#/showcase"` ✓
+- `logo-icon.png` (404) substituído por `logo-icon-gold-transp.png` em todos os pontos
+- Drop-shadow dourado: `drop-shadow(0 0 12px rgba(200,147,58,0.6))` no nav
+
+---
+
 ## 2026-04-16 — V5.7: Hotfix Final Release — ShowcasePage + Login + Segurança 🔒
 
 ### Problema Identificado — ShowcasePage Branco após Vídeo/Prints

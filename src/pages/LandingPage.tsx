@@ -610,13 +610,13 @@ Agora, gere o prompt perfeito:`;
                     Quero meu Agente IA
                     <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mês</span>
                   </button>
-                  <a
-                    href="https://wa.me/5541992557600?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20o%20Agente%20de%20IA%20por%20R%2480"
+                <a
+                    href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse. Pode me contar mais?')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                   >
-                    <MessageCircle size={18} /> Tirar dúvidas no WhatsApp
+                    <MessageCircle size={18} /> Tirar dúvidas com a Lidi
                   </a>
                 </div>
               </div>
@@ -630,7 +630,7 @@ Agora, gere o prompt perfeito:`;
                     {/* Bot avatar */}
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-14 h-14 rounded-2xl bg-[#0f0c0b] border border-white/10 flex items-center justify-center shadow-lg overflow-hidden p-2">
-                        <img src="/logos/logo-icon.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+                        <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(200,147,58,0.4)]" />
                       </div>
                       <div>
                         <p className="font-bold text-white">Agente de IA</p>
@@ -1075,7 +1075,7 @@ Agora, gere o prompt perfeito:`;
               <h3 className="text-xl font-bold text-white mb-2">{t('noOneLeftBehind')}</h3>
               <p className="text-slate-400 text-sm mb-6">{t('socialImpact')}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1!%20Sou%20do%20grupo%20de%20impacto%20social%20e%20gostaria%20da%20consultoria%20gratuita%20de%2010%20minutos.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                <button onClick={() => window.open(`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Conheci o Hub e quero conversar sobre uma implementação sob medida para minha operação.')}`, '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
                   <MessageCircle size={18} /> {t('socialConsult')}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">

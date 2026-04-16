@@ -9,12 +9,12 @@
 
 </div>
 
-### CRM de Produção `V5.7` — Final Release · Provadágua Launch
+### CRM de Produção `V6.2` — Final Release · Provadágua Launch
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V5.7**: Hotfix renderização ShowcasePage · Keyword Gate estável · Login multi-rota
+> **V6.2**: Links Stripe + mensagens Lidi WA Business · GA4 em todas as páginas · Hotfix DNS NexusBridge · Remoção forced-EN
 
 ---
 

@@ -11,7 +11,7 @@ import { initGA4, trackTrialStart, trackLogin, trackSignUp } from '@/lib/analyti
 const ACCESS_KEYWORD = import.meta.env.VITE_ACCESS_KEYWORD || 'provadagua';
 const WHATSAPP_SUPPORT = '5541992557600';
 const WHATSAPP_KEYWORD_MSG = encodeURIComponent(
-  'Olá! Estou na página de acesso da Provadágua e gostaria de solicitar a palavra-chave para experimentar o sistema.'
+  'Olá, Lidi! Estou na vitrine da Provadágua e quero minha Palavra-Chave para testar o CRM agora.'
 );
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
