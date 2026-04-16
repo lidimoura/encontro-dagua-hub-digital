@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
 import { Loader2, Mail, Lock, ArrowRight, Key, Leaf, Shield, User, Eye, EyeOff, MessageCircle } from 'lucide-react';
 import { AiflowSupport } from '@/components/AiflowSupport';
@@ -14,26 +14,28 @@ const WHATSAPP_KEYWORD_MSG = encodeURIComponent(
   'Olá! Estou na página de acesso da Provadágua e gostaria de solicitar a palavra-chave para experimentar o sistema.'
 );
 
-// ── Detecta origem: showcase ou hub puro ──────────────────────────────────────
-const urlParams = new URLSearchParams(window.location.search);
-const IS_SHOWCASE_ROUTE =
-  urlParams.get('from') === 'showcase' ||
-  window.location.href.includes('showcase') ||
-  document.referrer.includes('showcase') ||
-  document.referrer.includes('prova.');
-
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 type ShowcaseView = 'register' | 'signin';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, language } = useTranslation();
   const isEn = language === 'en';
+
+  // ── Detecta origem: showcase ou hub puro (HashRouter-safe via useLocation) ──
+  // Com HashRouter, location.search contém a query corretamente ex: ?from=showcase
+  const _lqp = new URLSearchParams(location.search);
+  const isShowcaseRoute =
+    _lqp.get('from') === 'showcase' ||
+    window.location.href.includes('?from=showcase') ||
+    document.referrer.includes('showcase') ||
+    document.referrer.includes('prova.');
 
   // ── God Mode ──────────────────────────────────────────────────────────────
   const logoClickCountRef = useRef(0);
   const logoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isGodModeUrl = urlParams.get('god') === 'true';
+  const isGodModeUrl = _lqp.get('god') === 'true';
   const [isGodMode, setIsGodMode] = useState(isGodModeUrl);
 
   const handleLogoTripleClick = () => {
@@ -382,7 +384,7 @@ const Login: React.FC = () => {
   // ══════════════════════════════════════════════════════════════════════════
   // RENDER: Hub puro (/login sem parâmetro) — APENAS SignIn
   // ══════════════════════════════════════════════════════════════════════════
-  if (!IS_SHOWCASE_ROUTE) {
+  if (!isShowcaseRoute) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#02040a] relative overflow-hidden">
         {/* Ambient */}

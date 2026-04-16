@@ -2,6 +2,67 @@
 
 ---
 
+## 2026-04-16 — V5.7: Hotfix Final Release — ShowcasePage + Login + Segurança 🔒
+
+### Problema Identificado — ShowcasePage Branco após Vídeo/Prints
+- **Root cause**: Seções FAQ, QA & Segurança e Arquitetura Técnica estavam definidas nas
+  traduções (`TRANSLATIONS`) mas **nunca renderizadas no JSX**. A ShowcasePage pulava de
+  `sec-modules` diretamente para `sec-trial`, fazendo o mid-scroll parecer vazio.
+- **Fix**: 3 novas seções adicionadas entre Módulos e Trial CTA:
+  - `sec-faq` — Accordion PT/EN com `Array.isArray()` guard (evita crash em arrays nulos)
+  - `sec-qa` — Cards de QA/Segurança com badge ✓ STATUS e hover verde
+  - `sec-tech` — Grid arquitetura técnica com bordas Solimões dourado
+
+### Fix Login — IS_SHOWCASE_ROUTE com HashRouter (Regressão SPA)
+- **Root cause**: `IS_SHOWCASE_ROUTE` era uma **constante de módulo** avaliada uma única vez
+  no import. Com HashRouter, `window.location.search` está sempre vazio — a query
+  `?from=showcase` fica no hash (`/#/login?from=showcase`). Navegação SPA não re-avaliava a constante.
+- **Fix**: Migrado para `useLocation()` do react-router-dom dentro do componente.
+  `location.search` retorna `?from=showcase` corretamente com HashRouter.
+- `isGodModeUrl` corrigido pelo mesmo motivo (`urlParams.get('god')` → `_lqp.get('god')`).
+- **Comportamento confirmado**:
+  - `/login` → Hub: somente aba "Entrar" (SignIn)
+  - `/login?from=showcase` → Provadágua: aba "Novo Cadastro" (padrão) + campo Palavra-Chave
+  - Logo Hub → `/#/` | Logo Showcase → `/#/showcase`
+  - Botão "Solicitar ao Admin" → WhatsApp `5541992557600`
+
+### Fix ShowcasePage — Referência de Imagem Quebrada
+- `logo-icon.png` (inexistente) substituído por `logo-icon-gold-transp.png` com
+  `filter: brightness(0) invert(1)` para branco no botão violeta.
+
+### Versão
+- `footer_version`: `V5.6 — Provadágua Launch` → `V5.7 — Final Release` (PT + EN)
+
+### Segurança — Auditoria V5.7
+- ✅ `SUPABASE_SERVICE_ROLE_KEY`: presente apenas em `.env` local (gitignored) e Vercel Secrets
+- ✅ Zero `VITE_` prefix em service role key (correto — não bundled no client JS)
+- ⚠️ `VITE_GEMINI_API_KEY` e `VITE_SUPABASE_ANON_KEY` são públicas BY DESIGN (VITE_ = client bundle)
+  → documentado na Skill e no README — nenhuma ação necessária
+- ✅ RLS ativo em todas as tabelas críticas (confirmado em `sec-qa` da ShowcasePage)
+- ✅ `is_demo_data` guard em todos os services — produção isolada do demo
+
+### Nicho — Copy Limpo (Zero Saúde)
+- Confirmado: ShowcasePage aponta exclusivamente para **"Negócios, Agências e Projetos"**
+- `hero_eyebrow`: "Para Empreendedores · Agências · Profissionais Liberais" ✓
+- Cards de segmentação: "Negócios & Projetos" + "Empreendedores & Times" (zero menção à saúde) ✓
+
+### Encoding UTF-8
+- Todos os arquivos de documentação (README, DEVLOG, UserGuide) gravados via ferramenta nativa
+  (não PowerShell) — UTF-8 sem BOM — acentos e emojis preservados corretamente.
+
+### LandingPage Hub — CTA Provadágua
+- Confirmado: `lp-cta-provadagua` seção já inserida na V5.6 logo após `<CRMSimulator>` ✓
+
+### Git — Branch `provadagua`
+```
+fix(v5.7): ShowcasePage missing FAQ+QA+Tech sections — rendered in JSX
+fix(login): IS_SHOWCASE_ROUTE HashRouter-safe via useLocation()
+fix(showcase): logo-icon.png broken ref → logo-icon-gold-transp.png
+chore(docs): README V5.7 multi-tenant endpoints + UserGuide trial flow
+```
+
+---
+
 ## 2026-04-13 — V5.3: Provadágua Rebranding Completo 🌊💜
 
 ### Identidade Visual — Rio Negro + Açaí + Solimões
