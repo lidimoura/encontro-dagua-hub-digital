@@ -85,22 +85,22 @@ const Login: React.FC = () => {
     hubNotTeam:     isEn ? 'Not part of the team? Discover the Provadágua →' : 'Não é da equipe? Conheça a Provadágua →',
 
     // Showcase — Cadastro
-    regTitle:       isEn ? 'Access to Provadágua CRM' : 'Acesso à Provadágua do CRM',
+    regTitle:       isEn ? 'Access to Provadágua (Demo CRM)' : 'Acesso à Provadágua (Demo CRM)',
     regSub:         isEn ? 'New registration. Enter the access keyword.' : 'Novo cadastro. Insira a palavra-chave de acesso.',
-    regTab:         isEn ? 'New Registration' : 'Novo Cadastro',
+    regTab:         isEn ? '+ New Registration' : '+ Novo Cadastro',
     regName:        isEn ? 'Your full name' : 'Seu nome completo',
     regEmail:       isEn ? 'Your professional email' : 'Seu e-mail profissional',
     regKeyword:     isEn ? 'Access keyword' : 'Palavra-chave de acesso',
     regKeyPlaceholder: isEn ? 'Your keyword...' : 'Sua palavra-chave...',
     regSubmit:      isEn ? '🌿 Start Free Trial' : '🌿 Iniciar Provadágua Grátis',
     regLoading:     isEn ? 'Opening access...' : 'Abrindo acesso...',
-    regHaveAccount: isEn ? 'Already have an account? Sign in' : 'Já tenho conta? Entrar',
+    regHaveAccount: isEn ? 'Already have an account? Sign in →' : 'Já tenho conta? Entrar →',
     regRequestKey:  isEn ? 'Request keyword from team' : 'Solicitar palavra-chave à equipe',
     regNoKey:       isEn ? "Don't have a keyword?" : 'Não tem a palavra-chave?',
 
     // Showcase — SignIn toggle
-    signinTitle:    isEn ? 'Access to Provadágua CRM' : 'Acesso à Provadágua do CRM',
-    signinTab:      isEn ? 'I already have an account' : 'Já tenho conta',
+    signinTitle:    isEn ? 'Access to Provadágua (Demo CRM)' : 'Acesso à Provadágua (Demo CRM)',
+    signinTab:      isEn ? '→ I have an account' : '→ Já tenho conta',
     signinSub:      isEn ? 'Access your existing account.' : 'Acesse sua conta existente.',
     signinSubmit:   isEn ? 'Sign In' : 'Entrar',
     signinLoading:  isEn ? 'Signing in...' : 'Entrando...',
@@ -526,16 +526,16 @@ const Login: React.FC = () => {
           </h1>
         </div>
 
-        {/* Abas: Novo Cadastro / Já tenho conta */}
-        <div className="flex rounded-xl bg-slate-900/50 border border-white/8 p-1 mb-3">
+        {/* Abas: Novo Cadastro / Já tenho conta — V6.0: abas maiores e mais claras */}
+        <div className="flex rounded-xl bg-slate-900/50 border border-white/10 p-1 mb-4 gap-1">
           <button
             id="tab-register"
             type="button"
             onClick={() => { setShowcaseView('register'); setKeywordError(null); setSigninError(null); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
               showcaseView === 'register'
-                ? 'bg-purple-700 text-white shadow'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'bg-purple-700 text-white shadow-lg shadow-purple-900/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             {txt.regTab}
@@ -544,10 +544,10 @@ const Login: React.FC = () => {
             id="tab-signin"
             type="button"
             onClick={() => { setShowcaseView('signin'); setKeywordError(null); setSigninError(null); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
               showcaseView === 'signin'
-                ? 'bg-purple-700 text-white shadow'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'bg-purple-700 text-white shadow-lg shadow-purple-900/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             {txt.signinTab}
@@ -642,12 +642,12 @@ const Login: React.FC = () => {
                 }
               </button>
 
-              {/* Toggle → Entrar */}
+              {/* Toggle → Entrar — V6.0: botão prominente com borda */}
               <button
                 type="button"
                 id="btn-toggle-signin"
                 onClick={() => { setShowcaseView('signin'); setKeywordError(null); }}
-                className="w-full text-slate-500 hover:text-purple-400 text-xs transition-colors py-1 text-center"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-purple-500/30 text-purple-400 hover:text-white hover:bg-purple-600/20 hover:border-purple-500/60 text-sm font-bold transition-all active:scale-[0.98]"
               >
                 {txt.regHaveAccount}
               </button>

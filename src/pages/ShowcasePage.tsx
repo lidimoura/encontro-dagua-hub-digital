@@ -23,6 +23,8 @@ interface Translation {
   modules_subtitle: string;
   modules_group_native: string;
   modules_group_custom: string;
+  modules_credit: string;
+  modules_pitch: string;
   modules: Array<{ icon: string; name: string; desc: string; badge: string; group: string }>;
   faq_title: string;
   faq_items: Array<{ q: string; a: string }>;
@@ -73,7 +75,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     hero_title_2: 'organiza seus negócios',
     hero_title_accent: 'e faz sua operação crescer.',
     hero_subtitle:
-      'Encontro D\'Água Hub é o sistema operacional de gestão para negócios e escritórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
+      'Provadágua: Experimente a potência do CRM personalizado do Encontro d\'Água Hub. Use esta demonstração gratuita por 7 dias e veja como podemos customizar uma operação exclusiva para o seu negócio.',
     hero_cta_primary: 'Experimente a Provadágua por 7 dias',
     hero_cta_secondary: 'Ver demonstração ao vivo',
     hero_cta_sub: 'Gestão de Elite com Privacidade OCI · Sem cartão de crédito · Dados 100% isolados',
@@ -109,20 +111,26 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         desc: 'Sem visibilidade do pipeline, sem follow-up automático e sem relatórios — você perde negócios sem nem perceber. O ecossistema Provadágua centraliza tudo.',
       },
     ],
-    modules_title: 'Funcionalidades',
-    modules_subtitle: 'Todas as funcionalidades ativas em hub.encontrodagua.com — operando 24/7',
-    modules_group_native: 'Nativas do CRM',
-    modules_group_custom: 'Agentes de IA Personalizados',
+    modules_title: 'O Ecossistema em Produção',
+    modules_subtitle: 'Veja o que está ativo em hub.encontrodagua.com — operando 24/7 para nossos clientes',
+    modules_group_native: 'BLOCO A — Funcionalidades Nativas',
+    modules_group_custom: 'BLOCO B — Hub Personalizado',
+    modules_credit: 'Base de CRM compartilhada com alunos vitalícios da Escola de Automação do Thales Laray, servindo como fundação de alta performance para nossas implementações.',
+    modules_pitch: 'Nós não vendemos software engessado. Personalizamos cada CRM de acordo com a sua demanda, contexto e necessidade.',
     modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo', group: 'native' },
-      { icon: '👥', name: 'Contatos', desc: 'Base de clientes com sync bidirecional', badge: 'Ativo', group: 'native' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo', group: 'native' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo', group: 'native' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo', group: 'native' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo', group: 'native' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo', group: 'native' },
-      { icon: '📬', name: 'Amazô', desc: 'Dupla atuação: CS/SDR nas LPs (externa) + CRM nativo (interna)', badge: 'IA', group: 'custom' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona para engenharia de prompts', badge: 'IA', group: 'custom' },
+      { icon: '📋', name: 'Gestão de Leads', desc: 'Pipeline visual com stages customizáveis e automação SDR ativa', badge: 'Ativo', group: 'native' },
+      { icon: '🏆', name: 'Kanban de Vendas', desc: 'Board visual com arrastar e soltar — funil de vendas em tempo real', badge: 'Ativo', group: 'native' },
+      { icon: '🤖', name: 'IA First Boards', desc: 'Templates criados via IA ou escolha entre os pré-definidos por nicho', badge: 'IA', group: 'native' },
+      { icon: '🌊', name: 'AIflow', desc: 'Assistente técnico embarcado — suporte inteligente dentro do CRM', badge: 'IA', group: 'native' },
+      { icon: '📬', name: 'Inbox TDAH-Friendly', desc: 'Prioridades estratégicas e briefings do dia — foco sem ruído cognitivo', badge: 'Ativo', group: 'native' },
+      { icon: '📊', name: 'Dashboards', desc: 'Win/Loss, ciclo de vendas e pipeline em tempo real', badge: 'Ativo', group: 'native' },
+      { icon: '👥', name: 'Banco de Contatos', desc: 'CRM de clientes com sync bidirecional e isolamento total por empresa', badge: 'Ativo', group: 'native' },
+      { icon: '📤', name: 'Amazô', desc: 'Agente IA: CS/SDR nas LPs e no CRM — responde leads 24/7', badge: 'Custom', group: 'custom' },
+      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law gerados por IA com PDF inline', badge: 'Custom', group: 'custom' },
+      { icon: '💰', name: 'Precy', desc: 'Precificação profissional BRL/USD/EUR com catálogo de produtos', badge: 'Custom', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Engenharia de prompts multi-persona com teste ao vivo', badge: 'Custom', group: 'custom' },
+      { icon: '📦', name: 'Catálogo de Produtos', desc: 'Gestão centralizada de produtos e serviços para precificação', badge: 'Custom', group: 'custom' },
+      { icon: '🔗', name: 'Integrações No-code', desc: 'Webhooks, n8n, Zapier e WhatsApp — conecte qualquer sistema', badge: 'Custom', group: 'custom' },
     ],
     faq_title: 'Perguntas Frequentes',
     faq_items: [
@@ -207,7 +215,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     hero_title_2: 'organizes your business',
     hero_title_accent: 'and makes your operation grow.',
     hero_subtitle:
-      'Encontro D\'Água Hub is the business management operating system for businesses and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
+      'Provadágua: Experience the power of the customized CRM from Encontro d\'Água Hub. Use this free 7-day demo and see how we can build an exclusive operation for your business.',
     hero_cta_primary: 'Try Provadágua for 7 days',
     hero_cta_secondary: 'Watch live demo',
     hero_cta_sub: 'Elite Management with OCI Privacy · No credit card · 100% isolated data',
@@ -243,20 +251,26 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         desc: 'No pipeline visibility, no automated follow-up, no reports — you lose business without realizing it. Provadágua centralizes everything.',
       },
     ],
-    modules_title: 'Features',
-    modules_subtitle: 'All features live at hub.encontrodagua.com — running 24/7',
-    modules_group_native: 'Native CRM Modules',
-    modules_group_custom: 'Custom AI Agents',
+    modules_title: 'The Ecosystem in Production',
+    modules_subtitle: 'See what is live at hub.encontrodagua.com — running 24/7 for our clients',
+    modules_group_native: 'BLOCK A — Native Features',
+    modules_group_custom: 'BLOCK B — Custom Hub',
+    modules_credit: 'CRM base shared with lifetime members of Thales Laray\'s Automation School, serving as a high-performance foundation for our implementations.',
+    modules_pitch: 'We don\'t sell rigid software. We customize every CRM according to your demand, context and specific needs.',
     modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live', group: 'native' },
-      { icon: '👥', name: 'Contacts', desc: 'Client database with bidirectional sync', badge: 'Live', group: 'native' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live', group: 'native' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live', group: 'native' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live', group: 'native' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live', group: 'native' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live', group: 'native' },
-      { icon: '📬', name: 'Amazô', desc: 'Dual role: CS/SDR on LPs (external) + native CRM agent (internal)', badge: 'AI', group: 'custom' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI for prompt engineering', badge: 'AI', group: 'custom' },
+      { icon: '📋', name: 'Lead Management', desc: 'Visual pipeline with customizable stages and active SDR automation', badge: 'Live', group: 'native' },
+      { icon: '🏆', name: 'Sales Kanban', desc: 'Drag-and-drop visual board — real-time sales funnel', badge: 'Live', group: 'native' },
+      { icon: '🤖', name: 'AI First Boards', desc: 'AI-generated templates or choose from niche-specific presets', badge: 'AI', group: 'native' },
+      { icon: '🌊', name: 'AIflow', desc: 'Embedded technical assistant — intelligent support inside the CRM', badge: 'AI', group: 'native' },
+      { icon: '📬', name: 'ADHD-Friendly Inbox', desc: 'Strategic priorities and daily briefings — focus without cognitive noise', badge: 'Live', group: 'native' },
+      { icon: '📊', name: 'Dashboards', desc: 'Win/Loss, sales cycle and real-time pipeline overview', badge: 'Live', group: 'native' },
+      { icon: '👥', name: 'Contact Database', desc: 'Client CRM with bidirectional sync and per-company isolation', badge: 'Live', group: 'native' },
+      { icon: '📤', name: 'Amazô', desc: 'AI Agent: CS/SDR on LPs and CRM — responds to leads 24/7', badge: 'Custom', group: 'custom' },
+      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts generated by AI with inline PDF', badge: 'Custom', group: 'custom' },
+      { icon: '💰', name: 'Precy', desc: 'Professional pricing BRL/USD/EUR with product catalog', badge: 'Custom', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona prompt engineering with live testing', badge: 'Custom', group: 'custom' },
+      { icon: '📦', name: 'Product Catalog', desc: 'Centralized management of products and services for pricing', badge: 'Custom', group: 'custom' },
+      { icon: '🔗', name: 'No-code Integrations', desc: 'Webhooks, n8n, Zapier and WhatsApp — connect any system', badge: 'Custom', group: 'custom' },
     ],
     faq_title: 'Frequently Asked Questions',
     faq_items: [
@@ -1271,66 +1285,64 @@ const ShowcasePage: React.FC = () => {
             <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.modules_subtitle}</p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-            gap: '14px',
-          }}>
-            {t.modules.map((mod, i) => (
-              <div
-                key={i}
-                id={`mod-${i}`}
-                style={{
-                  background: S.surface,
-                  border: `1px solid ${S.border}`,
-                  borderRadius: '16px',
-                  padding: '22px 20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '14px',
-                  transition: 'all 0.22s',
-                  cursor: 'default',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = S.surfaceHover;
-                  e.currentTarget.style.borderColor = S.borderHover;
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = S.surface;
-                  e.currentTarget.style.borderColor = S.border;
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{
-                  fontSize: '1.6rem',
-                  width: '44px', height: '44px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(14,165,233,0.1)',
-                  borderRadius: '11px',
-                  flexShrink: 0,
-                }} aria-hidden="true">
-                  {mod.icon}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
-                    <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{mod.name}</span>
-                    <span style={{
-                      background: mod.badge === 'AI' ? 'rgba(139,92,246,0.2)' : 'rgba(16,185,129,0.15)',
-                      color: mod.badge === 'AI' ? '#a78bfa' : S.emerald,
-                      borderRadius: '8px',
-                      padding: '2px 7px',
-                      fontSize: '0.66rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.04em',
-                    }}>
-                      {mod.badge === 'AI' ? '✦ AI' : `✓ ${mod.badge}`}
-                    </span>
+          {/* ── BLOCO A: Funcionalidades Nativas ───────────────── */}
+          <div style={{ marginBottom: '3.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.4rem' }}>
+              <div style={{ background: S.acaiGrad, borderRadius: '10px', padding: '4px 16px', fontSize: '0.72rem', fontWeight: 800, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>A</div>
+              <h3 style={{ fontWeight: 800, color: '#e2e8f0', fontSize: '1.05rem', margin: 0 }}>{t.modules_group_native}</h3>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))', gap: '11px', marginBottom: '1.4rem' }}>
+              {t.modules.filter(m => m.group === 'native').map((mod, i) => (
+                <div key={`native-${i}`} id={`mod-native-${i}`}
+                  style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: '16px', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.22s', cursor: 'default' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = S.surfaceHover; e.currentTarget.style.borderColor = S.borderHover; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = S.surface; e.currentTarget.style.borderColor = S.border; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ fontSize: '1.45rem', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(109,40,168,0.12)', borderRadius: '10px', flexShrink: 0 }} aria-hidden="true">{mod.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' as const }}>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.87rem' }}>{mod.name}</span>
+                      <span style={{ background: mod.badge === 'IA' || mod.badge === 'AI' ? 'rgba(139,92,246,0.2)' : 'rgba(16,185,129,0.15)', color: mod.badge === 'IA' || mod.badge === 'AI' ? '#a78bfa' : S.neonGreen, borderRadius: '7px', padding: '2px 6px', fontSize: '0.64rem', fontWeight: 800 }}>
+                        {mod.badge === 'IA' || mod.badge === 'AI' ? '✦ IA' : `✓ ${mod.badge}`}
+                      </span>
+                    </div>
+                    <p style={{ color: S.slateDim, fontSize: '0.79rem', margin: 0 }}>{mod.desc}</p>
                   </div>
-                  <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>{mod.desc}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {/* Crédito BLOCO A */}
+            <p style={{ fontSize: '0.79rem', color: S.textMuted, fontStyle: 'italic', borderLeft: `3px solid ${S.borderGold}`, paddingLeft: '14px', lineHeight: 1.65, maxWidth: '700px', margin: 0 }}>📌 {t.modules_credit}</p>
+          </div>
+
+          {/* ── BLOCO B: Hub Personalizado ─────────────────────── */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.4rem' }}>
+              <div style={{ background: S.solimoesGrad, borderRadius: '10px', padding: '4px 16px', fontSize: '0.72rem', fontWeight: 800, color: '#040308', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>B</div>
+              <h3 style={{ fontWeight: 800, color: '#e2e8f0', fontSize: '1.05rem', margin: 0 }}>{t.modules_group_custom}</h3>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))', gap: '11px', marginBottom: '1.4rem' }}>
+              {t.modules.filter(m => m.group === 'custom').map((mod, i) => (
+                <div key={`custom-${i}`} id={`mod-custom-${i}`}
+                  style={{ background: S.surfaceWarm, border: `1px solid ${S.borderGold}`, borderRadius: '16px', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.22s', cursor: 'default' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(200,147,58,0.12)'; e.currentTarget.style.borderColor = S.borderGoldHov; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = S.surfaceWarm; e.currentTarget.style.borderColor = S.borderGold; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ fontSize: '1.45rem', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,147,58,0.12)', borderRadius: '10px', flexShrink: 0 }} aria-hidden="true">{mod.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' as const }}>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.87rem' }}>{mod.name}</span>
+                      <span style={{ background: 'rgba(200,147,58,0.2)', color: S.solimoesLight, borderRadius: '7px', padding: '2px 6px', fontSize: '0.64rem', fontWeight: 800 }}>✦ {mod.badge}</span>
+                    </div>
+                    <p style={{ color: S.slateDim, fontSize: '0.79rem', margin: 0 }}>{mod.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Pitch BLOCO B */}
+            <div style={{ background: S.surfaceWarm, border: `1px solid ${S.borderGold}`, borderRadius: '14px', padding: '18px 22px', maxWidth: '700px' }}>
+              <p style={{ fontSize: '0.9rem', color: '#f1d98c', fontWeight: 600, margin: 0, lineHeight: 1.65 }}>💎 {t.modules_pitch}</p>
+            </div>
           </div>
         </div>
       </section>
