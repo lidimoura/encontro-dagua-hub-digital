@@ -24,6 +24,8 @@ interface Translation {
   modules_group_native: string;
   modules_group_custom: string;
   modules: Array<{ icon: string; name: string; desc: string; badge: string; group: string }>;
+  faq_title: string;
+  faq_items: Array<{ q: string; a: string }>;
   qa_eyebrow: string;
   qa_title: string;
   qa_subtitle: string;
@@ -109,16 +111,26 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     ],
     modules_title: 'Funcionalidades',
     modules_subtitle: 'Todas as funcionalidades ativas em hub.encontrodagua.com — operando 24/7',
+    modules_group_native: 'Nativas do CRM',
+    modules_group_custom: 'Agentes de IA Personalizados',
     modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
-      { icon: '👥', name: 'Contatos', desc: 'Base de clientes com sync bidirecional', badge: 'Ativo' },
-      { icon: '📬', name: 'Inbox / Amazô', desc: 'Dupla atuação: CS/SDR nas LPs (externa) + CRM nativo (interna)', badge: 'IA' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', badge: 'IA' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo' },
+      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo', group: 'native' },
+      { icon: '👥', name: 'Contatos', desc: 'Base de clientes com sync bidirecional', badge: 'Ativo', group: 'native' },
+      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo', group: 'native' },
+      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo', group: 'native' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo', group: 'native' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo', group: 'native' },
+      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo', group: 'native' },
+      { icon: '📬', name: 'Amazô', desc: 'Dupla atuação: CS/SDR nas LPs (externa) + CRM nativo (interna)', badge: 'IA', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona para engenharia de prompts', badge: 'IA', group: 'custom' },
+    ],
+    faq_title: 'Perguntas Frequentes',
+    faq_items: [
+      { q: 'Preciso de cartão de crédito para testar?', a: 'Não. A Provadágua de 7 dias é 100% gratuita. Só precisamos da palavra-chave — solicite pelo WhatsApp.' },
+      { q: 'Meus dados ficam isolados?', a: 'Sim. Cada empresa tem seu próprio company_id com RLS ativo. Dados nunca visíveis para outros tenants.' },
+      { q: 'Qual a diferença entre Nativas e Agentes de IA?', a: 'Nativas são os módulos do CRM (Kanban, Contatos, Reports). Agentes de IA são assistentes inteligentes integrados.' },
+      { q: 'Posso usar em inglês?', a: 'Sim. Toggle PT/EN disponível em todas as telas.' },
+      { q: 'O que acontece após os 7 dias?', a: 'Você decide se ativa um plano. Sem cobrança automática.' },
     ],
     qa_eyebrow: 'Auditoria V3.0 — Abril 2026',
     qa_title: 'Relatório de QA & Segurança',
@@ -185,7 +197,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
     trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
     footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
-    footer_version: 'V5.5 — Provadágua Hotfix Final',
+    footer_version: 'V5.6 — Provadágua Launch',
     footer_privacy: 'Privacidade · LGPD · Termos',
   },
   en: {
@@ -233,16 +245,26 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     ],
     modules_title: 'Features',
     modules_subtitle: 'All features live at hub.encontrodagua.com — running 24/7',
+    modules_group_native: 'Native CRM Modules',
+    modules_group_custom: 'Custom AI Agents',
     modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
-      { icon: '👥', name: 'Contacts', desc: 'Client database with bidirectional sync', badge: 'Live' },
-      { icon: '📬', name: 'Inbox / Amazô', desc: 'Dual role: CS/SDR on LPs (external) + native CRM agent (internal)', badge: 'AI' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', badge: 'AI' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live' },
+      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live', group: 'native' },
+      { icon: '👥', name: 'Contacts', desc: 'Client database with bidirectional sync', badge: 'Live', group: 'native' },
+      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live', group: 'native' },
+      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live', group: 'native' },
+      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live', group: 'native' },
+      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live', group: 'native' },
+      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live', group: 'native' },
+      { icon: '📬', name: 'Amazô', desc: 'Dual role: CS/SDR on LPs (external) + native CRM agent (internal)', badge: 'AI', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI for prompt engineering', badge: 'AI', group: 'custom' },
+    ],
+    faq_title: 'Frequently Asked Questions',
+    faq_items: [
+      { q: 'Do I need a credit card to try?', a: 'No. The 7-day Provadágua trial is 100% free. You just need an access keyword — request it via WhatsApp.' },
+      { q: 'Is my data isolated from others?', a: 'Yes. Each company has its own company_id with active RLS. Data is never visible to other tenants.' },
+      { q: "What's the difference between Native modules and AI Agents?", a: 'Native modules are core CRM tools (Kanban, Contacts, Reports). AI Agents are intelligent assistants integrated into your workflow.' },
+      { q: 'Can I use it in English?', a: 'Yes. PT/EN language toggle available on all screens.' },
+      { q: 'What happens after 7 days?', a: 'You decide whether to activate a plan. No automatic charges.' },
     ],
     qa_eyebrow: 'V3.0 Audit — April 2026',
     qa_title: 'QA & Security Report',
@@ -309,7 +331,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Try Provadágua for 7 days — Free',
     trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
     footer_built: 'Built with ❤ by the Encontro D\'Água team',
-    footer_version: 'V5.5 — Provadágua Hotfix Final',
+    footer_version: 'V5.6 — Provadágua Launch',
     footer_privacy: 'Privacy · LGPD/GDPR · Terms',
   },
 };
@@ -490,19 +512,17 @@ const ShowcasePage: React.FC = () => {
       >
         {/* Logo */}
         <a href="/#/" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-          <div
+          <img
+            src="/logos/logo-icon-gold-transp.png"
+            alt="Encontro d'Agua Hub"
             aria-hidden="true"
             style={{
               width: '34px', height: '34px',
-              background: S.cyanBlue,
+              objectFit: 'contain',
               borderRadius: '9px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '18px',
-              boxShadow: '0 0 18px rgba(14,165,233,0.4)',
+              filter: 'drop-shadow(0 0 10px rgba(200,147,58,0.5))',
             }}
-          >
-            💧
-          </div>
+          />
           <span style={{ fontWeight: 700, fontSize: '0.95rem', color: S.textPrimary, letterSpacing: '-0.01em' }}>
             Encontro D’Água Hub
           </span>

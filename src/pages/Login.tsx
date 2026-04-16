@@ -71,7 +71,7 @@ const Login: React.FC = () => {
   // ── i18n ──────────────────────────────────────────────────────────────────
   const txt = {
     // Hub puro
-    hubTitle:       isEn ? 'Hub Access' : 'Acesso ao Hub',
+    hubTitle:       isEn ? 'Hub Digital Access' : 'Acesso ao Hub Digital',
     hubSub:         isEn ? 'Enter with your credentials.' : 'Entre com suas credenciais.',
     hubEmailLbl:    'E-mail',
     hubPassLbl:     isEn ? 'Password' : 'Senha',
@@ -80,10 +80,12 @@ const Login: React.FC = () => {
     hubBlocked:     isEn
       ? 'Administrative access only. Please enter through the Provadágua showcase.'
       : 'Acesso administrativo restrito. Entre pela página da Provadágua.',
+    hubNotTeam:     isEn ? 'Not part of the team? Discover the Provadágua →' : 'Não é da equipe? Conheça a Provadágua →',
 
     // Showcase — Cadastro
-    regTitle:       isEn ? 'Start your 7-day trial' : 'Comece sua Provadágua de 7 dias',
-    regSub:         isEn ? 'Fill in your details and enter the access keyword.' : 'Preencha seus dados e insira a palavra-chave de acesso.',
+    regTitle:       isEn ? 'Access to Provadágua CRM' : 'Acesso à Provadágua do CRM',
+    regSub:         isEn ? 'New registration. Enter the access keyword.' : 'Novo cadastro. Insira a palavra-chave de acesso.',
+    regTab:         isEn ? 'New Registration' : 'Novo Cadastro',
     regName:        isEn ? 'Your full name' : 'Seu nome completo',
     regEmail:       isEn ? 'Your professional email' : 'Seu e-mail profissional',
     regKeyword:     isEn ? 'Access keyword' : 'Palavra-chave de acesso',
@@ -95,11 +97,12 @@ const Login: React.FC = () => {
     regNoKey:       isEn ? "Don't have a keyword?" : 'Não tem a palavra-chave?',
 
     // Showcase — SignIn toggle
-    signinTitle:    isEn ? 'Sign In' : 'Entrar',
+    signinTitle:    isEn ? 'Access to Provadágua CRM' : 'Acesso à Provadágua do CRM',
+    signinTab:      isEn ? 'I already have an account' : 'Já tenho conta',
     signinSub:      isEn ? 'Access your existing account.' : 'Acesse sua conta existente.',
     signinSubmit:   isEn ? 'Sign In' : 'Entrar',
     signinLoading:  isEn ? 'Signing in...' : 'Entrando...',
-    signinBack:     isEn ? '← Register instead' : '← Cadastrar em vez disso',
+    signinBack:     isEn ? '← New Registration' : '← Novo Cadastro',
 
     // Erros
     errMissing:     isEn ? 'Fill in your name and email.' : 'Preencha seu nome e e-mail.',
@@ -395,18 +398,18 @@ const Login: React.FC = () => {
         <div className="max-w-md w-full relative z-10 px-4">
           {/* Logo */}
           <div className="text-center mb-8">
-            <button
-              onClick={handleLogoTripleClick}
+            <a
+              href="/#/"
+              onClick={(e) => { if (logoClickCountRef.current >= 2) { e.preventDefault(); handleLogoTripleClick(); } else { handleLogoTripleClick(); } }}
               className="inline-block mb-4 opacity-90 hover:opacity-100 transition-opacity"
               title="Hub Digital"
-              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
               <img
                 src="/logos/logo-icon-gold-transp.png"
-                alt="Encontro d'Água Hub"
+                alt="Encontro d'\u00c1gua Hub"
                 className="h-16 w-16 object-contain mx-auto"
               />
-            </button>
+            </a>
             <h1 className="text-2xl font-extrabold text-white tracking-tight mb-1">{txt.hubTitle}</h1>
             <p className="text-slate-500 text-sm">{txt.hubSub}</p>
           </div>
@@ -469,7 +472,16 @@ const Login: React.FC = () => {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-xs text-slate-600">{txt.footer}</p>
+          <div className="mt-4 text-center space-y-2">
+            <p className="text-xs text-slate-600">{txt.footer}</p>
+            <a
+              id="hub-login-not-team"
+              href="/#/showcase"
+              className="inline-block text-xs text-purple-500 hover:text-purple-400 transition-colors"
+            >
+              {txt.hubNotTeam}
+            </a>
+          </div>
         </div>
 
         <AiflowSupport />
@@ -495,32 +507,57 @@ const Login: React.FC = () => {
 
       <div className="max-w-md w-full relative z-10 px-4">
         {/* Logo */}
-        <div className="text-center mb-6">
-          <button
-            onClick={handleLogoTripleClick}
-            className="inline-block mb-3 opacity-90 hover:opacity-100 transition-opacity"
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        <div className="text-center mb-4">
+          <a
+            href="/#/showcase"
+            onClick={() => handleLogoTripleClick()}
+            className="inline-block mb-2 opacity-90 hover:opacity-100 transition-opacity"
           >
             <img
               src="/logos/logo-icon-gold-transp.png"
               alt="Encontro d'Água Hub"
-              className="h-16 w-16 object-contain mx-auto"
+              className="h-14 w-14 object-contain mx-auto"
             />
-          </button>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider mb-3">
-            <Leaf className="w-3 h-3" /> Provadágua — 7 dias grátis
-          </div>
+          </a>
+          <h1 className="text-xl font-extrabold text-white mb-2">
+            {showcaseView === 'register' ? txt.regTitle : txt.signinTitle}
+          </h1>
         </div>
 
-        <div className="bg-slate-900/60 border border-white/8 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
+        {/* Abas: Novo Cadastro / Já tenho conta */}
+        <div className="flex rounded-xl bg-slate-900/50 border border-white/8 p-1 mb-3">
+          <button
+            id="tab-register"
+            type="button"
+            onClick={() => { setShowcaseView('register'); setKeywordError(null); setSigninError(null); }}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+              showcaseView === 'register'
+                ? 'bg-purple-700 text-white shadow'
+                : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {txt.regTab}
+          </button>
+          <button
+            id="tab-signin"
+            type="button"
+            onClick={() => { setShowcaseView('signin'); setKeywordError(null); setSigninError(null); }}
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+              showcaseView === 'signin'
+                ? 'bg-purple-700 text-white shadow'
+                : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {txt.signinTab}
+          </button>
+        </div>
+
+        <div className="bg-slate-900/60 border border-white/8 rounded-2xl shadow-2xl p-6 backdrop-blur-sm">
 
           {/* ── CADASTRAR (padrão) ── */}
           {showcaseView === 'register' && (
             <form onSubmit={handleKeywordSubmit} className="space-y-4">
-              <div className="text-center mb-4">
-                <h1 className="text-xl font-bold text-white mb-1">{txt.regTitle}</h1>
-                <p className="text-slate-400 text-xs">{txt.regSub}</p>
-              </div>
+              <p className="text-slate-500 text-xs text-center mb-2">{txt.regSub}</p>
 
               {/* Nome */}
               <div>

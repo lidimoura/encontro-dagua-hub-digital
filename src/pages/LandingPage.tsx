@@ -1008,6 +1008,42 @@ Agora, gere o prompt perfeito:`;
         {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
 
+        {/* ── CTA PROVADÁGUA — inserido após demo CRM V5.6 ── */}
+        <section className="py-16 px-6 bg-[#02040a]">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 via-[#02040a] to-amber-900/10 p-10 text-center shadow-2xl">
+              {/* Glows */}
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-16 right-0 w-60 h-60 bg-amber-600/8 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10">
+                <span className="inline-block px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400 text-xs font-bold uppercase tracking-widest mb-4">
+                  🌏 Provadágua — Acesso Gratuito por 7 dias
+                </span>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 leading-tight">
+                  {t('language') === 'en'
+                    ? 'Try the Provadágua: Your business ecosystem in 7 days'
+                    : 'Experimente a Provadágua: O seu ecossistema de gestão em 7 dias'}
+                </h2>
+                <p className="text-slate-400 text-sm mb-6 max-w-xl mx-auto">
+                  {t('language') === 'en'
+                    ? 'CRM with AI, isolated data per company, SDR agent 24/7 and LGPD compliance. No credit card.'
+                    : 'CRM com IA, dados isolados por empresa, agente SDR 24/7 e conformidade LGPD. Sem cartão de crédito.'}
+                </p>
+                <a
+                  id="lp-cta-provadagua"
+                  href="/#/showcase"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 text-white font-extrabold text-base shadow-lg shadow-purple-500/30 transition-all active:scale-[0.98] hover:-translate-y-0.5"
+                >
+                  {t('language') === 'en'
+                    ? 'Discover the Provadágua →'
+                    : 'Experimente a Provadágua →'}
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── PRICING REMOVED V5.5 — checkout centralizado nos cards de produto ── */}
 
 
