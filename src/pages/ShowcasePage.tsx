@@ -413,31 +413,37 @@ const ShowcasePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && e.target.id) {
-            setVisible((prev) => new Set(prev).add(e.target.id));
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    document.querySelectorAll('[data-obs]').forEach((el) => {
-      if (el.id && !observedRef.current.has(el.id)) {
-        obs.observe(el);
-        observedRef.current.add(el.id);
-      }
-    });
-    return () => obs.disconnect();
+    // Delay 200ms para garantir que o DOM das seções está montado
+    const timeout = setTimeout(() => {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting && e.target.id) {
+              setVisible((prev) => new Set(prev).add(e.target.id));
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      document.querySelectorAll('[data-obs]').forEach((el) => {
+        if (el.id && !observedRef.current.has(el.id)) {
+          obs.observe(el);
+          observedRef.current.add(el.id);
+        }
+      });
+      return () => obs.disconnect();
+    }, 200);
+    return () => clearTimeout(timeout);
   }, []);
 
   const isVis = (id: string) => visible.has(id);
 
+  // SAFE fadeIn: conteúdo SEMPRE visível (opacity:1).
+  // IntersectionObserver adiciona a animação de slide — nunca bloqueia renderização.
   const fadeIn = (id: string, delay = 0): React.CSSProperties => ({
-    opacity: isVis(id) ? 1 : 0,
-    transform: isVis(id) ? 'translateY(0)' : 'translateY(36px)',
-    transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+    opacity: 1,                          // sempre visível — jamais opacity:0
+    transform: isVis(id) ? 'translateY(0)' : 'translateY(24px)',
+    transition: `transform 0.65s ease ${delay}s`,
   });
 
   return (
@@ -525,8 +531,8 @@ const ShowcasePage: React.FC = () => {
           transition: 'all 0.3s ease',
         }}
       >
-        {/* Logo */}
-        <a href="/#/" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+        {/* Logo — no contexto Showcase, retorna para /#/showcase */}
+        <a href="/#/showcase" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
           <img
             src="/logos/logo-icon-gold-transp.png"
             alt="Encontro d'Agua Hub"
@@ -1759,7 +1765,7 @@ const ShowcasePage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 12px 48px rgba(16, 185, 129, 0.4)';
                 }}
               >
-                <img src="/logos/logo-icon.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0)' }} /> Falar com a Amazô 
+                <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0) invert(1)' }} /> Falar com a Amazô 
               </button>
 
               {/* Secondary CTA - WhatsApp */}
