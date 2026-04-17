@@ -2,6 +2,37 @@
 
 ---
 
+## 2026-04-17 — V6.4: Segurança no Cadastro · Campo de Senha · Keyword Oficial
+
+### 🔑 Palavra-chave Oficial da Demo
+- **Keyword:** `provadagua` (tudo minúsculo, sem acento, sem espaço)
+- Configurada via `VITE_ACCESS_KEYWORD=provadagua` no `.env` e Vercel
+- Validação: normaliza input (trim + lowercase + remove espaços) antes de comparar
+- Mensagem de erro: *"Palavra-chave incorreta. Solicite ao Admin."*
+
+### 🔒 Correção Crítica de Segurança — Campo de Senha no Cadastro
+- **Problema:** O formulário de cadastro da Provadágua (`from=showcase`) não tinha campo de senha.
+  O sistema gerava uma senha temporária aleatória (`Prova${Date.now()}!`) que era descartada após o signup.
+  **Resultado:** O lead criava conta, acessava o dashboard, mas **nunca conseguia logar novamente**
+  porque não sabia a senha.
+- **Fix:** Campo "Crie sua senha" adicionado ao formulário com:
+  - `type="password"` com toggle show/hide (Eye/EyeOff)
+  - Validação mínima de 6 caracteres antes do submit
+  - Lembrete: *"🔒 Guarde essa senha para entrar novamente depois."*
+  - `autoComplete="new-password"` para managers de senha do browser
+- **Handler:** `handleKeywordSubmit` agora usa `userPassword` (digitada pelo lead) em vez de `tempPassword` — tanto no signup quanto no `signInWithPassword` pós-cadastro
+
+### Fluxo Completo do Lead Amanda (V6.4)
+```
+1. Showcase → CTA "Iniciar Trial Grátis" → /#/login?from=showcase
+2. Formulário: Nome + Email + Keyword ('provadagua') + Senha (≥6 chars)
+3. submit → signup-showcase Edge Fn → supabase.auth.signInWithPassword(email, userPassword)
+4. AuthContext.fetchProfile (maybeSingle) → loading=false → /dashboard
+5. Retorno: Amanda loga com email + senha que ela definiu
+```
+
+---
+
 ## 2026-04-16 — V6.2: Final Release QA · Stripe · WA Business Lidi · GA4
 
 ### Arquitetura de Canais (documentada)

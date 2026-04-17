@@ -70,6 +70,10 @@ const Login: React.FC = () => {
   const [signinError, setSigninError] = useState<string | null>(null);
   const [showSigninPassword, setShowSigninPassword] = useState(false);
 
+  // ── V6.4: Campo de senha no cadastro Provadágua ─────────────────────────
+  const [leadPassword, setLeadPassword] = useState('');
+  const [showLeadPassword, setShowLeadPassword] = useState(false);
+
   // ── i18n ──────────────────────────────────────────────────────────────────
   const txt = {
     // Hub puro
@@ -92,6 +96,9 @@ const Login: React.FC = () => {
     regEmail:       isEn ? 'Your professional email' : 'Seu e-mail profissional',
     regKeyword:     isEn ? 'Access keyword' : 'Palavra-chave de acesso',
     regKeyPlaceholder: isEn ? 'Your keyword...' : 'Sua palavra-chave...',
+    regPassword:    isEn ? 'Create your password' : 'Crie sua senha',
+    regPassPlaceholder: isEn ? 'Min. 6 characters' : 'Mín. 6 caracteres',
+    regPassWeak:    isEn ? 'Password must be at least 6 characters.' : 'A senha precisa ter ao menos 6 caracteres.',
     regSubmit:      isEn ? '🌿 Start Free Trial' : '🌿 Iniciar Provadágua Grátis',
     regLoading:     isEn ? 'Opening access...' : 'Abrindo acesso...',
     regHaveAccount: isEn ? 'Already have an account? Sign in →' : 'Já tenho conta? Entrar →',
@@ -221,9 +228,16 @@ const Login: React.FC = () => {
       setKeywordLoading(false);
       return;
     }
+    // V6.4: Validação da senha do lead
+    if (leadPassword.length < 6) {
+      setKeywordError(txt.regPassWeak);
+      setKeywordLoading(false);
+      return;
+    }
 
     try {
-      const tempPassword = `Prova${Date.now()}!`;
+      // V6.4: usa a senha definida pelo próprio lead (não mais senha temporária descartada)
+      const userPassword   = leadPassword;
       const normalizedEmail = leadEmail.trim().toLowerCase();
 
       const controller = new AbortController();
@@ -237,7 +251,7 @@ const Login: React.FC = () => {
           body: {
             name:     leadName.trim(),
             email:    normalizedEmail,
-            password: tempPassword,
+            password: userPassword,
             language: isEn ? 'en' : 'pt',
           },
         });
@@ -263,7 +277,7 @@ const Login: React.FC = () => {
 
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email:    normalizedEmail,
-        password: tempPassword,
+        password: userPassword, // usa a senha que o próprio lead definiu
       });
       if (loginError) throw loginError;
 
@@ -622,6 +636,41 @@ const Login: React.FC = () => {
                     {txt.regRequestKey}
                   </a>
                 </div>
+              </div>
+
+              {/* ── V6.4: Campo de Senha ─── */}
+              <div>
+                <label htmlFor="lead-password" className="block text-sm font-medium text-slate-300 mb-1.5">
+                  {txt.regPassword}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="lead-password"
+                    type={showLeadPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    className="block w-full pl-10 pr-10 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all sm:text-sm"
+                    placeholder={txt.regPassPlaceholder}
+                    value={leadPassword}
+                    onChange={e => setLeadPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowLeadPassword(v => !v)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                    aria-label={showLeadPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  >
+                    {showLeadPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-slate-600 mt-1.5">
+                  {isEn ? '🔒 Save this password to log in again later.' : '🔒 Guarde essa senha para entrar novamente depois.'}
+                </p>
               </div>
 
               {keywordError && (
