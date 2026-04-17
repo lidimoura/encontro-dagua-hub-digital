@@ -114,10 +114,12 @@ const Login: React.FC = () => {
     signinBack:     isEn ? '← New Registration' : '← Novo Cadastro',
 
     // Erros
-    errMissing:     isEn ? 'Fill in your name and email.' : 'Preencha seu nome e e-mail.',
+    errMissing:     isEn ? 'Fill in all required fields.' : 'Preencha todos os campos obrigatórios.',
     errKeyword:     isEn ? 'Wrong keyword. Request from the team.' : 'Palavra-chave incorreta. Solicite à equipe.',
     errGeneric:     isEn ? 'Error. Try again.' : 'Erro. Tente novamente.',
-    errEmailUsed:   isEn ? 'Email already registered. Sign in instead.' : 'E-mail já cadastrado. Use "Entrar".',
+    errEmailUsed:   isEn
+      ? 'This email is already registered. Click “I have an account” to sign in.'
+      : 'Este e-mail já está cadastrado. Clique em “Já tenho conta” para fazer o login.',
     errLogin:       isEn ? 'Login failed. Check credentials.' : 'Falha no login. Verifique as credenciais.',
 
     // God Mode
@@ -236,48 +238,38 @@ const Login: React.FC = () => {
     }
 
     try {
-      // V6.4: senha definida pelo próprio lead no formulário
-      const userPassword   = leadPassword;
       const normalizedEmail = leadEmail.trim().toLowerCase();
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      let signupData: any = null;
-      let signupError: any = null;
-
-      try {
-        const result = await supabase.functions.invoke('signup-showcase', {
-          body: {
-            name:     leadName.trim(),
-            email:    normalizedEmail,
-            password: userPassword,
-            language: isEn ? 'en' : 'pt',
+      // V6.5: usa supabase.auth.signUp() nativo — elimina CORS da Edge Function
+      const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
+        email:    normalizedEmail,
+        password: leadPassword,
+        options: {
+          data: {
+            full_name:  leadName.trim(),
+            user_type:  'lead_provadagua',
           },
-        });
-        signupData  = result.data;
-        signupError = result.error;
-      } catch (invokeErr: any) {
-        if (invokeErr?.name === 'AbortError') {
-          throw new Error(isEn ? 'Request timeout. Check your connection.' : 'Tempo esgotado. Verifique sua conexão.');
-        }
-        throw invokeErr;
-      } finally {
-        clearTimeout(timeoutId);
-      }
+        },
+      });
 
-      if (signupData?.error === 'email_already_registered') {
+      // Detecta email já cadastrado: Supabase retorna user com identidades vazias
+      const alreadyExists =
+        signUpError?.message?.toLowerCase().includes('already registered') ||
+        signUpError?.message?.toLowerCase().includes('user already') ||
+        (signUpResult?.user && signUpResult.user.identities?.length === 0);
+
+      if (alreadyExists) {
         setKeywordError(txt.errEmailUsed);
         setKeywordLoading(false);
         return;
       }
-      if (signupError) {
-        throw new Error(signupError?.message || txt.errGeneric);
-      }
 
+      if (signUpError) throw signUpError;
+
+      // Auto-login após cadastro bem-sucedido
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email:    normalizedEmail,
-        password: userPassword,
+        password: leadPassword,
       });
       if (loginError) throw loginError;
 
@@ -575,39 +567,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleKeywordSubmit} className="space-y-4">
               <p className="text-slate-500 text-xs text-center mb-2">{txt.regSub}</p>
 
-              {/* Nome */}
-              <div>
-                <label htmlFor="lead-name" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.regName}</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <input
-                    id="lead-name" type="text" required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all sm:text-sm"
-                    placeholder={isEn ? 'Your name' : 'Seu nome'}
-                    value={leadName} onChange={e => setLeadName(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label htmlFor="lead-email" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.regEmail}</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <input
-                    id="lead-email" type="email" required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all sm:text-sm"
-                    placeholder="seu@email.com"
-                    value={leadEmail} onChange={e => setLeadEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Palavra-chave */}
+              {/* 1º Campo: Palavra-chave — é o gatekeeper, vem primeiro */}
               <div>
                 <label htmlFor="keyword" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.regKeyword}</label>
                 <div className="relative">
@@ -621,7 +581,6 @@ const Login: React.FC = () => {
                     value={keyword} onChange={e => setKeyword(e.target.value)}
                   />
                 </div>
-
                 {/* Solicitar palavra-chave */}
                 <div className="mt-2 flex items-center gap-2">
                   <p className="text-xs text-slate-600">{txt.regNoKey}</p>
@@ -638,7 +597,39 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* ── V6.4: Campo de Senha ─── */}
+              {/* 2º Campo: Nome */}
+              <div>
+                <label htmlFor="lead-name" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.regName}</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="lead-name" type="text" required
+                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all sm:text-sm"
+                    placeholder={isEn ? 'Your name' : 'Seu nome'}
+                    value={leadName} onChange={e => setLeadName(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* 3º Campo: Email */}
+              <div>
+                <label htmlFor="lead-email" className="block text-sm font-medium text-slate-300 mb-1.5">{txt.regEmail}</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    id="lead-email" type="email" required
+                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all sm:text-sm"
+                    placeholder="seu@email.com"
+                    value={leadEmail} onChange={e => setLeadEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* 4º Campo: Senha */}
               <div>
                 <label htmlFor="lead-password" className="block text-sm font-medium text-slate-300 mb-1.5">
                   {txt.regPassword}

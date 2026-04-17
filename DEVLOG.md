@@ -2,6 +2,45 @@
 
 ---
 
+## 2026-04-17 — V6.5: Hotfix CORS · signUp Nativo · Reordenação do Formulário
+
+### ❌ Problema Resolvido: Bloqueio de CORS na Edge Function
+- A `signup-showcase` Edge Function estava sendo bloqueada por CORS no preflight request.
+- **Causa:** requisição fetch para Supabase Edge Functions em contexto de browser disparava preflight OPTIONS que não passava no check de `access-control-allow-origin`.
+- **Fix:** A chamada `supabase.functions.invoke('signup-showcase', ...)` foi **removida completamente** do `Login.tsx`.
+
+### ✅ Solução: supabase.auth.signUp() Nativo
+- Substituído por chamada direta ao Auth client:
+  ```ts
+  supabase.auth.signUp({
+    email, password: leadPassword,
+    options: { data: { full_name: name, user_type: 'lead_provadagua' } }
+  })
+  ```
+- Metadados do lead (`full_name`, `user_type`) passados via `options.data` → armazenados no `raw_user_meta_data` do Supabase Auth.
+- Auto-login imediato pós-cadastro com `signInWithPassword`.
+
+### 🔍 Detecção de Email Já Cadastrado (User Already Exists)
+- Supabase retorna `user.identities.length === 0` quando o email já existe (em vez de erro HTTP 409).
+- Lógica de detecção tripla: mensagem de erro + identidades vazias.
+- Mensagem exibida: *"Este e-mail já está cadastrado. Clique em 'Já tenho conta' para fazer o login."*
+
+### 🔁 Reordenação do Formulário (UX)
+- **Antes:** Nome → Email → Palavra-chave → Senha
+- **Agora:** Palavra-chave → Nome → Email → Senha
+- Justificativa: a palavra-chave é o gatekeeper — se o lead não tem, ele solicita via WA antes de preencher dados pessoais.
+
+### Fluxo Completo do Lead Amanda (V6.5)
+```
+1. Showcase → CTA "Iniciar Trial Grátis" → /#/login?from=showcase (ou domínio prova.*)
+2. Formulário: Palavra-chave ('provadagua') → Nome → Email → Senha (≥6 chars)
+3. submit → supabase.auth.signUp() com metadata → signInWithPassword(email, leadPassword)
+4. AuthContext.fetchProfile (maybeSingle) → loading=false → /dashboard
+5. Retorno: Amanda loga com email + senha que ela definiu
+```
+
+---
+
 ## 2026-04-17 — V6.4: Segurança no Cadastro · Campo de Senha · Keyword Oficial
 
 ### 🔑 Palavra-chave Oficial da Demo
