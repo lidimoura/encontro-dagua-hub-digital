@@ -319,6 +319,16 @@ export default function AdminPage() {
                             {profiles.filter(p => !p.plan_type || p.plan_type === 'free').length}
                         </p>
                     </div>
+                    {/* V6.3: Leads Provadágua counter */}
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-purple-500/40">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-purple-500 text-sm">🌿</span>
+                            <span className="text-xs text-purple-400 font-bold">Lead Provadágua</span>
+                        </div>
+                        <p className="text-2xl font-bold text-purple-600">
+                            {profiles.filter(p => p.role === 'user' || p.user_type === 'lead_provadagua').length}
+                        </p>
+                    </div>
                 </div>
             )}
 
@@ -359,6 +369,12 @@ export default function AdminPage() {
                                                     {profile.plan_type === 'annual' ? 'ANNUAL' :
                                                         profile.plan_type === 'monthly' ? 'MONTHLY' : 'FREE'}
                                                 </span>
+                                                {/* V6.3: Badge Lead Provadágua */}
+                                                {(profile.role === 'user' || profile.user_type === 'lead_provadagua') && (
+                                                    <span className="text-xs font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full">
+                                                        🌿 LEAD
+                                                    </span>
+                                                )}
                                                 {profile.phone && (
                                                     <>
                                                         <span className="text-xs text-slate-400">•</span>
@@ -370,13 +386,26 @@ export default function AdminPage() {
                                             </div>
                                         </div>
 
-                                        <button
-                                            onClick={() => setEditingProfile(profile)}
-                                            className="px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white"
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                            {t('editUser')}
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            {/* V6.3: Botão WA direto para leads */}
+                                            {(profile.role === 'user' || profile.user_type === 'lead_provadagua') && profile.email && (
+                                                <a
+                                                    href={`https://wa.me/5541992557600?text=${encodeURIComponent(`Olá, Lidi! Verificando o lead Provadágua: ${profile.email}. Como posso ajudar?`)}`}
+                                                    target="_blank" rel="noopener noreferrer"
+                                                    title="Contato via WhatsApp Business"
+                                                    className="px-3 py-2 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-500 text-white transition flex items-center gap-1"
+                                                >
+                                                    💬 WA
+                                                </a>
+                                            )}
+                                            <button
+                                                onClick={() => setEditingProfile(profile)}
+                                                className="px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                                {t('editUser')}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))

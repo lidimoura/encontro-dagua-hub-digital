@@ -143,7 +143,7 @@ const Login: React.FC = () => {
         .from('profiles')
         .select('is_super_admin, access_level')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // V6.3: evita PGRST116
 
       const isHubAdmin = profile?.is_super_admin === true;
       if (!isHubAdmin) {
@@ -182,7 +182,7 @@ const Login: React.FC = () => {
         .from('profiles')
         .select('is_super_admin, access_level')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // V6.3: evita PGRST116
 
       const isHubAdmin = profile?.is_super_admin === true;
       if (!isHubAdmin) {

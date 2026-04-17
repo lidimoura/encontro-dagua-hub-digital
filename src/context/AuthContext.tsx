@@ -59,14 +59,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
-                .single();
+                .maybeSingle(); // V6.3: maybeSingle evita PGRST116 (406) quando perfil ainda não existe
 
             if (error) {
-                console.error('Error fetching profile:', error);
-            } else {
-                setProfile(data);
+                // Erro real de rede/RLS — log mas não bloqueia
+                console.warn('[AuthContext] Erro ao buscar perfil (não bloqueante):', error);
             }
+
+            if (data) {
+                setProfile(data);
+            } else {
+                // Perfil ainda não criado (delay pós-signup) ou not found
+                // Fica null — ProtectedRoute lida com isso roteando para dashboard mesmo assim
+                console.info('[AuthContext] Perfil não encontrado para', userId, '— usando perfil temporário');
+                setProfile(null);
+            }
+        } catch (e) {
+            // Captura qualquer excessão inesperada — nunca trava o loading
+            console.warn('[AuthContext] Excessão em fetchProfile:', e);
         } finally {
+            // SEMPRE libera o loading — usuário nunca fica preso
             setLoading(false);
         }
     };

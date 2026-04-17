@@ -70,9 +70,13 @@ export async function sendNexusAlert(payload: NexusAlertPayload): Promise<void> 
             keepalive: true,
             signal: controller.signal,
         });
-    } catch (err) {
-        // Silent failure — log locally, NEVER re-throw
-        console.warn('[NexusBridge] Failed to send alert (network/timeout):', err);
+    } catch (err: any) {
+        // V6.3: AbortError capturado explicitamente — nunca bloqueia login ou renderização
+        if (err?.name === 'AbortError') {
+            console.warn('[NexusBridge] Alerta cancelado por timeout (3s) — rede lenta ou DNS falhou');
+        } else {
+            console.warn('[NexusBridge] Falha ao enviar alerta (não bloqueante):', err?.message ?? err);
+        }
     } finally {
         clearTimeout(timer);
     }
