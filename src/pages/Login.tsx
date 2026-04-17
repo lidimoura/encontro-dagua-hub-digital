@@ -236,7 +236,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      // V6.4: usa a senha definida pelo próprio lead (não mais senha temporária descartada)
+      // V6.4: senha definida pelo próprio lead no formulário
       const userPassword   = leadPassword;
       const normalizedEmail = leadEmail.trim().toLowerCase();
 
@@ -277,7 +277,7 @@ const Login: React.FC = () => {
 
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email:    normalizedEmail,
-        password: userPassword, // usa a senha que o próprio lead definiu
+        password: userPassword,
       });
       if (loginError) throw loginError;
 

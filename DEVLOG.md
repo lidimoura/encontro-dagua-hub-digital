@@ -12,15 +12,14 @@
 
 ### 🔒 Correção Crítica de Segurança — Campo de Senha no Cadastro
 - **Problema:** O formulário de cadastro da Provadágua (`from=showcase`) não tinha campo de senha.
-  O sistema gerava uma senha temporária aleatória (`Prova${Date.now()}!`) que era descartada após o signup.
-  **Resultado:** O lead criava conta, acessava o dashboard, mas **nunca conseguia logar novamente**
-  porque não sabia a senha.
+  O sistema gerava uma senha temporária aleatória (descartada internamente) que o lead nunca via.
+  **Resultado:** O lead criava conta, acessava o dashboard, mas **nunca conseguia logar novamente**.
 - **Fix:** Campo "Crie sua senha" adicionado ao formulário com:
   - `type="password"` com toggle show/hide (Eye/EyeOff)
   - Validação mínima de 6 caracteres antes do submit
-  - Lembrete: *"🔒 Guarde essa senha para entrar novamente depois."*
+  - Lembrete visível: *"🔒 Guarde essa senha para entrar novamente depois."*
   - `autoComplete="new-password"` para managers de senha do browser
-- **Handler:** `handleKeywordSubmit` agora usa `userPassword` (digitada pelo lead) em vez de `tempPassword` — tanto no signup quanto no `signInWithPassword` pós-cadastro
+- **Handler:** usa diretamente a senha digitada pelo lead — sem geração de strings internas
 
 ### Fluxo Completo do Lead Amanda (V6.4)
 ```
