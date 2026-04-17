@@ -1,47 +1,87 @@
 
 <div align="center">
 
-  <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="150">
+  <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
 
-  <h1>Encontro D'água Hub & CRM</h1>
+  <h1>Encontro D'Água Hub & CRM</h1>
 
-  <p>Ecossistema de Inteligência Aplicada a Data Science</p>
+  <p>Ecossistema de Gestão com IA — Multi-Tenant · Bilingue · LGPD-Ready</p>
 
 </div>
 
-  ### CRM de Produção `v4.4` — Lançamento Agente IA
+### CRM de Produção `V6.2` — Final Release · Provadágua Launch
 
-> **Branch `main` → hub.encontrodagua.com**
-> **Branch `provadagua` → prova.encontrodagua.com**
+> **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
+> **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V4.4**: Agente IA R$80 (oferta de lançamento) · LeadCaptureModal com redirect Stripe · source hub-lp-launch
+> **V6.2**: Links Stripe + mensagens Lidi WA Business · GA4 em todas as páginas · Hotfix DNS NexusBridge · Remoção forced-EN
 
 ---
 
-##  Sobre o Hub
+## Arquitetura Multi-Tenant (Hub vs Provadágua)
 
-O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Água. Centraliza todos os leads reais capturados via Link d'Água (webhook WhatsApp/Typebot), gerencia os deals no Board Kanban e automatiza o follow-up com a IA Mazô.
+O projeto opera em **dois contextos distintos**:
+
+| Contexto | URL | Branch | Acesso | Perfil |
+|---|---|---|---|---|
+| **Hub Digital** | `hub.encontrodagua.com` | `main` | Super Admin apenas | `is_super_admin = true` |
+| **Provadágua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate → trial 7d | `access_level = provadagua-trial` |
+
+### Fluxo Provadágua
+```
+/#/showcase  →  [CTA "Experimentar"]  →  /#/login?from=showcase
+              →  Aba "Novo Cadastro" (padrão)
+              →  Preenche nome + e-mail + palavra-chave
+              →  Edge Function signup-showcase
+              →  auto-login  →  /dashboard  (trial ativo 7 dias)
+```
+
+### Fluxo Hub
+```
+/#/login  →  Aba "Entrar" (única)  →  SignIn com e-mail/senha
+          →  Valida is_super_admin  →  /dashboard
+          →  Não-admin: bloqueado + link para /#/showcase
+```
 
 ---
 
-## Funcionalidades Principais
+## Endpoints Principais
+
+| Rota | Acesso | Descrição |
+|---|---|---|
+| `/#/` | Público | LandingPage Hub |
+| `/#/showcase` | Público | ShowcasePage Provadágua (LP pitch) |
+| `/#/login` | Público | Login Hub (só SignIn) |
+| `/#/login?from=showcase` | Público | Login Provadágua (SignUp com Keyword + SignIn) |
+| `/#/dashboard` | Auth | Dashboard CRM (ProtectedRoute) |
+| `/#/trial-expired` | Auth | Página pós-trial com NPS + CTA fechar negócio |
+
+### Edge Functions (Supabase)
+
+| Função | Método | Descrição |
+|---|---|---|
+| `signup-showcase` | POST | Cria usuário trial sem confirmação de e-mail |
+| `form-lp-lead` | POST | Captura lead via LeadCaptureModal → Board |
+| `qr-redirect` | GET | Redireciona slug QR Code para URL real |
+
+---
+
+## Funcionalidades
 
 | Módulo | Descrição |
 |---|---|
-| **Board Kanban** | Leads SDR (`🤖 sdr`) aparecem no primeiro estágio automaticamente |
-| **Contatos** | Todos os leads reais sincronizados — isolamento por `company_id` |
-| **Atividades / Inbox** | Tarefas e compromissos reais com briefing da Mazô |
-| **Mazô (IA)** | Agente de vendas com contexto completo dos leads |
-| **Jury (IA)** | Geração de contratos com visualização de PDF |
-| **Precy (IA)** | Precificação em BRL/USD/EUR com conversão automática |
-| **QRDágua** | Geração e gestão de QR Codes / Cartões Digitais |
-| **Catálogo** | Produtos salvos em BRL (preço canônico) |
-| **Reports** | Top Oportunidades, ciclo de vendas, win/loss real |
-| **Showcase LP** | Landing page pública bilingue com Pricing em `/#/showcase` |
-| **Pricing** | 3 planos: Mensal R$3 · Anual R$29,90 · Agente IA R$80 (Stripe) |
-| **Trial Gate** | Keyword `provadagua` → signup imediato sem email confirm · 7d trial |
-| **Agente IA** | Produto de lançamento R$80/mês — banner na HomePage + modal + redirect Stripe |
-| **Admin** | Super Admin (`lidimfc@gmail.com`), `access_expires_at`, Tech Stack |
+| **Board Kanban** | Leads mapeados ao funil automaticamente (tag `🤖 sdr` → estágio 1) |
+| **Contatos** | Base isolada por `company_id` (RLS ativo) |
+| **Jury** | Contratos BR + Common Law, PDF inline |
+| **Precy** | Precificação BRL/USD/EUR com catálogo |
+| **QR D'água** | QR Codes + Bridge Pages + galeria pública |
+| **Reports** | Pipeline + Win/Loss real (sem dados demo) |
+| **Admin** | Usuários, `access_expires_at`, Tech Stack, Super Admin |
+| **Amazô** | Agente IA: CS/SDR nas LPs + CRM nativo |
+| **Prompt Lab** | Engenharia de prompts multi-persona |
+| **ShowcasePage** | LP pública `/showcase` bilingue com FAQ + QA + Tech |
+| **Trial Gate** | Keyword `provadagua` → signup imediato · 7d trial |
+| **TrialExpiredPage** | NPS + feedback + CTA fechar negócio |
 
 ---
 
@@ -49,46 +89,53 @@ O **Encontro d'Água Hub** é o sistema operacional de vendas da Encontro d'Águ
 
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
 - **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
-- **IA**: Google Gemini (principal), OpenAI, Anthropic
-- **Deploy**: Vercel (branch `main` → `hub.encontrodagua.com`)
+- **IA**: Google Gemini (principal), OpenAI, Anthropic (fallback)
+- **Deploy**: Vercel (banch-based: `main` → hub / `provadagua` → prova)
 - **Webhook SDR**: Supabase Edge Function `form-lp-lead`
+- **Pagamentos**: Stripe (Prompt Lab Mensal R$3 · Anual R$29,90 · Agente IA R$80)
 
 ---
 
 ## Variáveis de Ambiente
 
 ```env
-VITE_APP_MODE=PRODUCTION
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-VITE_GEMINI_API_KEY=...
-VITE_GA4_MEASUREMENT_ID=G-MHH0WSX5QS   # GA4 (também injetado em index.html)
-VITE_ACCESS_KEYWORD=provadagua          # Palavra-chave do Lead Gate
-SUPABASE_SERVICE_ROLE_KEY=...           # Apenas Vercel Secrets — nunca commitar
-VITE_CRM_API_KEY=...                    # Opcional: Nexus Bridge
+# ── Públicas (bundled no client JS) ──────────────────────────────────────────
+VITE_APP_MODE=PRODUCTION          # DEMO em prova.encontrodagua.com
+VITE_SUPABASE_URL=https://...     # Supabase Project URL
+VITE_SUPABASE_ANON_KEY=eyJ...     # Anon key (segura — scoped por RLS)
+VITE_GEMINI_API_KEY=AIza...       # Google Gemini (público by design)
+VITE_GA4_MEASUREMENT_ID=G-...     # Google Analytics 4
+VITE_ACCESS_KEYWORD=provadagua    # Keyword Gate — mude para aumentar segurança
+VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (público)
+
+# ── Privadas (APENAS Vercel Secrets / .env local) ─────────────────────────────
+SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor — server-only / Edge Functions
 ```
 
----
-
-## Planos & Preços
-
-| Plano | Valor | Stripe / Ação |
-|---|---|---|
-| Prompt Lab Mensal | R$ 3,00/mês | fallback `/#/login` |
-| Prompt Lab Anual | R$ 29,90/ano | fallback `/#/login` |
-| Agente IA (SDR/SAC) | R$ 80,00/mês | [buy.stripe.com/...](https://buy.stripe.com/00wcMY9wU4nsdx4eRWaIM02) — via LeadCaptureModal |
-
-> V4.4: Leads do Agente IA entram no Board com tags `agente-ia-80`, `launch-offer` e source `hub-lp-launch`.
+> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** — se tiver, rotate imediatamente.
 
 ---
 
-## Fluxo SDR (Link d'Água → Board)
+## Segurança & RLS
 
-1. Lead preenche formulário no Typebot / WhatsApp
-2. Webhook `form-lp-lead` chama `capture_amazo_lead` no Supabase
-3. Contato criado com tag `🤖 sdr`
-4. Board auto-mapeia o contato para o **primeiro estágio**
-5. Mazô analisa e sugere follow-up no Inbox
+- Todas as tabelas críticas têm `company_id UUID` + RLS policy com bypass `is_super_admin`
+- Dados de demo isolados por `is_demo_data = true`
+- `access_expires_at` controlado por usuário — ProtectedRoute verifica em toda rota autenticada
+- `SUPABASE_SERVICE_ROLE_KEY` apenas em Vercel Secrets + `.env` local (nunca commitada)
+
+---
+
+## Deploy
+
+```bash
+# Provadágua (branch provadagua)
+git push origin provadagua
+# Vercel detecta → build → prova.encontrodagua.com
+
+# Hub (branch main)
+git push origin main
+# Vercel detecta → build → hub.encontrodagua.com
+```
 
 ---
 
@@ -96,25 +143,19 @@ VITE_CRM_API_KEY=...                    # Opcional: Nexus Bridge
 
 ```
 src/
-  features/       # Pages e módulos (boards, contacts, admin, ...)
+  pages/
+    LandingPage.tsx      # Hub LP — inclui CTA Provadágua após CRMSimulator
+    ShowcasePage.tsx     # Provadágua pitch LP bilingue completa
+    Login.tsx            # Multi-rota: Hub SignIn / Showcase SignUp+Keyword
+    TrialExpiredPage.tsx # Pós-trial: NPS + fechar negócio
+  features/              # Módulos CRM (boards, contacts, admin, ...)
   lib/
-    supabase/     # Services com IS_DEMO guards
-    query/hooks/  # TanStack Query hooks
-    appConfig.ts  # IS_DEMO = false em PRODUCTION
+    supabase/            # Services com IS_DEMO guards
+    analytics.ts         # GA4 eventos (trial_start, lead_capture, login, sign_up)
   hooks/
-    useTranslation.ts  # i18n (pt-BR padrão em PRODUCTION)
+    useTranslation.ts    # i18n PT-BR / EN
 ```
 
 ---
 
-## Deploy
-
-```bash
-git push origin main
-# Vercel detecta e faz build automático → hub.encontrodagua.com
-```
-
----
-
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI*
-
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V5.7 — Final Release*

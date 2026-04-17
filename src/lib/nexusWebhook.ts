@@ -1,12 +1,18 @@
 /**
  * ─── NEXUS BRIDGE — Agility OS Error Interceptor ──────────────────────────────
- * Sends real-time debug payloads to the Agility OS webhook (incoming-deal).
+ * Sends real-time debug payloads to the project's own Supabase webhook.
  * Authenticated via VITE_CRM_API_KEY environment variable.
+ *
+ * ⚠️  URL GUARD: Only fires if the Supabase URL belongs to THIS project.
+ *     Never blocks page rendering — silent fail with console.warn.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-const NEXUS_WEBHOOK_URL =
-    'https://kfejaqwzgzlmuaodhwmf.supabase.co/functions/v1/incoming-deal';
+// ── URL deste projeto (via env) ───────────────────────────────────────────────
+const THIS_SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined) || '';
+const NEXUS_WEBHOOK_URL = THIS_SUPABASE_URL
+  ? `${THIS_SUPABASE_URL}/functions/v1/incoming-deal`
+  : ''; // vazio = desativado
 
 export interface NexusAlertPayload {
     /** Human-readable error description */
@@ -26,13 +32,19 @@ export interface NexusAlertPayload {
 }
 
 /**
- * Fires a debug payload to the Agility OS Nexus webhook.
- * Fails silently — never throws, so it won't cascade into a second error.
+ * Fires a debug payload to the project's own Supabase webhook.
+ * NEVER throws — fails silently with console.warn.
+ * Uses AbortController (3s) so a dead DNS never hangs the browser.
  */
 export async function sendNexusAlert(payload: NexusAlertPayload): Promise<void> {
+    // ── Guard: desativado se URL não configurada ──────────────────────────────
+    if (!NEXUS_WEBHOOK_URL) {
+        console.warn('[NexusBridge] Webhook URL not configured — skipping alert.');
+        return;
+    }
+
     const apiKey = import.meta.env.VITE_CRM_API_KEY as string | undefined;
 
-    // Enrich the payload with runtime context
     const enrichedPayload: NexusAlertPayload = {
         ...payload,
         app_state: {
@@ -43,6 +55,10 @@ export async function sendNexusAlert(payload: NexusAlertPayload): Promise<void> 
         },
     };
 
+    // AbortController: cancela após 3s — nunca bloqueia a UI
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+
     try {
         await fetch(NEXUS_WEBHOOK_URL, {
             method: 'POST',
@@ -51,11 +67,14 @@ export async function sendNexusAlert(payload: NexusAlertPayload): Promise<void> 
                 'x-nexus-key': apiKey || '',
             },
             body: JSON.stringify(enrichedPayload),
-            // Don't block the page — fire and forget
             keepalive: true,
+            signal: controller.signal,
         });
     } catch (err) {
-        // Silent failure — log locally but never let this throw
-        console.warn('[NexusBridge] Failed to send alert:', err);
+        // Silent failure — log locally, NEVER re-throw
+        console.warn('[NexusBridge] Failed to send alert (network/timeout):', err);
+    } finally {
+        clearTimeout(timer);
     }
 }
+

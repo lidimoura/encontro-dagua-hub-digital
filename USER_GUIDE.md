@@ -77,13 +77,11 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 - **Biblioteca**: Gerencie templates de contratos e assets.
 - **Decisões**: Insights de IA sobre deals estagnados.
 
-### 6. Prova D'água (Demo Gratuito)
-- **Conceito**: Ambiente seguro para testar o poder do Hub sem compromisso.
-- **Como Acessar**: Clique em "Quero o meu" na Landing Page.
-- **Funcionalidades**:
-    - **Prompt Lab**: Teste suas ideias com persona "Engenheiro" ou "Especialista em Marketing".
-    - **Kanban Demo**: Mova cards em um fluxo simulado de negociação.
-- **Privacidade**: Nenhum dado é salvo permanentemente no modo Demo.
+### 6. Provadágua (CRM Customizado — Trial)
+- **Conceito**: Sandbox realista para testar o ecossistema CRM da Lidi Moura ("O seu software deveria trabalhar para você, não o contrário").
+- **Como Acessar**: Inserir palavra-chave `provadagua` na página de Login. Acesso de 7 dias liberado imediatamente.
+- **Isolamento de Dados**: Leads de trial caem em um `company_id` próprio. Eles nunca verão os dados do Hub administrativo.
+- **Pós-Trial (V5.3)**: Quando o tempo acaba (`access_expires_at`), o acesso é bloqueado e o sistema força o roteamento para a tela `/trial-expired`, contendo NPS, consentimento LGPD e fluxo de Upsell focado em vendas via WhatsApp.
 
 ---
 
@@ -94,18 +92,21 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 4. **Explore os Agentes**: Abra um card de Deal e clique na aba "Agentes" para interagir com Jury e Precy.
 5. **Configure seu Link d'Água**: Acesse `/qrdagua` e crie sua vitrine digital.
 
-## Suporte
-Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** no canto inferior esquerdo. Selecione **"Reportar Bug / Feedback"** para enviar uma mensagem direta à nossa equipe de engenharia.
-
+## Suporte e Contato
+Para suporte técnico, feedback ou encerramento de trial, entre em contato exclusivo pelo **WhatsApp Business (Administrativo Hub e Provadágua)**: `+55 (41) 99255-7600`.
 ---
 
-## 7. Pagamentos & Acesso (Stripe + Provadágua) — V4.3
+## 7. Acesso, God Mode e Upsell (V5.3)
 
-### Trial Keyword — Acesso Imediato
+### Hub vs Provadágua — Separação Estrita
+A nova estrutura divide o acesso:
+- **Hub (Admin)**: Somente `is_super_admin` consegue acesso. Qualquer tentativa de lead entrar no Hub resulta em logout automático e bloqueio com a mensagem "Acesso administrativo restrito".
+- **God Mode**: Para login administrativo, é exigido dar triplo clique no logotipo (na tela de `/login`). Isso libera o botão de acesso admin bypassando o formulário Provadágua.
+
+### Trial Keyword — Acesso Imediato Leads Provadágua
 - **Keyword:** `provadagua`
-- Inserida na tela de Login → campo "Palavra-chave de acesso"
-- Flow: nome + e-mail + keyword → Edge Function `signup-showcase` → Dashboard imediato
-- **7 dias de acesso** sem confirmação de e-mail (`email_confirm: true`)
+- Inserida pelo Lead. Flow: nome + e-mail + keyword → Edge Function `signup-showcase` (timeout 15s) → Dashboard imediato
+- **7 dias de acesso** marcados no `access_expires_at` do Profile
 - Dados isolados por empresa (`company_id` único por lead)
 
 ### Planos Disponíveis
@@ -124,6 +125,76 @@ Para suporte técnico, feedback ou reportar bugs, use o botão azul **"Ajuda"** 
 3. Use botão **+7d** para liberar mais 7 dias ou **Block** para revogar acesso
 4. O campo `access_expires_at` controla o vencimento automaticamente
 
+---
+
+## 8. MVP V4.3 — Lançamento Provadágua
+
+> *Atualizado: 12 Abril 2026 · Build V4.3*
+
+### Identidade da Fundadora
+- **Nome:** Lidi Moura
+- **Formação:** Formada em Psicologia e Especialista em Dados
+- **Público-alvo:** Profissionais de Saúde e Empreendedores
+
+### Fluxo de Acesso pela Palavra-Chave (CHAVE: `provadagua`)
+
+| Etapa | Ação |
+|---|---|
+| 1 | Usuário acessa `/#/login` e clica **"Entrar no Hub"** |
+| 2 | Preenche nome, e-mail e digita `provadagua` |
+| 3 | Clique em **"Entrar no Hub — Acesso Imediato"** |
+| 4 | Edge Function `signup-showcase` cria conta com `email_confirm: true` |
+| 5 | Sistema seta `access_expires_at = now() + 7 dias` automaticamente |
+| 6 | Auto-login com `signInWithPassword()` — sem confirmação de e-mail |
+| 7 | Redirecionamento direto para `/dashboard` — trial ativo |
+| 8 | Lead cai nos Contatos e Boards do CRM com tags `provadagua`, `provadagua-trial`, `trial-7d` |
+
+> **Zero barreiras de aprovação manual** para quem tem a palavra-chave.
+
+### CTAs do Login (V4.3)
+
+| Botão | Ação |
+|---|---|
+| **Experimentar Ecossistema** | Abre vitrine da Provadágua (`prova.encontrodagua.com`) em nova aba |
+| **Entrar no Hub** | Abre formulário de palavra-chave → trial imediato |
+
+### Identidade Visual — Paleta Earth-Neon
+
+| Token | Cor | Uso |
+|---|---|---|
+| `earthNeon` | `#00C97B → #00E5FF` | CTAs, gradientes principais |
+| `gold` | `#D4A853` | Título accent, badges fundadora |
+| `obsidian` | `#070D09` | Background principal |
+| `neonGreen` | `#00C97B` | Pills, bordas hover |
+| `neonCyan` | `#00E5FF` | Eyebrow, acentos |
+
+### Showcase LP (`/#/showcase`)
+
+Nova Hero Section com:
+- Badge fundadora: *"Lidi Moura · Formada em Psicologia e Especialista em Dados"*
+- Copy: *"O CRM Personalizado que Cresce com Você"*
+- Placeholder de vídeo demo interativo
+- Grid de 3 screenshots mockup do CRM (Kanban · Contatos IA · Dashboard)
+
+### Link d'Água — Vitrine Externa
+- Card "Kit Básico" na ShowcasePage → `https://link.encontrodagua.com/vitrine`
+
+### Google Analytics 4
+- **ID:** `G-MHH0WSX5QS`
+- Helper: `src/lib/analytics.ts`
+- Eventos rastreados: `showcase_cta_click`, `trial_start`, `lead_capture`, `checkout_success`, `checkout_cancel`, `sign_up`, `login`
+
+### Stripe — Planos
+| Plano | Valor | Product ID |
+|---|---|---|
+| Mensal | R$ 3,00/mês | `prod_UGWT3Pm4ztKmcU` |
+| Anual | R$ 29,90/ano | `prod_UGVFdr4qUVufSu` |
+| Agente IA | R$ 80,00/mês | Link Stripe direto |
+
+### Deploy
+- Branch de produção: `provadagua`
+- Domínio: `prova.encontrodagua.com`
+- Hub principal: `hub.encontrodagua.com`
 ---
 
 ## 8. Checklist de Backup — Acer Go (Novo Hardware)

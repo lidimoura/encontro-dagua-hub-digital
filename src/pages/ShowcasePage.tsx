@@ -21,7 +21,13 @@ interface Translation {
   pain_items: Array<{ icon: string; title: string; desc: string }>;
   modules_title: string;
   modules_subtitle: string;
-  modules: Array<{ icon: string; name: string; desc: string; badge: string }>;
+  modules_group_native: string;
+  modules_group_custom: string;
+  modules_credit: string;
+  modules_pitch: string;
+  modules: Array<{ icon: string; name: string; desc: string; badge: string; group: string }>;
+  faq_title: string;
+  faq_items: Array<{ q: string; a: string }>;
   qa_eyebrow: string;
   qa_title: string;
   qa_subtitle: string;
@@ -64,17 +70,17 @@ const ArrowIcon = () => (
 const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
   pt: {
     nav_login: 'Entrar no Hub',
-    hero_eyebrow: 'Para Médicos · Fisioterapeutas · Psicólogos',
+    hero_eyebrow: 'Para Empreendedores · Agências · Profissionais Liberais',
     hero_title_1: 'O CRM com IA que',
-    hero_title_2: 'protege seus pacientes',
-    hero_title_accent: 'e faz crescer seu consultório.',
+    hero_title_2: 'organiza seus negócios',
+    hero_title_accent: 'e faz sua operação crescer.',
     hero_subtitle:
-      'Encontro D\'Água Hub é o sistema operacional de gestão para clínicas e consultórios. Automação de leads, IA embarcada, isolamento total de dados por empresa e conformidade com LGPD — tudo em um único hub.',
+      'Provadágua: Experimente a potência do CRM personalizado do Encontro d\'Água Hub. Use esta demonstração gratuita por 7 dias e veja como podemos customizar uma operação exclusiva para o seu negócio.',
     hero_cta_primary: 'Experimente a Provadágua por 7 dias',
     hero_cta_secondary: 'Ver demonstração ao vivo',
     hero_cta_sub: 'Gestão de Elite com Privacidade OCI · Sem cartão de crédito · Dados 100% isolados',
-    trust_label: 'Confiado por profissionais de saúde',
-    specialties: ['Medicina', 'Fisioterapia', 'Psicologia', 'Nutrição', 'Odontologia'],
+    trust_label: 'Confiado por empreendedores e agências',
+    specialties: ['Tech', 'Marketing', 'Vendas', 'Consultoria', 'Agências'],
     metrics: [
       { value: '100%', label: 'Dados Isolados por Empresa', icon: '🔒' },
       { value: '9', label: 'Módulos em Produção', icon: '⚡' },
@@ -82,36 +88,57 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { value: '24/7', label: 'SDR Automatizado', icon: '📡' },
     ],
     pain_title: 'Você reconhece esses problemas?',
-    pain_subtitle: 'Criamos soluções específicas para a realidade do profissional de saúde',
+    pain_subtitle: 'Criamos soluções específicas para a realidade do profissional moderno',
     pain_items: [
       {
         icon: '📁',
-        title: 'Dados de pacientes espalhados',
+        title: 'Dados espalhados por toda parte',
         desc: 'Planilhas, WhatsApp, e-mail e papel — impossível acompanhar sem um sistema centralizado e seguro.',
       },
       {
         icon: '⏰',
         title: 'Tempo perdido em tarefas manuais',
-        desc: 'Agendamentos, follow-ups e lembretes consomem horas que deveriam ser dedicadas ao paciente.',
+        desc: 'Follow-ups, propostas e lembretes consomem horas que deveriam ser dedicadas aos seus clientes e projetos.',
       },
       {
         icon: '🚫',
         title: 'Risco de vazamento de dados (LGPD)',
-        desc: 'Softwares genéricos não foram projetados para a privacidade que a saúde exige. Sua clínica está vulnerável.',
+        desc: 'Softwares genéricos não foram projetados para a privacidade que seu negócio exige. Você está vulnerável.',
+      },
+      {
+        icon: '📊',
+        title: 'Não consegue gerenciar seus clientes e projetos?',
+        desc: 'Sem visibilidade do pipeline, sem follow-up automático e sem relatórios — você perde negócios sem nem perceber. O ecossistema Provadágua centraliza tudo.',
       },
     ],
-    modules_title: 'Módulos em Produção',
-    modules_subtitle: 'Todos os módulos ativos em hub.encontrodagua.com — operando 24/7',
+    modules_title: 'O Ecossistema em Produção',
+    modules_subtitle: 'Veja o que está ativo em hub.encontrodagua.com — operando 24/7 para nossos clientes',
+    modules_group_native: 'BLOCO A — Funcionalidades Nativas',
+    modules_group_custom: 'BLOCO B — Hub Personalizado',
+    modules_credit: 'Base de CRM compartilhada com alunos vitalícios da Escola de Automação do Thales Laray, servindo como fundação de alta performance para nossas implementações.',
+    modules_pitch: 'Nós não vendemos software engessado. Personalizamos cada CRM de acordo com a sua demanda, contexto e necessidade.',
     modules: [
-      { icon: '📋', name: 'Board Kanban', desc: 'Leads mapeados ao funil automaticamente', badge: 'Ativo' },
-      { icon: '👥', name: 'Contatos', desc: 'Base de pacientes com sync bidirecional', badge: 'Ativo' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'Agente IA de Customer Success', badge: 'IA' },
-      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law', badge: 'Ativo' },
-      { icon: '💰', name: 'Precy', desc: 'Precificação BRL/USD/EUR', badge: 'Ativo' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Ativo' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + Win/Loss real', badge: 'Ativo' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'IA multi-persona', badge: 'IA' },
-      { icon: '🔧', name: 'Admin', desc: 'Usuários, Tech Stack, Super Admin', badge: 'Ativo' },
+      { icon: '📋', name: 'Gestão de Leads', desc: 'Pipeline visual com stages customizáveis e automação SDR ativa', badge: 'Ativo', group: 'native' },
+      { icon: '🏆', name: 'Kanban de Vendas', desc: 'Board visual com arrastar e soltar — funil de vendas em tempo real', badge: 'Ativo', group: 'native' },
+      { icon: '🤖', name: 'IA First Boards', desc: 'Templates criados via IA ou escolha entre os pré-definidos por nicho', badge: 'IA', group: 'native' },
+      { icon: '🌊', name: 'AIflow', desc: 'Assistente técnico embarcado — suporte inteligente dentro do CRM', badge: 'IA', group: 'native' },
+      { icon: '📬', name: 'Inbox TDAH-Friendly', desc: 'Prioridades estratégicas e briefings do dia — foco sem ruído cognitivo', badge: 'Ativo', group: 'native' },
+      { icon: '📊', name: 'Dashboards', desc: 'Win/Loss, ciclo de vendas e pipeline em tempo real', badge: 'Ativo', group: 'native' },
+      { icon: '👥', name: 'Banco de Contatos', desc: 'CRM de clientes com sync bidirecional e isolamento total por empresa', badge: 'Ativo', group: 'native' },
+      { icon: '📤', name: 'Amazô', desc: 'Agente IA: CS/SDR nas LPs e no CRM — responde leads 24/7', badge: 'Custom', group: 'custom' },
+      { icon: '⚖️', name: 'Jury', desc: 'Contratos BR + Common Law gerados por IA com PDF inline', badge: 'Custom', group: 'custom' },
+      { icon: '💰', name: 'Precy', desc: 'Precificação profissional BRL/USD/EUR com catálogo de produtos', badge: 'Custom', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Engenharia de prompts multi-persona com teste ao vivo', badge: 'Custom', group: 'custom' },
+      { icon: '📦', name: 'Catálogo de Produtos', desc: 'Gestão centralizada de produtos e serviços para precificação', badge: 'Custom', group: 'custom' },
+      { icon: '🔗', name: 'Integrações No-code', desc: 'Webhooks, n8n, Zapier e WhatsApp — conecte qualquer sistema', badge: 'Custom', group: 'custom' },
+    ],
+    faq_title: 'Perguntas Frequentes',
+    faq_items: [
+      { q: 'Preciso de cartão de crédito para testar?', a: 'Não. A Provadágua de 7 dias é 100% gratuita. Só precisamos da palavra-chave — solicite pelo WhatsApp.' },
+      { q: 'Meus dados ficam isolados?', a: 'Sim. Cada empresa tem seu próprio company_id com RLS ativo. Dados nunca visíveis para outros tenants.' },
+      { q: 'Qual a diferença entre Nativas e Agentes de IA?', a: 'Nativas são os módulos do CRM (Kanban, Contatos, Reports). Agentes de IA são assistentes inteligentes integrados.' },
+      { q: 'Posso usar em inglês?', a: 'Sim. Toggle PT/EN disponível em todas as telas.' },
+      { q: 'O que acontece após os 7 dias?', a: 'Você decide se ativa um plano. Sem cobrança automática.' },
     ],
     qa_eyebrow: 'Auditoria V3.0 — Abril 2026',
     qa_title: 'Relatório de QA & Segurança',
@@ -121,7 +148,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         icon: 'shield',
         title: 'Isolamento Multi-Tenant',
         status: 'APROVADO',
-        desc: 'company_id RLS ativo em todas as tabelas críticas. Dados de cada clínica completamente separados.',
+        desc: 'company_id RLS ativo em todas as tabelas críticas. Dados de cada empresa completamente separados.',
       },
       {
         icon: 'shield',
@@ -166,9 +193,9 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Experimente a Provadágua por 7 dias',
-    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM feito para profissionais de saúde que não abrem mão da segurança dos seus pacientes.',
+    trial_subtitle: 'Gestão de Elite com Privacidade OCI. O CRM feito para empreendedores e agências que não abrem mão da segurança dos seus dados.',
     trial_features: [
-      'Isolamento total de dados por clínica',
+      'Isolamento total de dados por empresa',
       '4 Agentes de IA inclusos',
       'SDR automatizado 24/7',
       'Relatório de QA/Segurança',
@@ -178,22 +205,22 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Experimente a Provadágua por 7 dias — Grátis',
     trial_sub: 'Gestão de Elite com Privacidade OCI · Setup em menos de 5 minutos · Cancele a qualquer momento',
     footer_built: 'Construído com ❤ pela equipe Encontro D\'Água',
-    footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_version: 'V5.7 — Final Release',
     footer_privacy: 'Privacidade · LGPD · Termos',
   },
   en: {
     nav_login: 'Enter Hub',
-    hero_eyebrow: 'For Physicians · Physiotherapists · Psychologists',
+    hero_eyebrow: 'For Entrepreneurs · Agencies · Consultants',
     hero_title_1: 'The AI-powered CRM that',
-    hero_title_2: 'protects your patients',
-    hero_title_accent: 'and grows your practice.',
+    hero_title_2: 'organizes your business',
+    hero_title_accent: 'and makes your operation grow.',
     hero_subtitle:
-      'Encontro D\'Água Hub is the practice management operating system for clinics and offices. Lead automation, embedded AI, complete per-company data isolation, and LGPD/GDPR compliance — all in one hub.',
+      'Provadágua: Experience the power of the customized CRM from Encontro d\'Água Hub. Use this free 7-day demo and see how we can build an exclusive operation for your business.',
     hero_cta_primary: 'Try Provadágua for 7 days',
     hero_cta_secondary: 'Watch live demo',
     hero_cta_sub: 'Elite Management with OCI Privacy · No credit card · 100% isolated data',
-    trust_label: 'Trusted by health professionals',
-    specialties: ['Medicine', 'Physiotherapy', 'Psychology', 'Nutrition', 'Dentistry'],
+    trust_label: 'Trusted by entrepreneurs and agencies',
+    specialties: ['Tech', 'Marketing', 'Sales', 'Consulting', 'Agencies'],
     metrics: [
       { value: '100%', label: 'Data Isolated per Company', icon: '🔒' },
       { value: '9', label: 'Modules in Production', icon: '⚡' },
@@ -201,36 +228,57 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { value: '24/7', label: 'Automated SDR', icon: '📡' },
     ],
     pain_title: 'Do you recognize these problems?',
-    pain_subtitle: 'We built specific solutions for the real challenges of healthcare professionals',
+    pain_subtitle: 'We built specific solutions for the real challenges of modern professionals',
     pain_items: [
       {
         icon: '📁',
-        title: 'Patient data scattered everywhere',
+        title: 'Client data scattered everywhere',
         desc: 'Spreadsheets, WhatsApp, email, and paper — impossible to track without a centralized, secure system.',
       },
       {
         icon: '⏰',
         title: 'Time wasted on manual tasks',
-        desc: 'Scheduling, follow-ups, and reminders consume hours that should be dedicated to your patients.',
+        desc: 'Follow-ups, proposals, and reminders consume hours that should be dedicated to your clients and projects.',
       },
       {
         icon: '🚫',
         title: 'Data breach risk (GDPR/LGPD)',
-        desc: 'Generic software wasn\'t designed for the privacy healthcare requires. Your practice is vulnerable.',
+        desc: 'Generic software wasn\'t designed for the privacy your business requires. You are vulnerable.',
+      },
+      {
+        icon: '📊',
+        title: 'Can\'t manage your clients and projects?',
+        desc: 'No pipeline visibility, no automated follow-up, no reports — you lose business without realizing it. Provadágua centralizes everything.',
       },
     ],
-    modules_title: 'Production Modules',
-    modules_subtitle: 'All modules live at hub.encontrodagua.com — running 24/7',
+    modules_title: 'The Ecosystem in Production',
+    modules_subtitle: 'See what is live at hub.encontrodagua.com — running 24/7 for our clients',
+    modules_group_native: 'BLOCK A — Native Features',
+    modules_group_custom: 'BLOCK B — Custom Hub',
+    modules_credit: 'CRM base shared with lifetime members of Thales Laray\'s Automation School, serving as a high-performance foundation for our implementations.',
+    modules_pitch: 'We don\'t sell rigid software. We customize every CRM according to your demand, context and specific needs.',
     modules: [
-      { icon: '📋', name: 'Kanban Board', desc: 'Leads auto-mapped to sales funnel', badge: 'Live' },
-      { icon: '👥', name: 'Contacts', desc: 'Patient database with bidirectional sync', badge: 'Live' },
-      { icon: '📬', name: 'Inbox / Mazô', desc: 'AI Customer Success Agent', badge: 'AI' },
-      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts', badge: 'Live' },
-      { icon: '💰', name: 'Precy', desc: 'Pricing BRL/USD/EUR', badge: 'Live' },
-      { icon: '📱', name: 'QR D\'água', desc: 'QR Codes + Bridge Pages', badge: 'Live' },
-      { icon: '📊', name: 'Reports', desc: 'Pipeline + real Win/Loss', badge: 'Live' },
-      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona AI', badge: 'AI' },
-      { icon: '🔧', name: 'Admin', desc: 'Users, Tech Stack, Super Admin', badge: 'Live' },
+      { icon: '📋', name: 'Lead Management', desc: 'Visual pipeline with customizable stages and active SDR automation', badge: 'Live', group: 'native' },
+      { icon: '🏆', name: 'Sales Kanban', desc: 'Drag-and-drop visual board — real-time sales funnel', badge: 'Live', group: 'native' },
+      { icon: '🤖', name: 'AI First Boards', desc: 'AI-generated templates or choose from niche-specific presets', badge: 'AI', group: 'native' },
+      { icon: '🌊', name: 'AIflow', desc: 'Embedded technical assistant — intelligent support inside the CRM', badge: 'AI', group: 'native' },
+      { icon: '📬', name: 'ADHD-Friendly Inbox', desc: 'Strategic priorities and daily briefings — focus without cognitive noise', badge: 'Live', group: 'native' },
+      { icon: '📊', name: 'Dashboards', desc: 'Win/Loss, sales cycle and real-time pipeline overview', badge: 'Live', group: 'native' },
+      { icon: '👥', name: 'Contact Database', desc: 'Client CRM with bidirectional sync and per-company isolation', badge: 'Live', group: 'native' },
+      { icon: '📤', name: 'Amazô', desc: 'AI Agent: CS/SDR on LPs and CRM — responds to leads 24/7', badge: 'Custom', group: 'custom' },
+      { icon: '⚖️', name: 'Jury', desc: 'BR + Common Law contracts generated by AI with inline PDF', badge: 'Custom', group: 'custom' },
+      { icon: '💰', name: 'Precy', desc: 'Professional pricing BRL/USD/EUR with product catalog', badge: 'Custom', group: 'custom' },
+      { icon: '🧪', name: 'Prompt Lab', desc: 'Multi-persona prompt engineering with live testing', badge: 'Custom', group: 'custom' },
+      { icon: '📦', name: 'Product Catalog', desc: 'Centralized management of products and services for pricing', badge: 'Custom', group: 'custom' },
+      { icon: '🔗', name: 'No-code Integrations', desc: 'Webhooks, n8n, Zapier and WhatsApp — connect any system', badge: 'Custom', group: 'custom' },
+    ],
+    faq_title: 'Frequently Asked Questions',
+    faq_items: [
+      { q: 'Do I need a credit card to try?', a: 'No. The 7-day Provadágua trial is 100% free. You just need an access keyword — request it via WhatsApp.' },
+      { q: 'Is my data isolated from others?', a: 'Yes. Each company has its own company_id with active RLS. Data is never visible to other tenants.' },
+      { q: "What's the difference between Native modules and AI Agents?", a: 'Native modules are core CRM tools (Kanban, Contacts, Reports). AI Agents are intelligent assistants integrated into your workflow.' },
+      { q: 'Can I use it in English?', a: 'Yes. PT/EN language toggle available on all screens.' },
+      { q: 'What happens after 7 days?', a: 'You decide whether to activate a plan. No automatic charges.' },
     ],
     qa_eyebrow: 'V3.0 Audit — April 2026',
     qa_title: 'QA & Security Report',
@@ -240,7 +288,7 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
         icon: 'shield',
         title: 'Multi-Tenant Isolation',
         status: 'PASSED',
-        desc: 'company_id RLS active on all critical tables. Each clinic\'s data is completely separated.',
+        desc: 'company_id RLS active on all critical tables. Each company\'s data is completely separated.',
       },
       {
         icon: 'shield',
@@ -285,9 +333,9 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
       { icon: '☁', name: 'Edge Functions', category: 'Serverless' },
     ],
     trial_title: 'Try Provadágua for 7 days',
-    trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM built for health professionals who demand the highest standard of patient data security.',
+    trial_subtitle: 'Elite Management with OCI-grade Privacy. The CRM built for entrepreneurs and agencies who demand the highest standard of data security.',
     trial_features: [
-      'Complete data isolation per clinic',
+      'Complete data isolation per company',
       '4 AI Agents included',
       'Automated SDR 24/7',
       'QA/Security Report',
@@ -297,47 +345,53 @@ const TRANSLATIONS: Record<'pt' | 'en', Translation> = {
     trial_cta: 'Try Provadágua for 7 days — Free',
     trial_sub: 'Elite Management with OCI Privacy · Setup in under 5 minutes · Cancel anytime',
     footer_built: 'Built with ❤ by the Encontro D\'Água team',
-    footer_version: 'V3.0 — Provadágua Mission Complete',
+    footer_version: 'V5.7 — Final Release',
     footer_privacy: 'Privacy · LGPD/GDPR · Terms',
   },
 };
 
-// ─── Shared style tokens — Paleta Earth-Neon V4.3 ─────────────────────────
-// Earth: Floresta Amazônica + Terra + Dourado | Neon: Verde + Cyan
+// ─── Shared style tokens — Paleta V5.3: Rio Negro + Açaí + Solimões ─────────
+// Rio Negro: preto profundo | Açaí: roxo neon | Solimões: dourado/argila
 const S = {
   // ── Gradientes principais
-  earthNeon:     'linear-gradient(135deg, #00C97B, #00E5FF)',
-  earthWarm:     'linear-gradient(135deg, #D4A853, #E8C97A)',
-  forestDeep:    'linear-gradient(135deg, #1A3A2A, #2D5A3D)',
+  acaiGrad:      'linear-gradient(135deg, #6D28A8, #A855F7)',
+  solimoesGrad:  'linear-gradient(135deg, #C8933A, #F59E0B)',
+  acaiSolimoes:  'linear-gradient(135deg, #6D28A8, #A855F7, #C8933A)',
+  // ── Compat earthNeon → Açaí (manter compilação de seções antigas)
+  earthNeon:     'linear-gradient(135deg, #6D28A8, #A855F7)',
+  earthWarm:     'linear-gradient(135deg, #C8933A, #F59E0B)',
+  forestDeep:    'linear-gradient(135deg, #1A0A2E, #2D1B55)',
   // ── Fundos
-  obsidian:      '#070D09',
+  obsidian:      '#040308',    // Rio Negro profundo
   // ── Superficies glassmorphism
-  surface:       'rgba(0, 201, 123, 0.04)',
-  surfaceHover:  'rgba(0, 201, 123, 0.09)',
-  surfaceWarm:   'rgba(212, 168, 83, 0.06)',
+  surface:       'rgba(109, 40, 168, 0.05)',
+  surfaceHover:  'rgba(109, 40, 168, 0.12)',
+  surfaceWarm:   'rgba(200, 147, 58, 0.06)',
   // ── Bordas
-  border:        'rgba(0, 201, 123, 0.1)',
-  borderHover:   'rgba(0, 201, 123, 0.35)',
-  borderGold:    'rgba(212, 168, 83, 0.2)',
-  borderGoldHov: 'rgba(212, 168, 83, 0.45)',
+  border:        'rgba(109, 40, 168, 0.12)',
+  borderHover:   'rgba(109, 40, 168, 0.40)',
+  borderGold:    'rgba(200, 147, 58, 0.20)',
+  borderGoldHov: 'rgba(200, 147, 58, 0.48)',
   // ── Cores de destaque
-  neonGreen:     '#00C97B',
-  neonCyan:      '#00E5FF',
-  gold:          '#D4A853',
-  goldLight:     '#F0D080',
-  earth:         '#8B5E3C',
-  moss:          '#4A7C59',
+  acai:          '#6D28A8',    // Açaí roxo
+  acaiLight:     '#A855F7',    // Neon violeta
+  solimoes:      '#C8933A',    // Solimões dourado/argila
+  solimoesLight: '#F59E0B',    // Neon dourado
+  neonGreen:     '#00C97B',    // Verde manutenção (CTA secondary)
+  neonCyan:      '#A855F7',    // Redirecionado para violeta
+  gold:          '#C8933A',
+  goldLight:     '#F59E0B',
   // ── Tipografia
-  textPrimary:   '#F0F7F2',
-  textSecondary: '#8BA99A',
-  textMuted:     '#4A6358',
-  // ── Compat legado (mantém seções não-migradas compilando)
-  cyanBlue:      'linear-gradient(135deg, #00C97B, #00E5FF)',
-  navy:          '#070D09',
-  blue:          '#00C97B',
-  emerald:       '#00C97B',
-  slate:         '#8BA99A',
-  slateDim:      '#4A6358',
+  textPrimary:   '#F8FAFC',
+  textSecondary: '#94a3b8',
+  textMuted:     '#64748b',
+  // ── Compat legado
+  cyanBlue:      'linear-gradient(135deg, #6D28A8, #A855F7)',
+  navy:          '#040308',
+  blue:          '#A855F7',
+  emerald:       '#A855F7',
+  slate:         '#94a3b8',
+  slateDim:      '#64748b',
 };
 
 // ─── ShowcasePage Component ────────────────────────────────────────────────
@@ -347,6 +401,8 @@ const ShowcasePage: React.FC = () => {
   const observedRef = useRef<Set<string>>(new Set());
   const [visible, setVisible] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [linkDaguaOpen, setLinkDaguaOpen] = useState(false); // Accordion: Bônus Link d'Água
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   const t = TRANSLATIONS[lang];
 
@@ -357,31 +413,37 @@ const ShowcasePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && e.target.id) {
-            setVisible((prev) => new Set(prev).add(e.target.id));
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    document.querySelectorAll('[data-obs]').forEach((el) => {
-      if (el.id && !observedRef.current.has(el.id)) {
-        obs.observe(el);
-        observedRef.current.add(el.id);
-      }
-    });
-    return () => obs.disconnect();
+    // Delay 200ms para garantir que o DOM das seções está montado
+    const timeout = setTimeout(() => {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting && e.target.id) {
+              setVisible((prev) => new Set(prev).add(e.target.id));
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      document.querySelectorAll('[data-obs]').forEach((el) => {
+        if (el.id && !observedRef.current.has(el.id)) {
+          obs.observe(el);
+          observedRef.current.add(el.id);
+        }
+      });
+      return () => obs.disconnect();
+    }, 200);
+    return () => clearTimeout(timeout);
   }, []);
 
   const isVis = (id: string) => visible.has(id);
 
+  // SAFE fadeIn: conteúdo SEMPRE visível (opacity:1).
+  // IntersectionObserver adiciona a animação de slide — nunca bloqueia renderização.
   const fadeIn = (id: string, delay = 0): React.CSSProperties => ({
-    opacity: isVis(id) ? 1 : 0,
-    transform: isVis(id) ? 'translateY(0)' : 'translateY(36px)',
-    transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+    opacity: 1,                          // sempre visível — jamais opacity:0
+    transform: isVis(id) ? 'translateY(0)' : 'translateY(24px)',
+    transition: `transform 0.65s ease ${delay}s`,
   });
 
   return (
@@ -390,10 +452,10 @@ const ShowcasePage: React.FC = () => {
       style={{
         minHeight: '100vh',
         background: `
-          radial-gradient(ellipse 100% 50% at 20% 0%, rgba(0,201,123,0.12) 0%, transparent 60%),
-          radial-gradient(ellipse 80% 40% at 80% 10%, rgba(212,168,83,0.08) 0%, transparent 60%),
-          radial-gradient(ellipse 60% 30% at 50% 80%, rgba(0,229,255,0.06) 0%, transparent 70%),
-          #070D09
+          radial-gradient(ellipse 100% 50% at 20% 0%, rgba(109,40,168,0.16) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 40% at 80% 10%, rgba(200,147,58,0.09) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 30% at 50% 80%, rgba(168,85,247,0.07) 0%, transparent 70%),
+          #040308
         `,
         color: S.textPrimary,
         fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
@@ -414,32 +476,33 @@ const ShowcasePage: React.FC = () => {
         @keyframes shimmer  { 0%{ background-position:-200% center; } 100%{ background-position:200% center; } }
         @keyframes float    { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
         @keyframes scanAnim { 0%{ transform:translateY(-100%); } 100%{ transform:translateY(400%); } }
+        @keyframes acaiPulse { 0%,100%{ box-shadow:0 0 20px rgba(109,40,168,0.3); } 50%{ box-shadow:0 0 40px rgba(168,85,247,0.5); } }
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        ::selection { background: rgba(0,201,123,0.35); }
+        ::selection { background: rgba(109,40,168,0.4); }
         a { text-decoration: none; }
         .screen-mock {
           position: relative;
-          background: #0D1F16;
-          border: 1px solid rgba(0,201,123,0.22);
+          background: #0D0820;
+          border: 1px solid rgba(109,40,168,0.25);
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,201,123,0.08);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(109,40,168,0.08);
         }
         .screen-mock::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 28px;
-          background: #0A1A10;
-          border-bottom: 1px solid rgba(0,201,123,0.12);
+          background: #080412;
+          border-bottom: 1px solid rgba(109,40,168,0.15);
           z-index: 3;
         }
         .scanline {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(0,201,123,0.4), transparent);
+          background: linear-gradient(90deg, transparent, rgba(168,85,247,0.5), transparent);
           animation: scanAnim 3s linear infinite;
           z-index: 5;
           pointer-events: none;
@@ -468,21 +531,19 @@ const ShowcasePage: React.FC = () => {
           transition: 'all 0.3s ease',
         }}
       >
-        {/* Logo */}
-        <a href="/#/" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-          <div
+        {/* Logo — no contexto Showcase, retorna para /#/showcase */}
+        <a href="/#/showcase" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+          <img
+            src="/logos/logo-icon-gold-transp.png"
+            alt="Encontro d'Agua Hub"
             aria-hidden="true"
             style={{
               width: '34px', height: '34px',
-              background: S.cyanBlue,
+              objectFit: 'contain',
               borderRadius: '9px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '18px',
-              boxShadow: '0 0 18px rgba(14,165,233,0.4)',
+              filter: 'drop-shadow(0 0 10px rgba(200,147,58,0.5))',
             }}
-          >
-            💧
-          </div>
+          />
           <span style={{ fontWeight: 700, fontSize: '0.95rem', color: S.textPrimary, letterSpacing: '-0.01em' }}>
             Encontro D’Água Hub
           </span>
@@ -516,24 +577,22 @@ const ShowcasePage: React.FC = () => {
             {lang === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
           </button>
 
-          <a
-            href="/#/login"
-            id="showcase-nav-login"
+          <a href="/#/login?from=showcase" id="showcase-nav-login"
             style={{
-              background: S.earthNeon,
+              background: S.acaiGrad,
               borderRadius: '20px', padding: '8px 20px',
-              color: '#060C08',
+              color: '#fff',
               fontSize: '0.82rem', fontWeight: 800,
               transition: 'all 0.2s',
-              boxShadow: '0 4px 18px rgba(0,201,123,0.35)',
+              boxShadow: '0 4px 18px rgba(109,40,168,0.40)',
               minHeight: '36px', display: 'flex', alignItems: 'center',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,201,123,0.55)';
+              e.currentTarget.style.boxShadow = '0 6px 28px rgba(168,85,247,0.60)';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,201,123,0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 18px rgba(109,40,168,0.40)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
@@ -558,22 +617,28 @@ const ShowcasePage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Background orbs */}
+        {/* Background orbs — Açaí + Solimões */}
         <div aria-hidden="true" style={{
           position: 'absolute', top: '25%', left: '50%',
           transform: 'translate(-50%, -50%)',
           width: '720px', height: '720px',
-          background: 'radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 68%)',
+          background: 'radial-gradient(circle, rgba(109,40,168,0.14) 0%, transparent 68%)',
           pointerEvents: 'none',
         }} />
         <div aria-hidden="true" style={{
           position: 'absolute', bottom: '15%', right: '10%',
           width: '380px', height: '380px',
-          background: 'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(200,147,58,0.10) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '60%', left: '5%',
+          width: '320px', height: '320px',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
-        {/* Specialty pills */}
+        {/* Specialty pills — Açaí palette */}
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: '8px',
           justifyContent: 'center',
@@ -582,22 +647,22 @@ const ShowcasePage: React.FC = () => {
         }}>
           {t.specialties.map((s, i) => (
             <span key={i} style={{
-              background: 'rgba(14,165,233,0.1)',
-              border: '1px solid rgba(14,165,233,0.22)',
+              background: 'rgba(109,40,168,0.10)',
+              border: '1px solid rgba(168,85,247,0.25)',
               borderRadius: '20px',
               padding: '5px 14px',
               fontSize: '0.74rem',
               fontWeight: 600,
-              color: '#7dd3fc',
+              color: '#c4b5fd',
             }}>{s}</span>
           ))}
         </div>
 
-        {/* Eyebrow */}
+        {/* Eyebrow — Solimões */}
         <div style={{
           fontSize: '0.78rem',
           fontWeight: 700,
-          color: S.blue,
+          color: S.solimoesLight,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           marginBottom: '1.2rem',
@@ -622,7 +687,7 @@ const ShowcasePage: React.FC = () => {
         >
           {t.hero_title_1}{' '}
           <span style={{
-            background: S.cyanBlue,
+            background: S.acaiGrad,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -630,7 +695,12 @@ const ShowcasePage: React.FC = () => {
             {t.hero_title_2}
           </span>
           <br />
-          {t.hero_title_accent}
+          <span style={{
+            background: S.solimoesGrad,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>{t.hero_title_accent}</span>
         </h1>
 
         {/* Subtitle */}
@@ -655,13 +725,13 @@ const ShowcasePage: React.FC = () => {
               id="showcase-cta-primary"
               onClick={() => setIsModalOpen(true)}
               style={{
-                background: S.cyanBlue,
+                background: S.acaiGrad,
                 color: '#fff',
                 padding: '16px 36px',
                 borderRadius: '50px',
                 fontWeight: 800,
                 fontSize: '1rem',
-                boxShadow: '0 8px 32px rgba(14,165,233,0.42)',
+                boxShadow: '0 8px 32px rgba(109,40,168,0.50)',
                 transition: 'all 0.25s',
                 cursor: 'pointer',
                 display: 'flex',
@@ -669,21 +739,22 @@ const ShowcasePage: React.FC = () => {
                 gap: '8px',
                 minHeight: '52px',
                 border: 'none',
+                animation: 'acaiPulse 3s ease-in-out infinite',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 16px 48px rgba(14,165,233,0.58)';
+                e.currentTarget.style.boxShadow = '0 16px 48px rgba(168,85,247,0.65)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 32px rgba(14,165,233,0.42)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(109,40,168,0.50)';
               }}
             >
               {t.hero_cta_primary}
               <ArrowIcon />
             </button>
             <a
-              href="/#/login"
+              href="/#/login?from=showcase"
               id="showcase-cta-secondary"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -716,12 +787,12 @@ const ShowcasePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Metrics bar */}
+        {/* Metrics bar — Açaí */}
         <div style={{
           marginTop: '5rem',
-          background: 'rgba(255,255,255,0.03)',
+          background: 'rgba(109,40,168,0.05)',
           backdropFilter: 'blur(16px)',
-          border: `1px solid ${S.border}`,
+          border: '1px solid rgba(109,40,168,0.18)',
           borderRadius: '20px',
           display: 'flex',
           flexWrap: 'wrap',
@@ -736,7 +807,7 @@ const ShowcasePage: React.FC = () => {
               style={{
                 padding: '22px 32px',
                 textAlign: 'center',
-                borderRight: i < t.metrics.length - 1 ? `1px solid ${S.border}` : 'none',
+                borderRight: i < t.metrics.length - 1 ? '1px solid rgba(109,40,168,0.15)' : 'none',
                 flex: '1 1 140px',
               }}
             >
@@ -744,7 +815,7 @@ const ShowcasePage: React.FC = () => {
                 fontSize: '1.9rem',
                 fontWeight: 900,
                 fontFamily: "'Outfit', sans-serif",
-                background: S.earthNeon,
+                background: i % 2 === 0 ? S.acaiGrad : S.solimoesGrad,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -759,30 +830,7 @@ const ShowcasePage: React.FC = () => {
           ))}
         </div>
 
-        {/* ── Founder Credibility Badge ──────────────────────────────────── */}
-        <div style={{
-          marginTop: '3rem',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '10px',
-          background: 'rgba(212,168,83,0.08)',
-          border: '1px solid rgba(212,168,83,0.25)',
-          borderRadius: '40px',
-          padding: '10px 20px',
-          animation: 'fadeUp 0.7s ease 0.5s both',
-        }}>
-          <span style={{ fontSize: '20px' }}>🌿</span>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '0.73rem', fontWeight: 800, color: S.gold, letterSpacing: '0.04em' }}>
-              {lang === 'pt' ? 'Criado por' : 'Built by'}
-            </div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: S.textPrimary }}>
-              {lang === 'pt'
-                ? 'Lidi Moura: Formada em Psicologia e Especialista em Dados'
-                : 'Lidi Moura: Psychology Graduate & Data Specialist'}
-            </div>
-          </div>
-        </div>
+        {/* V5.3: Badge de credibilidade removido da Hero — exibido no footer com contexto correto. */}
 
         {/* ── Demo Video Placeholder ─────────────────────────────────────── */}
         <div style={{
@@ -807,19 +855,19 @@ const ShowcasePage: React.FC = () => {
                 hub.encontrodagua.com — CRM Dashboard
               </span>
             </div>
-            {/* Video body */}
+            {/* Video body — Açaí theme */}
             <div style={{
               height: '300px', paddingTop: '28px',
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center', gap: '14px',
-              background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+              background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
               position: 'relative', overflow: 'hidden',
             }}>
               <div style={{
                 position: 'absolute', inset: 0,
                 backgroundImage: `
-                  linear-gradient(rgba(0,201,123,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0,201,123,0.04) 1px, transparent 1px)
+                  linear-gradient(rgba(109,40,168,0.06) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(109,40,168,0.06) 1px, transparent 1px)
                 `,
                 backgroundSize: '32px 32px',
               }} />
@@ -828,28 +876,28 @@ const ShowcasePage: React.FC = () => {
                 onClick={() => { trackShowcaseCTA('video_play'); setIsModalOpen(true); }}
                 style={{
                   width: '72px', height: '72px', borderRadius: '50%',
-                  background: 'rgba(0,201,123,0.12)',
-                  border: '2px solid rgba(0,201,123,0.5)',
+                  background: 'rgba(109,40,168,0.15)',
+                  border: '2px solid rgba(168,85,247,0.55)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', transition: 'all 0.3s',
                   position: 'relative', zIndex: 2,
-                  boxShadow: '0 0 40px rgba(0,201,123,0.2)',
+                  boxShadow: '0 0 40px rgba(109,40,168,0.25)',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.28)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,201,123,0.12)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.35)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.15)'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#00C97B">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#A855F7">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
               </button>
               <p style={{ color: S.textSecondary, fontSize: '0.84rem', fontWeight: 500, position: 'relative', zIndex: 2 }}>
-                {lang === 'pt' ? '🌱 Demo interativa disponível — clique para agendar' : '🌱 Interactive demo available — click to schedule'}
+                {lang === 'pt' ? '💜 Demo interativa disponível — clique para agendar' : '💜 Interactive demo available — click to schedule'}
               </p>
               <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
                 {['Contatos', 'Board SDR', 'IA Mazô', 'Reports'].map((label, i) => (
                   <div key={i} style={{
                     flex: 1, height: '3px', borderRadius: '2px',
-                    background: i === 0 ? S.neonGreen : `rgba(0,201,123,${0.12 + i * 0.1})`,
+                    background: i === 0 ? '#A855F7' : `rgba(168,85,247,${0.15 + i * 0.12})`,
                   }} />
                 ))}
               </div>
@@ -868,9 +916,9 @@ const ShowcasePage: React.FC = () => {
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: S.neonGreen },
-              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: S.neonCyan },
-              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: S.gold },
+              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: '#A855F7' },
+              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: '#C4B5FD' },
+              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: '#F59E0B' },
             ].map((screen, i) => (
               <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
                 onClick={() => { trackShowcaseCTA(`screenshot_${screen.label}`); setIsModalOpen(true); }}
@@ -880,7 +928,7 @@ const ShowcasePage: React.FC = () => {
                   height: '110px', paddingTop: '28px',
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', gap: '6px',
-                  background: 'linear-gradient(180deg, #0D2318 0%, #081409 100%)',
+                  background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
                 }}>
                   <div style={{ fontSize: '1.8rem' }}>{screen.icon}</div>
                   <span style={{ fontSize: '0.68rem', color: screen.color, fontWeight: 600 }}>{screen.label}</span>
@@ -888,7 +936,7 @@ const ShowcasePage: React.FC = () => {
                     {[60,90,45,75,100,65,80].map((h, j) => (
                       <div key={j} style={{
                         width: '3px', height: `${h * 0.16}px`, borderRadius: '2px',
-                        background: `rgba(0,201,123,${0.2 + h / 200})`,
+                        background: `rgba(168,85,247,${0.2 + h / 200})`,
                       }} />
                     ))}
                   </div>
@@ -954,9 +1002,9 @@ const ShowcasePage: React.FC = () => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
         }}>
-          {/* Card 1: Saúde */}
+          {/* Card 1: Negócios & Projetos */}
           <div
-            id="segment-saude"
+            id="segment-negocios"
             style={{
               background: 'rgba(14,165,233,0.05)',
               border: '1px solid rgba(14,165,233,0.2)',
@@ -979,20 +1027,20 @@ const ShowcasePage: React.FC = () => {
               e.currentTarget.style.background = 'rgba(14,165,233,0.05)';
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🩺</div>
+            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🚀</div>
             <div>
               <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
-                {lang === 'pt' ? 'Saúde & Consultório' : 'Health & Clinic'}
+                {lang === 'pt' ? 'Negócios & Projetos' : 'Business & Projects'}
               </h3>
               <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
                 {lang === 'pt'
-                  ? 'Para Psicólogos, Médicos, Fisioterapeutas e terapeutas. Gestão de leads com privacidade LGPD nativa, sem misturar dados de pacientes.'
-                  : 'For Psychologists, Physicians, Physiotherapists. Lead management with native LGPD privacy, no patient data mixing.'}
+                  ? 'Para consultores, freelancers e startups. Gestão de leads com pipeline visual, automação SDR e privacidade LGPD nativa por empresa.'
+                  : 'For consultants, freelancers and startups. Lead management with visual pipeline, SDR automation and native LGPD privacy per company.'}
               </p>
             </div>
             <div style={{ marginTop: 'auto' }}>
               <button
-                id="segment-saude-cta"
+                id="segment-negocios-cta"
                 onClick={() => setIsModalOpen(true)}
                 style={{
                   background: S.cyanBlue,
@@ -1009,7 +1057,7 @@ const ShowcasePage: React.FC = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
               >
-                {lang === 'pt' ? '🩺 Quero testar 7 dias' : '🩺 Try 7 days free'}
+                {lang === 'pt' ? '🚀 Quero testar 7 dias' : '🚀 Try 7 days free'}
               </button>
             </div>
           </div>
@@ -1074,68 +1122,66 @@ const ShowcasePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 3: Kit Básico / Link d'Água */}
+          {/* Card 3: Bonus — Link d'Agua (Accordion) */}
           <div
             id="segment-linkdagua"
+            role="button"
+            tabIndex={0}
+            aria-expanded={linkDaguaOpen}
+            onClick={() => setLinkDaguaOpen(v => !v)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLinkDaguaOpen(v => !v); }}
             style={{
-              background: 'rgba(251,191,36,0.05)',
-              border: '1px solid rgba(251,191,36,0.2)',
+              background: linkDaguaOpen ? 'rgba(200,147,58,0.09)' : 'rgba(200,147,58,0.05)',
+              border: linkDaguaOpen ? '1px solid rgba(200,147,58,0.42)' : '1px solid rgba(200,147,58,0.20)',
               borderRadius: '22px',
               padding: '32px 28px',
-              transition: 'all 0.28s',
-              cursor: 'default',
+              transition: 'all 0.3s',
+              cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.45)';
-              e.currentTarget.style.transform = 'translateY(-5px)';
-              e.currentTarget.style.background = 'rgba(251,191,36,0.09)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(251,191,36,0.2)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'rgba(251,191,36,0.05)';
+              gap: '14px',
+              userSelect: 'none' as const,
             }}
           >
-            <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
-            <div>
-              <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: '8px' }}>
-                {lang === 'pt' ? 'Kit Básico — Link d’Água' : 'Basic Kit — Link d’Água'}
-              </h3>
-              <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, margin: 0 }}>
-                {lang === 'pt'
-                  ? 'Cartão digital profissional + QR Code personalizado + microsite com sua bio e links. Simples, rápido, impactante.'
-                  : 'Professional digital card + custom QR Code + bio microsite. Simple, fast, impactful.'}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ fontSize: '2.4rem' }} aria-hidden="true">🔗</div>
+                <div>
+                  <div style={{ display: 'inline-block', background: 'rgba(200,147,58,0.12)', border: '1px solid rgba(200,147,58,0.30)', borderRadius: '12px', padding: '3px 10px', fontSize: '0.68rem', fontWeight: 800, color: '#F59E0B', letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: '5px' }}>
+                    🎁 {lang === 'pt' ? 'Bonus Incluso' : 'Bonus Included'}
+                  </div>
+                  <h3 style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.05rem', margin: 0 }}>
+                    {lang === 'pt' ? "Link d\u2019\u00c1gua \u2014 Cart\u00e3o Digital" : "Link d\u2019\u00c1gua \u2014 Digital Card"}
+                  </h3>
+                </div>
+              </div>
+              <span style={{ fontSize: '1rem', color: '#F59E0B', fontWeight: 700, transform: linkDaguaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.32s ease', flexShrink: 0 }}>▼</span>
+            </div>
+            {!linkDaguaOpen && (
+              <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>
+                {lang === 'pt' ? 'Clique para ver o bonus' : "Click to see the bonus"}
               </p>
-            </div>
-            <div style={{ marginTop: 'auto' }}>
-              <a
-                id="segment-linkdagua-cta"
-                href="https://link.encontrodagua.com/vitrine"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '30px',
-                  padding: '12px 24px',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  width: '100%',
-                  transition: 'all 0.2s',
-                  display: 'block',
-                  textAlign: 'center',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-              >
-                {lang === 'pt' ? '🔗 Ver Link d’Água' : '🔗 See Link d’Água'}
-              </a>
-            </div>
+            )}
+            {linkDaguaOpen && (
+              <div onClick={e => e.stopPropagation()} style={{ borderTop: '1px solid rgba(200,147,58,0.15)', paddingTop: '14px', cursor: 'default' }}>
+                <p style={{ color: S.slate, fontSize: '0.88rem', lineHeight: 1.7, marginBottom: '14px' }}>
+                  {lang === 'pt'
+                    ? "Cart\u00e3o digital profissional + QR Code personalizado + microsite. Iniciativa de Start Digital."
+                    : "Professional digital card + custom QR Code + bio microsite. A Start Digital initiative."}
+                </p>
+                <a
+                  id="segment-linkdagua-cta"
+                  href="https://link.encontrodagua.com/vitrine"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ background: S.solimoesGrad, color: '#000', border: 'none', borderRadius: '30px', padding: '12px 24px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'all 0.2s', display: 'block', textAlign: 'center' as const }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  {lang === 'pt' ? "🔗 Conhecer o Link d\u2019\u00c1gua" : "🔗 Learn about Link d\u2019\u00c1gua"}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1245,63 +1291,242 @@ const ShowcasePage: React.FC = () => {
             <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.modules_subtitle}</p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-            gap: '14px',
-          }}>
-            {t.modules.map((mod, i) => (
-              <div
-                key={i}
-                id={`mod-${i}`}
+          {/* ── BLOCO A: Funcionalidades Nativas ───────────────── */}
+          <div style={{ marginBottom: '3.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.4rem' }}>
+              <div style={{ background: S.acaiGrad, borderRadius: '10px', padding: '4px 16px', fontSize: '0.72rem', fontWeight: 800, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>A</div>
+              <h3 style={{ fontWeight: 800, color: '#e2e8f0', fontSize: '1.05rem', margin: 0 }}>{t.modules_group_native}</h3>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))', gap: '11px', marginBottom: '1.4rem' }}>
+              {t.modules.filter(m => m.group === 'native').map((mod, i) => (
+                <div key={`native-${i}`} id={`mod-native-${i}`}
+                  style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: '16px', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.22s', cursor: 'default' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = S.surfaceHover; e.currentTarget.style.borderColor = S.borderHover; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = S.surface; e.currentTarget.style.borderColor = S.border; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ fontSize: '1.45rem', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(109,40,168,0.12)', borderRadius: '10px', flexShrink: 0 }} aria-hidden="true">{mod.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' as const }}>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.87rem' }}>{mod.name}</span>
+                      <span style={{ background: mod.badge === 'IA' || mod.badge === 'AI' ? 'rgba(139,92,246,0.2)' : 'rgba(16,185,129,0.15)', color: mod.badge === 'IA' || mod.badge === 'AI' ? '#a78bfa' : S.neonGreen, borderRadius: '7px', padding: '2px 6px', fontSize: '0.64rem', fontWeight: 800 }}>
+                        {mod.badge === 'IA' || mod.badge === 'AI' ? '✦ IA' : `✓ ${mod.badge}`}
+                      </span>
+                    </div>
+                    <p style={{ color: S.slateDim, fontSize: '0.79rem', margin: 0 }}>{mod.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Crédito BLOCO A */}
+            <p style={{ fontSize: '0.79rem', color: S.textMuted, fontStyle: 'italic', borderLeft: `3px solid ${S.borderGold}`, paddingLeft: '14px', lineHeight: 1.65, maxWidth: '700px', margin: 0 }}>📌 {t.modules_credit}</p>
+          </div>
+
+          {/* ── BLOCO B: Hub Personalizado ─────────────────────── */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.4rem' }}>
+              <div style={{ background: S.solimoesGrad, borderRadius: '10px', padding: '4px 16px', fontSize: '0.72rem', fontWeight: 800, color: '#040308', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>B</div>
+              <h3 style={{ fontWeight: 800, color: '#e2e8f0', fontSize: '1.05rem', margin: 0 }}>{t.modules_group_custom}</h3>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))', gap: '11px', marginBottom: '1.4rem' }}>
+              {t.modules.filter(m => m.group === 'custom').map((mod, i) => (
+                <div key={`custom-${i}`} id={`mod-custom-${i}`}
+                  style={{ background: S.surfaceWarm, border: `1px solid ${S.borderGold}`, borderRadius: '16px', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.22s', cursor: 'default' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(200,147,58,0.12)'; e.currentTarget.style.borderColor = S.borderGoldHov; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = S.surfaceWarm; e.currentTarget.style.borderColor = S.borderGold; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ fontSize: '1.45rem', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,147,58,0.12)', borderRadius: '10px', flexShrink: 0 }} aria-hidden="true">{mod.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' as const }}>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.87rem' }}>{mod.name}</span>
+                      <span style={{ background: 'rgba(200,147,58,0.2)', color: S.solimoesLight, borderRadius: '7px', padding: '2px 6px', fontSize: '0.64rem', fontWeight: 800 }}>✦ {mod.badge}</span>
+                    </div>
+                    <p style={{ color: S.slateDim, fontSize: '0.79rem', margin: 0 }}>{mod.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Pitch BLOCO B */}
+            <div style={{ background: S.surfaceWarm, border: `1px solid ${S.borderGold}`, borderRadius: '14px', padding: '18px 22px', maxWidth: '700px' }}>
+              <p style={{ fontSize: '0.9rem', color: '#f1d98c', fontWeight: 600, margin: 0, lineHeight: 1.65 }}>💎 {t.modules_pitch}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ─────────────────────────────────────────────── */}
+      <section
+        id="sec-faq"
+        data-obs
+        aria-labelledby="faq-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          maxWidth: '860px',
+          margin: '0 auto',
+          ...fadeIn('sec-faq'),
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2
+            id="faq-heading"
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
+              fontWeight: 800,
+              color: '#f1f5f9',
+              marginBottom: '0.8rem',
+            }}
+          >
+            {t.faq_title}
+          </h2>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {Array.isArray(t.faq_items) && t.faq_items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                background: faqOpen === i ? S.surfaceHover : S.surface,
+                border: `1px solid ${faqOpen === i ? S.borderHover : S.border}`,
+                borderRadius: '14px',
+                overflow: 'hidden',
+                transition: 'all 0.25s',
+              }}
+            >
+              <button
+                id={`faq-item-${i}`}
+                aria-expanded={faqOpen === i}
+                onClick={() => setFaqOpen(faqOpen === i ? null : i)}
                 style={{
-                  background: S.surface,
-                  border: `1px solid ${S.border}`,
-                  borderRadius: '16px',
-                  padding: '22px 20px',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '18px 22px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#e2e8f0',
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {item.q}
+                <span style={{
+                  fontSize: '1.4rem',
+                  color: S.acaiLight,
+                  transform: faqOpen === i ? 'rotate(45deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.28s ease',
+                  flexShrink: 0,
+                  lineHeight: 1,
+                }} aria-hidden="true">+</span>
+              </button>
+              {faqOpen === i && (
+                <div style={{
+                  padding: '0 22px 20px',
+                  color: S.slate,
+                  fontSize: '0.9rem',
+                  lineHeight: 1.75,
+                  borderTop: `1px solid ${S.border}`,
+                  paddingTop: '14px',
+                }}>
+                  {item.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── QA & Segurança ───────────────────────────────────── */}
+      <section
+        id="sec-qa"
+        data-obs
+        aria-labelledby="qa-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          background: 'rgba(0,0,0,0.15)',
+          ...fadeIn('sec-qa'),
+        }}
+      >
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <div style={{
+              display: 'inline-block',
+              background: 'rgba(109,40,168,0.10)',
+              border: `1px solid ${S.border}`,
+              borderRadius: '20px',
+              padding: '6px 18px',
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              color: S.acaiLight,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase' as const,
+              marginBottom: '1rem',
+            }}>
+              {t.qa_eyebrow}
+            </div>
+            <h2 id="qa-heading" style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
+              fontWeight: 800,
+              color: '#f1f5f9',
+              marginBottom: '0.6rem',
+            }}>{t.qa_title}</h2>
+            <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.qa_subtitle}</p>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '14px',
+          }}>
+            {Array.isArray(t.qa_items) && t.qa_items.map((item, i) => (
+              <div
+                key={i}
+                id={`qa-item-${i}`}
+                style={{
+                  background: 'rgba(109,40,168,0.06)',
+                  border: '1px solid rgba(16,185,129,0.20)',
+                  borderRadius: '16px',
+                  padding: '24px 22px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
                   gap: '14px',
                   transition: 'all 0.22s',
-                  cursor: 'default',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = S.surfaceHover;
-                  e.currentTarget.style.borderColor = S.borderHover;
+                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.45)';
                   e.currentTarget.style.transform = 'translateY(-3px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = S.surface;
-                  e.currentTarget.style.borderColor = S.border;
+                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.20)';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div style={{
-                  fontSize: '1.6rem',
-                  width: '44px', height: '44px',
+                  width: '36px', height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(16,185,129,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(14,165,233,0.1)',
-                  borderRadius: '11px',
                   flexShrink: 0,
+                  color: S.neonGreen,
                 }} aria-hidden="true">
-                  {mod.icon}
+                  <ShieldIcon />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
-                    <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{mod.name}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{item.title}</span>
                     <span style={{
-                      background: mod.badge === 'AI' ? 'rgba(139,92,246,0.2)' : 'rgba(16,185,129,0.15)',
-                      color: mod.badge === 'AI' ? '#a78bfa' : S.emerald,
+                      background: 'rgba(16,185,129,0.15)',
+                      color: S.neonGreen,
                       borderRadius: '8px',
-                      padding: '2px 7px',
-                      fontSize: '0.66rem',
+                      padding: '2px 8px',
+                      fontSize: '0.65rem',
                       fontWeight: 800,
-                      letterSpacing: '0.04em',
-                    }}>
-                      {mod.badge === 'AI' ? '✦ AI' : `✓ ${mod.badge}`}
-                    </span>
+                      letterSpacing: '0.05em',
+                    }}>✓ {item.status}</span>
                   </div>
-                  <p style={{ color: S.slateDim, fontSize: '0.8rem', margin: 0 }}>{mod.desc}</p>
+                  <p style={{ color: S.slateDim, fontSize: '0.82rem', margin: 0, lineHeight: 1.6 }}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -1309,6 +1534,65 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
+      {/* ── Arquitetura Técnica ──────────────────────────────── */}
+      <section
+        id="sec-tech"
+        data-obs
+        aria-labelledby="tech-heading"
+        style={{
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          maxWidth: '1100px',
+          margin: '0 auto',
+          ...fadeIn('sec-tech'),
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 id="tech-heading" style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 'clamp(1.7rem, 3.5vw, 2.4rem)',
+            fontWeight: 800,
+            color: '#f1f5f9',
+            marginBottom: '0.6rem',
+          }}>{t.tech_title}</h2>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+          gap: '12px',
+        }}>
+          {Array.isArray(t.tech_stack) && t.tech_stack.map((tech, i) => (
+            <div
+              key={i}
+              style={{
+                background: S.surface,
+                border: `1px solid ${S.borderGold}`,
+                borderRadius: '14px',
+                padding: '18px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.22s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = S.surfaceWarm;
+                e.currentTarget.style.borderColor = S.borderGoldHov;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = S.surface;
+                e.currentTarget.style.borderColor = S.borderGold;
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <span style={{ fontSize: '1.4rem', flexShrink: 0 }} aria-hidden="true">{tech.icon}</span>
+              <div>
+                <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>{tech.name}</div>
+                <div style={{ fontSize: '0.72rem', color: S.solimoes, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{tech.category}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
       <section
@@ -1421,7 +1705,7 @@ const ShowcasePage: React.FC = () => {
             }}>
               {/* Primary CTA 1 - Trial */}
               <a
-                href="/#/login"
+                href="/#/login?from=showcase"
                 id="showcase-trial-cta"
                 style={{
                   display: 'inline-flex',
@@ -1481,12 +1765,12 @@ const ShowcasePage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 12px 48px rgba(16, 185, 129, 0.4)';
                 }}
               >
-                <img src="/logos/logo-icon.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0)' }} /> Falar com a Amazô 
+                <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0) invert(1)' }} /> Falar com a Amazô 
               </button>
 
-              {/* Secondary CTA - WhatsApp */}
+              {/* Secondary CTA - WhatsApp Business (Lidi Moura - gestão humana) */}
               <a
-                href="https://wa.me/5541992557600"
+                href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização para o meu negócio.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -1529,16 +1813,62 @@ const ShowcasePage: React.FC = () => {
       </section>
 
       <footer style={{
-        padding: '2.5rem 1.5rem',
+        padding: '3rem 1.5rem',
         textAlign: 'center',
         borderTop: `1px solid ${S.border}`,
+        background: 'rgba(0,0,0,0.15)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-          <img src="/logos/logo-icon.png" alt="Hub Icon" style={{ height: '24px' }} />
-          <span style={{ color: S.slate, fontSize: '0.82rem', fontWeight: 500 }}>{t.footer_built}</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
+          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
+          <span style={{ color: S.textSecondary, fontSize: '0.88rem', fontWeight: 600 }}>{t.footer_built}</span>
         </div>
-        <p style={{ color: S.slateDim, fontSize: '0.74rem', margin: '4px 0' }}>Lidi Moura: Formada em Psicologia e Especialista em Dados</p>
+        {/* Bio contextualizada — lugar correto */}
+        <p style={{ color: S.slateDim, fontSize: '0.78rem', margin: '4px 0 12px' }}>
+          🎓 Lidi Moura — Formada em Psicologia e Especialista em Dados · Certificações OCI, IA &amp; MySQL
+        </p>
+        {/* Links sociais */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <a
+            href="https://github.com/encontro-dagua-hub"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            ⚙ GitHub Org
+          </a>
+          <a
+            href="https://github.com/lidimoura"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = S.acaiLight; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            👩‍💻 GitHub (Lidi)
+          </a>
+          <a
+            href="https://www.linkedin.com/company/encontro-d-agua-hub/"
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💼 LinkedIn
+          </a>
+          <a
+            href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização para o meu negócio.')}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#25D366'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = S.slateDim; }}
+          >
+            💬 Suporte
+          </a>
+        </div>
         <p style={{ color: S.slateDim, fontSize: '0.72rem', margin: 0 }}>{t.footer_privacy}</p>
+        <p style={{ color: S.slateDim, fontSize: '0.68rem', margin: '4px 0 0' }}>
+          {t.footer_version}
+        </p>
       </footer>
       {/* ── Lead Capture Modal ────────────────────────────────────────────── */}
       <LeadCaptureModal

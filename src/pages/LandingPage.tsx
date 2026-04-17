@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
   Sparkles, Zap, Users, TrendingUp, QrCode, Menu, X, ChevronLeft, ChevronRight, ArrowRight,
-  Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, ThumbsUp, ThumbsDown,
+  Globe, CheckCircle, Copy, Play, Bot, Brain, MessageCircle, Linkedin, Github, ThumbsUp, ThumbsDown,
   Heart, Briefcase, Link as LinkIcon, ChevronDown, Leaf, ShieldCheck, Target, BarChart3, Filter
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -90,12 +90,13 @@ export default function LandingPage() {
   const TEAM_MEMBERS = [
     {
       id: 'lidi',
-      name: "Lidi",
+      name: "Lidi Moura",
       role: t('founderRole'),
       type: "human",
       image: "/profile.png",
       color: "border-amber-500 text-amber-400",
-      linkedin: "https://linkedin.com/in/sua-url",
+      linkedin: "https://linkedin.com/in/lidimoura",
+      github: "https://github.com/lidimoura",
       pitch: t('founderPitch')
     },
     {
@@ -103,23 +104,27 @@ export default function LandingPage() {
       name: "Precy",
       role: t('techLeadRole'),
       type: "ai",
+      image: "",
+      emoji: "🤖",
       color: "border-blue-500 text-blue-400",
       pitch: t('precyPitch')
     },
     {
-      id: 'amazo',
-      name: "Amazô",
+      id: 'jury',
+      name: "Jury",
       role: t('csRole'),
       type: "ai",
-      image: "/avatar-amazo.jpeg",
+      image: "",
+      emoji: "⚖️",
       color: "border-fuchsia-500 text-fuchsia-400",
-      pitch: t('amazoPitch')
+      pitch: t('juryPitch')
     },
     {
       id: 'antigravity',
       name: "Antigravity",
       role: t('devRole'),
       type: "ai",
+      image: "/logos/logo-icon-gold-transp.png",
       color: "border-purple-500 text-purple-400",
       pitch: t('antigravityPitch')
     }
@@ -533,106 +538,9 @@ Agora, gere o prompt perfeito:`;
         </section>
 
         {/* ════════════════════════════════════════════════════ */}
-        {/* SEGMENTAÇÃO: 3 Nichos (Earth-Neon) V4.1            */}
+        {/* SEGMENTAÇÃO: Removida na V5.3 (Agora no Showcase)  */}
         {/* ════════════════════════════════════════════════════ */}
-        <section className="py-16 px-6 bg-gradient-to-b from-[#02040a] to-[#04080a]">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <p className="text-slate-400 text-sm mb-2">Para quem é o Hub?</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Escolha o seu caminho</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-              {/* Card 1: Saúde & Psi */}
-              <div className="group relative bg-gradient-to-br from-[#0a1a14] to-[#051008] border border-teal-500/20 rounded-3xl p-7 hover:border-teal-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/10"
-                onClick={() => navigate('/login')}>
-                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-teal-500/20 transition-colors">
-                  <Heart className="w-6 h-6 text-teal-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Psicólogos & Saúde
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-teal-300 transition-colors">
-                  Cuide melhor de quem você cuida
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  CRM desenhado para a realidade do consultório: organiza encaminhamentos
-                  e automatiza o contato com respeito e ética.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['Funil de captação de clientes', 'Cartão digital profissional', 'Automação ética de follow-up'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-teal-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Explorar <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-              {/* Card 2: Empreendedores */}
-              <div className="group relative bg-gradient-to-br from-[#1a0f00] to-[#0a0800] border border-amber-600/20 rounded-3xl p-7 hover:border-amber-500/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10"
-                onClick={() => navigate('/login')}>
-                <div className="w-12 h-12 bg-amber-600/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-amber-500/20 transition-colors">
-                  <Briefcase className="w-6 h-6 text-amber-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-600/10 text-amber-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Empreendedores
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-300 transition-colors">
-                  Seu negócio todo num lugar só
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  Do primeiro contato ao pós-venda: gerencie clientes, acompanhe vendas
-                  e deixa a IA trabalhar enquanto você foca no que ama.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['Pipeline visual de vendas', 'IA que escreve proposta por você', 'Relatórios em tempo real'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-amber-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Explorar <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-              {/* Card 3: Link d'Água */}
-              <div className="group relative bg-gradient-to-br from-[#050a1a] to-[#020510] border border-cyan-500/20 rounded-3xl p-7 hover:border-cyan-400/50 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-500/10"
-                onClick={() => window.open('https://link.encontrodagua.com/vitrine', '_blank')}>
-                <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-cyan-500/20 transition-colors">
-                  <QrCode className="w-6 h-6 text-cyan-400" />
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                  Link d'Água • Cartão Digital
-                </span>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
-                  Sua presença digital num QR
-                </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  Um link único e bonito com tudo que as pessoas precisam saber de você.
-                  Simples de compartilhar, fácil de atualizar.
-                </p>
-                <ul className="space-y-1.5 mb-5">
-                  {['QR Code personalizado', 'Links ilimitados', 'Estatísticas de acesso'].map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-cyan-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-cyan-400 text-xs font-bold group-hover:gap-2 transition-all">
-                  Ver vitrine <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-            </div>
-
-            {/* ICEBERG: detalhes técnicos ocultos (OCI, RLS, API, Webhooks) */}
-            <IcebergDetails />
-          </div>
-        </section>
+        {/* IcebergDetails movido para o card da Lidi na seção Team */}
 
         {/* ══════════════════════════════════════════════ */}
         {/* 🔥 OFERTA DE LANÇAMENTO — Agente de IA R$80 (V4.4)             */}
@@ -727,13 +635,13 @@ Agora, gere o prompt perfeito:`;
                     Quero meu Agente IA
                     <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mês</span>
                   </button>
-                  <a
-                    href="https://wa.me/5592992943998?text=Ol%C3%A1%20Lidi!%20Quero%20saber%20mais%20sobre%20o%20Agente%20de%20IA%20por%20R$80"
+                <a
+                    href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse. Pode me contar mais?')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                   >
-                    <MessageCircle size={18} /> Tirar dúvidas no WhatsApp
+                    <MessageCircle size={18} /> Tirar dúvidas com a Lidi
                   </a>
                 </div>
               </div>
@@ -747,7 +655,7 @@ Agora, gere o prompt perfeito:`;
                     {/* Bot avatar */}
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-14 h-14 rounded-2xl bg-[#0f0c0b] border border-white/10 flex items-center justify-center shadow-lg overflow-hidden p-2">
-                        <img src="/logos/logo-icon.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+                        <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(200,147,58,0.4)]" />
                       </div>
                       <div>
                         <p className="font-bold text-white">Agente de IA</p>
@@ -908,10 +816,10 @@ Agora, gere o prompt perfeito:`;
               {t('promptLabDesc')}
             </p>
 
-            <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
-              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-0 text-lg" />
-              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50">
-                {isOptimizing ? t('optimizing') : t('optimize')}
+            <div className="flex gap-2 mb-6 bg-slate-900/50 p-2 rounded-2xl border border-fuchsia-500/40 relative">
+              <input type="text" value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOptimize()} placeholder={t('inputPlaceholder')} className="flex-1 bg-transparent border-none px-4 py-3 text-white focus:ring-2 focus:ring-fuchsia-500 rounded-xl text-lg" />
+              <button onClick={handleOptimize} disabled={isOptimizing} className="bg-fuchsia-700 hover:bg-fuchsia-600 px-6 py-3 rounded-xl font-bold text-white disabled:opacity-50 flex items-center gap-2">
+                {isOptimizing ? t('optimizing') : <><Sparkles size={16} /> {language === 'en' ? 'Optimize' : 'Otimizar'}</>}
               </button>
             </div>
 
@@ -967,7 +875,14 @@ Agora, gere o prompt perfeito:`;
 
             <div className="mt-8 p-6 bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 border border-fuchsia-500/30 rounded-2xl max-w-2xl mx-auto">
               <p className="text-lg font-bold text-fuchsia-300 mb-2">{t('wantJustPromptLab')}</p>
-              <p className="text-slate-400 text-sm mb-5">{t('promptLabBenefits')}</p>
+              <div className="mb-5">
+                <p className="text-slate-400 text-sm mb-3">{t('promptLabBenefits')}</p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {[t('softwareEngineer'), t('productManager'), t('dataScientist'), t('designer'), t('marketer'), t('teacher'), t('botArchitect'), t('llmTrainer'), t('webArchitect')].map((role) => (
+                    <span key={role} className="bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300 text-[10px] font-bold px-2 py-1 rounded-md">{role}</span>
+                  ))}
+                </div>
+              </div>
 
               {/* ══ CHECKOUT BUTTONS ═════════════════════════════ */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -1003,8 +918,8 @@ Agora, gere o prompt perfeito:`;
 
         {/* OLD QR SECTION REMOVED */}
 
-        {/* GALERIA DE CLIENTES DO HUB */}
-        <section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
+        {/* GALERIA DE CLIENTES DO HUB — oculta V5.5, reativar quando base real */}
+        {false && (<section id="showcase" className="py-20 px-6 bg-[#05020a] text-center">
           <div className="max-w-6xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
               <Sparkles className="w-3 h-3" /> {t('galleryTag')}
@@ -1112,14 +1027,50 @@ Agora, gere o prompt perfeito:`;
               {t('wantToAppear')}
             </div>
           </div>
-        </section>
+        </section>)} {/* fim gallery oculta */}
 
         {/* AMAZÔ IA BLOCK REMOVED AS CHAT BUBBLE IS ACTIVE */}
 
         {/* CRM NATIVO - Solução #4 */}
         <CRMSimulator onCTAClick={() => setIsApplicationModalOpen(true)} />
 
+        {/* ── CTA PROVADÁGUA — inserido após demo CRM V5.6 ── */}
+        <section className="py-16 px-6 bg-[#02040a]">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 via-[#02040a] to-amber-900/10 p-10 text-center shadow-2xl">
+              {/* Glows */}
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-16 right-0 w-60 h-60 bg-amber-600/8 rounded-full blur-3xl pointer-events-none" />
 
+              <div className="relative z-10">
+                <span className="inline-block px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400 text-xs font-bold uppercase tracking-widest mb-4">
+                  🌏 Provadágua — Acesso Gratuito por 7 dias
+                </span>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 leading-tight">
+                  {t('language') === 'en'
+                    ? 'Try the Provadágua: Your business ecosystem in 7 days'
+                    : 'Experimente a Provadágua: O seu ecossistema de gestão em 7 dias'}
+                </h2>
+                <p className="text-slate-400 text-sm mb-6 max-w-xl mx-auto">
+                  {t('language') === 'en'
+                    ? 'CRM with AI, isolated data per company, SDR agent 24/7 and LGPD compliance. No credit card.'
+                    : 'CRM com IA, dados isolados por empresa, agente SDR 24/7 e conformidade LGPD. Sem cartão de crédito.'}
+                </p>
+                <a
+                  id="lp-cta-provadagua"
+                  href="/#/showcase"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 text-white font-extrabold text-base shadow-lg shadow-purple-500/30 transition-all active:scale-[0.98] hover:-translate-y-0.5"
+                >
+                  {t('language') === 'en'
+                    ? 'Discover the Provadágua →'
+                    : 'Experimente a Provadágua →'}
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── PRICING REMOVED V5.5 — checkout centralizado nos cards de produto ── */}
 
         {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
 
@@ -1151,8 +1102,8 @@ Agora, gere o prompt perfeito:`;
               <h3 className="text-xl font-bold text-white mb-2">{translations.en.noOneLeftBehind}</h3>
               <p className="text-slate-400 text-sm mb-6">{translations.en.socialImpact}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open('https://wa.me/5592992943998?text=Olá Lidi! Sou do grupo de impacto social e gostaria da consultoria gratuita de 10min.', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <MessageCircle size={18} /> {translations.en.socialConsult}
+                <button onClick={() => window.open(`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Conheci o Hub e quero conversar sobre uma implementação sob medida para minha operação.')}`, '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                  <MessageCircle size={18} /> {t('socialConsult')}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
                   <Bot size={18} /> {translations.en.chatWithAmazo}
@@ -1170,13 +1121,29 @@ Agora, gere o prompt perfeito:`;
 
             <div className="text-center p-8 bg-[#0f0518] border border-white/10 rounded-3xl w-full mx-8 shadow-2xl flex flex-col items-center">
               <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden`}>
-                {TEAM_MEMBERS[activeTeamIndex].image ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" /> : '🤖'}
+                {TEAM_MEMBERS[activeTeamIndex].image
+                  ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" />
+                  : <span>{(TEAM_MEMBERS[activeTeamIndex] as any).emoji || '🤖'}</span>}
               </div>
               <h3 className="text-2xl font-bold text-white mb-1">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
               <span className={`text-xs uppercase font-bold tracking-widest mb-4 block ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>{TEAM_MEMBERS[activeTeamIndex].role}</span>
               <p className="text-slate-300 text-sm italic mb-4">"{TEAM_MEMBERS[activeTeamIndex].pitch}"</p>
-              {TEAM_MEMBERS[activeTeamIndex].linkedin && (
-                <a href={TEAM_MEMBERS[activeTeamIndex].linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white"><Linkedin size={20} /></a>
+              <div className="flex items-center justify-center gap-3">
+                {TEAM_MEMBERS[activeTeamIndex].linkedin && (
+                  <a href={TEAM_MEMBERS[activeTeamIndex].linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white transition-colors">
+                    <Linkedin size={20} />
+                  </a>
+                )}
+                {(TEAM_MEMBERS[activeTeamIndex] as any).github && (
+                  <a href={(TEAM_MEMBERS[activeTeamIndex] as any).github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
+                    <Github size={20} />
+                  </a>
+                )}
+              </div>
+              {activeTeamIndex === 0 && (
+                <div className="mt-2">
+                  <IcebergDetails />
+                </div>
               )}
             </div>
 

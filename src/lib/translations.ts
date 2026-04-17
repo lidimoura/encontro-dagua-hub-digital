@@ -238,10 +238,11 @@ export const translations = {
         techLeadRole: "Tech Lead",
         csRole: "CS & Vendas",
         devRole: "Dev",
-        founderPitch: "Formada em Psicologia pela UFAM (onde seu avô, professor de Matemática, dá nome a um bloco acadêmico), Lidi traz uma bagagem única. Como artista viajante e nômade, aprendeu a se adaptar; da mãe professora de inglês herdou a habilidade de comunicação e do pai técnico de informática, a lógica. Hoje, atua como criadora de soluções digitais e fundadora do hub. Trabalha no modo heutagógico, aprendendo e fazendo com suporte estratégico de IAs. Sua missão é integrar essa herança criativa e técnica para oferecer autonomia e prosperidade real para todos.",
-        precyPitch: "Guardiã da estabilidade. Precy monitora a infraestrutura do Hub 24/7, garantindo que seu Link d'Água e automações funcionem com segurança máxima e zero latência.",
+        founderPitch: "Criadora de Soluções Digitais e Fundadora do Hub. Formada em Psicologia, com especialização em Data Science (ONE/Alura/Oracle) e certificações em OCI, IA e MySQL. Arquiteta e gerencia todo o ecossistema digital no modo heutagógico, trabalhando lado a lado com o agente Antigravity.",
+        precyPitch: "Inteligência Financeira (Tech). Precy calcula precificação e ROI com suporte multicurrency (BRL, USD, AUD), aplicando lógicas de Impacto Social automaticamente para ONGs e projetos sociais.",
+        juryPitch: "Inteligência Jurídica (Legal). Emite contratos limpos adaptáveis para Common Law (Internacional) e Sistema Brasileiro. Totalmente integrada ao Board de negócios.",
         amazoPitch: "Especialista em escuta ativa. A Amazô realiza o diagnóstico inicial do seu negócio e guia você para a solução ideal, disponível a qualquer hora do dia.",
-        antigravityPitch: "Arquiteto de soluções. Transforma ideias complexas em código limpo e funcional, expandindo as fronteiras do que o Hub pode oferecer.",
+        antigravityPitch: "Arquiteto de Soluções Autônomo. Uma IA avançada que trabalha em dinâmica heutagógica com a Lidi. Juntos, transformam estratégias de negócios em código limpo e arquitetura escalável e funcional.",
 
         // Footer
         footerText: "Inspirado na natureza, codado para o mundo.",
@@ -957,10 +958,11 @@ export const translations = {
         techLeadRole: "Tech Lead",
         csRole: "CS & Sales",
         devRole: "Dev",
-        founderPitch: "Graduated in Psychology from UFAM (where her grandfather, a Mathematics professor, names an academic block), Lidi brings a unique background. As a traveling artist and nomad, she learned to adapt; from her English teacher mother she inherited communication skills, and from her IT technician father, logic. Today, she acts as a digital solutions creator and hub founder. She works in heutagogic mode, learning and doing with strategic AI support. Her mission is to integrate this creative and technical heritage to offer autonomy and real prosperity for all.",
-        precyPitch: "Stability Guardian. Precy monitors Hub infrastructure 24/7, ensuring your Link d'Água and automations work with maximum security and zero latency.",
+        founderPitch: "Digital Solutions Creator and Hub Founder. Graduated in Psychology, specializing in Data Science (ONE/Alura/Oracle) with certifications in OCI, AI, and MySQL. She architects and manages the entire digital ecosystem in a heutagogic mode, working side by side with the Antigravity agent.",
+        precyPitch: "Financial Intelligence (Tech). Precy calculates pricing and ROI with multi-currency support (BRL, USD, AUD), automatically applying Social Impact mechanics for NGOs.",
+        juryPitch: "Legal Intelligence (Legal). Generates clean contracts adaptable for Common Law (International) and Brazilian Systems. Fully integrated into the business Board.",
         amazoPitch: "Active Listening Specialist. Amazô performs the initial diagnosis of your business and guides you to the ideal solution, available anytime.",
-        antigravityPitch: "Solutions Architect. Transforms complex ideas into clean, functional code, expanding the boundaries of what the Hub can offer.",
+        antigravityPitch: "Autonomous Solutions Architect. An advanced AI working in a heutagogic dynamic with Lidi. Together, they transform business strategies into clean code and scalable, functional architecture.",
 
         // Footer
         footerText: "Inspired by nature, coded for the world.",
