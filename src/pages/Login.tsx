@@ -124,6 +124,12 @@ const Login: React.FC = () => {
       ? 'Registration successful! Please check your inbox to confirm your email and then sign in.'
       : 'Cadastro realizado com sucesso! Por favor, verifique a caixa de entrada do seu e-mail para confirmar a conta e fazer o login.',
     errLogin:       isEn ? 'Login failed. Check credentials.' : 'Falha no login. Verifique as credenciais.',
+    errInvalidCreds: isEn
+      ? 'Incorrect email or password. Please check your details or ask the Admin to reset your password.'
+      : 'E-mail ou senha incorretos. Verifique os dados ou solicite uma nova senha ao Admin.',
+    errSuspended: isEn
+      ? 'Your demo access has expired or been suspended. Contact Lidi to renew your trial.'
+      : 'Seu acesso à demo expirou ou foi suspenso. Entre em contato com a Lidi para renovar seu trial.',
 
     // God Mode
     adminTitle:     isEn ? 'Administrative Access' : 'Acesso Administrativo',
@@ -304,6 +310,26 @@ const Login: React.FC = () => {
       initGA4();
       trackSignUp('keyword_provadagua');
       trackTrialStart('keyword');
+
+      // V7.0: insere o lead no CRM (Contacts) como best-effort (não bloqueia navegação)
+      try {
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        if (freshUser) {
+          await supabase.from('contacts').insert({
+            name:        leadName.trim(),
+            email:       normalizedEmail,
+            source:      'showcase',
+            notes:       isEn
+              ? `Lead entered via Provadágua Showcase. Entry date: ${new Date().toLocaleDateString('en-US')}.`
+              : `Lead entrou via Provadágua Showcase. Data de entrada: ${new Date().toLocaleDateString('pt-BR')}.`,
+            user_id:     freshUser.id,
+          });
+        }
+      } catch (crmErr) {
+        // Silencioso — não bloqueia o lead de acessar o dashboard
+        console.warn('[V7.0] CRM contact insert failed (non-blocking):', crmErr);
+      }
+
       navigate('/dashboard');
     } catch (err: any) {
       // V6.6: erro 429 / rate limit — mensagem amigável em PT/EN
@@ -320,6 +346,26 @@ const Login: React.FC = () => {
   };
 
   // ── Handler: Showcase SignIn toggle ──────────────────────────────────────
+  // V7.0: humaniza erros do Supabase Auth — nenhuma mensagem técnica vaza
+  const smartSignInError = (err: any): string => {
+    const msg = (err?.message || '').toLowerCase();
+    const waUrl = `https://wa.me/${WHATSAPP_SUPPORT}?text=${encodeURIComponent(
+      isEn ? 'Hi Lidi! My Provadágua trial access is not working.' : 'Oi Lidi! Meu acesso à Provadágua não está funcionando.'
+    )}`;
+    if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('wrong password') || msg.includes('email not confirmed')) {
+      return txt.errInvalidCreds;
+    }
+    if (msg.includes('suspended') || msg.includes('inactive') || msg.includes('forbidden') || msg.includes('not authorized')) {
+      return isEn
+        ? `Your demo access has expired or been suspended. → Contact Lidi: ${waUrl}`
+        : `Seu acesso à demo expirou ou foi suspenso. → Fale com a Lidi: ${waUrl}`;
+    }
+    if (msg.includes('rate limit') || msg.includes('too many')) {
+      return isEn ? 'Too many attempts. Please wait a few minutes.' : 'Muitas tentativas. Aguarde alguns minutos.';
+    }
+    return txt.errLogin;
+  };
+
   const handleShowcaseSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSigninLoading(true);
@@ -334,7 +380,7 @@ const Login: React.FC = () => {
       trackLogin('showcase_signin');
       navigate('/dashboard');
     } catch (err: any) {
-      setSigninError(err.message || txt.errLogin);
+      setSigninError(smartSignInError(err));
     } finally {
       setSigninLoading(false);
     }

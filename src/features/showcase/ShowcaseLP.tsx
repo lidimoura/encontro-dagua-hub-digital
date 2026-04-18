@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase/client';
 
-// ─── Access keyword (case-insensitive) ───────────────────────────────────────
-const ACCESS_KEYWORD = 'provadagua';
+// ─── Access keyword — lida via ENV (V7.0: zero hardcode no bundle) ────────────
+// Configurar VITE_ACCESS_KEYWORD=provadagua no .env e no painel Vercel/Supabase
+const ACCESS_KEYWORD = (import.meta.env.VITE_ACCESS_KEYWORD as string || '').trim().toLowerCase();
 
 // ─── Demo signup metadata (ISOLATION WALL) ───────────────────────────────────
 // Every user created via this LP gets is_demo_data: true injected at the

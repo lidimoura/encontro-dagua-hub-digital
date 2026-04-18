@@ -79,6 +79,8 @@ const CheckoutSuccessPage = lazy(() => import('@/pages/CheckoutSuccessPage'));
 const CheckoutCancelPage  = lazy(() => import('@/pages/CheckoutCancelPage'));
 // ── V5.3 Trial Expired — Upsell + Feedback page ─────────────────────────────
 const TrialExpiredPage = lazy(() => import('@/pages/TrialExpiredPage'));
+// ── V7.0 Leads Admin — painel de gestão de leads Provadágua ──────────────────
+const LeadsAdminPage = lazy(() => import('@/pages/AdminPage'));
 
 // Layout wrapper for protected routes
 const ProtectedLayout: React.FC = () => (
@@ -295,6 +297,11 @@ const App: React.FC = () => {
                           <Route path="admin/tech-stack" element={
                             <RoleBasedRoute allowedRoles={['admin']}>
                               <TechStackPage />
+                            </RoleBasedRoute>
+                          } />
+                          <Route path="admin/leads" element={
+                            <RoleBasedRoute allowedRoles={['admin']}>
+                              <LeadsAdminPage />
                             </RoleBasedRoute>
                           } />
 
