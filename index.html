@@ -34,6 +34,32 @@
   <link rel="icon" type="image/png" href="/logos/logo-icon-dark-gold.png" />
   <link rel="apple-touch-icon" href="/logos/logo-icon-dark-gold.png" />
 
+  <!-- ══ SW KILL SWITCH — V6.8: purga caches fantasmas antes do React ───────────── -->
+  <!-- Roda imediatamente, antes de qualquer JS do bundle. Garante que a cliente -->
+  <!-- nunca veja o bundle antigo mesmo que o SW antigo esteja instalado.         -->
+  <script>
+    (function killSWCache() {
+      // Unregistra TODOS os Service Workers registrados
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(reg) {
+            reg.unregister();
+            console.log('[SW-KILL] Unregistered:', reg.scope);
+          });
+        });
+      }
+      // Purga TODOS os caches do CacheStorage
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
+            console.log('[CACHE-KILL] Deleted cache:', key);
+          });
+        });
+      }
+    })();
+  </script>
+
   <!-- ══ TITLE DINÂMICO POR DOMÍNIO ════════════════════════════════ -->
   <script>
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

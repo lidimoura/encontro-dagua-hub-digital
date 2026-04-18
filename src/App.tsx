@@ -129,10 +129,26 @@ const App: React.FC = () => {
   }, []);
 
   // ── Service Worker & Push Notification registration ──────────
+  // V6.8: purga caches antigos antes de re-registrar o SW
   useEffect(() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
-    // Register SW
+    // ① Purga qualquer cache CacheStorage residual
+    if ('caches' in window) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+    }
+
+    // ② Unregistra qualquer SW antigo (diferente de /sw.js ou scope diferente)
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => {
+        if (!reg.active?.scriptURL?.endsWith('/sw.js')) {
+          reg.unregister();
+          console.log('[SW] Unregistered stale SW:', reg.scope);
+        }
+      });
+    });
+
+    // ③ Registra o novo SW cache-free
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(async (registration) => {
         console.log('[SW] Registered:', registration.scope);
