@@ -278,7 +278,14 @@ const Login: React.FC = () => {
       trackTrialStart('keyword');
       navigate('/dashboard');
     } catch (err: any) {
-      setKeywordError(err.message || txt.errGeneric);
+      // V6.6: erro 429 / rate limit — mensagem amigável em PT/EN
+      const isRate = err?.message?.toLowerCase().includes('rate limit') || err?.message?.toLowerCase().includes('too many');
+      setKeywordError(isRate
+        ? (isEn
+            ? 'Too many attempts. Please wait a few minutes or try a different network.'
+            : 'Muitas tentativas de cadastro detectadas. Por favor, aguarde alguns minutos ou tente outra rede.')
+        : (err.message || txt.errGeneric)
+      );
     } finally {
       setKeywordLoading(false);
     }

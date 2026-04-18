@@ -63,7 +63,8 @@ const copy = {
       signingUp: 'Criando conta...',
       successMsg: '🎉 Conta criada! Redirecionando para o Hub...',
       errorGeneric: '❌ Erro ao criar conta. Tente novamente.',
-      errorEmailUsed: '⚠️ Este e-mail já está cadastrado. Tente fazer login.',
+      errorEmailUsed: '⚠️ Este e-mail já está cadastrado. Clique em "Usar outra chave" e tente fazer login.',
+      errorRateLimit: '⏳ Muitas tentativas detectadas. Aguarde alguns minutos ou tente outra rede.',
       backToKey: '← Usar outra chave',
     },
     footer: {
@@ -116,7 +117,8 @@ const copy = {
       signingUp: 'Creating account...',
       successMsg: '🎉 Account created! Redirecting to Hub...',
       errorGeneric: '❌ Error creating account. Please try again.',
-      errorEmailUsed: '⚠️ This email is already registered. Try logging in.',
+      errorEmailUsed: '⚠️ This email is already registered. Click “Use a different key” to sign in.',
+      errorRateLimit: '⏳ Too many attempts detected. Please wait a few minutes or try a different network.',
       backToKey: '← Use a different key',
     },
     footer: {
@@ -140,7 +142,7 @@ export const ShowcaseLP: React.FC = () => {
 
   // ─ Sign-up form ───────────────────────────────────────────────────────────
   const [signupForm, setSignupForm] = useState({ name: '', email: '', password: '' });
-  const [signupStatus, setSignupStatus] = useState<'idle' | 'loading' | 'error_generic' | 'error_email'>('idle');
+  const [signupStatus, setSignupStatus] = useState<'idle' | 'loading' | 'error_generic' | 'error_email' | 'error_ratelimit'>('idle');
 
   const keyInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -166,57 +168,65 @@ export const ShowcaseLP: React.FC = () => {
     }
   };
 
-  // ── Step 2: Demo Sign Up via Edge Function (Fix Erro 228 + Trigger) ──────────
-  // We use the signup-showcase Edge Function which:
-  // 1. Creates auth user with email_confirm: true (no email needed)
-  // 2. Inserts profile manually (bypasses broken handle_new_user trigger)
-  // 3. Saves lead in contacts with is_demo_data: true
+  // ── Step 2: Demo Sign Up via supabase.auth.signUp() nativo (V6.6: sem Edge Function, sem CORS) ─
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignupStatus('loading');
 
     try {
-      // ① Call the edge function (bypass trigger + email confirmation)
-      const res = await supabase.functions.invoke('signup-showcase', {
-        body: {
-          name:     signupForm.name.trim(),
-          email:    signupForm.email.trim().toLowerCase(),
-          password: signupForm.password,
-          language,
+      const normalizedEmail = signupForm.email.trim().toLowerCase();
+
+      // ① Cadastro nativo — metadados passados via options.data
+      const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
+        email:    normalizedEmail,
+        password: signupForm.password,
+        options: {
+          data: {
+            full_name:  signupForm.name.trim(),
+            user_type:  'lead_provadagua',
+            is_demo_data: true,
+            app_source: 'showcase_lp',
+          },
         },
       });
 
-      if (res.error) {
-        throw new Error(res.error.message || 'Edge function error');
+      // ② Detecta rate limit (429)
+      const isRateLimit =
+        signUpError?.message?.toLowerCase().includes('rate limit') ||
+        signUpError?.message?.toLowerCase().includes('too many') ||
+        signUpError?.status === 429;
+
+      if (isRateLimit) {
+        setSignupStatus('error_ratelimit');
+        return;
       }
 
-      const data = res.data as any;
+      // ③ Detecta email já cadastrado (identidades vazias ou erro de duplicata)
+      const alreadyExists =
+        signUpError?.message?.toLowerCase().includes('already registered') ||
+        signUpError?.message?.toLowerCase().includes('user already') ||
+        (signUpResult?.user && signUpResult.user.identities?.length === 0);
 
-      if (data?.error === 'email_already_registered') {
+      if (alreadyExists) {
         setSignupStatus('error_email');
         return;
       }
 
-      if (!data?.success) {
-        console.error('[ShowcaseLP] signup-showcase returned:', data);
-        setSignupStatus('error_generic');
-        return;
-      }
+      if (signUpError) throw signUpError;
 
-      // ② Sign in immediately (user has email confirmed via admin API)
+      // ④ Auto-login imediato
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email:    signupForm.email.trim().toLowerCase(),
+        email:    normalizedEmail,
         password: signupForm.password,
       });
 
       if (signInError) {
-        console.error('[ShowcaseLP] signIn after edge signup failed:', signInError.message);
+        console.error('[ShowcaseLP] signIn after signUp failed:', signInError.message);
         setSignupStatus('error_generic');
         return;
       }
 
-      // ③ Success — clear onboarding flag so OnboardingModal fires on /boards
-      //    (OnboardingModal lives in BoardsPage and triggers on isFirstVisit + no boards)
+      // ⑤ Limpa flag de onboarding para o modal disparar no /boards
       localStorage.removeItem('crm_onboarding_completed');
 
       setPhase('success');
@@ -224,7 +234,12 @@ export const ShowcaseLP: React.FC = () => {
 
     } catch (err: any) {
       console.error('[ShowcaseLP] unexpected signup error:', err);
-      setSignupStatus('error_generic');
+      // Captura rate limit vindo de throw genérico
+      if (err?.message?.toLowerCase().includes('rate limit') || err?.message?.toLowerCase().includes('too many')) {
+        setSignupStatus('error_ratelimit');
+      } else {
+        setSignupStatus('error_generic');
+      }
     }
   };
 
@@ -473,6 +488,9 @@ export const ShowcaseLP: React.FC = () => {
                   )}
                   {signupStatus === 'error_email' && (
                     <p style={{ ...s.formError, color: '#F5A623' }}>{c.portal.errorEmailUsed}</p>
+                  )}
+                  {signupStatus === 'error_ratelimit' && (
+                    <p style={{ ...s.formError, color: '#F5A623' }}>{c.portal.errorRateLimit}</p>
                   )}
 
                   <button
