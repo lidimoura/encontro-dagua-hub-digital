@@ -118,8 +118,11 @@ const Login: React.FC = () => {
     errKeyword:     isEn ? 'Wrong keyword. Request from the team.' : 'Palavra-chave incorreta. Solicite à equipe.',
     errGeneric:     isEn ? 'Error. Try again.' : 'Erro. Tente novamente.',
     errEmailUsed:   isEn
-      ? 'This email is already registered. Click “I have an account” to sign in.'
-      : 'Este e-mail já está cadastrado. Clique em “Já tenho conta” para fazer o login.',
+      ? 'This email already has an account. Click “I have an account” below to sign in.'
+      : 'Este e-mail já possui cadastro. Clique em “Já tenho conta” abaixo para entrar.',
+    errEmailConfirm: isEn
+      ? 'Registration successful! Please check your inbox to confirm your email and then sign in.'
+      : 'Cadastro realizado com sucesso! Por favor, verifique a caixa de entrada do seu e-mail para confirmar a conta e fazer o login.',
     errLogin:       isEn ? 'Login failed. Check credentials.' : 'Falha no login. Verifique as credenciais.',
 
     // God Mode
@@ -252,6 +255,19 @@ const Login: React.FC = () => {
         },
       });
 
+      // V6.7: Detecta email-not-confirmed (SMTP esgotado ou confirmação pendente)
+      // Supabase retorna user sem session quando email precisa ser confirmado
+      const needsConfirm =
+        signUpError?.message?.toLowerCase().includes('email not confirmed') ||
+        signUpError?.message?.toLowerCase().includes('not confirmed') ||
+        (signUpResult?.user && !signUpResult?.session);
+
+      if (needsConfirm && !signUpError?.message?.toLowerCase().includes('already registered')) {
+        setKeywordError(txt.errEmailConfirm);
+        setKeywordLoading(false);
+        return;
+      }
+
       // Detecta email já cadastrado: Supabase retorna user com identidades vazias
       const alreadyExists =
         signUpError?.message?.toLowerCase().includes('already registered') ||
@@ -271,7 +287,19 @@ const Login: React.FC = () => {
         email:    normalizedEmail,
         password: leadPassword,
       });
-      if (loginError) throw loginError;
+
+      // V6.7: auto-login falhou por email-not-confirmed — orá amigável
+      if (loginError) {
+        const isNotConfirmed =
+          loginError.message?.toLowerCase().includes('email not confirmed') ||
+          loginError.message?.toLowerCase().includes('not confirmed');
+        if (isNotConfirmed) {
+          setKeywordError(txt.errEmailConfirm);
+          setKeywordLoading(false);
+          return;
+        }
+        throw loginError;
+      }
 
       initGA4();
       trackSignUp('keyword_provadagua');

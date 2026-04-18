@@ -63,7 +63,8 @@ const copy = {
       signingUp: 'Criando conta...',
       successMsg: '🎉 Conta criada! Redirecionando para o Hub...',
       errorGeneric: '❌ Erro ao criar conta. Tente novamente.',
-      errorEmailUsed: '⚠️ Este e-mail já está cadastrado. Clique em "Usar outra chave" e tente fazer login.',
+      errorEmailUsed: '⚠️ Este e-mail já possui cadastro. Clique em “Usar outra chave” e tente fazer login.',
+      errorEmailConfirm: '✅ Cadastro realizado! Verifique sua caixa de entrada para confirmar o e-mail e depois faça o login.',
       errorRateLimit: '⏳ Muitas tentativas detectadas. Aguarde alguns minutos ou tente outra rede.',
       backToKey: '← Usar outra chave',
     },
@@ -117,7 +118,8 @@ const copy = {
       signingUp: 'Creating account...',
       successMsg: '🎉 Account created! Redirecting to Hub...',
       errorGeneric: '❌ Error creating account. Please try again.',
-      errorEmailUsed: '⚠️ This email is already registered. Click “Use a different key” to sign in.',
+      errorEmailUsed: '⚠️ This email already has an account. Click “Use a different key” to sign in.',
+      errorEmailConfirm: '✅ Registration successful! Check your inbox to confirm your email, then sign in.',
       errorRateLimit: '⏳ Too many attempts detected. Please wait a few minutes or try a different network.',
       backToKey: '← Use a different key',
     },
@@ -142,7 +144,7 @@ export const ShowcaseLP: React.FC = () => {
 
   // ─ Sign-up form ───────────────────────────────────────────────────────────
   const [signupForm, setSignupForm] = useState({ name: '', email: '', password: '' });
-  const [signupStatus, setSignupStatus] = useState<'idle' | 'loading' | 'error_generic' | 'error_email' | 'error_ratelimit'>('idle');
+  const [signupStatus, setSignupStatus] = useState<'idle' | 'loading' | 'error_generic' | 'error_email' | 'error_ratelimit' | 'error_confirm'>('idle');
 
   const keyInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -201,6 +203,18 @@ export const ShowcaseLP: React.FC = () => {
         return;
       }
 
+      // V6.7: Detecta email-not-confirmed (Supabase SMTP esgotado ou confirm obrigatório)
+      // Supabase retorna user.session === null quando confirmação de email está ativa
+      const needsConfirm =
+        signUpError?.message?.toLowerCase().includes('email not confirmed') ||
+        signUpError?.message?.toLowerCase().includes('not confirmed') ||
+        (signUpResult?.user && !signUpResult?.session);
+
+      if (needsConfirm && !signUpError?.message?.toLowerCase().includes('already registered')) {
+        setSignupStatus('error_confirm');
+        return;
+      }
+
       // ③ Detecta email já cadastrado (identidades vazias ou erro de duplicata)
       const alreadyExists =
         signUpError?.message?.toLowerCase().includes('already registered') ||
@@ -220,7 +234,15 @@ export const ShowcaseLP: React.FC = () => {
         password: signupForm.password,
       });
 
+      // V6.7: auto-login falhou por email-not-confirmed
       if (signInError) {
+        const isNotConfirmed =
+          signInError.message?.toLowerCase().includes('email not confirmed') ||
+          signInError.message?.toLowerCase().includes('not confirmed');
+        if (isNotConfirmed) {
+          setSignupStatus('error_confirm');
+          return;
+        }
         console.error('[ShowcaseLP] signIn after signUp failed:', signInError.message);
         setSignupStatus('error_generic');
         return;
@@ -488,6 +510,9 @@ export const ShowcaseLP: React.FC = () => {
                   )}
                   {signupStatus === 'error_email' && (
                     <p style={{ ...s.formError, color: '#F5A623' }}>{c.portal.errorEmailUsed}</p>
+                  )}
+                  {signupStatus === 'error_confirm' && (
+                    <p style={{ ...s.formError, color: '#4ADE80', lineHeight: 1.5 }}>{c.portal.errorEmailConfirm}</p>
                   )}
                   {signupStatus === 'error_ratelimit' && (
                     <p style={{ ...s.formError, color: '#F5A623' }}>{c.portal.errorRateLimit}</p>
