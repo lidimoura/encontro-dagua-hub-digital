@@ -58,13 +58,14 @@ export const UsersPage: React.FC = () => {
         e.preventDefault();
         if (!inviteEmail.trim() || !currentUser?.company_id) return;
         setInviting(true);
-        // Insere um invite pendente — o usuário convidado precisará aceitar via link
-        // (mesma lógica do InviteGenerator: cria registro em invite_tokens ou notifica)
-        // Por ora: abre WA com o link de cadastro para o e-mail convidado
+
+        const origin = window.location.origin;
+        const showcaseUrl = `${origin}/#/provadagua`;
+
         const msg = encodeURIComponent(
             isEn
-                ? `Hi! You've been invited to join the CRM team. Register at: ${window.location.origin}`
-                : `Olá! Você foi convidado(a) para a equipe do CRM. Cadastre-se em: ${window.location.origin}`
+                ? `You have been invited to experience Provadágua, the free 7-day demo of the custom CRM by Encontro d’água Hub! 🌊\n\nAccess the link and use the keyword to enter:\n${showcaseUrl}\n\nSee you there! 🚀`
+                : `Você foi convidada para experimentar a Provadágua, a demo gratuita de 7 dias do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link e use a palavra-chave para entrar:\n${showcaseUrl}\n\nTe espero lá! 🚀`
         );
         window.open(`https://wa.me/?text=${msg}`, '_blank');
         setInviteEmail('');

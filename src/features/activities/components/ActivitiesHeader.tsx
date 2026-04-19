@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plus, LayoutList, Calendar as CalendarIcon } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ActivitiesHeaderProps {
   viewMode: 'list' | 'calendar';
@@ -12,14 +13,14 @@ export const ActivitiesHeader: React.FC<ActivitiesHeaderProps> = ({
   setViewMode,
   onNewActivity,
 }) => {
-  console.log('Rendering ActivitiesHeader');
+  const { t } = useLanguage();
   return (
     <div className="flex justify-between items-center mb-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display">
-          Atividades
+          {t('activities')}
         </h1>
-        <p className="text-slate-500 dark:text-slate-400">Gerencie suas tarefas e compromissos</p>
+        <p className="text-slate-500 dark:text-slate-400">{t('activitiesSubtitle')}</p>
       </div>
       <div className="flex items-center gap-3">
         <div className="flex bg-white dark:bg-dark-card p-1 rounded-lg border border-slate-200 dark:border-white/10">
@@ -49,7 +50,7 @@ export const ActivitiesHeader: React.FC<ActivitiesHeaderProps> = ({
           className="flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-primary-600/20"
         >
           <Plus size={20} />
-          Nova Atividade
+          {t('newActivity')}
         </button>
       </div>
     </div>

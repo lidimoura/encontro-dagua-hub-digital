@@ -52,6 +52,8 @@ export const translations = {
         recentActivities: "Atividades Recentes",
         noRecentActivities: "Nenhuma atividade recente",
         viewAllActivities: "Ver todas as atividades",
+        activitiesSubtitle: "Gerencie suas tarefas e compromissos",
+        newActivity: "Nova Atividade",
 
         // --- INBOX ---
         inboxTitle: "Inbox",
@@ -769,6 +771,8 @@ export const translations = {
         recentActivities: "Recent Activities",
         noRecentActivities: "No recent activities",
         viewAllActivities: "View all activities",
+        activitiesSubtitle: "Manage your tasks and commitments",
+        newActivity: "New Activity",
 
         // --- INBOX ---
         inboxTitle: "Inbox",

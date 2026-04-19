@@ -345,8 +345,8 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* Search Bar - Only for Users Tab */}
-            {activeTab === 'users' && (
+            {/* Search Bar - Only for super_admin in Users Tab */}
+            {activeTab === 'users' && isSuperAdmin && (
                 <div className="max-w-4xl mx-auto mb-6">
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -361,8 +361,8 @@ export default function AdminPage() {
                 </div>
             )}
 
-            {/* Stats - Only for Users Tab */}
-            {activeTab === 'users' && (
+            {/* Stats - Only for super_admin in Users Tab */}
+            {activeTab === 'users' && isSuperAdmin && (
                 <div className="max-w-4xl mx-auto mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 mb-1">
