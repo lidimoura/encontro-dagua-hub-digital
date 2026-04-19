@@ -516,17 +516,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* Main Content Area - Route-aware overflow handling */}
+        {/* Main Content Area */}
         {/* Boards & AI Hub use overflow-hidden + h-full for Kanban/chat layouts */}
         {/* All other pages use overflow-y-auto for normal scrolling */}
         <main
-          className={`flex-1 min-h-0 w-full max-w-full overflow-x-hidden pt-16 md:pt-0 pb-safe
+          className={`flex-1 min-h-0 w-full max-w-full overflow-x-hidden
             ${['/boards', '/ai'].some(p => location.pathname.startsWith(p))
               ? 'overflow-hidden flex flex-col bg-slate-50 dark:bg-dark-bg'
               : 'overflow-y-auto bg-slate-50 dark:bg-dark-bg'
             }`}
         >
-          <div className={['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-hidden flex flex-col h-full' : 'h-full p-4 md:p-6'}>
+          {/* pt-16 sempre presente no mobile (compensa o fixed header h-16) */}
+          {/* md:pt-0 remove o padding no desktop onde o header é relativo */}
+          <div className={`pt-16 md:pt-0 ${['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-hidden flex flex-col h-full' : 'h-full p-4 md:p-6'}`}>
             {children}
           </div>
         </main>
