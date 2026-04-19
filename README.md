@@ -9,12 +9,12 @@
 
 </div>
 
-### CRM de Produção `V6.2` — Final Release · Provadágua Launch
+### CRM de Produção `V8.0` — Encerramento · Provadágua Go-Live
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V6.2**: Links Stripe + mensagens Lidi WA Business · GA4 em todas as páginas · Hotfix DNS NexusBridge · Remoção forced-EN
+> **V8.0**: Painel Admin CRUD · Isolamento company_id implacável · AiflowSupport bilingue · Header mobile fix · SW cache-free
 
 ---
 
@@ -27,13 +27,14 @@ O projeto opera em **dois contextos distintos**:
 | **Hub Digital** | `hub.encontrodagua.com` | `main` | Super Admin apenas | `is_super_admin = true` |
 | **Provadágua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate → trial 7d | `access_level = provadagua-trial` |
 
-### Fluxo Provadágua
+### Fluxo Provadágua (V8.0 — sem Edge Function)
 ```
 /#/showcase  →  [CTA "Experimentar"]  →  /#/login?from=showcase
               →  Aba "Novo Cadastro" (padrão)
-              →  Preenche nome + e-mail + palavra-chave
-              →  Edge Function signup-showcase
+              →  Preenche Palavra-chave + Nome + E-mail + Senha
+              →  supabase.auth.signUp() nativo (sem CORS, sem Edge Function)
               →  auto-login  →  /dashboard  (trial ativo 7 dias)
+              →  Lead inserido em contacts (CRM) automaticamente
 ```
 
 ### Fluxo Hub
@@ -55,14 +56,52 @@ O projeto opera em **dois contextos distintos**:
 | `/#/login?from=showcase` | Público | Login Provadágua (SignUp com Keyword + SignIn) |
 | `/#/dashboard` | Auth | Dashboard CRM (ProtectedRoute) |
 | `/#/trial-expired` | Auth | Página pós-trial com NPS + CTA fechar negócio |
+| `/#/admin` | Admin | Painel CRUD de usuários (Lidi) |
+| `/#/admin/leads` | Admin | Painel de leads Provadágua com trial control |
+| `/#/settings` | Auth | Configurações — usuários filtrados por `company_id` |
 
 ### Edge Functions (Supabase)
 
 | Função | Método | Descrição |
 |---|---|---|
-| `signup-showcase` | POST | Cria usuário trial sem confirmação de e-mail |
+| ~~`signup-showcase`~~ | ~~POST~~ | **DESCONTINUADA V6.6** — substituída por `supabase.auth.signUp()` nativo |
 | `form-lp-lead` | POST | Captura lead via LeadCaptureModal → Board |
 | `qr-redirect` | GET | Redireciona slug QR Code para URL real |
+
+---
+
+## Gestão de Leads e Multi-tenancy (V8.0)
+
+### Separação de Visões: Super Admin vs Owner/Lead
+
+O sistema usa `company_id` como parede de isolamento total entre organizações:
+
+| Papel | Visão | Rota |
+|---|---|---|
+| **Super Admin (Lidi)** | Todos os usuários do sistema | `/#/admin` |
+| **Owner/Lead (Amanda)** | Apenas usuários da `company_id` dela | `/#/settings` |
+
+### Sistema de Trial (7 dias)
+
+```
+Lead se cadastra via Keyword Gate
+  → supabase.auth.signUp() + metadata { user_type: 'lead_provadagua' }
+  → trial_expires_at = now() + 7 dias (setado no profile)
+  → access_level = 'trial'
+  → Lead inserido em contacts com source='showcase'
+```
+
+**Renovação Manual (Lidi):**
+1. Acessar `/#/admin` → aba Usuários
+2. Localizar o lead pela coluna E-mail
+3. Clicar em **+7d** para estender a partir da data atual ou do trial vigente
+4. Ou clicar em **Suspender** para bloquear acesso imediatamente
+5. O modal **Editar** permite ajuste fino: `trial_expires_at`, `access_level`, plano e role
+
+**Filtro de Privacy (`/#/settings`):**
+- Query Supabase com `.eq('company_id', currentUser.company_id)`
+- Amanda **nunca** vê os 10+ usuários de teste da Lidi
+- Amanda **só** vê a si mesma e quem ela convidar
 
 ---
 
@@ -158,4 +197,4 @@ src/
 
 ---
 
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V5.7 — Final Release*
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V8.0 — Go-Live Provadágua*

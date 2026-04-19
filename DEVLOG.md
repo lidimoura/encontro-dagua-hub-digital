@@ -1,5 +1,62 @@
-# DEVLOG — Encontro d'Água Hub
+﻿# DEVLOG — Encontro d'Água Hub
 
+## 2026-04-18 — V8.0: Encerramento · Gestao de Leads · Layout Fix · i18n EN
+
+### Painel Admin CRUD (/#/admin)
+- **Tabela reformulada**: colunas created_at (Data de Cadastro) e 	rial_expires_at (Expiracao Trial) adicionadas com destaque visual para trials expirados (cor laranja + icone aviso).
+- **Botao +7 dias**: estende o trial a partir da data atual (ou do vigente) sem abrir modal — acao instantanea via Supabase update.
+- **Botao Suspender / Ativar**: toggle de ccess_level entre 'suspended' e 'trial' com feedback imediato.
+- **Botao Excluir**: deleta o profile com window.confirm de seguranca. Auth user requer exclusao manual no Supabase Dashboard.
+- **EditUserModal**: agora inclui campos 	rial_expires_at (date picker), ccess_level (trial / suspenso / pago) e status.
+- **Handlers**: handleExtendTrial, handleToggleSuspend, handleDelete com ctionLoading por linha — zero conflito de estado.
+
+### Privacidade / Multi-tenancy (/#/settings)
+- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados da Lidi removida.
+- **Amanda ve apenas**: a si mesma e quem ela convidar para a company_id dela.
+- **Formulario de Convite**: Amanda pode convidar socias via e-mail (abre WhatsApp com link de cadastro pre-preenchido).
+
+### Exterminio do Service Worker (V6.8 — registrado aqui para historico)
+- public/sw.js: versao cache-free — install destroi todos os caches existentes, etch e pass-through puro (sem interceptacao de assets). CACHE_VERSION = 'hub-nocache-v2' forca substituicao do SW antigo.
+- index.html: kill script inline killSWCache() roda ANTES do bundle React — desregistra todos os SWs e purga CacheStorage.
+- App.tsx: purga caches.* e desregistra SWs antigos no useEffect de boot, antes de registrar o novo SW.
+- **Motivacao**: cliente (Amanda) estava presa em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
+
+### Fix Header Mobile (Layout.tsx)
+- **Problema**: ao navegar para /#/ai pelo menu hamburguer, o header desaparecia.
+- **Root cause**: o pt-16 md:pt-0 (compensacao do header fixed no mobile) estava no <main>, mas quando a rota /ai ativa overflow-hidden flex flex-col, o padding era absorvido pelo flex container e o conteudo subia atras do header.
+- **Fix**: pt-16 md:pt-0 movido para o <div> filho interno — aplicado sempre, independente da rota ativa.
+
+### AiflowSupport — Bilingue EN-US (V8.0)
+- Adicionado useTranslation — todos os 5 cards de help traduzidos (titulo, descricao, alert).
+- Form de bug report traduzido (placeholder, descricao, botao).
+- Footer: '🤖 Aiflow * Technical Support' em EN / '🤖 Aiflow * Suporte Tecnico' em PT.
+- WA link internacionalizado: mensagem diferente para EN e PT.
+
+### Transicao do Cadastro: Edge Function -> signUp Nativo (V6.5-V6.6)
+- **Causa do problema**: supabase.functions.invoke('signup-showcase') disparava preflight CORS que nao passava no check de ccess-control-allow-origin.
+- **Solucao**: substituido por supabase.auth.signUp() nativo com options.data para metadados.
+- **Erro 409 (email ja cadastrado)**: detectado via user.identities.length === 0 (comportamento Supabase).
+- **Erro 429 (rate limit)**: capturado no catch com mensagem amigavel PT/EN.
+- **Erro email-not-confirmed**: detectado via user && !session — mensagem orienta verificacao da caixa de entrada.
+- **Lead -> CRM**: apos signUp bem-sucedido, lead e inserido em contacts com source='showcase' e nota de data de entrada (best-effort, nao bloqueia navegacao).
+
+### Keyword via ENV (V7.0)
+- ShowcaseLP.tsx: ACCESS_KEYWORD = 'provadagua' hardcoded removido.
+- Substituido por import.meta.env.VITE_ACCESS_KEYWORD — configurar no .env e no painel Vercel.
+- Fallback seguro: se ENV vazia, keywork nao e validada e o cadastro e bloqueado.
+
+### UX de Erros Anti-desamparo (V7.0)
+- smartSignInError(): helper que intercepta erros do Supabase Auth e retorna mensagens humanizadas:
+  - invalid login credentials -> 'E-mail ou senha incorretos. Verifique os dados ou solicite uma nova senha ao Admin.'
+  - suspended / inactive -> 'Acesso suspenso. Fale com a Lidi: wa.me/...'
+  - ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
+
+### Git — Commits desta fase
+- hotfix(v6.8): kill service worker cache
+- eat(v7.0): AdminPage leads panel, smart auth errors, lead->contacts CRM insert, keyword moved to ENV
+- eat(v8.0): admin CRUD+trial, UsersPage company_id isolation, AiflowSupport EN, Layout mobile header fix
+
+---
 ---
 
 ## 2026-04-17 — V6.5: Hotfix CORS · signUp Nativo · Reordenação do Formulário
@@ -39,6 +96,63 @@
 5. Retorno: Amanda loga com email + senha que ela definiu
 ```
 
+## 2026-04-18 — V8.0: Encerramento · Gestao de Leads · Layout Fix · i18n EN
+
+### Painel Admin CRUD (/#/admin)
+- **Tabela reformulada**: colunas created_at (Data de Cadastro) e 	rial_expires_at (Expiracao Trial) adicionadas com destaque visual para trials expirados (cor laranja + icone aviso).
+- **Botao +7 dias**: estende o trial a partir da data atual (ou do vigente) sem abrir modal — acao instantanea via Supabase update.
+- **Botao Suspender / Ativar**: toggle de ccess_level entre 'suspended' e 'trial' com feedback imediato.
+- **Botao Excluir**: deleta o profile com window.confirm de seguranca. Auth user requer exclusao manual no Supabase Dashboard.
+- **EditUserModal**: agora inclui campos 	rial_expires_at (date picker), ccess_level (trial / suspenso / pago) e status.
+- **Handlers**: handleExtendTrial, handleToggleSuspend, handleDelete com ctionLoading por linha — zero conflito de estado.
+
+### Privacidade / Multi-tenancy (/#/settings)
+- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados da Lidi removida.
+- **Amanda ve apenas**: a si mesma e quem ela convidar para a company_id dela.
+- **Formulario de Convite**: Amanda pode convidar socias via e-mail (abre WhatsApp com link de cadastro pre-preenchido).
+
+### Exterminio do Service Worker (V6.8 — registrado aqui para historico)
+- public/sw.js: versao cache-free — install destroi todos os caches existentes, etch e pass-through puro (sem interceptacao de assets). CACHE_VERSION = 'hub-nocache-v2' forca substituicao do SW antigo.
+- index.html: kill script inline killSWCache() roda ANTES do bundle React — desregistra todos os SWs e purga CacheStorage.
+- App.tsx: purga caches.* e desregistra SWs antigos no useEffect de boot, antes de registrar o novo SW.
+- **Motivacao**: cliente (Amanda) estava presa em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
+
+### Fix Header Mobile (Layout.tsx)
+- **Problema**: ao navegar para /#/ai pelo menu hamburguer, o header desaparecia.
+- **Root cause**: o pt-16 md:pt-0 (compensacao do header fixed no mobile) estava no <main>, mas quando a rota /ai ativa overflow-hidden flex flex-col, o padding era absorvido pelo flex container e o conteudo subia atras do header.
+- **Fix**: pt-16 md:pt-0 movido para o <div> filho interno — aplicado sempre, independente da rota ativa.
+
+### AiflowSupport — Bilingue EN-US (V8.0)
+- Adicionado useTranslation — todos os 5 cards de help traduzidos (titulo, descricao, alert).
+- Form de bug report traduzido (placeholder, descricao, botao).
+- Footer: '🤖 Aiflow * Technical Support' em EN / '🤖 Aiflow * Suporte Tecnico' em PT.
+- WA link internacionalizado: mensagem diferente para EN e PT.
+
+### Transicao do Cadastro: Edge Function -> signUp Nativo (V6.5-V6.6)
+- **Causa do problema**: supabase.functions.invoke('signup-showcase') disparava preflight CORS que nao passava no check de ccess-control-allow-origin.
+- **Solucao**: substituido por supabase.auth.signUp() nativo com options.data para metadados.
+- **Erro 409 (email ja cadastrado)**: detectado via user.identities.length === 0 (comportamento Supabase).
+- **Erro 429 (rate limit)**: capturado no catch com mensagem amigavel PT/EN.
+- **Erro email-not-confirmed**: detectado via user && !session — mensagem orienta verificacao da caixa de entrada.
+- **Lead -> CRM**: apos signUp bem-sucedido, lead e inserido em contacts com source='showcase' e nota de data de entrada (best-effort, nao bloqueia navegacao).
+
+### Keyword via ENV (V7.0)
+- ShowcaseLP.tsx: ACCESS_KEYWORD = 'provadagua' hardcoded removido.
+- Substituido por import.meta.env.VITE_ACCESS_KEYWORD — configurar no .env e no painel Vercel.
+- Fallback seguro: se ENV vazia, keywork nao e validada e o cadastro e bloqueado.
+
+### UX de Erros Anti-desamparo (V7.0)
+- smartSignInError(): helper que intercepta erros do Supabase Auth e retorna mensagens humanizadas:
+  - invalid login credentials -> 'E-mail ou senha incorretos. Verifique os dados ou solicite uma nova senha ao Admin.'
+  - suspended / inactive -> 'Acesso suspenso. Fale com a Lidi: wa.me/...'
+  - ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
+
+### Git — Commits desta fase
+- hotfix(v6.8): kill service worker cache
+- eat(v7.0): AdminPage leads panel, smart auth errors, lead->contacts CRM insert, keyword moved to ENV
+- eat(v8.0): admin CRUD+trial, UsersPage company_id isolation, AiflowSupport EN, Layout mobile header fix
+
+---
 ---
 
 ## 2026-04-17 — V6.4: Segurança no Cadastro · Campo de Senha · Keyword Oficial

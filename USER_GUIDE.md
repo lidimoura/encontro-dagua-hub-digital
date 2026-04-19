@@ -104,10 +104,11 @@ A nova estrutura divide o acesso:
 - **God Mode**: Para login administrativo, é exigido dar triplo clique no logotipo (na tela de `/login`). Isso libera o botão de acesso admin bypassando o formulário Provadágua.
 
 ### Trial Keyword — Acesso Imediato Leads Provadágua
-- **Keyword:** `provadagua`
-- Inserida pelo Lead. Flow: nome + e-mail + keyword → Edge Function `signup-showcase` (timeout 15s) → Dashboard imediato
-- **7 dias de acesso** marcados no `access_expires_at` do Profile
+- **Keyword:** `provadagua` (configurada em `VITE_ACCESS_KEYWORD` no painel Vercel)
+- Inserida pelo Lead. Flow: **Palavra-chave → Nome → E-mail → Senha** → `supabase.auth.signUp()` nativo → Dashboard imediato
+- **7 dias de acesso** via `trial_expires_at` no Profile
 - Dados isolados por empresa (`company_id` único por lead)
+- Lead **inserido automaticamente** em `contacts` com `source='showcase'` e data de entrada
 
 ### Planos Disponíveis
 
@@ -119,11 +120,15 @@ A nova estrutura divide o acesso:
 
 > **Fallback Stripe:** Se o checkout falhar, redirecionar para WhatsApp: `https://wa.me/5592992943998`
 
-### Gerenciar Trials (SuperAdmin)
-1. Acesse **Admin → Usuários**
-2. Identifique usuários com badge **📎 Trial**
-3. Use botão **+7d** para liberar mais 7 dias ou **Block** para revogar acesso
-4. O campo `access_expires_at` controla o vencimento automaticamente
+### Gerenciar Trials (SuperAdmin — Lidi)
+
+> Ver seção completa **“Guia da Lidi: Painel Admin”** abaixo.
+
+1. Acesse `/#/admin` → aba **Usuários**
+2. Veja as colunas **Data de Cadastro** e **Expiração Trial**
+3. Leads com trial expirado aparecem em **laranja + ⚠️**
+4. Use os botões de ação: **+7d** / **Suspender** / **Editar** / **Excluir**
+5. O campo `trial_expires_at` controla o vencimento automaticamente
 
 ---
 
@@ -268,4 +273,94 @@ ORDER BY created_at DESC;
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI) — V4.4 Oferta Agente IA*
+## 10. Guia da Lidi: Painel de Gestão Global (V8.0)
+
+> **URL:** `/#/admin` — Acesso exclusivo `role = admin`
+
+### Visão Geral da Tabela
+
+| Coluna | O que mostra |
+|---|---|
+| **Usuário** | E-mail, nome completo, badge LEAD (leads Provadágua) |
+| **Role / Plano** | `user / admin / vendedor` · `FREE / MONTHLY / ANNUAL` · badge 🔴 SUSP |
+| **Cadastro** | Data de criação do usuário (`created_at`) |
+| **Expiração Trial** | `trial_expires_at` — exibição em laranja + ⚠️ se expirado |
+| **Ações** | WA · +7d · Suspender/Ativar · Editar · Excluir |
+
+### Como Renovar o Trial (+7 dias)
+
+1. Localize o lead pela barra de busca (e-mail ou nome)
+2. Clique em **"+ 7d"** na linha do lead
+3. O sistema calcula: *se o trial ainda está vigente*, estende a partir da data atual; *se já expirou*, conta 7 dias a partir de hoje
+4. Toast de confirm: `✅ Trial de amanda@... renovado +7 dias`
+5. A coluna **Expiração Trial** atualiza imediatamente
+
+### Como Suspender / Reativar Acesso
+
+1. Clique em **"Suspender"** na linha do lead
+2. O `access_level` muda para `'suspended'` — lead não consegue fazer login
+3. Para reativar: clique em **"Ativar"** (botão fica verde quando suspenso)
+
+### Como Editar Detalhes do Lead (Modal)
+
+1. Clique em **"Editar"** na linha
+2. No modal, você pode ajustar:
+   - **Plano**: Free / Monthly / Annual
+   - **Status**: Active / Inactive / Suspended
+   - **Acesso (Lead)**: Trial Ativo / Suspenso / Pago
+   - **Expiração do Trial**: campo de data (date picker)
+   - **Telefone**: campo livre
+3. Clique em **"Salvar"** — alterações são instantaneas no banco
+
+### Como Excluir um Lead Permanentemente
+
+> ⚠️ Esta ação **não pode ser desfeita**.
+
+1. Clique em **"Excluir"** (botao vermelho 🗑️)
+2. O navegador pede confirmação: *"Excluir PERMANENTEMENTE ...? "*
+3. O registro de `profiles` é deletado
+4. Para remover também o usuário de Auth: acesse o **Supabase Dashboard → Authentication → Users**
+
+### Como Contatar um Lead via WhatsApp
+
+- Clique no botão **💬 WA** na linha do lead
+- Abre o WhatsApp Web com mensagem pré-preenchida: *"Oi Lidi! Lead: amanda@..."*
+- Use como ponto de partida para a conversa de vendas
+
+---
+
+## 11. Guia da Amanda (Lead/Owner): Gestão do Time e CRM em Inglês (V8.0)
+
+### Convidar Sócias para a Empresa (`/#/settings`)
+
+> A Amanda vê **apenas** os usuários da empresa dela (`company_id`). Nunca vê dados da Lidi.
+
+1. Acesse **Settings → Team Members** (ou `/#/settings`)
+2. No topo, preencha o campo **"Invite a Teammate"** com o e-mail da sócia
+3. Clique em **"Send Invite"**
+4. O sistema abre o WhatsApp com mensagem de convite em inglês: *"Hi! You've been invited..."*
+5. A sócia deve se cadastrar usando o link enviado e a keyword da empresa
+6. Assim que cadastrada, ela aparece automaticamente na lista
+
+### Usando o CRM em Inglês (EN-US)
+
+1. No canto superior direito, clique no botão de idioma 🇧🇷 / 🇺🇸 / 🇪🇸
+2. Alterne para 🇺🇸 **English (US)**
+3. Todos os menus, labels, botões e mensagens do sistema mudam para EN
+4. O widget de suporte azul (**Aiflow**) também muda: título, cards e formulário ficam em inglês
+5. A preferência salva automaticamente no `localStorage`
+
+### Usando o Suporte Aiflow
+
+1. Clique no botão azul ❓ no canto inferior esquerdo
+2. Escolha o tema de suporte:
+   - **Forgot password** — instruções de recuperação
+   - **Didn't receive the email** — dica sobre spam
+   - **Access error** — troubleshoot de login
+   - **Report Bug / Feedback** — abre formulário que notifica a Lidi
+   - **Direct support** — abre WhatsApp com a equipe
+3. O idioma do painel Aiflow segue o idioma selecionado no sistema
+
+---
+
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V8.0 Go-Live Provadágua*
