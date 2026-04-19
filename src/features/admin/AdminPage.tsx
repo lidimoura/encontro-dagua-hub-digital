@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Shield, Users, Package, Search, Edit, User, Building2, DollarSign, X, CheckCircle, XCircle, Loader2, ShieldOff, RefreshCw, Trash2, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
-import { InviteGenerator } from './components/InviteGenerator';
 import CatalogTab from './CatalogTab';
 import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types';
@@ -312,11 +311,6 @@ export default function AdminPage() {
                 <p className="text-slate-600 dark:text-slate-400 text-sm">
                     {t('adminPanelSubtitle')}
                 </p>
-            </div>
-
-            {/* Invite Generator - Always visible for Admin */}
-            <div className="max-w-4xl mx-auto mb-6">
-                <InviteGenerator onInviteGenerated={fetchProfiles} />
             </div>
 
             {/* Tabs Navigation */}

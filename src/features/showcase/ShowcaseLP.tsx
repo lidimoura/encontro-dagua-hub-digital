@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase/client';
 
@@ -135,7 +135,15 @@ const copy = {
 export const ShowcaseLP: React.FC = () => {
   const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const c = copy[language] ?? copy['en'];
+
+  // ── V9.3: Capture company_id from invite URL param ────────────────────────
+  // URL example: /#/provadagua?company_id=uuid-of-amandas-company
+  const inviteCompanyId = React.useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('company_id') || null;
+  }, [location.search]);
 
   // ─ Portal state machine ────────────────────────────────────────────────────
   type PortalPhase = 'keyword' | 'signup' | 'success';
@@ -180,17 +188,23 @@ export const ShowcaseLP: React.FC = () => {
       const normalizedEmail = signupForm.email.trim().toLowerCase();
 
       // ① Cadastro nativo — metadados passados via options.data
+      const signUpMeta: Record<string, any> = {
+        full_name:    signupForm.name.trim(),
+        user_type:    'lead_provadagua',
+        is_demo_data: true,
+        app_source:   'showcase_lp',
+      };
+      // V9.3: se veio de convite com company_id, vincula ao time da convidante
+      if (inviteCompanyId) {
+        signUpMeta.company_id = inviteCompanyId;
+        signUpMeta.is_demo_data = false; // convidados não são dados de demo
+        signUpMeta.app_source   = 'team_invite';
+      }
+
       const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
         email:    normalizedEmail,
         password: signupForm.password,
-        options: {
-          data: {
-            full_name:  signupForm.name.trim(),
-            user_type:  'lead_provadagua',
-            is_demo_data: true,
-            app_source: 'showcase_lp',
-          },
-        },
+        options: { data: signUpMeta },
       });
 
       // ② Detecta rate limit (429)

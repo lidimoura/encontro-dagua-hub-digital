@@ -27,30 +27,44 @@ export const UsersPage: React.FC = () => {
 
     // ── Fetch ONLY users from the same company_id (privacy wall) ────────────
     useEffect(() => {
-        if (!currentUser?.company_id) return;
-        const fetch = async () => {
+        // Se não tem company_id, para spinner imediatamente — jamais loop infinito
+        if (!currentUser?.company_id) {
+            setLoading(false);
+            return;
+        }
+        const fetchTeam = async () => {
             setLoading(true);
-            const { data, error: err } = await supabase
-                .from('profiles')
-                .select('id, full_name, email, role, avatar_url')
-                // PRIVACY: implacável — filtro por company_id do usuário logado
-                .eq('company_id', currentUser.company_id!)
-                .order('role', { ascending: true });
-            if (err) {
-                // full_name column may not exist — fallback: select without it
-                const { data: data2, error: err2 } = await supabase
+            setError(null);
+            try {
+                const { data, error: err } = await supabase
                     .from('profiles')
-                    .select('id, email, role, avatar_url')
+                    .select('id, full_name, email, role, avatar_url')
+                    // PRIVACY: implacável — filtro por company_id do usuário logado
                     .eq('company_id', currentUser.company_id!)
                     .order('role', { ascending: true });
-                if (err2) setError(err2.message);
-                else setMembers((data2 || []).map((m: any) => ({ ...m, full_name: null })));
-            } else {
-                setMembers(data || []);
+
+                if (err) {
+                    // full_name column may not exist — retry sem o campo
+                    const { data: data2, error: err2 } = await supabase
+                        .from('profiles')
+                        .select('id, email, role, avatar_url')
+                        .eq('company_id', currentUser.company_id!)
+                        .order('role', { ascending: true });
+                    if (err2) {
+                        setError(err2.message);
+                    } else {
+                        setMembers((data2 || []).map((m: any) => ({ ...m, full_name: null })));
+                    }
+                } else {
+                    setMembers(data || []);
+                }
+            } catch (e: any) {
+                setError(e?.message || 'Erro inesperado');
+            } finally {
+                setLoading(false); // SEMPRE libera o spinner
             }
-            setLoading(false);
         };
-        fetch();
+        fetchTeam();
     }, [currentUser?.company_id]);
 
     // ── Invite teammate (uses InviteGenerator flow) ──────────────────────────
@@ -60,12 +74,13 @@ export const UsersPage: React.FC = () => {
         setInviting(true);
 
         const origin = window.location.origin;
-        const showcaseUrl = `${origin}/#/provadagua`;
+        // company_id no link garante que o convidado entra no time certo
+        const inviteUrl = `${origin}/#/provadagua?company_id=${encodeURIComponent(currentUser.company_id)}`;
 
         const msg = encodeURIComponent(
             isEn
-                ? `You have been invited to experience Provadágua, the free 7-day demo of the custom CRM by Encontro d’água Hub! 🌊\n\nAccess the link and use the keyword to enter:\n${showcaseUrl}\n\nSee you there! 🚀`
-                : `Você foi convidada para experimentar a Provadágua, a demo gratuita de 7 dias do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link e use a palavra-chave para entrar:\n${showcaseUrl}\n\nTe espero lá! 🚀`
+                ? `You have been invited to experience Provadágua, the free 7-day demo of the custom CRM by Encontro d’água Hub! 🌊\n\nAccess the link and use the keyword to enter:\n${inviteUrl}\n\nSee you there! 🚀`
+                : `Você foi convidada para experimentar a Provadágua, a demo gratuita de 7 dias do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link e use a palavra-chave para entrar:\n${inviteUrl}\n\nTe espero lá! 🚀`
         );
         window.open(`https://wa.me/?text=${msg}`, '_blank');
         setInviteEmail('');
