@@ -36,8 +36,18 @@ export const UsersPage: React.FC = () => {
                 // PRIVACY: implacável — filtro por company_id do usuário logado
                 .eq('company_id', currentUser.company_id!)
                 .order('role', { ascending: true });
-            if (err) setError(err.message);
-            else setMembers(data || []);
+            if (err) {
+                // full_name column may not exist — fallback: select without it
+                const { data: data2, error: err2 } = await supabase
+                    .from('profiles')
+                    .select('id, email, role, avatar_url')
+                    .eq('company_id', currentUser.company_id!)
+                    .order('role', { ascending: true });
+                if (err2) setError(err2.message);
+                else setMembers((data2 || []).map((m: any) => ({ ...m, full_name: null })));
+            } else {
+                setMembers(data || []);
+            }
             setLoading(false);
         };
         fetch();

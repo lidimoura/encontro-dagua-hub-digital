@@ -709,7 +709,7 @@ export const translations = {
         navContacts: "Contacts",
         navActivities: "Activities",
         navReports: "Reports",
-        navQR: "Bridge Pages",
+        navQR: "QR d'água",
         navPrompts: "Prompt Lab",
         navAdmin: "Admin",
         logout: "Logout",
@@ -728,7 +728,7 @@ export const translations = {
         boards: "Boards",
         contacts: "Contacts",
         activities: "Activities",
-        qrWater: "Bridge Pages",
+        qrWater: "QR d'água",
         promptLab: "Prompt Lab",
         reports: "Reports",
         aiHub: "AI Hub",
@@ -1051,9 +1051,9 @@ export const translations = {
         boardName: "Board Name",
 
         // --- BRIDGE PAGES MODULE (formerly QR d'Água) ---
-        qrPageTitle: "Bridge Pages Generator",
+        qrPageTitle: "QR d'água Generator",
         qrPageSubtitle: "Create bridges between the physical and digital world.",
-        createQR: "Create New Bridge Page",
+        createQR: "Create New QR d'água",
         downloadQR: "Download PNG",
         saveProject: "Save Project",
         updateProject: "Update Project",
@@ -1067,7 +1067,7 @@ export const translations = {
         typeLink: "External Link / Code",
         typeWhatsapp: "WhatsApp",
         typePix: "PIX",
-        typeBridge: "Digital Card (Bridge Page)",
+        typeBridge: "Digital Card (QR d'água)",
         targetUrl: "Destination URL",
         urlPlaceholder: "https://yoursite.com",
         waNumber: "WhatsApp Number",
@@ -1371,7 +1371,7 @@ export const translations = {
         navContacts: "Contactos",
         navActivities: "Actividades",
         navReports: "Informes",
-        navQR: "Bridge Pages",
+        navQR: "QR d'água",
         navPrompts: "Prompt Lab",
         navAdmin: "Admin",
         logout: "Cerrar sesión",
@@ -1441,11 +1441,11 @@ export const translations = {
         legalAnalyst: "Analista Legal",
         internalCS: "Éxito del Cliente Interno",
 
-        // --- BRIDGE PAGES (formerly QR d'Água) ---
-        qrPageTitle: "Generador de Bridge Pages",
+        // --- QR d'agua MODULE ---
+        qrPageTitle: "Generador de QR d'água",
         qrPageSubtitle: "Crea puentes entre el mundo físico y digital.",
-        typeBridge: "Tarjeta Digital (Bridge Page)",
-        qrWater: "Bridge Pages",
+        typeBridge: "Tarjeta Digital (QR d'água)",
+        qrWater: "QR d'água",
 
         // --- NOTIFICATIONS ---
         notifications: "Notificaciones",

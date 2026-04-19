@@ -403,6 +403,8 @@ const ShowcasePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [linkDaguaOpen, setLinkDaguaOpen] = useState(false); // Accordion: Bônus Link d'Água
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [qaOpen, setQaOpen] = useState(false);    // Accordion: QA & Segurança
+  const [techOpen, setTechOpen] = useState(false); // Accordion: Arquitetura Técnica
 
   const t = TRANSLATIONS[lang];
 
@@ -1438,95 +1440,226 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── QA & Segurança ───────────────────────────────────── */}
+      {/* ── QA & Segurança ─────────────────────────────────────────────── */}
       <section
         id="sec-qa"
         data-obs
         aria-labelledby="qa-heading"
         style={{
-          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          padding: 'clamp(3rem, 6vw, 5rem) 1.5rem',
           background: 'rgba(0,0,0,0.15)',
           ...fadeIn('sec-qa'),
         }}
       >
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div style={{
-              display: 'inline-block',
-              background: 'rgba(109,40,168,0.10)',
-              border: `1px solid ${S.border}`,
-              borderRadius: '20px',
-              padding: '6px 18px',
-              fontSize: '0.74rem',
-              fontWeight: 700,
-              color: S.acaiLight,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase' as const,
-              marginBottom: '1rem',
-            }}>
-              {t.qa_eyebrow}
+          {/* Accordion Header — always visible */}
+          <button
+            onClick={() => setQaOpen(prev => !prev)}
+            style={{
+              width: '100%',
+              background: qaOpen ? 'rgba(109,40,168,0.10)' : 'rgba(109,40,168,0.05)',
+              border: `1px solid ${qaOpen ? S.border : 'rgba(109,40,168,0.08)'}`,
+              borderRadius: '16px',
+              padding: '1.25rem 1.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              transition: 'all 0.22s',
+              textAlign: 'left',
+            }}
+            aria-expanded={qaOpen}
+            aria-controls="qa-content"
+          >
+            <div>
+              <div style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                color: S.acaiLight,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                marginBottom: '4px',
+              }}>{t.qa_eyebrow}</div>
+              <h2 id="qa-heading" style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
+                fontWeight: 800,
+                color: '#f1f5f9',
+                margin: 0,
+              }}>{t.qa_title}</h2>
+              <p style={{ color: S.slate, fontSize: '0.88rem', margin: '4px 0 0' }}>{t.qa_subtitle}</p>
             </div>
-            <h2 id="qa-heading" style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(1.7rem, 3.5vw, 2.6rem)',
-              fontWeight: 800,
-              color: '#f1f5f9',
-              marginBottom: '0.6rem',
-            }}>{t.qa_title}</h2>
-            <p style={{ color: S.slate, fontSize: '0.95rem' }}>{t.qa_subtitle}</p>
+            <span style={{
+              fontSize: '1.4rem',
+              color: S.acaiLight,
+              transform: qaOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease',
+              flexShrink: 0,
+            }} aria-hidden="true">▾</span>
+          </button>
+
+          {/* Collapsible content */}
+          <div
+            id="qa-content"
+            style={{
+              overflow: 'hidden',
+              maxHeight: qaOpen ? '2000px' : '0px',
+              transition: 'max-height 0.4s ease',
+            }}
+          >
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '14px',
+              paddingTop: '1.5rem',
+            }}>
+              {Array.isArray(t.qa_items) && t.qa_items.map((item, i) => (
+                <div
+                  key={i}
+                  id={`qa-item-${i}`}
+                  style={{
+                    background: 'rgba(109,40,168,0.06)',
+                    border: '1px solid rgba(16,185,129,0.20)',
+                    borderRadius: '16px',
+                    padding: '24px 22px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '14px',
+                    transition: 'all 0.22s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(16,185,129,0.45)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(16,185,129,0.20)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{
+                    width: '36px', height: '36px',
+                    borderRadius: '10px',
+                    background: 'rgba(16,185,129,0.12)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                    color: S.neonGreen,
+                  }} aria-hidden="true">
+                    <ShieldIcon />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{item.title}</span>
+                      <span style={{
+                        background: 'rgba(16,185,129,0.15)',
+                        color: S.neonGreen,
+                        borderRadius: '8px',
+                        padding: '2px 8px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        letterSpacing: '0.05em',
+                      }}>✓ {item.status}</span>
+                    </div>
+                    <p style={{ color: S.slateDim, fontSize: '0.82rem', margin: 0, lineHeight: 1.6 }}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Arquitetura Técnica ─────────────────────────────────────────────── */}
+      <section
+        id="sec-tech"
+        data-obs
+        aria-labelledby="tech-heading"
+        style={{
+          padding: 'clamp(3rem, 6vw, 5rem) 1.5rem',
+          maxWidth: '1100px',
+          margin: '0 auto',
+          ...fadeIn('sec-tech'),
+        }}
+      >
+        {/* Accordion Header */}
+        <button
+          onClick={() => setTechOpen(prev => !prev)}
+          style={{
+            width: '100%',
+            background: techOpen ? 'rgba(200,147,58,0.08)' : 'rgba(200,147,58,0.04)',
+            border: `1px solid ${techOpen ? S.borderGold : 'rgba(200,147,58,0.08)'}`,
+            borderRadius: '16px',
+            padding: '1.25rem 1.5rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            transition: 'all 0.22s',
+            textAlign: 'left',
+          }}
+          aria-expanded={techOpen}
+          aria-controls="tech-content"
+        >
+          <h2 id="tech-heading" style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
+            fontWeight: 800,
+            color: '#f1f5f9',
+            margin: 0,
+          }}>{t.tech_title}</h2>
+          <span style={{
+            fontSize: '1.4rem',
+            color: S.solimoes,
+            transform: techOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease',
+            flexShrink: 0,
+          }} aria-hidden="true">▾</span>
+        </button>
+
+        {/* Collapsible grid */}
+        <div
+          id="tech-content"
+          style={{
+            overflow: 'hidden',
+            maxHeight: techOpen ? '1200px' : '0px',
+            transition: 'max-height 0.4s ease',
+          }}
+        >
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '14px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '12px',
+            paddingTop: '1.5rem',
           }}>
-            {Array.isArray(t.qa_items) && t.qa_items.map((item, i) => (
+            {Array.isArray(t.tech_stack) && t.tech_stack.map((tech, i) => (
               <div
                 key={i}
-                id={`qa-item-${i}`}
                 style={{
-                  background: 'rgba(109,40,168,0.06)',
-                  border: '1px solid rgba(16,185,129,0.20)',
-                  borderRadius: '16px',
-                  padding: '24px 22px',
+                  background: S.surface,
+                  border: `1px solid ${S.borderGold}`,
+                  borderRadius: '14px',
+                  padding: '18px 20px',
                   display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '14px',
+                  alignItems: 'center',
+                  gap: '12px',
                   transition: 'all 0.22s',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.45)';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.background = S.surfaceWarm;
+                  e.currentTarget.style.borderColor = S.borderGoldHov;
+                  e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(16,185,129,0.20)';
+                  e.currentTarget.style.background = S.surface;
+                  e.currentTarget.style.borderColor = S.borderGold;
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <div style={{
-                  width: '36px', height: '36px',
-                  borderRadius: '10px',
-                  background: 'rgba(16,185,129,0.12)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                  color: S.neonGreen,
-                }} aria-hidden="true">
-                  <ShieldIcon />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem' }}>{item.title}</span>
-                    <span style={{
-                      background: 'rgba(16,185,129,0.15)',
-                      color: S.neonGreen,
-                      borderRadius: '8px',
-                      padding: '2px 8px',
-                      fontSize: '0.65rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.05em',
-                    }}>✓ {item.status}</span>
-                  </div>
-                  <p style={{ color: S.slateDim, fontSize: '0.82rem', margin: 0, lineHeight: 1.6 }}>{item.desc}</p>
+                <span style={{ fontSize: '1.4rem', flexShrink: 0 }} aria-hidden="true">{tech.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>{tech.name}</div>
+                  <div style={{ fontSize: '0.72rem', color: S.solimoes, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{tech.category}</div>
                 </div>
               </div>
             ))}
@@ -1534,65 +1667,6 @@ const ShowcasePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Arquitetura Técnica ──────────────────────────────── */}
-      <section
-        id="sec-tech"
-        data-obs
-        aria-labelledby="tech-heading"
-        style={{
-          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
-          maxWidth: '1100px',
-          margin: '0 auto',
-          ...fadeIn('sec-tech'),
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h2 id="tech-heading" style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontSize: 'clamp(1.7rem, 3.5vw, 2.4rem)',
-            fontWeight: 800,
-            color: '#f1f5f9',
-            marginBottom: '0.6rem',
-          }}>{t.tech_title}</h2>
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: '12px',
-        }}>
-          {Array.isArray(t.tech_stack) && t.tech_stack.map((tech, i) => (
-            <div
-              key={i}
-              style={{
-                background: S.surface,
-                border: `1px solid ${S.borderGold}`,
-                borderRadius: '14px',
-                padding: '18px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                transition: 'all 0.22s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = S.surfaceWarm;
-                e.currentTarget.style.borderColor = S.borderGoldHov;
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = S.surface;
-                e.currentTarget.style.borderColor = S.borderGold;
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <span style={{ fontSize: '1.4rem', flexShrink: 0 }} aria-hidden="true">{tech.icon}</span>
-              <div>
-                <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.88rem' }}>{tech.name}</div>
-                <div style={{ fontSize: '0.72rem', color: S.solimoes, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{tech.category}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* ── 7-Day Trial CTA — The Hero Closer ───────────────── */}
       <section

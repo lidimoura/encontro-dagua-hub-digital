@@ -28,7 +28,12 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
         plan_type: profile.plan_type || 'free',
         status: profile.status || 'active',
         phone: profile.phone || '',
-        role: profile.role || 'user'
+        role: profile.role || 'user',
+        access_level: (profile as any).access_level || 'trial',
+        trial_expires_at: (profile as any).trial_expires_at
+            ? new Date((profile as any).trial_expires_at).toISOString().split('T')[0]
+            : '',
+        send_survey: false,
     });
     const [saving, setSaving] = useState(false);
 
@@ -110,6 +115,49 @@ function EditUserModal({ profile, onClose, onSave }: EditModalProps) {
                         />
                     </div>
 
+                    {/* ── Trial Fields ── */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            📅 Trial Expira em
+                        </label>
+                        <input
+                            type="date"
+                            value={formData.trial_expires_at}
+                            onChange={(e) => setFormData({ ...formData, trial_expires_at: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            🎯 Acesso (Lead)
+                        </label>
+                        <select
+                            value={formData.access_level}
+                            onChange={(e) => setFormData({ ...formData, access_level: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                            <option value="trial">Trial Ativo</option>
+                            <option value="suspended">Suspenso</option>
+                            <option value="paid">Pago</option>
+                            <option value="free">Free</option>
+                        </select>
+                    </div>
+
+                    {/* ── Survey Toggle ── */}
+                    <label className="flex items-center gap-3 cursor-pointer p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/20 rounded-lg">
+                        <input
+                            type="checkbox"
+                            checked={formData.send_survey}
+                            onChange={(e) => setFormData({ ...formData, send_survey: e.target.checked })}
+                            className="w-4 h-4 accent-blue-500"
+                        />
+                        <div>
+                            <p className="text-sm font-semibold text-blue-900 dark:text-blue-300">📊 Enviar Pesquisa de Satisfação</p>
+                            <p className="text-xs text-blue-700 dark:text-blue-400">Envia NPS por e-mail ao salvar</p>
+                        </div>
+                    </label>
+
                     <div className="flex gap-3 pt-4">
                         <button
                             type="button"
@@ -151,6 +199,7 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<'users' | 'catalog'>('users');
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+    const isSuperAdmin = currentUserProfile?.role === 'super_admin';
 
     useEffect(() => {
         if (!authLoading) {
@@ -368,6 +417,20 @@ export default function AdminPage() {
             {/* Tab Content */}
             <div className="max-w-4xl mx-auto">
                 {activeTab === 'users' ? (
+                    // ── USERS: apenas super_admin ─────────────────────────────────────
+                    !isSuperAdmin ? (
+                        <div className="text-center py-16">
+                            <Shield className="w-12 h-12 mx-auto mb-4 text-red-400 opacity-50" />
+                            <p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Acesso Restrito</p>
+                            <p className="text-sm text-slate-500">A gestão de usuários é exclusiva do Super Admin.</p>
+                            <button
+                                onClick={() => setActiveTab('catalog')}
+                                className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-bold hover:bg-primary-600 transition"
+                            >
+                                Ver Catálogo
+                            </button>
+                        </div>
+                    ) : (
                     <div className="overflow-x-auto">
                         {filteredProfiles.length === 0 ? (
                             <div className="text-center py-12 text-slate-500 dark:text-slate-400">{t('noUsersFound')}</div>
@@ -474,8 +537,9 @@ export default function AdminPage() {
                             </table>
                         )}
                     </div>
+                    ) /* end isSuperAdmin guard */
                 ) : (
-                    /* Catalog Tab */
+                    /* Catalog Tab — visível para qualquer admin */
                     <CatalogTab />
                 )}
             </div>
