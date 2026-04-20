@@ -1,20 +1,24 @@
-﻿
+
 <div align="center">
 
   <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
 
-  <h1>Encontro D'Ãgua Hub & CRM</h1>
+<div align="center">
+
+  <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
+
+  <h1>Encontro D'Ã gua Hub & CRM</h1>
 
   <p>Ecossistema de GestÃ£o com IA â€” Multi-Tenant Â· Bilingue Â· LGPD-Ready</p>
 
 </div>
 
-### CRM de ProduÃ§Ã£o `V8.0` â€” Encerramento Â· ProvadÃ¡gua Go-Live
+### CRM de Produção `V9.6` — Security & Multi-tenancy Hotfix (Code Freeze)
 
-> **Branch `main` â†’ hub.encontrodagua.com** â€” Acesso restrito Ã  equipe interna
-> **Branch `provadagua` â†’ prova.encontrodagua.com** â€” Trial pÃºblico 7 dias via Keyword Gate
-> CRM interno para gestÃ£o de leads reais, automaÃ§Ã£o WhatsApp e operaÃ§Ã£o SDR.
-> **V9.5 (Code Freeze)**: Privacidade granular (super_admin vs lead), Accordion ShowcasePage, QR d'água por owner_id, i18n Activities, fix loading Team — Deploy estável para validação da cliente.
+> **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
+> **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
+> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
+> **V9.6 (Security Hotfix)**: RLS recriada nas 4 tabelas core (boards, board_stages, deals, activities). Fix crítico no `useCreateBoard` que omitia `company_id` do payload causando 403 Forbidden. Arquitetura multi-tenant **100% blindada via Row Level Security**.
 
 ---
 
@@ -151,7 +155,7 @@ VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (pÃºblico)
 SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor â€” server-only / Edge Functions
 ```
 
-> âš ï¸ `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** â€” se tiver, rotate imediatamente.
+> âš ï¸  `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** â€” se tiver, rotate imediatamente.
 
 ---
 
@@ -197,7 +201,7 @@ src/
 
 ---
 
-*Mantido pela equipe Encontro d'Ãgua | Manager: Antigravity AI | V8.0 â€” Go-Live ProvadÃ¡gua*
+*Mantido pela equipe Encontro d'Ã gua | Manager: Antigravity AI | V8.0 â€” Go-Live ProvadÃ¡gua*
 
 ---
 
@@ -216,4 +220,4 @@ src/
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI) — V9.5 Code Freeze*
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V9.6 Security & Multi-tenancy Hotfix*

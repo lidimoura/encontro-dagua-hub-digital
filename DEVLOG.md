@@ -555,3 +555,40 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 - Branch: main
 - Deploy: Vercel automatico
 - Build: Exit 0 (10s) em todos os commits da serie V9.x
+
+---
+
+## 2026-04-20 - V9.6: Security & RLS Hotfix (Blocker de Producao)
+
+### Status: CORRIGIDO E DEPLOYADO
+
+### Causa Raiz 1 — Front-end (useBoardsQuery.ts)
+- **Bug:** `useCreateBoard` chamava `boardsService.create(board, '')` passando string vazia como `company_id`
+- **Efeito:** `transformToDb` usa `...(companyId && { company_id: companyId })` — string vazia e falsy, entao o campo `company_id` era **completamente omitido** do payload de INSERT
+- **Resultado:** RLS do Supabase rejeitava o INSERT com `403 Forbidden` (nenhuma policy de INSERT autorizava rows sem `company_id`)
+- **Fix:** `useCreateBoard` agora le `profile?.company_id` do `AuthContext` e passa o valor real para o service. Inclui guard: se `company_id` for nulo/indefinido, lanca erro antes do fetch.
+
+### Causa Raiz 2 — Backend (RLS inexistente)
+- **Bug:** As tabelas `boards` e `board_stages` nao tinham policies RLS de INSERT definidas. As tabelas `deals` e `activities` tinham policies inconsistentes de versoes anteriores.
+- **Fix:** Migration `039_fix_rls_boards_contacts_deals.sql` criada e executada via Supabase Dashboard SQL Editor
+  - Padrao: DROP ALL (via loop `pg_policies`) + DISABLE RLS + ENABLE RLS + CREATE POLICY limpa
+  - 4 policies por tabela: SELECT / INSERT / UPDATE / DELETE
+  - Regra unica: `company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())`
+  - `boards` e `deals`: SELECT e operacoes permitidas tambem quando `company_id IS NULL` (leads SDR / boards globais)
+  - `board_stages`: INSERT autorizado via `board_id -> boards.company_id` (tabela nao tem `company_id` propria)
+
+### Tabelas corrigidas
+| Tabela | Politicas antes | Politicas depois |
+|---|---|---|
+| boards | Ausentes / inconsistentes | 4 policies limpas |
+| board_stages | Ausentes | 4 policies limpas |
+| deals | Parciais de versoes antigas | 4 policies recriadas |
+| activities | Parciais de versoes antigas | 4 policies recriadas |
+
+### Arquivos alterados
+- `src/lib/query/hooks/useBoardsQuery.ts` — fix company_id no mutationFn
+- `supabase/migrations/039_fix_rls_boards_contacts_deals.sql` — nova migration (referencia; executada manualmente)
+
+### Deploy
+- Commit: `23c9063` | Branch: `main` | Build: Exit 0 (7.25s)
+- SQL do backend: executado via Supabase Dashboard (nao via CLI)
