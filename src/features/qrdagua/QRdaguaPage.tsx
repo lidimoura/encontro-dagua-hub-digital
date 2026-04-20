@@ -368,9 +368,19 @@ export const QRdaguaPage: React.FC = () => {
         }
         setIsLoadingProjects(true);
         try {
+            // ── V9.4 PRIVACY WALL ────────────────────────────────────────────
+            // Each user sees ONLY their own QR codes (owner_id = current user).
+            // Leads new to the system will see an empty list — by design.
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                setProjects([]);
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('qr_codes')
                 .select('*')
+                .eq('owner_id', user.id)          // ← PRIVACY: never show other users' QRs
                 .order('created_at', { ascending: false });
 
             if (error) throw error;

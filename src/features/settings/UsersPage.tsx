@@ -74,15 +74,30 @@ export const UsersPage: React.FC = () => {
         setInviting(true);
 
         const origin = window.location.origin;
-        // company_id no link garante que o convidado entra no time certo
+        // V9.4: company_id no link garante que a convidada entra no time certo
         const inviteUrl = `${origin}/#/provadagua?company_id=${encodeURIComponent(currentUser.company_id)}`;
 
-        const msg = encodeURIComponent(
-            isEn
-                ? `You have been invited to experience Provadágua, the free 7-day demo of the custom CRM by Encontro d’água Hub! 🌊\n\nAccess the link and use the keyword to enter:\n${inviteUrl}\n\nSee you there! 🚀`
-                : `Você foi convidada para experimentar a Provadágua, a demo gratuita de 7 dias do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link e use a palavra-chave para entrar:\n${inviteUrl}\n\nTe espero lá! 🚀`
-        );
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
+        const msgPT = `Olá! Você foi convidada para experimentar a Provadágua, a demo gratuita do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link para entrar:\n${inviteUrl}`;
+        const msgEN = `Hello! You have been invited to experience Provadágua, the free CRM demo by Encontro d’água Hub! 🌊\n\nAccess the link to enter:\n${inviteUrl}`;
+        const msgText = isEn ? msgEN : msgPT;
+
+        // Detect if input is an e-mail or a phone/WhatsApp number
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim());
+
+        if (isEmail) {
+            // Open mailto: with pre-filled subject and body
+            const subject = encodeURIComponent(isEn ? 'You are invited to Provadágua!' : 'Convite para a Provadágua!');
+            const body = encodeURIComponent(msgText);
+            window.open(`mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`, '_blank');
+        } else {
+            // Treat as WhatsApp phone number (strip non-digits for wa.me)
+            const phone = inviteEmail.replace(/\D/g, '');
+            const waUrl = phone
+                ? `https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`
+                : `https://wa.me/?text=${encodeURIComponent(msgText)}`;
+            window.open(waUrl, '_blank');
+        }
+
         setInviteEmail('');
         setInviting(false);
     };
@@ -121,10 +136,10 @@ export const UsersPage: React.FC = () => {
                 </h2>
                 <form onSubmit={handleInvite} className="flex gap-3">
                     <input
-                        type="email"
+                        type="text"
                         value={inviteEmail}
                         onChange={e => setInviteEmail(e.target.value)}
-                        placeholder={isEn ? 'colleague@company.com' : 'socia@empresa.com'}
+                        placeholder={isEn ? 'E-mail or WhatsApp number' : 'E-mail ou número do WhatsApp'}
                         className="flex-1 px-3 py-2 rounded-lg border border-primary-200 dark:border-primary-500/30 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     <button type="submit" disabled={inviting || !inviteEmail.trim()}

@@ -336,7 +336,7 @@ export const translations = {
         juryDesc: "Gera contratos usando templates da biblioteca. Garante compliance e segurança.",
 
         // --- MÓDULO BRIDGE PAGES (antes: Link d'Água / QR d'Água) ---
-        qrPageTitle: "Gerador de Páginas Pontes",
+        qrPageTitle: "QR d'água",
         qrPageSubtitle: "Crie pontes entre o físico e o digital.",
         typeBridge: "Cartão Digital (Página Ponte)",
 
@@ -1055,7 +1055,7 @@ export const translations = {
         boardName: "Board Name",
 
         // --- BRIDGE PAGES MODULE (formerly QR d'Água) ---
-        qrPageTitle: "QR d'água Generator",
+        qrPageTitle: "QR d'água",
         qrPageSubtitle: "Create bridges between the physical and digital world.",
         createQR: "Create New QR d'água",
         downloadQR: "Download PNG",
