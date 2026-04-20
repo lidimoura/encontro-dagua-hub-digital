@@ -364,3 +364,24 @@ ORDER BY created_at DESC;
 ---
 
 *Atualizado automaticamente pelo Manager (Antigravity AI) â€” V8.0 Go-Live ProvadÃ¡gua*
+
+---
+
+## Nota para o Lead / Amanda: Convidar Sócias para o Time
+
+A funcionalidade de **convidar sócias e colaboradoras** diretamente pela aba **Team Members** (/#/settings/team) está temporariamente em manutenção.
+
+> **Status: ?? Em breve — previsto para a próxima atualização pós-validação.**
+
+### O que já funciona:
+- Visualizar os membros da sua equipe (filtrado pela sua empresa)
+- Ver roles (Admin, Membro, Sales Rep)
+
+### O que está em desenvolvimento:
+- Envio de convite por WhatsApp ou E-mail com link direto para a sua área
+- Integração automática do convidado ao seu time (via company_id)
+
+### Alternativa Manual (Enquanto aguarda):
+Peça para a Lidi criar o acesso da sua sócia diretamente no painel administrativo, informando o nome e e-mail. Ela configurará o vínculo correto com a sua empresa.
+
+---

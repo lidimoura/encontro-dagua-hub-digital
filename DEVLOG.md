@@ -523,3 +523,35 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 
 *Atualizado automaticamente pelo Manager (Antigravity AI)*
 
+
+---
+
+## 2026-04-20 - V9.5: Code Freeze (MVP Go-Live)
+
+### Status: PRODUCAO CONGELADA para validacao da cliente
+
+### Freeze de Funcionalidade: Convite de Equipe
+- UsersPage.tsx: Botao "Enviar Convite" desativado (disabled={true}) com label "Em breve / Coming soon"
+- Motivo: a logica de WA/mail precisava de testes adicionais que atrasariam o Go-Live
+- Arquitetura de convite por company_id no URL esta implementada e testada (backend pronto)
+- O fluxo completo (URL com company_id + captura em ShowcaseLP + vinculo no signUp) sera reativado pos-validacao
+
+### Ajustes Residuais (Backlog)
+- Traducoes parciais em CreateBoardModal (placeholders PT hardcoded)
+- Traducoes parciais em BoardTemplate (nomes dos templates)
+- Essas pendencias foram deliberadamente adiadas: nao afetam a demo funcional da Amanda
+
+### V9.4 (incluido neste push)
+- QRdaguaPage.tsx: Filtro owner_id na query de QR codes (privacidade total por lead)
+- 	ranslations.ts: qrPageTitle renomeado para "QR d'agua" (PT e EN)
+- UsersPage.tsx: Campo de convite alterado de 	ype=email para 	ype=text (aceita telefone)
+
+### V9.3 (historico)
+- AdminPage.tsx: InviteGenerator removido (inoperante)
+- UsersPage.tsx: Fix de loading infinito quando company_id e null
+- ShowcaseLP.tsx: Captura company_id da URL e injeta no signUp (vinculo de time)
+
+### Deploy
+- Branch: main
+- Deploy: Vercel automatico
+- Build: Exit 0 (10s) em todos os commits da serie V9.x

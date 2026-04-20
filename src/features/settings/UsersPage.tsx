@@ -22,8 +22,6 @@ export const UsersPage: React.FC = () => {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [inviteEmail, setInviteEmail] = useState('');
-    const [inviting, setInviting] = useState(false);
 
     // ── Fetch ONLY users from the same company_id (privacy wall) ────────────
     useEffect(() => {
@@ -67,41 +65,6 @@ export const UsersPage: React.FC = () => {
         fetchTeam();
     }, [currentUser?.company_id]);
 
-    // ── Invite teammate (uses InviteGenerator flow) ──────────────────────────
-    const handleInvite = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!inviteEmail.trim() || !currentUser?.company_id) return;
-        setInviting(true);
-
-        const origin = window.location.origin;
-        // V9.4: company_id no link garante que a convidada entra no time certo
-        const inviteUrl = `${origin}/#/provadagua?company_id=${encodeURIComponent(currentUser.company_id)}`;
-
-        const msgPT = `Olá! Você foi convidada para experimentar a Provadágua, a demo gratuita do CRM personalizado do Encontro d’Água Hub! 🌊\n\nAcesse o link para entrar:\n${inviteUrl}`;
-        const msgEN = `Hello! You have been invited to experience Provadágua, the free CRM demo by Encontro d’água Hub! 🌊\n\nAccess the link to enter:\n${inviteUrl}`;
-        const msgText = isEn ? msgEN : msgPT;
-
-        // Detect if input is an e-mail or a phone/WhatsApp number
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim());
-
-        if (isEmail) {
-            // Open mailto: with pre-filled subject and body
-            const subject = encodeURIComponent(isEn ? 'You are invited to Provadágua!' : 'Convite para a Provadágua!');
-            const body = encodeURIComponent(msgText);
-            window.open(`mailto:${inviteEmail.trim()}?subject=${subject}&body=${body}`, '_blank');
-        } else {
-            // Treat as WhatsApp phone number (strip non-digits for wa.me)
-            const phone = inviteEmail.replace(/\D/g, '');
-            const waUrl = phone
-                ? `https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`
-                : `https://wa.me/?text=${encodeURIComponent(msgText)}`;
-            window.open(waUrl, '_blank');
-        }
-
-        setInviteEmail('');
-        setInviting(false);
-    };
-
     const roleLabel = (role: string) => {
         if (role === 'admin' || role === 'super_admin') return isEn ? 'Admin' : 'Admin';
         if (role === 'vendedor') return isEn ? 'Sales Rep' : 'Vendedor(a)';
@@ -128,28 +91,33 @@ export const UsersPage: React.FC = () => {
                 </p>
             </div>
 
-            {/* Invite Form */}
-            <div className="mb-6 p-4 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-500/20 rounded-xl">
-                <h2 className="text-sm font-bold text-primary-700 dark:text-primary-400 mb-3 flex items-center gap-2">
+            {/* Invite Form — V9.5: COMING SOON (convite por link está em backlog) */}
+            <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl opacity-70">
+                <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
                     <UserPlus size={16} />
                     {isEn ? 'Invite a Teammate' : 'Convidar Sócia / Membro'}
                 </h2>
-                <form onSubmit={handleInvite} className="flex gap-3">
+                <div className="flex gap-3">
                     <input
                         type="text"
-                        value={inviteEmail}
-                        onChange={e => setInviteEmail(e.target.value)}
+                        disabled
                         placeholder={isEn ? 'E-mail or WhatsApp number' : 'E-mail ou número do WhatsApp'}
-                        className="flex-1 px-3 py-2 rounded-lg border border-primary-200 dark:border-primary-500/30 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="flex-1 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-400 text-sm cursor-not-allowed"
                     />
-                    <button type="submit" disabled={inviting || !inviteEmail.trim()}
-                        className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-bold disabled:opacity-50 flex items-center gap-2 transition-all">
-                        {inviting
-                            ? <Loader2 size={14} className="animate-spin" />
-                            : <UserPlus size={14} />}
-                        {isEn ? 'Send Invite' : 'Enviar Convite'}
+                    <button
+                        type="button"
+                        disabled
+                        className="px-4 py-2 bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-bold cursor-not-allowed flex items-center gap-2"
+                    >
+                        <UserPlus size={14} />
+                        {isEn ? '🔒 Coming Soon' : '🔒 Em breve'}
                     </button>
-                </form>
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                    {isEn
+                        ? 'Team invitations are under development and will be available soon.'
+                        : 'Convites para o time estão em desenvolvimento e serão liberados em breve.'}
+                </p>
             </div>
 
             {/* Team Table */}

@@ -1,98 +1,98 @@
-
+﻿
 <div align="center">
 
   <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
 
-  <h1>Encontro D'Água Hub & CRM</h1>
+  <h1>Encontro D'Ãgua Hub & CRM</h1>
 
-  <p>Ecossistema de Gestão com IA — Multi-Tenant · Bilingue · LGPD-Ready</p>
+  <p>Ecossistema de GestÃ£o com IA â€” Multi-Tenant Â· Bilingue Â· LGPD-Ready</p>
 
 </div>
 
-### CRM de Produção `V8.0` — Encerramento · Provadágua Go-Live
+### CRM de ProduÃ§Ã£o `V8.0` â€” Encerramento Â· ProvadÃ¡gua Go-Live
 
-> **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
-> **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
-> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V8.0**: Painel Admin CRUD · Isolamento company_id implacável · AiflowSupport bilingue · Header mobile fix · SW cache-free
+> **Branch `main` â†’ hub.encontrodagua.com** â€” Acesso restrito Ã  equipe interna
+> **Branch `provadagua` â†’ prova.encontrodagua.com** â€” Trial pÃºblico 7 dias via Keyword Gate
+> CRM interno para gestÃ£o de leads reais, automaÃ§Ã£o WhatsApp e operaÃ§Ã£o SDR.
+> **V9.5 (Code Freeze)**: Privacidade granular (super_admin vs lead), Accordion ShowcasePage, QR d'água por owner_id, i18n Activities, fix loading Team — Deploy estável para validação da cliente.
 
 ---
 
-## Arquitetura Multi-Tenant (Hub vs Provadágua)
+## Arquitetura Multi-Tenant (Hub vs ProvadÃ¡gua)
 
 O projeto opera em **dois contextos distintos**:
 
 | Contexto | URL | Branch | Acesso | Perfil |
 |---|---|---|---|---|
 | **Hub Digital** | `hub.encontrodagua.com` | `main` | Super Admin apenas | `is_super_admin = true` |
-| **Provadágua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate → trial 7d | `access_level = provadagua-trial` |
+| **ProvadÃ¡gua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate â†’ trial 7d | `access_level = provadagua-trial` |
 
-### Fluxo Provadágua (V8.0 — sem Edge Function)
+### Fluxo ProvadÃ¡gua (V8.0 â€” sem Edge Function)
 ```
-/#/showcase  →  [CTA "Experimentar"]  →  /#/login?from=showcase
-              →  Aba "Novo Cadastro" (padrão)
-              →  Preenche Palavra-chave + Nome + E-mail + Senha
-              →  supabase.auth.signUp() nativo (sem CORS, sem Edge Function)
-              →  auto-login  →  /dashboard  (trial ativo 7 dias)
-              →  Lead inserido em contacts (CRM) automaticamente
+/#/showcase  â†’  [CTA "Experimentar"]  â†’  /#/login?from=showcase
+              â†’  Aba "Novo Cadastro" (padrÃ£o)
+              â†’  Preenche Palavra-chave + Nome + E-mail + Senha
+              â†’  supabase.auth.signUp() nativo (sem CORS, sem Edge Function)
+              â†’  auto-login  â†’  /dashboard  (trial ativo 7 dias)
+              â†’  Lead inserido em contacts (CRM) automaticamente
 ```
 
 ### Fluxo Hub
 ```
-/#/login  →  Aba "Entrar" (única)  →  SignIn com e-mail/senha
-          →  Valida is_super_admin  →  /dashboard
-          →  Não-admin: bloqueado + link para /#/showcase
+/#/login  â†’  Aba "Entrar" (Ãºnica)  â†’  SignIn com e-mail/senha
+          â†’  Valida is_super_admin  â†’  /dashboard
+          â†’  NÃ£o-admin: bloqueado + link para /#/showcase
 ```
 
 ---
 
 ## Endpoints Principais
 
-| Rota | Acesso | Descrição |
+| Rota | Acesso | DescriÃ§Ã£o |
 |---|---|---|
-| `/#/` | Público | LandingPage Hub |
-| `/#/showcase` | Público | ShowcasePage Provadágua (LP pitch) |
-| `/#/login` | Público | Login Hub (só SignIn) |
-| `/#/login?from=showcase` | Público | Login Provadágua (SignUp com Keyword + SignIn) |
+| `/#/` | PÃºblico | LandingPage Hub |
+| `/#/showcase` | PÃºblico | ShowcasePage ProvadÃ¡gua (LP pitch) |
+| `/#/login` | PÃºblico | Login Hub (sÃ³ SignIn) |
+| `/#/login?from=showcase` | PÃºblico | Login ProvadÃ¡gua (SignUp com Keyword + SignIn) |
 | `/#/dashboard` | Auth | Dashboard CRM (ProtectedRoute) |
-| `/#/trial-expired` | Auth | Página pós-trial com NPS + CTA fechar negócio |
-| `/#/admin` | Admin | Painel CRUD de usuários (Lidi) |
-| `/#/admin/leads` | Admin | Painel de leads Provadágua com trial control |
-| `/#/settings` | Auth | Configurações — usuários filtrados por `company_id` |
+| `/#/trial-expired` | Auth | PÃ¡gina pÃ³s-trial com NPS + CTA fechar negÃ³cio |
+| `/#/admin` | Admin | Painel CRUD de usuÃ¡rios (Lidi) |
+| `/#/admin/leads` | Admin | Painel de leads ProvadÃ¡gua com trial control |
+| `/#/settings` | Auth | ConfiguraÃ§Ãµes â€” usuÃ¡rios filtrados por `company_id` |
 
 ### Edge Functions (Supabase)
 
-| Função | Método | Descrição |
+| FunÃ§Ã£o | MÃ©todo | DescriÃ§Ã£o |
 |---|---|---|
-| ~~`signup-showcase`~~ | ~~POST~~ | **DESCONTINUADA V6.6** — substituída por `supabase.auth.signUp()` nativo |
-| `form-lp-lead` | POST | Captura lead via LeadCaptureModal → Board |
+| ~~`signup-showcase`~~ | ~~POST~~ | **DESCONTINUADA V6.6** â€” substituÃ­da por `supabase.auth.signUp()` nativo |
+| `form-lp-lead` | POST | Captura lead via LeadCaptureModal â†’ Board |
 | `qr-redirect` | GET | Redireciona slug QR Code para URL real |
 
 ---
 
-## Gestão de Leads e Multi-tenancy (V8.0)
+## GestÃ£o de Leads e Multi-tenancy (V8.0)
 
-### Separação de Visões: Super Admin vs Owner/Lead
+### SeparaÃ§Ã£o de VisÃµes: Super Admin vs Owner/Lead
 
-O sistema usa `company_id` como parede de isolamento total entre organizações:
+O sistema usa `company_id` como parede de isolamento total entre organizaÃ§Ãµes:
 
-| Papel | Visão | Rota |
+| Papel | VisÃ£o | Rota |
 |---|---|---|
-| **Super Admin (Lidi)** | Todos os usuários do sistema | `/#/admin` |
-| **Owner/Lead (Amanda)** | Apenas usuários da `company_id` dela | `/#/settings` |
+| **Super Admin (Lidi)** | Todos os usuÃ¡rios do sistema | `/#/admin` |
+| **Owner/Lead (Amanda)** | Apenas usuÃ¡rios da `company_id` dela | `/#/settings` |
 
 ### Sistema de Trial (7 dias)
 
 ```
 Lead se cadastra via Keyword Gate
-  → supabase.auth.signUp() + metadata { user_type: 'lead_provadagua' }
-  → trial_expires_at = now() + 7 dias (setado no profile)
-  → access_level = 'trial'
-  → Lead inserido em contacts com source='showcase'
+  â†’ supabase.auth.signUp() + metadata { user_type: 'lead_provadagua' }
+  â†’ trial_expires_at = now() + 7 dias (setado no profile)
+  â†’ access_level = 'trial'
+  â†’ Lead inserido em contacts com source='showcase'
 ```
 
-**Renovação Manual (Lidi):**
-1. Acessar `/#/admin` → aba Usuários
+**RenovaÃ§Ã£o Manual (Lidi):**
+1. Acessar `/#/admin` â†’ aba UsuÃ¡rios
 2. Localizar o lead pela coluna E-mail
 3. Clicar em **+7d** para estender a partir da data atual ou do trial vigente
 4. Ou clicar em **Suspender** para bloquear acesso imediatamente
@@ -100,27 +100,27 @@ Lead se cadastra via Keyword Gate
 
 **Filtro de Privacy (`/#/settings`):**
 - Query Supabase com `.eq('company_id', currentUser.company_id)`
-- Amanda **nunca** vê os 10+ usuários de teste da Lidi
-- Amanda **só** vê a si mesma e quem ela convidar
+- Amanda **nunca** vÃª os 10+ usuÃ¡rios de teste da Lidi
+- Amanda **sÃ³** vÃª a si mesma e quem ela convidar
 
 ---
 
 ## Funcionalidades
 
-| Módulo | Descrição |
+| MÃ³dulo | DescriÃ§Ã£o |
 |---|---|
-| **Board Kanban** | Leads mapeados ao funil automaticamente (tag `🤖 sdr` → estágio 1) |
+| **Board Kanban** | Leads mapeados ao funil automaticamente (tag `ðŸ¤– sdr` â†’ estÃ¡gio 1) |
 | **Contatos** | Base isolada por `company_id` (RLS ativo) |
 | **Jury** | Contratos BR + Common Law, PDF inline |
-| **Precy** | Precificação BRL/USD/EUR com catálogo |
-| **QR D'água** | QR Codes + Bridge Pages + galeria pública |
+| **Precy** | PrecificaÃ§Ã£o BRL/USD/EUR com catÃ¡logo |
+| **QR D'Ã¡gua** | QR Codes + Bridge Pages + galeria pÃºblica |
 | **Reports** | Pipeline + Win/Loss real (sem dados demo) |
-| **Admin** | Usuários, `access_expires_at`, Tech Stack, Super Admin |
-| **Amazô** | Agente IA: CS/SDR nas LPs + CRM nativo |
+| **Admin** | UsuÃ¡rios, `access_expires_at`, Tech Stack, Super Admin |
+| **AmazÃ´** | Agente IA: CS/SDR nas LPs + CRM nativo |
 | **Prompt Lab** | Engenharia de prompts multi-persona |
-| **ShowcasePage** | LP pública `/showcase` bilingue com FAQ + QA + Tech |
-| **Trial Gate** | Keyword `provadagua` → signup imediato · 7d trial |
-| **TrialExpiredPage** | NPS + feedback + CTA fechar negócio |
+| **ShowcasePage** | LP pÃºblica `/showcase` bilingue com FAQ + QA + Tech |
+| **Trial Gate** | Keyword `provadagua` â†’ signup imediato Â· 7d trial |
+| **TrialExpiredPage** | NPS + feedback + CTA fechar negÃ³cio |
 
 ---
 
@@ -129,37 +129,37 @@ Lead se cadastra via Keyword Gate
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
 - **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
 - **IA**: Google Gemini (principal), OpenAI, Anthropic (fallback)
-- **Deploy**: Vercel (banch-based: `main` → hub / `provadagua` → prova)
+- **Deploy**: Vercel (banch-based: `main` â†’ hub / `provadagua` â†’ prova)
 - **Webhook SDR**: Supabase Edge Function `form-lp-lead`
-- **Pagamentos**: Stripe (Prompt Lab Mensal R$3 · Anual R$29,90 · Agente IA R$80)
+- **Pagamentos**: Stripe (Prompt Lab Mensal R$3 Â· Anual R$29,90 Â· Agente IA R$80)
 
 ---
 
-## Variáveis de Ambiente
+## VariÃ¡veis de Ambiente
 
 ```env
-# ── Públicas (bundled no client JS) ──────────────────────────────────────────
+# â”€â”€ PÃºblicas (bundled no client JS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 VITE_APP_MODE=PRODUCTION          # DEMO em prova.encontrodagua.com
 VITE_SUPABASE_URL=https://...     # Supabase Project URL
-VITE_SUPABASE_ANON_KEY=eyJ...     # Anon key (segura — scoped por RLS)
-VITE_GEMINI_API_KEY=AIza...       # Google Gemini (público by design)
+VITE_SUPABASE_ANON_KEY=eyJ...     # Anon key (segura â€” scoped por RLS)
+VITE_GEMINI_API_KEY=AIza...       # Google Gemini (pÃºblico by design)
 VITE_GA4_MEASUREMENT_ID=G-...     # Google Analytics 4
-VITE_ACCESS_KEYWORD=provadagua    # Keyword Gate — mude para aumentar segurança
-VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (público)
+VITE_ACCESS_KEYWORD=provadagua    # Keyword Gate â€” mude para aumentar seguranÃ§a
+VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (pÃºblico)
 
-# ── Privadas (APENAS Vercel Secrets / .env local) ─────────────────────────────
-SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor — server-only / Edge Functions
+# â”€â”€ Privadas (APENAS Vercel Secrets / .env local) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor â€” server-only / Edge Functions
 ```
 
-> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** — se tiver, rotate imediatamente.
+> âš ï¸ `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** â€” se tiver, rotate imediatamente.
 
 ---
 
-## Segurança & RLS
+## SeguranÃ§a & RLS
 
-- Todas as tabelas críticas têm `company_id UUID` + RLS policy com bypass `is_super_admin`
+- Todas as tabelas crÃ­ticas tÃªm `company_id UUID` + RLS policy com bypass `is_super_admin`
 - Dados de demo isolados por `is_demo_data = true`
-- `access_expires_at` controlado por usuário — ProtectedRoute verifica em toda rota autenticada
+- `access_expires_at` controlado por usuÃ¡rio â€” ProtectedRoute verifica em toda rota autenticada
 - `SUPABASE_SERVICE_ROLE_KEY` apenas em Vercel Secrets + `.env` local (nunca commitada)
 
 ---
@@ -167,13 +167,13 @@ SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor — server-only / Edge Functions
 ## Deploy
 
 ```bash
-# Provadágua (branch provadagua)
+# ProvadÃ¡gua (branch provadagua)
 git push origin provadagua
-# Vercel detecta → build → prova.encontrodagua.com
+# Vercel detecta â†’ build â†’ prova.encontrodagua.com
 
 # Hub (branch main)
 git push origin main
-# Vercel detecta → build → hub.encontrodagua.com
+# Vercel detecta â†’ build â†’ hub.encontrodagua.com
 ```
 
 ---
@@ -183,11 +183,11 @@ git push origin main
 ```
 src/
   pages/
-    LandingPage.tsx      # Hub LP — inclui CTA Provadágua após CRMSimulator
-    ShowcasePage.tsx     # Provadágua pitch LP bilingue completa
+    LandingPage.tsx      # Hub LP â€” inclui CTA ProvadÃ¡gua apÃ³s CRMSimulator
+    ShowcasePage.tsx     # ProvadÃ¡gua pitch LP bilingue completa
     Login.tsx            # Multi-rota: Hub SignIn / Showcase SignUp+Keyword
-    TrialExpiredPage.tsx # Pós-trial: NPS + fechar negócio
-  features/              # Módulos CRM (boards, contacts, admin, ...)
+    TrialExpiredPage.tsx # PÃ³s-trial: NPS + fechar negÃ³cio
+  features/              # MÃ³dulos CRM (boards, contacts, admin, ...)
   lib/
     supabase/            # Services com IS_DEMO guards
     analytics.ts         # GA4 eventos (trial_start, lead_capture, login, sign_up)
@@ -197,4 +197,23 @@ src/
 
 ---
 
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V8.0 — Go-Live Provadágua*
+*Mantido pela equipe Encontro d'Ãgua | Manager: Antigravity AI | V8.0 â€” Go-Live ProvadÃ¡gua*
+
+---
+
+## Roadmap / Próximos Passos (Pós-Validação V9.5)
+
+> Funcionalidades planejadas que estão fora do escopo do MVP Go-Live:
+
+| Feature | Status | Prioridade |
+|---|---|---|
+| **Gestão Autônoma de Equipes** — convite por link com company_id | 🔒 Em breve | Alta |
+| Confirmação de e-mail de convite via Supabase | 🔒 Backlog | Alta |
+| Notificação automática no WA ao expirar o trial | 🕐 Planejado | Média |
+| i18n completo em BoardTemplates e CreateBoardModal | 🕐 Backlog | Baixa |
+| Dashboard de métricas por company_id para o lead | 🕐 Planejado | Média |
+| Export de contatos / deals em CSV | 🕐 Planejado | Baixa |
+
+---
+
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V9.5 Code Freeze*
