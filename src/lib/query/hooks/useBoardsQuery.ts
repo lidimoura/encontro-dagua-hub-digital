@@ -72,11 +72,15 @@ export const useDefaultBoard = () => {
  */
 export const useCreateBoard = () => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   return useMutation({
     mutationFn: async (board: Omit<Board, 'id' | 'createdAt'>) => {
-      // company_id will be auto-set by trigger
-      const { data, error } = await boardsService.create(board, '');
+      // V9.6 FIX: company_id MUST be passed explicitly — RLS rejects INSERT without it.
+      // Previously passing '' (falsy) caused transformToDb to omit company_id → 403.
+      const companyId = profile?.company_id;
+      if (!companyId) throw new Error('company_id is required to create a board');
+      const { data, error } = await boardsService.create(board, companyId);
       if (error) throw error;
       return data!;
     },
