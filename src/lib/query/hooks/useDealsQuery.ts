@@ -77,11 +77,11 @@ export const useDealsView = (filters?: DealsFilters) => {
     queryFn: async () => {
       if (!profile?.company_id) return [];
 
-      // Fetch all data in parallel
+      // Fetch all data in parallel — companies is non-critical, never let it crash the hook
       const [dealsResult, contactsResult, companiesResult] = await Promise.all([
         dealsService.getAll(profile.company_id),
         contactsService.getAll(profile.company_id),
-        companiesService.getAll(profile.company_id),
+        companiesService.getAll(profile.company_id).catch(() => ({ data: [], error: null })),
       ]);
 
       if (dealsResult.error) throw dealsResult.error;
@@ -334,6 +334,7 @@ type CreateDealInput = Omit<Deal, 'id' | 'createdAt' | 'updatedAt'>;
  */
 export const useCreateDeal = () => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth(); // V9.7 FIX: must be at hook top level, not inside mutationFn
 
   return useMutation({
     mutationFn: async (deal: CreateDealInput) => {
@@ -343,12 +344,12 @@ export const useCreateDeal = () => {
         contactId: deal.contactId || undefined,
         companyId: deal.companyId || undefined,
         boardId: deal.boardId || undefined,
-        // Removed undefined stageId reference
         updatedAt: new Date().toISOString(),
       };
 
-      // company_id will be auto-set by trigger on server
-      const { data, error } = await dealsService.create(sanitizedDeal, '');
+      // V9.7 FIX: company_id MUST be passed — same root cause fixed for boards in V9.6.
+      // Passing '' (falsy) caused dealsService to send null company_id → RLS 403.
+      const { data, error } = await dealsService.create(sanitizedDeal, profile?.company_id || '');
       if (error) throw error;
       return data!;
     },
