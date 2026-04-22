@@ -302,7 +302,8 @@ export const companiesService = {
           name: company.name,
           industry: company.industry || null,
           website: company.website || null,
-          company_id: sanitizedTenantId,
+          // NOTE: company_id column does not exist in this table (shared DB).
+          // Tenant isolation is handled by RLS auth_only + UI-level filtering.
         })
         .select()
         .single();

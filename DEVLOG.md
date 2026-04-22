@@ -630,3 +630,40 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 ### V9.7 (contexto)
 - `useDealsView`: companies fetch agora com `.catch()` graceful (evita 400 crashar o hook)
 - `useCreateDeal`: company_id real do profile passado ao service (fix identico ao V9.6 em boards)
+
+---
+
+## 2026-04-22 - V9.7.3: Correcoes de Root Cause e Isolamento Final
+
+### Status: DEPLOYADO — Build verde, push para main
+
+### Causa Raiz 1 — companies INSERT 400 (contacts.ts:305)
+- Problema: `companiesService.create()` tentava inserir `company_id` na tabela `companies`
+  que nao possui essa coluna (banco compartilhado com Link d agua)
+- Fix: Removido `company_id: sanitizedTenantId` do payload de INSERT
+- Arquivo: `src/lib/supabase/contacts.ts`
+
+### Causa Raiz 2 — Tech Stack vazando dados globais para leads
+- Problema: `TechStackPage` nao verificava `is_super_admin`, carregando e exibindo
+  todos os produtos internos (Stripe, Vercel, GitHub, chaves de API) para qualquer usuario autenticado
+- Fix: Adicionado guard `isSuperAdmin` com early return:
+  - Leads: veem empty state "Area Restrita" (sem chamada ao banco)
+  - Super Admin (Lidi): comportamento normal, pode criar/editar ferramentas e salvar API Keys
+- Arquivo: `src/features/admin/TechStackPage.tsx`
+
+### SQL Definitivo para o Supabase Dashboard (042)
+- `042_rls_auth_only_products_companies.sql`: politica auth_only para products e companies
+- Estas tabelas nao possuem colunas de multi-tenancy — isolamento feito no front-end
+- RLS garante apenas que usuarios anonimos nao acessam os dados
+
+### Tabela de Funcionalidades Pos-V9.7.3
+| Funcionalidade | Status |
+|---|---|
+| Criar Boards (template/IA) | OK - company_id correto desde V9.6 |
+| Criar Contatos | OK - company_id correto desde V9.6 |
+| Criar Deals | OK - company_id correto desde V9.7 |
+| Criar Empresa (CRM) | OK - removido company_id invalido (V9.7.3) |
+| Salvar API Key (Tech Stack) | OK - super_admin apenas (V9.7.3) |
+| Catalogo de Produtos | OK - auth_only RLS (execute SQL 042) |
+| Isolamento Lead (Tech Stack) | OK - early return guard (V9.7.3) |
+| companies 400 on load | RESOLVIDO - graceful catch desde V9.7 |

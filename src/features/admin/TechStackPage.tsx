@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/context/AuthContext';
 import {
     Server,
     Database,
@@ -74,6 +75,8 @@ const CATEGORY_COLORS = {
 export const TechStackPage: React.FC = () => {
     const { t } = useTranslation();
     const { addToast } = useToast();
+    const { profile } = useAuth();
+    const isSuperAdmin = profile?.is_super_admin === true;
     const [products, setProducts] = useState<TechStackProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -92,8 +95,10 @@ export const TechStackPage: React.FC = () => {
     });
 
     useEffect(() => {
-        fetchTechStack();
-    }, []);
+        // ISOLAMENTO: leads nao carregam tech stack (dados globais do Hub)
+        if (isSuperAdmin) fetchTechStack();
+        else setLoading(false);
+    }, [isSuperAdmin]);
 
     const fetchTechStack = async () => {
         setLoading(true);
@@ -208,6 +213,23 @@ export const TechStackPage: React.FC = () => {
         acc[p.stack_category] = (acc[p.stack_category] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
+
+    // LEAD GUARD: early return — leads see restricted message
+    if (!isSuperAdmin) {
+        return (
+            <div className="p-8 max-w-7xl mx-auto">
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <Server className="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4" />
+                    <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">
+                        {t('techStackRestricted') || 'Área Restrita'}
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                        {t('techStackRestrictedDesc') || 'O Tech Stack é gerenciado pelo administrador da plataforma.'}
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8 max-w-7xl mx-auto">
