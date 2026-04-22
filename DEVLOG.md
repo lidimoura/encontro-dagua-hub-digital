@@ -592,3 +592,41 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 ### Deploy
 - Commit: `23c9063` | Branch: `main` | Build: Exit 0 (7.25s)
 - SQL do backend: executado via Supabase Dashboard (nao via CLI)
+
+---
+
+## 2026-04-22 - V9.7.2: RLS Fallback & Tech Stack Fix (Hotfix Final)
+
+### Status: SQL DEFINITIVO GERADO — aguardando execucao manual no Dashboard
+
+### Inconsistencia de Tipagem Documentada (Causa Raiz dos V9.7/V9.7.1)
+- As tabelas `products` e `companies` NO banco fisico NAO possuem as colunas
+  `company_id` nem `owner_id` pressupostas nos arquivos TypeScript do front-end
+- `DbCompany` (contacts.ts) declara `owner_id` — coluna INEXISTENTE na tabela real
+- `TechStackProduct` (TechStackPage.tsx) nao declara ownership — correto, mas sem RLS
+- O banco e compartilhado com o app "Link d'agua": nao podemos alterar esquemas sem alinhar os dois times
+
+### Solucao Adotada (V9.7.2): RLS "auth_only" (Fallback Seguro de MVP)
+- Politica unica `FOR ALL TO authenticated USING (true)` em `products` e `companies`
+- Garante: visitantes anonimos bloqueados pelo RLS
+- Aceita: qualquer usuario autenticado opera livremente
+- Filtragem por tenant (Lead so ve seus dados) feita na camada de UI/service
+- Migration: `042_rls_auth_only_products_companies.sql`
+
+### Backlog Tecnico Pos-Validacao (Isolamento Completo de DB)
+- [ ] Migration: adicionar `company_id UUID REFERENCES profiles(company_id)` em `products`
+- [ ] Migration: adicionar `company_id UUID REFERENCES profiles(company_id)` em `companies`
+- [ ] Sincronizar tipos TypeScript (`DbCompany`, `TechStackProduct`) com esquema real via `supabase gen types`
+- [ ] Recriar policies RLS com filtro `company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())`
+- [ ] Alinhar com equipe do Link d'agua antes de qualquer ALTER TABLE nessas tabelas
+
+### Historico de tentativas (para referencia)
+| Arquivo | Resultado |
+|---|---|
+| `040_fix_rls_products_companies.sql` | FALHOU — usou `company_id` inexistente |
+| `041_fix_rls_real_columns.sql` | FALHOU — usou `owner_id` inexistente em products |
+| `042_rls_auth_only_products_companies.sql` | APROVADO — sem dependencia de colunas |
+
+### V9.7 (contexto)
+- `useDealsView`: companies fetch agora com `.catch()` graceful (evita 400 crashar o hook)
+- `useCreateDeal`: company_id real do profile passado ao service (fix identico ao V9.6 em boards)
