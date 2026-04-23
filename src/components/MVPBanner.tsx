@@ -20,19 +20,19 @@ function FeedbackModal({ onClose }: FeedbackModalProps) {
 
     setSending(true);
     try {
-      // Tenta inserir na tabela waitlist_and_feedback (migration 008)
-      // Se não existir, fallback para console log (não bloqueia o usuário)
       const { error } = await supabase
-        .from('waitlist_and_feedback')
+        .from('crm_feedbacks')
         .insert({
-          email: profile?.email || 'anon',
-          message: `[${category.toUpperCase()}] ${message}`,
-          source: 'crm_feedback_modal',
+          user_id: profile?.id || null,
+          email: profile?.email || null,
+          category,
+          message,
           company_id: profile?.company_id || null,
+          source: 'mvp_banner',
         });
 
       if (error) {
-        // Tabela pode ter schema diferente — apenas registra e considera enviado
+        // Tabela pode ainda não existir (migration 045 não executada) — fallback
         console.info('[FeedbackModal] Feedback recebido (fallback log):', {
           category,
           message,
@@ -48,7 +48,6 @@ function FeedbackModal({ onClose }: FeedbackModalProps) {
       }, 2000);
     } catch (err) {
       console.error('[FeedbackModal] Erro ao enviar feedback:', err);
-      // Mesmo com erro, marca como enviado — não frustra o usuário
       setSent(true);
       setTimeout(onClose, 2000);
     } finally {

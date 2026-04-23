@@ -3,6 +3,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase/client';
 
+// V9.9: Gera UUID v4 sem dependência externa — necessário para company_id de novos leads
+const generateUUID = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 // ─── Access keyword — lida via ENV (V7.0: zero hardcode no bundle) ────────────
 // Configurar VITE_ACCESS_KEYWORD=provadagua no .env e no painel Vercel/Supabase
 const ACCESS_KEYWORD = (import.meta.env.VITE_ACCESS_KEYWORD as string || '').trim().toLowerCase();
@@ -194,11 +206,17 @@ export const ShowcaseLP: React.FC = () => {
         is_demo_data: true,
         app_source:   'showcase_lp',
       };
-      // V9.3: se veio de convite com company_id, vincula ao time da convidante
+      // V9.9 FIX: Novos leads precisam de um company_id próprio desde o signup.
+      // O RLS estrito (migration 043) rejeita INSERT com company_id = NULL.
+      // Se veio de convite: usa o company_id da convidante.
+      // Se é lead novo: gera um UUID próprio como "sua empresa".
       if (inviteCompanyId) {
         signUpMeta.company_id = inviteCompanyId;
         signUpMeta.is_demo_data = false; // convidados não são dados de demo
         signUpMeta.app_source   = 'team_invite';
+      } else {
+        // Lead novo: gera company_id próprio — isolamento perfeito desde o D0
+        signUpMeta.company_id = generateUUID();
       }
 
       const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({

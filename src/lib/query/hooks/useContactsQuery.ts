@@ -229,7 +229,10 @@ export const useCreateContact = () => {
         companyId: contact.companyId || undefined,
       };
 
-      const companyId = profile?.company_id || '';
+      // V9.9 FIX: guard explícito igual ao useCreateBoard
+      // RLS estrito (migration 043) rejeita INSERT com company_id = NULL ou ''
+      const companyId = profile?.company_id;
+      if (!companyId) throw new Error('company_id é obrigatório para criar contatos. Perfil ainda não carregado.');
       const { data, error } = await contactsService.create(sanitizedContact, companyId);
       if (error) throw error;
       return data!;

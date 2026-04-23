@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Shield, Users, Package, Search, Edit, User, Building2, DollarSign, X, CheckCircle, XCircle, Loader2, ShieldOff, RefreshCw, Trash2, Clock } from 'lucide-react';
+import { Shield, Users, Package, Search, Edit, User, Building2, DollarSign, X, CheckCircle, XCircle, Loader2, ShieldOff, RefreshCw, Trash2, Clock, MessageSquare } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import CatalogTab from './CatalogTab';
+import FeedbacksTab from './FeedbacksTab';
 import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types';
 import { useToast } from '@/context/ToastContext';
@@ -195,7 +196,7 @@ export default function AdminPage() {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'users' | 'catalog'>('users');
+    const [activeTab, setActiveTab] = useState<'users' | 'catalog' | 'feedbacks'>('users');
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
     const isSuperAdmin = currentUserProfile?.role === 'super_admin';
@@ -336,6 +337,18 @@ export default function AdminPage() {
                         <Package size={18} />
                         {t('catalog')}
                     </button>
+                    {isSuperAdmin && (
+                    <button
+                        onClick={() => setActiveTab('feedbacks')}
+                        className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'feedbacks'
+                            ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'
+                            }`}
+                    >
+                        <MessageSquare size={18} />
+                        Feedbacks
+                    </button>
+                    )}
                 </div>
             </div>
 
@@ -532,6 +545,9 @@ export default function AdminPage() {
                         )}
                     </div>
                     ) /* end isSuperAdmin guard */
+                ) : activeTab === 'feedbacks' ? (
+                    /* Feedbacks Tab — visível apenas para super_admin */
+                    isSuperAdmin ? <FeedbacksTab /> : null
                 ) : (
                     /* Catalog Tab — visível para qualquer admin */
                     <CatalogTab />
