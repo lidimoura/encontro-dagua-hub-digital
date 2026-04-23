@@ -220,5 +220,6 @@ src/
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI) â€” V9.7.2 RLS Fallback & Tech Stack Fix*
+*Atualizado automaticamente pelo Manager (Antigravity AI) â€” V9.8 Strict RLS, Isolation & MVP Banner*
+
 

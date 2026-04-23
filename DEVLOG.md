@@ -667,3 +667,52 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 | Catalogo de Produtos | OK - auth_only RLS (execute SQL 042) |
 | Isolamento Lead (Tech Stack) | OK - early return guard (V9.7.3) |
 | companies 400 on load | RESOLVIDO - graceful catch desde V9.7 |
+
+---
+
+## 2026-04-23 - V9.8: RLS Estrito, Isolamento Total e Banner MVP
+
+### Status: DEPLOYADO — Commit 887e9ed · main · Build verde (19s)
+
+### ACAO 1 — RLS Definitivo (043_v98_strict_rls_final.sql)
+- Criada função helper `is_super_admin()` no Supabase para bypass da Lidi
+- Eliminado `OR company_id IS NULL` de TODAS as policies CRM (era o vetor de leak cross-tenant)
+- Corrigido bug crítico do 039: `board_stages_insert` referenciava `company_id` inexistente
+  na tabela `board_stages` — causava 403 em criação de boards por template e por IA
+- Tabelas com RLS estrito (company_id): boards, board_stages, contacts, deals, activities
+- Tabelas com RLS auth_only (banco compartilhado): products, companies
+
+### ACAO 2 — Isolamento Total de Interface
+- `TechStackPage.tsx`: early return para leads (V9.7.3, mantido)
+- `CatalogTab.tsx`: guard `isSuperAdmin` adicionado
+  - Leads: catálogo somente-leitura (sem botões de editar/criar)
+  - Lidi (super_admin): God Mode completo com CRUD
+
+### ACAO 3 — Criação de Boards Desbloqueada
+- Causa raiz: `board_stages_insert` policy no 039 usava `company_id` (coluna inexistente)
+- Fix no 043: policy reescrita usando apenas `board_id IN (SELECT id FROM boards WHERE ...)`
+- `useCreateBoard` já estava correto desde V9.6 — bloqueio era 100% no RLS
+
+### ACAO 4 — Banner MVP + Modal de Feedback
+- Novo componente: `src/components/MVPBanner.tsx`
+  - Banner dismissível com gradiente no topo do CRM
+  - Modal de feedback com categorias: Bug / Melhoria / Elogio
+  - Envio assíncrono com fallback graceful (nunca frustra o usuário)
+- Integrado no `Layout.tsx` (visível para todos os usuários autenticados)
+- Novo arquivo `FEEDBACK.md` no repositório para tracking de QA e roadmap
+
+### QA Estático — Tabela de Garantias V9.8
+| Funcionalidade | Lead (Amanda) | Super Admin (Lidi) |
+|---|---|---|
+| Boards: criar (template/IA) | OK - company_id correto | OK - is_super_admin bypass |
+| Boards: ver boards de outra empresa | BLOQUEADO (RLS estrito) | VISÍVEL |
+| Contatos: criar/ver | OK - filtrado por company_id | OK - God Mode |
+| Deals/Atividades | OK - filtrado por company_id | OK - God Mode |
+| Tech Stack | Tela "Área Restrita" | Acesso completo + salvar API Key |
+| Catálogo de Produtos | Somente leitura (sem CRUD) | CRUD completo |
+| Banner MVP | Visível + botão Feedback | Visível + botão Feedback |
+| Alerta rls_disabled | RESOLVIDO (SQL 043) | — |
+
+### SQL Obrigatório para Lidi executar no Dashboard
+- Arquivo: `supabase/migrations/043_v98_strict_rls_final.sql`
+- Caminho: Supabase Dashboard > SQL Editor > New Query > Cole e Run
