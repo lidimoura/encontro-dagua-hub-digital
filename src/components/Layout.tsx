@@ -28,6 +28,7 @@ import {
   Package,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
+import { MVPBanner } from '@/components/MVPBanner';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from '../hooks/useTranslation';
@@ -227,6 +228,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
+    <>
+    <MVPBanner />
     <div className="flex min-h-screen bg-slate-50 dark:bg-dark-bg bg-dots">
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
@@ -540,6 +543,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Aiflow Technical Support - Hub Routes Only */}
       <AiflowSupport />
     </div>
+    </>
   );
 };
 

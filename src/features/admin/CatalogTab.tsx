@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { Loader2, Plus, Edit, Trash2, X, Package } from 'lucide-react';
 import { Product } from '@/types';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProductFormData {
     name: string;
@@ -182,6 +183,8 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
 
 export default function CatalogTab() {
     const { t } = useTranslation();
+    const { profile } = useAuth();
+    const isSuperAdmin = profile?.is_super_admin === true;
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -303,16 +306,18 @@ export default function CatalogTab() {
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Catálogo de Produtos</h2>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                        Gerencie os produtos e serviços da sua loja
+                        {isSuperAdmin ? 'Gerencie os produtos e serviços da sua loja' : 'Produtos e serviços disponíveis'}
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition flex items-center gap-2"
-                >
-                    <Plus size={20} />
-                    Novo Produto
-                </button>
+                {isSuperAdmin && (
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition flex items-center gap-2"
+                    >
+                        <Plus size={20} />
+                        Novo Produto
+                    </button>
+                )}
             </div>
 
             {/* Products List */}
@@ -320,12 +325,14 @@ export default function CatalogTab() {
                 <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                     <Package className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
                     <p className="text-slate-600 dark:text-slate-400 mb-4">{t('noProductsRegistered')}</p>
+                    {isSuperAdmin && (
                     <button
                         onClick={() => setShowCreateModal(true)}
                         className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition"
                     >
                         Criar Primeiro Produto
                     </button>
+                    )}
                 </div>
             ) : (
                 <div className="grid gap-3">
