@@ -1,9 +1,3 @@
-﻿# DEVLOG — Encontro d'Água Hub
-
-## 2026-04-18 — V8.0: Encerramento · Gestao de Leads · Layout Fix · i18n EN
-
-### Painel Admin CRUD (/#/admin)
-- **Tabela reformulada**: colunas created_at (Data de Cadastro) e 	rial_expires_at (Expiracao Trial) adicionadas com destaque visual para trials expirados (cor laranja + icone aviso).
 - **Botao +7 dias**: estende o trial a partir da data atual (ou do vigente) sem abrir modal — acao instantanea via Supabase update.
 - **Botao Suspender / Ativar**: toggle de ccess_level entre 'suspended' e 'trial' com feedback imediato.
 - **Botao Excluir**: deleta o profile com window.confirm de seguranca. Auth user requer exclusao manual no Supabase Dashboard.
