@@ -251,7 +251,7 @@ export default function CatalogTab() {
 
                 const { data, error } = await supabase
                     .from('products')
-                    .insert([formData])
+                    .insert([{ ...formData, company_id: profile?.company_id || null }])
                     .select()
                     .single();
 

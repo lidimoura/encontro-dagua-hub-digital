@@ -328,20 +328,18 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       if (existingCompany) {
         finalCompanyId = existingCompany.id;
       } else {
-        const newCompany = await addCompany({
-          name: relatedData.companyName,
-        });
-        if (newCompany) {
-          finalCompanyId = newCompany.id;
+        // V9.9.2: gracioso — se addCompany falhar (RLS/network), não trava o modal
+        try {
+          const newCompany = await addCompany({ name: relatedData.companyName });
+          if (newCompany) finalCompanyId = newCompany.id;
+        } catch {
+          console.warn('[addDeal] addCompany falhou, prosseguindo sem empresa vinculada');
         }
       }
-    } else if (!companies.find(c => c.id === deal.companyId)) {
-      const newCompany = await addCompany({
-        name: 'Nova Empresa (Auto)',
-      });
-      if (newCompany) {
-        finalCompanyId = newCompany.id;
-      }
+    } else if (deal.companyId && !companies.find(c => c.id === deal.companyId)) {
+      // Empresa referenciada não carregada — não tenta criar automaticamente
+      // para evitar bloquear o modal com erros de companies
+      finalCompanyId = deal.companyId;
     }
 
     // Handle Contact

@@ -95,10 +95,9 @@ export const TechStackPage: React.FC = () => {
     });
 
     useEffect(() => {
-        // ISOLAMENTO: leads nao carregam tech stack (dados globais do Hub)
-        if (isSuperAdmin) fetchTechStack();
-        else setLoading(false);
-    }, [isSuperAdmin]);
+        // V9.9.2: Todo usuário autenticado vê o PRÓPRIO tech stack (RLS isola por company_id)
+        fetchTechStack();
+    }, []);
 
     const fetchTechStack = async () => {
         setLoading(true);
@@ -128,6 +127,8 @@ export const TechStackPage: React.FC = () => {
                 product_type: 'tech_stack',
                 is_internal: true,
                 active: true,
+                // V9.9.2: company_id obrigatório para RLS estrito passar
+                company_id: profile?.company_id || null,
             };
 
             if (editingProduct) {
@@ -214,22 +215,7 @@ export const TechStackPage: React.FC = () => {
         return acc;
     }, {} as Record<string, number>);
 
-    // LEAD GUARD: early return — leads see restricted message
-    if (!isSuperAdmin) {
-        return (
-            <div className="p-8 max-w-7xl mx-auto">
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <Server className="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4" />
-                    <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">
-                        {t('techStackRestricted') || 'Área Restrita'}
-                    </h2>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-                        {t('techStackRestrictedDesc') || 'O Tech Stack é gerenciado pelo administrador da plataforma.'}
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    // V9.9.2: guard removido — RLS no banco garante isolamento por company_id
 
     return (
         <div className="p-8 max-w-7xl mx-auto">
