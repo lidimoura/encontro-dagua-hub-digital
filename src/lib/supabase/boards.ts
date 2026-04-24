@@ -119,17 +119,28 @@ export const boardsService = {
     try {
       if (!companyId) return { data: [], error: null };
 
-      let boardsQuery = supabase.from('boards').select('*').order('created_at', { ascending: true });
-      if (companyId) {
-        boardsQuery = boardsQuery.eq('company_id', companyId);
-      }
-
-      const [boardsResult, stagesResult] = await Promise.all([
-        boardsQuery,
-        supabase.from('board_stages').select('*').order('order', { ascending: true }),
-      ]);
+      // Step 1: buscar boards do tenant
+      const boardsResult = await supabase
+        .from('boards')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: true });
 
       if (boardsResult.error) return { data: null, error: boardsResult.error };
+
+      const boardIds = (boardsResult.data || []).map((b: any) => b.id);
+
+      // Step 2: V9.9.1 FIX — board_stages não tem company_id
+      // filtrar pelos board_ids do tenant — evita cross-tenant leak
+      let stagesResult: { data: any[] | null; error: any } = { data: [], error: null };
+      if (boardIds.length > 0) {
+        stagesResult = await supabase
+          .from('board_stages')
+          .select('*')
+          .in('board_id', boardIds)
+          .order('order', { ascending: true });
+      }
+
       if (stagesResult.error) return { data: null, error: stagesResult.error };
 
       const boards = (boardsResult.data || []).map(b =>

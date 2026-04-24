@@ -199,7 +199,7 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<'users' | 'catalog' | 'feedbacks'>('users');
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
-    const isSuperAdmin = currentUserProfile?.role === 'super_admin';
+    const isSuperAdmin = currentUserProfile?.is_super_admin === true || currentUserProfile?.role === 'super_admin';
 
     useEffect(() => {
         if (!authLoading) {

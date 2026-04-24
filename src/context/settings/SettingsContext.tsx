@@ -139,14 +139,42 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       const { data: settings } = await settingsService.get();
       if (settings) {
         setAiProviderState(settings.aiProvider);
-        setAiApiKeyState(settings.aiApiKey);
-        if (settings.aiApiKeySecondary) setAiApiKeySecondaryState(settings.aiApiKeySecondary);
-        if (settings.aiApiKeyNote) setAiApiKeyNoteState(settings.aiApiKeyNote);
-        if (settings.aiApiKeySecondaryNote) setAiApiKeySecondaryNoteState(settings.aiApiKeySecondaryNote);
         setAiModelState(settings.aiModel);
         setAiThinkingState(settings.aiThinking);
         setAiSearchState(settings.aiSearch);
         setAiAnthropicCachingState(settings.aiAnthropicCaching);
+        if (settings.aiApiKeyNote) setAiApiKeyNoteState(settings.aiApiKeyNote);
+        if (settings.aiApiKeySecondaryNote) setAiApiKeySecondaryNoteState(settings.aiApiKeySecondaryNote);
+
+        // V9.9.1 — Lógica de Herança Silenciosa de API Key
+        // Prioridade: (1) chave do usuário → (2) chave da super_admin → (3) env var
+        if (settings.aiApiKey) {
+          // Usuário tem chave própria configurada — usa ela
+          setAiApiKeyState(settings.aiApiKey);
+          if (settings.aiApiKeySecondary) setAiApiKeySecondaryState(settings.aiApiKeySecondary);
+        } else if (!profile.is_super_admin) {
+          // Lead sem chave — herda silenciosamente da super_admin via JOIN com profiles
+          try {
+            const { supabase } = await import('@/lib/supabase/client');
+            const { data: adminSettings } = await supabase
+              .from('user_settings')
+              .select('ai_api_key, ai_api_key_secondary, profiles!inner(is_super_admin)')
+              .eq('profiles.is_super_admin', true)
+              .maybeSingle();
+            const inheritedKey = (adminSettings as any)?.ai_api_key || import.meta.env.VITE_GEMINI_API_KEY || '';
+            const inheritedSecondary = (adminSettings as any)?.ai_api_key_secondary || import.meta.env.VITE_GEMINI_API_KEY_SECONDARY || '';
+            setAiApiKeyState(inheritedKey);
+            if (inheritedSecondary) setAiApiKeySecondaryState(inheritedSecondary);
+            if (inheritedKey) console.info('[SettingsContext] API key herdada da super_admin (modo demo)');
+          } catch {
+            // Fallback final: env var
+            setAiApiKeyState(import.meta.env.VITE_GEMINI_API_KEY || '');
+          }
+        } else {
+          // super_admin sem chave configurada — usa env var
+          setAiApiKeyState(import.meta.env.VITE_GEMINI_API_KEY || '');
+          if (settings.aiApiKeySecondary) setAiApiKeySecondaryState(settings.aiApiKeySecondary);
+        }
       }
 
       // Fetch lifecycle stages
