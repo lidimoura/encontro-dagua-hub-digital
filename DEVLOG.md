@@ -5,15 +5,15 @@
 - **Handlers**: handleExtendTrial, handleToggleSuspend, handleDelete com ctionLoading por linha — zero conflito de estado.
 
 ### Privacidade / Multi-tenancy (/#/settings)
-- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados da Lidi removida.
-- **Amanda ve apenas**: a si mesma e quem ela convidar para a company_id dela.
-- **Formulario de Convite**: Amanda pode convidar socias via e-mail (abre WhatsApp com link de cadastro pre-preenchido).
+- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados do Super Admin removida.
+- **Lead/Tenant ve apenas**: a si mesmo e quem ele convidar para a company_id dele.
+- **Formulario de Convite** ⚠️ INOPERANTE (Backlog): A funcionalidade de convite de membros da equipe via WhatsApp/E-mail foi implementada no front-end mas nao foi concluida nem testada a tempo do Go-Live. O botao esta desativado (Coming Soon) na UsersPage. A arquitetura de URL com company_id esta pronta, porem o fluxo completo sera reativado em versao futura pos-validacao.
 
 ### Exterminio do Service Worker (V6.8 — registrado aqui para historico)
 - public/sw.js: versao cache-free — install destroi todos os caches existentes, etch e pass-through puro (sem interceptacao de assets). CACHE_VERSION = 'hub-nocache-v2' forca substituicao do SW antigo.
 - index.html: kill script inline killSWCache() roda ANTES do bundle React — desregistra todos os SWs e purga CacheStorage.
 - App.tsx: purga caches.* e desregistra SWs antigos no useEffect de boot, antes de registrar o novo SW.
-- **Motivacao**: cliente (Amanda) estava presa em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
+- **Motivacao**: um Tenant de teste estava preso em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
 
 ### Fix Header Mobile (Layout.tsx)
 - **Problema**: ao navegar para /#/ai pelo menu hamburguer, o header desaparecia.
@@ -42,8 +42,9 @@
 ### UX de Erros Anti-desamparo (V7.0)
 - smartSignInError(): helper que intercepta erros do Supabase Auth e retorna mensagens humanizadas:
   - invalid login credentials -> 'E-mail ou senha incorretos. Verifique os dados ou solicite uma nova senha ao Admin.'
-  - suspended / inactive -> 'Acesso suspenso. Fale com a Lidi: wa.me/...'
-  - ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
+  - suspended / inactive -> 'Acesso suspenso. Entre em contato com o Super Admin.'
+  - 
+ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
 
 ### Git — Commits desta fase
 - hotfix(v6.8): kill service worker cache
@@ -81,13 +82,13 @@
 - **Agora:** Palavra-chave → Nome → Email → Senha
 - Justificativa: a palavra-chave é o gatekeeper — se o lead não tem, ele solicita via WA antes de preencher dados pessoais.
 
-### Fluxo Completo do Lead Amanda (V6.5)
+### Fluxo Completo do Lead/Tenant (V6.5)
 ```
 1. Showcase → CTA "Iniciar Trial Grátis" → /#/login?from=showcase (ou domínio prova.*)
 2. Formulário: Palavra-chave ('provadagua') → Nome → Email → Senha (≥6 chars)
 3. submit → supabase.auth.signUp() com metadata → signInWithPassword(email, leadPassword)
 4. AuthContext.fetchProfile (maybeSingle) → loading=false → /dashboard
-5. Retorno: Amanda loga com email + senha que ela definiu
+5. Retorno: Tenant/Lead loga com email + senha que ele definiu
 ```
 
 ## 2026-04-18 — V8.0: Encerramento · Gestao de Leads · Layout Fix · i18n EN
@@ -101,15 +102,15 @@
 - **Handlers**: handleExtendTrial, handleToggleSuspend, handleDelete com ctionLoading por linha — zero conflito de estado.
 
 ### Privacidade / Multi-tenancy (/#/settings)
-- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados da Lidi removida.
-- **Amanda ve apenas**: a si mesma e quem ela convidar para a company_id dela.
-- **Formulario de Convite**: Amanda pode convidar socias via e-mail (abre WhatsApp com link de cadastro pre-preenchido).
+- **UsersPage.tsx reescrita**: query real do Supabase com .eq('company_id', currentUser.company_id) — tabela hardcoded com dados do Super Admin removida.
+- **Lead/Tenant ve apenas**: a si mesmo e quem ele convidar para a company_id dele.
+- **Formulario de Convite** ⚠️ INOPERANTE (Backlog): A funcionalidade de convite de membros da equipe via WhatsApp/E-mail foi implementada no front-end mas nao foi concluida nem testada a tempo do Go-Live. O botao esta desativado (Coming Soon) na UsersPage. A arquitetura de URL com company_id esta pronta, porem o fluxo completo sera reativado em versao futura pos-validacao.
 
 ### Exterminio do Service Worker (V6.8 — registrado aqui para historico)
 - public/sw.js: versao cache-free — install destroi todos os caches existentes, etch e pass-through puro (sem interceptacao de assets). CACHE_VERSION = 'hub-nocache-v2' forca substituicao do SW antigo.
 - index.html: kill script inline killSWCache() roda ANTES do bundle React — desregistra todos os SWs e purga CacheStorage.
 - App.tsx: purga caches.* e desregistra SWs antigos no useEffect de boot, antes de registrar o novo SW.
-- **Motivacao**: cliente (Amanda) estava presa em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
+- **Motivacao**: um Tenant de teste estava preso em cache do bundle antigo com erro de CORS da signup-showcase (ja deletada no V6.6).
 
 ### Fix Header Mobile (Layout.tsx)
 - **Problema**: ao navegar para /#/ai pelo menu hamburguer, o header desaparecia.
@@ -138,8 +139,9 @@
 ### UX de Erros Anti-desamparo (V7.0)
 - smartSignInError(): helper que intercepta erros do Supabase Auth e retorna mensagens humanizadas:
   - invalid login credentials -> 'E-mail ou senha incorretos. Verifique os dados ou solicite uma nova senha ao Admin.'
-  - suspended / inactive -> 'Acesso suspenso. Fale com a Lidi: wa.me/...'
-  - ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
+  - suspended / inactive -> 'Acesso suspenso. Entre em contato com o Super Admin.'
+  - 
+ate_limit / too_many -> 'Muitas tentativas. Aguarde alguns minutos.'
 
 ### Git — Commits desta fase
 - hotfix(v6.8): kill service worker cache
@@ -168,22 +170,22 @@
   - `autoComplete="new-password"` para managers de senha do browser
 - **Handler:** usa diretamente a senha digitada pelo lead — sem geração de strings internas
 
-### Fluxo Completo do Lead Amanda (V6.4)
+### Fluxo Completo do Lead/Tenant (V6.4)
 ```
 1. Showcase → CTA "Iniciar Trial Grátis" → /#/login?from=showcase
 2. Formulário: Nome + Email + Keyword ('provadagua') + Senha (≥6 chars)
 3. submit → signup-showcase Edge Fn → supabase.auth.signInWithPassword(email, userPassword)
 4. AuthContext.fetchProfile (maybeSingle) → loading=false → /dashboard
-5. Retorno: Amanda loga com email + senha que ela definiu
+5. Retorno: Tenant/Lead loga com email + senha que ele definiu
 ```
 
 ---
 
-## 2026-04-16 — V6.2: Final Release QA · Stripe · WA Business Lidi · GA4
+## 2026-04-16 — V6.2: Final Release QA · Stripe · WA Business · GA4
 
 ### Arquitetura de Canais (documentada)
 - **Amazô** = IA de front-end — atendimento automatizado 24/7 nas LPs e ShowcasePage
-- **WhatsApp Business `5541992557600`** = gestão humana direta da **Lidi Moura** (proprietária)
+- **WhatsApp Business `5541992557600`** = gestão humana direta da proprietaria (ária)
 - Nenhum bot acessa o WA Business — é canal exclusivo de conversão e suporte humano
 
 ### Fix Crítico — NexusBridge (`nexusWebhook.ts`)
@@ -197,19 +199,19 @@
 - Observer com `setTimeout(200ms)` para garantir DOM montado antes de observar
 
 ### Stripe Payments (`stripe.ts`) — V6.2
-- `whatsappFallback` corrigido: `5592992943998` → `5541992557600` (Lidi)
-- Mensagens WA todas Lidi-branded por produto (Prompt Lab Mensal/Anual, Agente IA, Consultoria)
+- `whatsappFallback` corrigido: `5592992943998` → `5541992557600` (canal principal)
+- Mensagens WA todas branded por produto (canal proprietaria) (Prompt Lab Mensal/Anual, Agente IA, Consultoria)
 - Payment Links via env vars: `VITE_STRIPE_LINK_MONTHLY`, `VITE_STRIPE_LINK_ANNUAL`, `VITE_STRIPE_LINK_AGENTE_IA`
 - Fallback automático para WA Business se link Stripe não configurado
 
 ### WhatsApp Business — Mensagens Estratégicas
 | Origem | Mensagem |
 |---|---|
-| Showcase — Keyword | "Olá, Lidi! Estou na vitrine da Provadágua e quero minha Palavra-Chave..." |
-| Showcase — Dúvida | "Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização..." |
-| Hub — Consultoria | "Olá, Lidi! Conheci o Hub e quero conversar sobre uma implementação sob medida..." |
-| Prompt Lab Mensal | "Olá, Lidi! Vi o Prompt Lab no Hub e quero assinar o Plano Mensal (R$ 3,00/mês)..." |
-| Agente de IA | "Olá, Lidi! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse..." |
+| Showcase — Keyword | "Olá, [Admin]! Estou na vitrine da Provadágua e quero minha Palavra-Chave..." |
+| Showcase — Dúvida | "Olá, [Admin]! Estou testando a demo e tenho uma dúvida sobre a personalização..." |
+| Hub — Consultoria | "Olá, [Admin]! Conheci o Hub e quero conversar sobre uma implementação sob medida..." |
+| Prompt Lab Mensal | "Olá, [Admin]! Vi o Prompt Lab no Hub e quero assinar o Plano Mensal (R$ 3,00/mês)..." |
+| Agente de IA | "Olá, [Admin]! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse..." |
 
 ### GA4 (`App.tsx`)
 - `initGA4()` agora chamado no `useEffect` do `App.tsx` — rastreia **todas as páginas** desde o boot
@@ -294,7 +296,7 @@ chore(docs): README V5.7 multi-tenant endpoints + UserGuide trial flow
 - `ShowcasePage.tsx` tokens `S`: `acaiGrad`, `solimoesGrad`, `border`, `surface` — todos em Açaí/Solimões
 - Hero: orbs roxo+dourado, scanline violeta, CTA com `acaiPulse` animation, metrics bar alternando gradientes
 - Nav: logo `logo-icon-gold-transp.png` substituindo emoji; botão de acesso cor Açaí
-- Footer: `logo-icon-gold-transp.png`, bio Lidi c/ certificações OCI/IA/MySQL, links GitHub Org + LinkedIn + WA Suporte
+- Footer: `logo-icon-gold-transp.png`, bio da fundadora c/ certificações OCI/IA/MySQL, links GitHub Org + LinkedIn + WA Suporte
 
 ### ShowcasePage — Conteúdo V5.3
 - **Badge fundadora REMOVIDO** da Hero Section (contexto errado — movido para footer)
@@ -344,10 +346,10 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 - **Seção `#sec-agente-ia-launch`** inserida após os 3 cards de segmentação
 - Badge pulsante: "🔥 Oferta de Lançamento — Vagas Limitadas"
 - Copy: "Seu próprio Agente de IA 24/7 — igual à Amazô"
-- Bio: "Por Lidi Moura — Formada em Psicologia e Especialista em Dados"
+- Bio: "Por [Fundadora da Plataforma] — Formada em Psicologia e Especialista em Dados"
 - Mockup de chat interativo (balões de conversa) com preço e botão "Contratar"
 - CTA principal: `btn-agente-ia-launch` → `openAgenteIAModal()`
-- CTA secundário: WhatsApp Lidi (`wa.me/5592992943998`)
+- CTA secundario: WhatsApp do Super Admin (`wa.me/5592992943998`)
 
 ### LeadCaptureModal — V4.4 Upgrades
 
@@ -390,7 +392,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 
 ### Identidade Visual Confirmada
 - Paleta Earth-Neon: Fundo `#070D09` · Verde `#00C97B` · Ciano `#00E5FF` · Dourado `#D4A853`
-- Founder badge: "Lidi Moura: Formada em Psicologia e Especialista em Dados"
+- Founder badge: identidade visual da fundadora da plataforma
 - Bilinguismo PT/EN mantido em todos os novos componentes
 
 ### Lógica de Acesso (já estava completa — confirmada V4.3)
@@ -494,7 +496,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 - `dealsService.ts`: Substituído hostname check por IS_DEMO
 - `contactsService.ts`: IS_DEMO import adicionado
 - `AdminUsersPage.tsx`: signUp simplificado — só `full_name` no metadata
-- `InviteGenerator.tsx`: Texto genérico (sem "Amanda")
+- `InviteGenerator.tsx`: Texto genérico (sem referencias a clientes)
 - `useDealsQuery.ts`: Deduplicação por contactId (real deals têm prioridade sobre ghost cards)
 
 ---
@@ -533,7 +535,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 ### Ajustes Residuais (Backlog)
 - Traducoes parciais em CreateBoardModal (placeholders PT hardcoded)
 - Traducoes parciais em BoardTemplate (nomes dos templates)
-- Essas pendencias foram deliberadamente adiadas: nao afetam a demo funcional da Amanda
+- Essas pendencias foram deliberadamente adiadas: nao afetam a demo funcional do Tenant de validacao
 
 ### V9.4 (incluido neste push)
 - QRdaguaPage.tsx: Filtro owner_id na query de QR codes (privacidade total por lead)
@@ -642,7 +644,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
   todos os produtos internos (Stripe, Vercel, GitHub, chaves de API) para qualquer usuario autenticado
 - Fix: Adicionado guard `isSuperAdmin` com early return:
   - Leads: veem empty state "Area Restrita" (sem chamada ao banco)
-  - Super Admin (Lidi): comportamento normal, pode criar/editar ferramentas e salvar API Keys
+  - Super Admin: comportamento normal, pode criar/editar ferramentas e salvar API Keys
 - Arquivo: `src/features/admin/TechStackPage.tsx`
 
 ### SQL Definitivo para o Supabase Dashboard (042)
@@ -669,7 +671,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 ### Status: DEPLOYADO — Commit 887e9ed · main · Build verde (19s)
 
 ### ACAO 1 — RLS Definitivo (043_v98_strict_rls_final.sql)
-- Criada função helper `is_super_admin()` no Supabase para bypass da Lidi
+- Criada função helper `is_super_admin()` no Supabase para bypass do Super Admin
 - Eliminado `OR company_id IS NULL` de TODAS as policies CRM (era o vetor de leak cross-tenant)
 - Corrigido bug crítico do 039: `board_stages_insert` referenciava `company_id` inexistente
   na tabela `board_stages` — causava 403 em criação de boards por template e por IA
@@ -680,7 +682,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 - `TechStackPage.tsx`: early return para leads (V9.7.3, mantido)
 - `CatalogTab.tsx`: guard `isSuperAdmin` adicionado
   - Leads: catálogo somente-leitura (sem botões de editar/criar)
-  - Lidi (super_admin): God Mode completo com CRUD
+  - Super Admin: God Mode completo com CRUD
 
 ### ACAO 3 — Criação de Boards Desbloqueada
 - Causa raiz: `board_stages_insert` policy no 039 usava `company_id` (coluna inexistente)
@@ -696,7 +698,7 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 - Novo arquivo `FEEDBACK.md` no repositório para tracking de QA e roadmap
 
 ### QA Estático — Tabela de Garantias V9.8
-| Funcionalidade | Lead (Amanda) | Super Admin (Lidi) |
+| Funcionalidade | Lead/Tenant | Super Admin |
 |---|---|---|
 | Boards: criar (template/IA) | OK - company_id correto | OK - is_super_admin bypass |
 | Boards: ver boards de outra empresa | BLOQUEADO (RLS estrito) | VISÍVEL |
@@ -707,6 +709,91 @@ feat(v5.3): Provadagua Rebranding — RioNegro+Acai+Solimoes palette, TrialExpir
 | Banner MVP | Visível + botão Feedback | Visível + botão Feedback |
 | Alerta rls_disabled | RESOLVIDO (SQL 043) | — |
 
-### SQL Obrigatório para Lidi executar no Dashboard
+### SQL Obrigatório para o Super Admin executar no Dashboard
 - Arquivo: `supabase/migrations/043_v98_strict_rls_final.sql`
 - Caminho: Supabase Dashboard > SQL Editor > New Query > Cole e Run
+
+---
+
+## 2026-04-24 — V9.9.2: UX Lead Restaurada · TechStack/Catálogo Desbloqueados · Modal Fix
+
+### Status: DEPLOYADO — Commits `72ead14` + `969054f` · main · Build verde (7.74s)
+
+### Diagnóstico (Auditoria Git — git log + git diff)
+- **Causa raiz — techStackRestricted para Leads**: Commit V9.7.3 introduziu `if (!isSuperAdmin) return <ÁreaRestrita>` em `TechStackPage.tsx`, bloqueando Leads de gerenciar o próprio Tech Stack isolado por `company_id`.
+- **Causa raiz — modais congelados**: `addDeal` no `CRMContext.tsx` tentava criar automaticamente `Nova Empresa (Auto)` via `await addCompany()` quando `companyId` não era encontrado. O RLS estrito de `companies` (sem `company_id`) retornava 403 e o `await` nunca resolvia, congelando o modal.
+- **Causa raiz — Gemini 400**: `SettingsContext` carregava `aiApiKey = ''` para Leads sem chave. A herança tentava `.eq('is_super_admin_settings', true)` — coluna inexistente.
+- **Causa raiz — produtos 403**: Inserts em `products` sem `company_id` no payload — RLS estrito do 046 rejeita qualquer INSERT sem `company_id = my_company_id()`.
+
+### Correções Aplicadas
+
+#### TechStackPage.tsx — Desbloqueio Total da UI
+- **Removido**: `if (!isSuperAdmin) return <ÁreaRestrita>` (early return bloqueante)
+- **Adicionado**: `company_id: profile?.company_id` no payload de insert/update de ferramentas
+- **Princípio confirmado**: RLS no banco garante isolamento por tenant. A UI não discrimina por role.
+
+#### CatalogTab.tsx — company_id no Payload de Criação
+- `insert([formData])` → `insert([{ ...formData, company_id: profile?.company_id }])`
+
+#### CRMContext.tsx — addDeal Gracioso para Falhas de companies
+- `addCompany()` agora em `try/catch` — se falhar (RLS/network), o modal fecha normalmente
+- Removida criação automática de empresa quando `companyId` não encontrado localmente
+
+#### SettingsContext.tsx — Herança de API Key do Gemini
+- Prioridade: (1) chave do próprio usuário → (2) chave do Super Admin via JOIN com profiles → (3) `VITE_GEMINI_API_KEY` (env)
+- Query corrigida: `profiles!inner(is_super_admin).eq('is_super_admin', true)`
+
+### SQL Executado no Dashboard
+- `047_v992_companies_authonly.sql`: DROP + CREATE de políticas `auth_only` para `companies`
+- A tabela `companies` é compartilhada com o app "Link d'água" e não tem `company_id` — isolamento feito na camada de UI
+
+### Tabela de Funcionalidades V9.9.2
+| Funcionalidade | Lead/Tenant | Super Admin |
+|---|---|---|
+| Tech Stack | Acesso completo (dados do próprio `company_id`) | Acesso completo (God Mode) |
+| Catálogo de Produtos | CRUD completo (dados do próprio `company_id`) | CRUD completo (God Mode) |
+| Criar Boards (template/IA) | OK — company_id correto | OK — is_super_admin bypass |
+| Criar Contatos | OK — filtrado por company_id | OK — God Mode |
+| Criar Deals/Atividades | OK — gracioso, não congela modal | OK — God Mode |
+| IA (Gemini) | Herança silenciosa da chave do Super Admin | Chave própria no Tech Stack |
+
+### Regra de Ouro Documentada
+> **"Isolar dados ≠ bloquear interface."** O RLS no banco garante que cada tenant só vê seus próprios dados. A UI deve ser idêntica para todos os roles — sem guards de `isSuperAdmin` na renderização de páginas de negócio.
+
+### Arquivos Modificados
+- `src/features/admin/TechStackPage.tsx` — guard removido, `company_id` em inserts
+- `src/features/admin/CatalogTab.tsx` — `company_id` em insert
+- `src/context/CRMContext.tsx` — `addDeal` gracioso para falhas de companies
+- `src/context/settings/SettingsContext.tsx` — herança silenciosa de API key
+- `supabase/migrations/047_v992_companies_authonly.sql` — [NOVO] RLS auth_only companies
+
+---
+
+## 2026-04-25 — V9.9.3: Limpeza de Documentação · Remoção de Nomes Reais · Precisão Histórica
+
+### Status: DOCUMENTAÇÃO APENAS — nenhum arquivo .ts/.tsx alterado
+
+### Motivação
+Auditoria revelou que o DEVLOG.md, README.md e USER_GUIDE.md continham:
+1. Nomes de clientes reais usados como exemplos de caso de uso (viola privacidade e profissionalismo SaaS)
+2. Features documentadas como funcionais quando estavam inoperantes (desonestidade técnica)
+
+### Ação 1 — Extermínio de Nomes Reais (Varredura Completa)
+- **DEVLOG.md**: todas as ocorrências de nomes reais substituídas por `Lead/Tenant`, `Super Admin`, `[Admin]`, `[Fundadora da Plataforma]`
+- **README.md**: mesmas substituições nas seções de rotas, tabela de permissões e filtro de privacy
+- **USER_GUIDE.md**: seções renomeadas de "Guia [Nome Pessoal]" para "Guia do Super Admin" / "Guia do Lead/Tenant"
+- Mensagens de WhatsApp Business: saudação genérica `"Olá, [Admin]!"` nos templates de conversão
+
+### Ação 2 — Correção de Feature Status (Precisão Histórica)
+- **Formulário de Convite de Equipe** — status corrigido de "funcionando" para **⚠️ INOPERANTE (Backlog)**:
+  - A funcionalidade de convite via WhatsApp/E-mail para novos membros do time do Lead foi implementada no front-end mas não foi concluída nem testada antes do Go-Live
+  - O botão está desativado (`disabled={true}`, label "Em breve / Coming soon") na UsersPage desde V9.5
+  - A arquitetura de URL com `company_id` está pronta (back-end); o fluxo completo será reativado em versão futura
+
+### Ação 3 — Entrada V9.9.2 Adicionada (esta seção)
+Ver entrada anterior `2026-04-24 — V9.9.2`.
+
+### Arquivos Modificados (apenas .md)
+- `DEVLOG.md` — limpeza de nomes + entradas V9.9.2 e V9.9.3 adicionadas
+- `README.md` — limpeza de nomes reais em tabelas de rotas e permissões
+- `USER_GUIDE.md` — renomeação de seções e correção de referências a nomes pessoais

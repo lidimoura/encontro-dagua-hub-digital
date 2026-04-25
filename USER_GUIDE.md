@@ -78,7 +78,7 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 - **Decisões**: Insights de IA sobre deals estagnados.
 
 ### 6. Provadágua (CRM Customizado — Trial)
-- **Conceito**: Sandbox realista para testar o ecossistema CRM da Lidi Moura ("O seu software deveria trabalhar para você, não o contrário").
+- **Conceito**: Sandbox realista para testar o ecossistema CRM da Plataforma Provadagua ("O seu software deveria trabalhar para você, não o contrário").
 - **Como Acessar**: Inserir palavra-chave `provadagua` na página de Login. Acesso de 7 dias liberado imediatamente.
 - **Isolamento de Dados**: Leads de trial caem em um `company_id` próprio. Eles nunca verão os dados do Hub administrativo.
 - **Pós-Trial (V5.3)**: Quando o tempo acaba (`access_expires_at`), o acesso é bloqueado e o sistema força o roteamento para a tela `/trial-expired`, contendo NPS, consentimento LGPD e fluxo de Upsell focado em vendas via WhatsApp.
@@ -120,9 +120,9 @@ A nova estrutura divide o acesso:
 
 > **Fallback Stripe:** Se o checkout falhar, redirecionar para WhatsApp: `https://wa.me/5592992943998`
 
-### Gerenciar Trials (SuperAdmin — Lidi)
+### Gerenciar Trials (Super Admin)
 
-> Ver seção completa **“Guia da Lidi: Painel Admin”** abaixo.
+> Ver seção completa **"Guia do Super Admin: Painel Admin"** abaixo.
 
 1. Acesse `/#/admin` → aba **Usuários**
 2. Veja as colunas **Data de Cadastro** e **Expiração Trial**
@@ -137,7 +137,7 @@ A nova estrutura divide o acesso:
 > *Atualizado: 12 Abril 2026 · Build V4.3*
 
 ### Identidade da Fundadora
-- **Nome:** Lidi Moura
+- **Nome:** Super Admin (proprietario da plataforma)
 - **Formação:** Formada em Psicologia e Especialista em Dados
 - **Público-alvo:** Profissionais de Saúde e Empreendedores
 
@@ -176,7 +176,7 @@ A nova estrutura divide o acesso:
 ### Showcase LP (`/#/showcase`)
 
 Nova Hero Section com:
-- Badge fundadora: *"Lidi Moura · Formada em Psicologia e Especialista em Dados"*
+- Badge fundadora: *"[Fundadora] — Formada em Psicologia e Especialista em Dados"*
 - Copy: *"O CRM Personalizado que Cresce com Você"*
 - Placeholder de vídeo demo interativo
 - Grid de 3 screenshots mockup do CRM (Kanban · Contatos IA · Dashboard)
@@ -273,7 +273,7 @@ ORDER BY created_at DESC;
 
 ---
 
-## 10. Guia da Lidi: Painel de Gestão Global (V8.0)
+## 10. Guia do Super Admin: Painel de Gestão Global (V8.0)
 
 > **URL:** `/#/admin` — Acesso exclusivo `role = admin`
 
@@ -292,7 +292,7 @@ ORDER BY created_at DESC;
 1. Localize o lead pela barra de busca (e-mail ou nome)
 2. Clique em **"+ 7d"** na linha do lead
 3. O sistema calcula: *se o trial ainda está vigente*, estende a partir da data atual; *se já expirou*, conta 7 dias a partir de hoje
-4. Toast de confirm: `✅ Trial de amanda@... renovado +7 dias`
+4. Toast de confirm: `✅ Trial de [email do tenant] renovado +7 dias`
 5. A coluna **Expiração Trial** atualiza imediatamente
 
 ### Como Suspender / Reativar Acesso
@@ -324,16 +324,16 @@ ORDER BY created_at DESC;
 ### Como Contatar um Lead via WhatsApp
 
 - Clique no botão **💬 WA** na linha do lead
-- Abre o WhatsApp Web com mensagem pré-preenchida: *"Oi Lidi! Lead: amanda@..."*
+- Abre o WhatsApp Web com mensagem pré-preenchida: *"[Mensagem pre-preenchida para o Super Admin]"*
 - Use como ponto de partida para a conversa de vendas
 
 ---
 
-## 11. Guia da Amanda (Lead/Owner): Gestão do Time e CRM em Inglês (V8.0)
+## 11. Guia do Lead/Tenant (Owner): Gestão do Time e CRM em Inglês (V8.0)
 
 ### Convidar Sócias para a Empresa (`/#/settings`)
 
-> A Amanda vê **apenas** os usuários da empresa dela (`company_id`). Nunca vê dados da Lidi.
+> O Lead/Tenant ve **apenas** os usuarios da propria empresa (`company_id`). Nunca ve dados de outros tenants.
 
 1. Acesse **Settings → Team Members** (ou `/#/settings`)
 2. No topo, preencha o campo **"Invite a Teammate"** com o e-mail da sócia
@@ -357,7 +357,7 @@ ORDER BY created_at DESC;
    - **Forgot password** — instruções de recuperação
    - **Didn't receive the email** — dica sobre spam
    - **Access error** — troubleshoot de login
-   - **Report Bug / Feedback** — abre formulário que notifica a Lidi
+   - **Report Bug / Feedback** — abre formulario que notifica o Super Admin
    - **Direct support** — abre WhatsApp com a equipe
 3. O idioma do painel Aiflow segue o idioma selecionado no sistema
 
@@ -367,21 +367,21 @@ ORDER BY created_at DESC;
 
 ---
 
-## Nota para o Lead / Amanda: Convidar S�cias para o Time
+## Nota para o Lead/Tenant: Convidar Membros para o Time
 
-A funcionalidade de **convidar s�cias e colaboradoras** diretamente pela aba **Team Members** (/#/settings/team) est� temporariamente em manuten��o.
+A funcionalidade de **convidar s�cias e colaboradoras** diretamente pela aba **Team Members** (/#/settings/team) est� temporariamente em manuten��o.
 
-> **Status: ?? Em breve � previsto para a pr�xima atualiza��o p�s-valida��o.**
+> **Status: ?? Em breve � previsto para a pr�xima atualiza��o p�s-valida��o.**
 
-### O que j� funciona:
+### O que j� funciona:
 - Visualizar os membros da sua equipe (filtrado pela sua empresa)
 - Ver roles (Admin, Membro, Sales Rep)
 
-### O que est� em desenvolvimento:
-- Envio de convite por WhatsApp ou E-mail com link direto para a sua �rea
-- Integra��o autom�tica do convidado ao seu time (via company_id)
+### O que est� em desenvolvimento:
+- Envio de convite por WhatsApp ou E-mail com link direto para a sua �rea
+- Integra��o autom�tica do convidado ao seu time (via company_id)
 
 ### Alternativa Manual (Enquanto aguarda):
-Pe�a para a Lidi criar o acesso da sua s�cia diretamente no painel administrativo, informando o nome e e-mail. Ela configurar� o v�nculo correto com a sua empresa.
+Pe�a para a ao Super Admin criar o acesso do novo membro diretamente no painel administrativo, informando nome e e-mail. Ela configurar� o v�nculo correto com a sua empresa.
 
 ---
