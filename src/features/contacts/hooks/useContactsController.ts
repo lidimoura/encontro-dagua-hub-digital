@@ -98,7 +98,7 @@ export const useContactsController = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Find or create company
+    // Resolve companyId from local cache first (zero network cost)
     let companyId: string | undefined;
     const existingCompany = companies.find(
       c => c.name.toLowerCase() === formData.companyName.toLowerCase()
@@ -107,15 +107,18 @@ export const useContactsController = () => {
     if (existingCompany) {
       companyId = existingCompany.id;
     } else if (formData.companyName) {
-      // Create new company and wait for result
-      const newCompany = await new Promise<{ id: string } | null>(resolve => {
-        createCompanyMutation.mutate(
-          { name: formData.companyName },
-          { onSuccess: resolve, onError: () => resolve(null) }
-        );
-      });
-      if (newCompany) {
-        companyId = newCompany.id;
+      // V9.9.4: tentar criar empresa, mas não bloquear o modal se RLS rejeitar (400/403)
+      try {
+        const newCompany = await new Promise<{ id: string } | null>(resolve => {
+          createCompanyMutation.mutate(
+            { name: formData.companyName },
+            { onSuccess: resolve, onError: () => resolve(null) }
+          );
+        });
+        if (newCompany) companyId = newCompany.id;
+      } catch {
+        // empresa não criada — contato será salvo sem vínculo de empresa
+        console.warn('⚠️ Empresa não pôde ser criada (RLS ou rede). Contato será salvo sem empresa.');
       }
     } else if (editingContact) {
       companyId = editingContact.companyId;
@@ -140,6 +143,10 @@ export const useContactsController = () => {
             (addToast || showToast)('Contato atualizado!', 'success');
             setIsModalOpen(false);
           },
+          onError: () => {
+            (addToast || showToast)('Erro ao atualizar contato. Tente novamente.', 'error');
+            setIsModalOpen(false);
+          },
         }
       );
     } else {
@@ -158,7 +165,12 @@ export const useContactsController = () => {
         {
           onSuccess: () => {
             (addToast || showToast)('Contato criado!', 'success');
-            setIsModalOpen(false);
+            setIsModalOpen(false); // V9.9.4: fechar imediatamente ao salvar — não depende do refetch de companies
+          },
+          onError: (err) => {
+            console.error('❌ Erro ao criar contato:', err);
+            (addToast || showToast)('Erro ao criar contato. Verifique sua conexão.', 'error');
+            setIsModalOpen(false); // V9.9.4: fechar mesmo com erro — nunca congelar
           },
         }
       );

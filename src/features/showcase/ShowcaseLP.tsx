@@ -442,7 +442,7 @@ export const ShowcaseLP: React.FC = () => {
                   {[
                     language === 'pt' ? '🔑 Inserir chave' : '🔑 Enter key',
                     language === 'pt' ? '📝 Criar conta' : '📝 Create account',
-                    language === 'pt' ? '🚀 Acessar Hub' : '🚀 Access Hub',
+                    language === 'pt' ? '🚀 Acessar o CRM' : '🚀 Access the CRM',
                   ].map((step, i) => (
                     <div key={i} style={{
                       ...s.step,

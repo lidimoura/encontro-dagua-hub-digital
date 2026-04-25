@@ -353,6 +353,12 @@ export const useBoardsController = () => {
         setIsCreateBoardModalOpen(false);
         setIsWizardOpen(false);
       },
+      onError: (error) => {
+        // V9.9.4: fechar modal graciosamente — nunca congelar a UI
+        console.error('❌ Erro ao criar board:', error);
+        setIsCreateBoardModalOpen(false);
+        setIsWizardOpen(false);
+      },
     });
   };
 

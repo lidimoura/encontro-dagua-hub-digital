@@ -500,6 +500,7 @@ export const translations = {
         manageStages: "Gerenciar Estágios",
         // cancel: "Cancelar", // Already exists above
         saveChanges: "Salvar Alterações",
+        addTool: "Adicionar Ferramenta",
         featureDevelopment: "Funcionalidade em desenvolvimento",
 
         // --- TEMPLATES ---
@@ -1294,6 +1295,7 @@ export const translations = {
         manageStages: "Manage Stages",
         // cancel: "Cancel", // Already exists
         saveChanges: "Save Changes",
+        addTool: "Add Tool",
         featureDevelopment: "Feature in development",
 
         // --- TEMPLATES ---
