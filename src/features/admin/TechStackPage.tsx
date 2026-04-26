@@ -121,14 +121,20 @@ export const TechStackPage: React.FC = () => {
     };
 
     const handleSave = async () => {
+        // V9.9.5: RLS estrito rejeita INSERT com company_id = NULL → guard explícito
+        const companyId = profile?.company_id;
+        if (!companyId) {
+            addToast('Aguardando carregamento do perfil. Tente novamente.', 'error');
+            return;
+        }
+
         try {
             const productData = {
                 ...formData,
                 product_type: 'tech_stack',
                 is_internal: true,
                 active: true,
-                // V9.9.2: company_id obrigatório para RLS estrito passar
-                company_id: profile?.company_id || null,
+                company_id: companyId, // V9.9.5: garantido não-nulo
             };
 
             if (editingProduct) {

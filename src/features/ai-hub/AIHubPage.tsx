@@ -143,7 +143,7 @@ export const AIHubPage: React.FC = () => {
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col bg-slate-50 dark:bg-dark-bg/50 overflow-hidden min-h-0">
+    <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-dark-bg/50 overflow-hidden min-h-0">
       {/* ── Header ── */}
       <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-dark-card shadow-sm">
         <div className="flex items-center gap-3">

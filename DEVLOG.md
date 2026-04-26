@@ -1,4 +1,68 @@
-- **Botao +7 dias**: estende o trial a partir da data atual (ou do vigente) sem abrir modal — acao instantanea via Supabase update.
+# DEVLOG — Provadágua Hub Digital
+
+> **⚠️ PADRÃO OBRIGATÓRIO DE ENTRADA (leia antes de escrever qualquer entrada):**
+> Toda entrada no DEVLOG DEVE conter:
+> 1. **Data exata** no cabeçalho (`## YYYY-MM-DD — Versão: Título`)
+> 2. **O que foi alterado e por quê** — incluindo diagnóstico técnico da causa raiz do erro
+> 3. **Feedback/Resultado** — status documentando o sucesso (ou nova falha) na prática, após teste real
+>
+> *Entradas sem esses três elementos são consideradas incompletas e devem ser complementadas.*
+
+---
+
+## 2026-04-26 — V9.9.5: Fix de Layout, CRUD de Leads e Rodízio de API Key
+
+### 1. Bug de Layout — `/ai` Quebrava o App Inteiro
+
+**Causa raiz identificada:**
+`AIHubPage.tsx` usava `className="absolute inset-0 flex flex-col"` no wrapper raiz. Isso funciona apenas se o pai tiver `overflow: hidden` **estritamente garantido**. O `Layout.tsx` aplica `overflow-hidden` no `<main>` apenas quando `location.pathname.startsWith('/ai')`. Em casos de renderização simultânea ou transição de rota, o `absolute inset-0` vazava para fora do container, cortando o topo da página e persistindo após navegação.
+
+**Fix aplicado:** `AIHubPage.tsx` — substituído `absolute inset-0` por `flex flex-col h-full w-full`. O componente agora se contém corretamente dentro do espaço alocado pelo Layout sem depender de posicionamento absoluto.
+
+**Feedback/Resultado:** ⏳ Aguardando validação da Lidi em produção.
+
+---
+
+### 2. CRUD de Leads — Boards, Contatos, Produtos e Tech Stack Falhando
+
+**Causa raiz identificada:**
+`profile?.company_id` retorna `undefined` nos primeiros renders enquanto o AuthContext ainda não terminou de carregar o perfil do Supabase. As funções de insert em `TechStackPage.tsx`, `CatalogTab.tsx` e `useBoardsQuery.ts` passavam `null` como `company_id` para o Supabase. O RLS estrito (`migration 043`) rejeita qualquer INSERT com `company_id = NULL` com erro 403 — sem feedback visual para o usuário, causando a percepção de "modal que não fecha" ou "criação silenciosa que falha".
+
+**Fixes aplicados:**
+- `TechStackPage.tsx`: guard explícito — se `!companyId`, exibe toast de erro e retorna cedo (sem throw)
+- `CatalogTab.tsx`: mesmo guard para INSERT de produtos
+- `useBoardsController.ts`: `isLoading` agora inclui `!profileReady` → enquanto `company_id` não carregou, a página de boards mostra spinner em vez do empty-state "Criar Primeiro Board"
+- `useBoardsController.ts`: `profileReady` exposto no return do hook para uso opcional pelos componentes filhos
+- `useContactsController.ts` (V9.9.4): `onError` adicionado a todas as mutations — modal fecha em qualquer cenário
+
+**Feedback/Resultado:** ⏳ Aguardando validação da Lidi em produção.
+
+---
+
+### 3. Rodízio de API Keys — Diagnóstico e Status
+
+**Diagnóstico:**
+O `useCRMAgent.ts` **já implementa corretamente** o rodízio de API Keys (linhas 655–677):
+- Tentativa 1: usa `aiApiKey` do CRMContext (chave configurada no Settings) ou `VITE_GEMINI_API_KEY`
+- Em caso de erro 429: usa `aiApiKeySecondary` do CRMContext ou `VITE_GEMINI_API_KEY_SECONDARY`
+
+O `geminiProxy.ts` e `geminiService.ts` também implementam fallback para a chave secundária.
+
+**Causa do 429 persistente:** Quando os leads não têm chave própria configurada no Settings, o sistema usa a chave primária do `.env` (da Super Admin). Se essa cota esgotar e a chave secundária não estiver configurada no `.env`, o sistema entra em "Demo Mode" — comportamento correto e documentado.
+
+**Ação:** Nenhuma alteração de código necessária. A Super Admin deve configurar `VITE_GEMINI_API_KEY_SECONDARY` no painel Vercel para ativar o fallback automático.
+
+**Feedback/Resultado:** ✅ Arquitetura de rodízio validada — documentada aqui para referência futura.
+
+---
+
+### 4. Integridade do Super Admin e Link d'Água
+
+**Status:** ✅ Mantido. Nenhuma alteração de RLS ou schema foi feita nesta sessão. Todas as correções foram exclusivamente no front-end React.
+
+---
+
+
 - **Botao Suspender / Ativar**: toggle de ccess_level entre 'suspended' e 'trial' com feedback imediato.
 - **Botao Excluir**: deleta o profile com window.confirm de seguranca. Auth user requer exclusao manual no Supabase Dashboard.
 - **EditUserModal**: agora inclui campos 	rial_expires_at (date picker), ccess_level (trial / suspenso / pago) e status.

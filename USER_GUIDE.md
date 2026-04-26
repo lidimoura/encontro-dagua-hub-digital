@@ -1,9 +1,12 @@
-# Guia do Usuário — Encontro D'água Hub
+# Guia do Usuário — Prova D'água CRM
+
+> **Versão atual:** `V9.9.5` | **Plataforma:** Prova D'água (Multi-Tenant SaaS)
+> **Última atualização:** 2026-04-26
 
 ## Visão Geral
-Bem-vindo ao **Encontro D'água Hub** — CRM e Ecossistema Digital projetado para empreendedores das comunidades amazônicas e além. Este guia cobre as funcionalidades essenciais, incluindo os Agentes de IA e o suporte bilíngue.
+Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento com clientes com IA integrada. Cada lead (tenant) possui um ambiente **completamente isolado** via Row Level Security (RLS) no banco de dados. Nenhum dado de um tenant é visível para outro.
 
-> **Idioma Principal:** Português do Brasil (PT-BR). O inglês está disponível como alternativa via toggle 🇧🇷/🇺🇸 no cabeçalho.
+> **Idioma:** Português do Brasil (PT-BR) com suporte completo a Inglês (EN) e Espanhol (ES) via toggle no cabeçalho.
 
 ---
 

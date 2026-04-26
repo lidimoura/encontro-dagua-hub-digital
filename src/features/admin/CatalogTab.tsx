@@ -244,14 +244,15 @@ export default function CatalogTab() {
                     prev.map(p => p.id === id ? { ...p, ...formData } : p)
                 );
             } else {
-                // Create new product
-                // Note: company_id is automatically set by the database trigger
-                // but we log the payload for debugging
-                console.log('Creating product with payload:', formData);
+                // V9.9.5: company_id OBRIGATÓRIO — RLS estrito rejeita NULL com 403
+                const companyId = profile?.company_id;
+                if (!companyId) {
+                    throw new Error('Perfil ainda carregando. Aguarde e tente novamente.');
+                }
 
                 const { data, error } = await supabase
                     .from('products')
-                    .insert([{ ...formData, company_id: profile?.company_id || null }])
+                    .insert([{ ...formData, company_id: companyId }])
                     .select()
                     .single();
 

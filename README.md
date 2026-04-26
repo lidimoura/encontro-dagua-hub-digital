@@ -9,16 +9,16 @@
 
   <h1>Encontro D'Ãƒ gua Hub & CRM</h1>
 
-  <p>Ecossistema de GestÃƒÂ£o com IA Ã¢â‚¬â€ Multi-Tenant Ã‚Â· Bilingue Ã‚Â· LGPD-Ready</p>
+  <p>Ecossistema de GestÃƒÂ£o com IA Ã¢â‚¬â€  Multi-Tenant Ã‚Â· Bilingue Ã‚Â· LGPD-Ready</p>
 
 </div>
 
-### CRM de ProduÃ§Ã£o `V9.6` â€” Security & Multi-tenancy Hotfix (Code Freeze)
+### CRM de Produção `V9.9.5` — Layout Fix · CRUD de Leads · Documentação (2026-04-26)
 
-> **Branch `main` â†’ hub.encontrodagua.com** â€” Acesso restrito Ã  equipe interna
-> **Branch `provadagua` â†’ prova.encontrodagua.com** â€” Trial pÃºblico 7 dias via Keyword Gate
-> CRM interno para gestÃ£o de leads reais, automaÃ§Ã£o WhatsApp e operaÃ§Ã£o SDR.
-> **V9.7.2 (RLS Fallback)**: Correcao definitiva de RLS para tabelas legadas sem ownership columns. Policy auth_only em products e companies (bloqueio de anonimos). Backlog documentado para adicao de company_id pos-validacao.
+> **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
+> **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
+> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
+> **V9.9.5**: Fix de layout da página /ai (absolute→flex), guards de company_id em TechStackPage/CatalogTab, e proteção de isLoading nos Boards enquanto profile carrega.
 
 ---
 

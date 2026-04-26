@@ -53,6 +53,8 @@ export const useBoardsController = () => {
   const deleteBoardMutation = useDeleteBoard();
   const queryClient = useQueryClient();
   const { profile } = useAuth();
+  // V9.9.5: flag para desabilitar botões de CRUD enquanto profile.company_id ainda carrega
+  const profileReady = !!profile?.company_id;
 
   // Active board state (persisted)
   const [activeBoardId, setActiveBoardId] = usePersistedState<string | null>(
@@ -115,8 +117,9 @@ export const useBoardsController = () => {
   // Optimistic reorder: tracks deal order during drag before server confirms
   const [draggingOverStage, setDraggingOverStage] = React.useState<string | null>(null);
 
-  // Combined loading state
-  const isLoading = boardsLoading || dealsLoading;
+  // V9.9.5: !profileReady garante spinner enquanto company_id ainda não carregou
+  // Evita que o empty state apareça prematuramente e leve o lead a clicar "Criar Board" com company_id=null
+  const isLoading = boardsLoading || dealsLoading || !profileReady;
 
   useEffect(() => {
     const handleClickOutside = () => setOpenActivityMenuId(null);
@@ -410,6 +413,7 @@ export const useBoardsController = () => {
   return {
     // Boards (real database only)
     boards,
+    profileReady,      // V9.9.5: use para disable de botões de criação
     activeBoard,
     activeBoardId,
     handleSelectBoard,
