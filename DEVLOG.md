@@ -10,7 +10,53 @@
 
 ---
 
-## 2026-04-26 — V9.9.5: Fix de Layout, CRUD de Leads e Rodízio de API Key
+## 2026-04-30 — V9.9.6: Fix de FK no Trigger, RLS Blindado e Showcase Gallery
+
+### 1. Erro de Foreign Key no Trigger `handle_new_user`
+
+**Causa raiz identificada:**
+O trigger tentava inserir um UUID gerado (`gen_random_uuid()`) diretamente no campo `profiles.company_id`, que é uma **FK para `public.companies(id)`**. Como nenhuma linha com esse ID existia em `companies`, o PostgreSQL rejeitava o INSERT com `ERROR 23503: insert or update on table "profiles" violates foreign key constraint "profiles_company_id_fkey"`.
+
+**Fix aplicado (SQL — rodar no Supabase SQL Editor):**
+O trigger foi reescrito com lógica em dois passos:
+1. Gera o UUID do novo tenant
+2. Insere uma linha em `public.companies` com `id = UUID` e `name` derivado do email
+3. Só então insere em `public.profiles` com o `company_id` válido
+
+**Resultado esperado:** Todo novo signup via `/showcase` cria automaticamente 1 empresa + 1 perfil vinculado, sem erro de FK. O `company_id` estará preenchido desde o D0 do lead.
+
+---
+
+### 2. Alerta de Segurança — RLS Desabilitado em Tabelas Críticas
+
+**Causa raiz identificada:**
+Migrations anteriores usaram `ALTER TABLE ... DISABLE ROW LEVEL SECURITY` para contornar erros temporários, e algumas policies foram dropadas sem serem recriadas. O Supabase detectou tabelas `public` com dados acessíveis sem autenticação.
+
+**Fix aplicado (mesmo script SQL):**
+Todas as tabelas CRM (`contacts`, `boards`, `board_stages`, `deals`, `products`, `activities`, `crm_companies`, `tags`) tiveram RLS reativado com `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` e policies `tenant_isolation` recriadas com `company_id = (auth.jwt()->>'company_id')::uuid`. As tabelas que não possuem `company_id` (`user_settings`, `ai_conversations`, `ai_decisions`) foram protegidas por `user_id = auth.uid()`.
+
+**Resultado esperado:** Zero tabelas expostas publicamente. Alerta do Supabase resolvido.
+
+---
+
+### 3. AuthContext — Loading Infinito Pós-Signup
+
+**Causa raiz identificada:**
+O trigger PostgreSQL roda de forma assíncrona. O `fetchProfile` original fazia uma única tentativa e retornava `null` se o profile ainda não existia, deixando o front-end em loading infinito.
+
+**Fix aplicado:** `AuthContext.tsx` — retry com backoff exponencial (0ms, 500ms, 1s, 2s). Se o profile encontrado não tiver `company_id`, retenta. Após 4 tentativas, desbloqueia a UI mesmo sem profile.
+
+---
+
+### 4. Showcase LP — Galeria e Vídeo
+
+**Ação:** `ShowcaseLP.tsx` recebeu seção de vídeo (`/showcase/demo-provadagua.mp4`) com fallback visual e galeria de 3 screenshots com alt text de acessibilidade. Textos PT/EN adicionados ao sistema i18n interno da LP.
+
+**Resultado esperado:** Página visualmente completa para demonstrações externas, pronta para receber os assets quando gravados.
+
+---
+
+
 
 ### 1. Bug de Layout — `/ai` Quebrava o App Inteiro
 

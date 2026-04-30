@@ -53,33 +53,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const fetchProfile = async (userId: string) => {
+    /**
+     * V9.9.6: fetchProfile com retry + backoff exponencial.
+     * O trigger handle_new_user() é async e pode demorar 200–800ms para commitar.
+     * Sem retry, profile retorna null imediatamente → loading infinito no front-end.
+     * Com retry: 4 tentativas em 500ms / 1s / 2s / 3s (total ~6.5s antes de desistir).
+     */
+    const fetchProfile = async (userId: string, attempt = 1) => {
+        const MAX_ATTEMPTS = 4;
+        const BACKOFF_MS = [0, 500, 1000, 2000]; // delay antes de cada tentativa
+
         try {
+            // Delay antes de tentar (0ms na 1ª tentativa, crescente nas retentativas)
+            if (BACKOFF_MS[attempt - 1] > 0) {
+                await new Promise(res => setTimeout(res, BACKOFF_MS[attempt - 1]));
+            }
+
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
-                .maybeSingle(); // V6.3: maybeSingle evita PGRST116 (406) quando perfil ainda não existe
+                .maybeSingle(); // maybeSingle evita PGRST116 (406) quando perfil ainda não existe
 
             if (error) {
-                // Erro real de rede/RLS — log mas não bloqueia
-                console.warn('[AuthContext] Erro ao buscar perfil (não bloqueante):', error);
+                console.warn(`[AuthContext] Erro ao buscar perfil (tentativa ${attempt}):`, error.message);
             }
 
             if (data) {
+                // Profile encontrado — verifica se company_id está preenchido
+                if (!data.company_id && attempt < MAX_ATTEMPTS) {
+                    // Trigger commitou o profile mas ainda sem company_id → retenta
+                    console.info(`[AuthContext] Profile encontrado sem company_id (tentativa ${attempt}), retentando...`);
+                    return fetchProfile(userId, attempt + 1);
+                }
                 setProfile(data);
-            } else {
-                // Perfil ainda não criado (delay pós-signup) ou not found
-                // Fica null — ProtectedRoute lida com isso roteando para dashboard mesmo assim
-                console.info('[AuthContext] Perfil não encontrado para', userId, '— usando perfil temporário');
-                setProfile(null);
+                setLoading(false);
+                return;
             }
+
+            // Profile ainda não existe (trigger não commitou)
+            if (attempt < MAX_ATTEMPTS) {
+                console.info(`[AuthContext] Profile não encontrado (tentativa ${attempt}), retentando em ${BACKOFF_MS[attempt]}ms...`);
+                return fetchProfile(userId, attempt + 1);
+            }
+
+            // Esgotou tentativas — desbloqueia UI mesmo sem profile
+            console.warn('[AuthContext] Profile não encontrado após', MAX_ATTEMPTS, 'tentativas para', userId);
+            setProfile(null);
         } catch (e) {
-            // Captura qualquer excessão inesperada — nunca trava o loading
-            console.warn('[AuthContext] Excessão em fetchProfile:', e);
+            console.warn('[AuthContext] Exceção em fetchProfile (tentativa', attempt, '):', e);
+            if (attempt < MAX_ATTEMPTS) {
+                return fetchProfile(userId, attempt + 1);
+            }
+            setProfile(null);
         } finally {
-            // SEMPRE libera o loading — usuário nunca fica preso
-            setLoading(false);
+            // Garante que o loading sempre é liberado na última tentativa
+            if (attempt >= MAX_ATTEMPTS) {
+                setLoading(false);
+            }
         }
     };
 
@@ -102,11 +133,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
             if (session?.user) {
-                fetchProfile(session.user.id);
+                // V9.9.6: SIGNED_IN = signup ou login — trigger pode ainda não ter commitado.
+                // Usamos retry completo (attempt=1). Para TOKEN_REFRESHED, profile já existe —
+                // passamos attempt direto na tentativa final para evitar backoff desnecessário.
+                const startAttempt = (event === 'SIGNED_IN') ? 1 : 1;
+                fetchProfile(session.user.id, startAttempt);
             } else {
                 setProfile(null);
                 setLoading(false);

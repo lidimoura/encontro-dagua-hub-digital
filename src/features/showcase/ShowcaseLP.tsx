@@ -55,9 +55,31 @@ const copy = {
     },
     video: {
       title: 'Veja em ação.',
-      sub: 'A demonstração completa do Hub — gravada ao vivo pela fundadora.',
+      sub: 'A demonstração completa do Hub — login, onboarding e IA em ação.',
       placeholder: '▶  Vídeo de demonstração em breve',
       placeholderSub: 'A PO está gravando. Fique ligado!',
+      videoAlt: 'Vídeo de demonstração do login e onboarding de boards com Inteligência Artificial',
+    },
+    gallery: {
+      title: 'Veja as telas em detalhe.',
+      sub: 'Capturas reais do ambiente de demonstração.',
+      items: [
+        {
+          src: '/showcase/boards-squadIA.png',
+          alt: 'Visão do Board no CRM mostrando o Squad de IA com os agentes Precy, Mazô e Jury atuando nos cards',
+          caption: 'Squad de IA no Kanban',
+        },
+        {
+          src: '/showcase/decision-center.png',
+          alt: 'Decision Center do CRM sugerindo ações proativas como reagendamentos e ligações para negócios parados',
+          caption: 'Decision Center Proativo',
+        },
+        {
+          src: '/showcase/inbox-foco.png',
+          alt: 'Inbox do CRM no Modo Foco destacando um negócio urgente parado há mais de 7 dias',
+          caption: 'Inbox — Modo Foco',
+        },
+      ],
     },
     portal: {
       title: 'Portão de Acesso',
@@ -110,9 +132,31 @@ const copy = {
     },
     video: {
       title: 'See it in action.',
-      sub: 'The complete Hub demo — recorded live by the founder.',
+      sub: 'The complete Hub demo — login, onboarding and AI in action.',
       placeholder: '▶  Demo video coming soon',
       placeholderSub: 'The PO is recording. Stay tuned!',
+      videoAlt: 'Demo video showing login and onboarding of AI-powered boards',
+    },
+    gallery: {
+      title: 'See the screens in detail.',
+      sub: 'Real captures from the demo environment.',
+      items: [
+        {
+          src: '/showcase/boards-squadIA.png',
+          alt: 'Board view in the CRM showing the AI Squad with Precy, Mazô and Jury agents acting on cards',
+          caption: 'AI Squad on Kanban',
+        },
+        {
+          src: '/showcase/decision-center.png',
+          alt: 'CRM Decision Center suggesting proactive actions like rescheduling and calls for stalled deals',
+          caption: 'Proactive Decision Center',
+        },
+        {
+          src: '/showcase/inbox-foco.png',
+          alt: 'CRM Inbox in Focus Mode highlighting an urgent deal stalled for more than 7 days',
+          caption: 'Inbox — Focus Mode',
+        },
+      ],
     },
     portal: {
       title: 'Access Gate',
@@ -391,20 +435,74 @@ export const ShowcaseLP: React.FC = () => {
             <p style={s.sectionSub}>{c.video.sub}</p>
           </div>
           <div style={s.videoWrapper}>
-            <div style={s.videoPlaceholder}>
+            {/* V9.9.6: Vídeo real com fallback visual elegante */}
+            <video
+              controls
+              preload="metadata"
+              poster="/showcase/boards-squadIA.png"
+              aria-label={c.video.videoAlt}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 24, background: '#0D0D1A' }}
+              onError={(e) => {
+                // Fallback: esconde o vídeo e mostra o placeholder
+                (e.currentTarget as HTMLVideoElement).style.display = 'none';
+                const fb = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fb) fb.style.display = 'flex';
+              }}
+            >
+              <source src="/showcase/demo-provadagua.mp4" type="video/mp4" />
+            </video>
+            {/* Placeholder — visível apenas se o vídeo falhar */}
+            <div style={{ ...s.videoPlaceholder, display: 'none' }}>
               <span style={s.videoIcon}>🎬</span>
               <p style={s.videoText}>{c.video.placeholder}</p>
               <p style={s.videoSubText}>{c.video.placeholderSub}</p>
             </div>
-            {/*
-              TO REPLACE WITH:
-              <iframe
-                src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-                style={{ width: '100%', height: '100%', border: 'none' }}
-                title="Demo Video"
-                allowFullScreen
-              />
-            */}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ GALLERY ══════════════════════════════════════════════════════════ */}
+      <section id="gallery" style={{ ...s.videoSection, paddingTop: 0 }}>
+        <div style={s.inner}>
+          <div style={s.sectionHeader}>
+            <h2 style={s.sectionTitle}>{c.gallery.title}</h2>
+            <p style={s.sectionSub}>{c.gallery.sub}</p>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 24,
+            marginTop: 40,
+          }}>
+            {c.gallery.items.map((item, i) => (
+              <figure key={i} style={{
+                margin: 0,
+                borderRadius: 16,
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: '#12121E',
+              }}>
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  loading="lazy"
+                  style={{ width: '100%', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.background = '#1a1a2e';
+                    (e.currentTarget as HTMLImageElement).alt = item.caption;
+                  }}
+                />
+                <figcaption style={{
+                  padding: '12px 16px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.7)',
+                  fontFamily: 'Inter, sans-serif',
+                }}>
+                  {item.caption}
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </section>

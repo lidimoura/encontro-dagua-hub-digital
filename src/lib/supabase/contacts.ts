@@ -272,29 +272,30 @@ export const companiesService = {
     try {
       if (!tenantId) return { data: [], error: null };
 
-      // Rely on RLS policies for tenant isolation.
-      // Do NOT filter by company_id or id — the column may not exist
-      // and RLS already restricts access to this tenant's companies.
+      // V9.9.6: Selecionar colunas conhecidas em vez de * para evitar 400
+      // quando o schema do PostgREST tem colunas extras não mapeadas no DbCompany.
       const { data, error } = await supabase
         .from('companies')
-        .select('*')
+        .select('id, name, industry, website, created_at, owner_id')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.warn('[companiesService] Error fetching companies:', error.message);
-        return { data: [], error: null }; // Graceful fallback — never crash the Kanban
+        return { data: [], error: null }; // Graceful fallback — nunca crasha o Kanban
       }
       return { data: (data || []).map(c => transformCompany(c as DbCompany)), error: null };
     } catch (e) {
       console.warn('[companiesService] Exception:', e);
-      return { data: [], error: null }; // Graceful fallback
+      return { data: [], error: null };
     }
   },
 
   async create(company: Omit<Company, 'id' | 'createdAt'>, tenantId: string): Promise<{ data: Company | null; error: Error | null }> {
     try {
-      // Sanitize: Convert empty string to null for UUID field
-      const sanitizedTenantId = tenantId || null;
+      // V9.9.6: owner_id é necessário para evitar erro 400 (NOT NULL constraint).
+      // Obtemos via getSession() — zero round-trip, sessão já está em memória no client.
+      const { data: { session } } = await supabase.auth.getSession();
+      const ownerId = session?.user?.id || null;
 
       const { data, error } = await supabase
         .from('companies')
@@ -302,16 +303,21 @@ export const companiesService = {
           name: company.name,
           industry: company.industry || null,
           website: company.website || null,
-          // NOTE: company_id column does not exist in this table (shared DB).
-          // Tenant isolation is handled by RLS auth_only + UI-level filtering.
+          owner_id: ownerId,
+          // NOTA: company_id não existe nesta tabela — isolamento via owner_id + RLS auth_only
         })
-        .select()
+        .select('id, name, industry, website, created_at, owner_id')
         .single();
 
-      if (error) return { data: null, error };
+      if (error) {
+        // V9.9.6: criar empresa é best-effort — nunca bloqueia o salvamento do contato
+        console.warn('[companiesService] Empresa não pôde ser criada (non-blocking):', error.message);
+        return { data: null, error: null }; // retorna null sem propagar o erro
+      }
       return { data: transformCompany(data as DbCompany), error: null };
     } catch (e) {
-      return { data: null, error: e as Error };
+      console.warn('[companiesService] Exception em create (non-blocking):', e);
+      return { data: null, error: null }; // nunca propaga — empresa é opcional
     }
   },
 

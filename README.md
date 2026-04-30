@@ -13,12 +13,21 @@
 
 </div>
 
-### CRM de Produção `V9.9.5` — Layout Fix · CRUD de Leads · Documentação (2026-04-26)
+### CRM de Produção `V9.9.6` — FK Fix · RLS Ativo · Trigger Robusto · Showcase Gallery (2026-04-30)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
-> **Branch `provadagua` → prova.encontrodagua.com** — Trial público 7 dias via Keyword Gate
+> **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
 > CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V9.9.5**: Fix de layout da página /ai (absolute→flex), guards de company_id em TechStackPage/CatalogTab, e proteção de isLoading nos Boards enquanto profile carrega.
+> **V9.9.6**: Fix de FK no trigger (INSERT em `companies` antes de `profiles`), blindagem de RLS em tabelas críticas, retry com backoff no AuthContext e galeria multimedia na Showcase LP.
+
+## Demo
+
+> **Vídeo:** [demo-provadagua.mp4](/showcase/demo-provadagua.mp4)
+> *Vídeo de demonstração do login e onboarding de boards com Inteligência Artificial*
+
+| Squad de IA no Kanban | Decision Center | Inbox — Modo Foco |
+|---|---|---|
+| ![Visão do Board no CRM mostrando o Squad de IA com os agentes Precy, Mazô e Jury atuando nos cards](./public/showcase/boards-squadIA.png) | ![Decision Center do CRM sugerindo ações proativas como reagendamentos e ligações para negócios parados](./public/showcase/decision-center.png) | ![Inbox do CRM no Modo Foco destacando um negócio urgente parado há mais de 7 dias](./public/showcase/inbox-foco.png) |
 
 ---
 
