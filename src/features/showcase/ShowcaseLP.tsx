@@ -449,7 +449,7 @@ export const ShowcaseLP: React.FC = () => {
                 if (fb) fb.style.display = 'flex';
               }}
             >
-              <source src="/showcase/demo-provadagua.mp4" type="video/mp4" />
+              <source src="/showcase/showcase-demo.mp4" type="video/mp4" />
             </video>
             {/* Placeholder — visível apenas se o vídeo falhar */}
             <div style={{ ...s.videoPlaceholder, display: 'none' }}>
