@@ -857,56 +857,22 @@ const ShowcasePage: React.FC = () => {
                 hub.encontrodagua.com — CRM Dashboard
               </span>
             </div>
-            {/* Video body — Açaí theme */}
-            <div style={{
-              height: '300px', paddingTop: '28px',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: '14px',
-              background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
-              position: 'relative', overflow: 'hidden',
-            }}>
-              <div style={{
-                position: 'absolute', inset: 0,
-                backgroundImage: `
-                  linear-gradient(rgba(109,40,168,0.06) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(109,40,168,0.06) 1px, transparent 1px)
-                `,
-                backgroundSize: '32px 32px',
-              }} />
-              <button
-                id="showcase-video-play"
-                onClick={() => { trackShowcaseCTA('video_play'); setIsModalOpen(true); }}
-                style={{
-                  width: '72px', height: '72px', borderRadius: '50%',
-                  background: 'rgba(109,40,168,0.15)',
-                  border: '2px solid rgba(168,85,247,0.55)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', transition: 'all 0.3s',
-                  position: 'relative', zIndex: 2,
-                  boxShadow: '0 0 40px rgba(109,40,168,0.25)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.35)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(109,40,168,0.15)'; e.currentTarget.style.transform = 'scale(1)'; }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#A855F7">
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-              </button>
-              <p style={{ color: S.textSecondary, fontSize: '0.84rem', fontWeight: 500, position: 'relative', zIndex: 2 }}>
-                {lang === 'pt' ? '💜 Demo interativa disponível — clique para agendar' : '💜 Interactive demo available — click to schedule'}
-              </p>
-              <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
-                {['Contatos', 'Board SDR', 'IA Mazô', 'Reports'].map((label, i) => (
-                  <div key={i} style={{
-                    flex: 1, height: '3px', borderRadius: '2px',
-                    background: i === 0 ? '#A855F7' : `rgba(168,85,247,${0.15 + i * 0.12})`,
-                  }} />
-                ))}
-              </div>
+            {/* V9.9.6: player de vídeo real — mantém chrome e tema roxo */}
+            <div style={{ paddingTop: '28px', position: 'relative', overflow: 'hidden' }}>
+              <video
+                src="/showcase/showcase-demo.mp4"
+                controls
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-auto rounded-xl shadow-2xl border border-purple-500/30"
+                style={{ display: 'block', width: '100%' }}
+              />
             </div>
           </div>
           <p style={{ color: S.textMuted, fontSize: '0.72rem', marginTop: '10px', textAlign: 'center' }}>
-            {lang === 'pt' ? 'Vídeo completo em produção · Clique para agendar demo ao vivo' : 'Full video in production · Click to schedule a live demo'}
+            {lang === 'pt' ? 'Demo real do CRM · hub.encontrodagua.com' : 'Real CRM demo · hub.encontrodagua.com'}
           </p>
         </div>
 
@@ -931,32 +897,21 @@ const ShowcasePage: React.FC = () => {
                 alt: 'Inbox no Modo Foco',
               },
             ].map((screen, i) => (
-              <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
+              <div key={i} className="screen-mock" style={{ cursor: 'pointer', overflow: 'hidden' }}
                 onClick={() => { trackShowcaseCTA(`screenshot_${screen.alt}`); setIsModalOpen(true); }}
               >
                 <div className="scanline" />
-                <div style={{
-                  height: '110px', paddingTop: '28px',
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center', gap: '6px',
-                  background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
-                  overflow: 'hidden',
-                }}>
-                  <img
-                    src={screen.src}
-                    alt={screen.alt}
-                    loading="lazy"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
+                {/* V9.9.6: imagem real — sem div intermediário que cortava */}
+                <img
+                  src={screen.src}
+                  alt={screen.alt}
+                  loading="lazy"
+                  className="w-full h-auto object-cover rounded-lg"
+                  style={{ display: 'block', marginTop: '28px' }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
+                />
               </div>
             ))}
           </div>
