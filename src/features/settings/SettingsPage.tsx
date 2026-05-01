@@ -9,8 +9,9 @@ import { AIConfigSection } from './components/AIConfigSection';
 import { DataStorageSettings } from './components/DataStorageSettings';
 import { NotificationsSection } from './components/NotificationsSection';
 import { UsersPage } from './UsersPage';
+import { SuperAdminKeyPanel } from './components/SuperAdminKeyPanel';
 import { useAuth } from '@/context/AuthContext';
-import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell } from 'lucide-react';
+import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell, ShieldCheck } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -154,6 +155,7 @@ const SettingsPage: React.FC = () => {
       case 'data':          return <DataStorageSettings />;
       case 'notifications': return <NotificationsSection />;
       case 'team':          return isAdmin ? <UsersPage /> : <Navigate to="/settings" />;
+      case 'superadmin':    return profile?.is_super_admin ? <SuperAdminKeyPanel /> : <Navigate to="/settings" />;
       default:              return <GeneralSettings />;
     }
   };
@@ -214,6 +216,21 @@ const SettingsPage: React.FC = () => {
             <Bell size={18} />
             Notificações
           </button>
+
+          {/* Super Admin exclusive tab */}
+          {profile?.is_super_admin && (
+            <button
+              onClick={() => setActiveTab('superadmin')}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                activeTab === 'superadmin'
+                  ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
+              }`}
+            >
+              <ShieldCheck size={18} />
+              IA Avançada
+            </button>
+          )}
         </nav>
 
         {/* Content Area */}

@@ -89,6 +89,20 @@ interface SettingsContextType {
   updateLead: (id: string, updates: Partial<Lead>) => void;
   discardLead: (id: string) => void;
 
+  // Pool A — Super Admin exclusive keys
+  poolAKeys: KeyEntry[];
+  addPoolAKey: (label: string, key: string) => void;
+  removePoolAKey: (id: string) => void;
+  // Pool B — Demo keys for leads without own key
+  poolBKeys: KeyEntry[];
+  addPoolBKey: (label: string, key: string) => void;
+  removePoolBKey: (id: string) => void;
+  isSavingKeys: boolean;
+  /** Returns the correct API key for the current user + rotates on 429 */
+  resolveApiKey: () => string;
+  /** Call when Gemini returns 429 to rotate to next available key */
+  onApiKey429: () => void;
+
   // Refresh
   refresh: () => Promise<void>;
 
@@ -97,6 +111,9 @@ interface SettingsContextType {
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+/** Shared type for AI key pool entries */
+export interface KeyEntry { id: string; label: string; key: string; }
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
@@ -123,6 +140,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // UI State
   const [isGlobalAIOpen, setIsGlobalAIOpen] = useState(false);
+
+  // ── Pool A/B state (Super Admin key tiers) ──────────────────────────────
+  const [poolAKeys, setPoolAKeys] = useState<KeyEntry[]>([]);
+  const [poolBKeys, setPoolBKeys] = useState<KeyEntry[]>([]);
+  const [isSavingKeys, setIsSavingKeys] = useState(false);
+  // Index tracker for round-robin rotation on 429
+  const poolBIndexRef = React.useRef(0);
+  const poolAIndexRef = React.useRef(0);
 
   // Fetch settings on mount
   const fetchSettings = useCallback(async () => {
@@ -189,6 +214,22 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (productsData) {
         setProducts(productsData);
       }
+      // ── Load Pool A/B from user_settings JSONB field ──────────────────
+      if (profile.is_super_admin) {
+        try {
+          const { supabase } = await import('@/lib/supabase/client');
+          const { data: ks } = await supabase
+            .from('user_settings')
+            .select('ai_pool_a, ai_pool_b')
+            .eq('user_id', profile.id)
+            .maybeSingle();
+          if (ks) {
+            if (Array.isArray((ks as any).ai_pool_a)) setPoolAKeys((ks as any).ai_pool_a);
+            if (Array.isArray((ks as any).ai_pool_b)) setPoolBKeys((ks as any).ai_pool_b);
+          }
+        } catch { /* non-blocking */ }
+      }
+
     } catch (e) {
       console.error('Error fetching settings:', e);
       setError(e instanceof Error ? e.message : 'Failed to fetch settings');
@@ -344,6 +385,72 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
   }, [aiProvider, aiApiKey, aiApiKeySecondary, aiApiKeyNote, aiApiKeySecondaryNote, aiModel, aiThinking, aiSearch, aiAnthropicCaching, updateSettings]);
 
+  // ── Pool A/B management ────────────────────────────────────────────────
+  const persistPools = useCallback(async (a: KeyEntry[], b: KeyEntry[]) => {
+    setIsSavingKeys(true);
+    try {
+      const { supabase } = await import('@/lib/supabase/client');
+      await supabase.from('user_settings')
+        .upsert({ user_id: profile?.id, ai_pool_a: a, ai_pool_b: b }, { onConflict: 'user_id' });
+    } catch { /* non-blocking */ } finally {
+      setIsSavingKeys(false);
+    }
+  }, [profile?.id]);
+
+  const addPoolAKey = useCallback((label: string, key: string) => {
+    const entry: KeyEntry = { id: crypto.randomUUID(), label, key };
+    setPoolAKeys(prev => { const next = [...prev, entry]; persistPools(next, poolBKeys); return next; });
+  }, [persistPools, poolBKeys]);
+
+  const removePoolAKey = useCallback((id: string) => {
+    setPoolAKeys(prev => { const next = prev.filter(k => k.id !== id); persistPools(next, poolBKeys); return next; });
+  }, [persistPools, poolBKeys]);
+
+  const addPoolBKey = useCallback((label: string, key: string) => {
+    const entry: KeyEntry = { id: crypto.randomUUID(), label, key };
+    setPoolBKeys(prev => { const next = [...prev, entry]; persistPools(poolAKeys, next); return next; });
+  }, [persistPools, poolAKeys]);
+
+  const removePoolBKey = useCallback((id: string) => {
+    setPoolBKeys(prev => { const next = prev.filter(k => k.id !== id); persistPools(poolAKeys, next); return next; });
+  }, [persistPools, poolAKeys]);
+
+  /**
+   * resolveApiKey: Routing logic for AI key tiers
+   * Super Admin → Pool A (round-robin), fallback to aiApiKey
+   * Lead with own key → aiApiKey
+   * Lead without key → Pool B (round-robin), fallback to env var
+   */
+  const resolveApiKey = useCallback((): string => {
+    if (profile?.is_super_admin) {
+      if (poolAKeys.length > 0) {
+        const idx = poolAIndexRef.current % poolAKeys.length;
+        return poolAKeys[idx].key;
+      }
+      return aiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
+    }
+    // Lead with own key
+    if (aiApiKey) return aiApiKey;
+    // Lead without key → Pool B
+    if (poolBKeys.length > 0) {
+      const idx = poolBIndexRef.current % poolBKeys.length;
+      return poolBKeys[idx].key;
+    }
+    return import.meta.env.VITE_GEMINI_API_KEY || '';
+  }, [profile?.is_super_admin, poolAKeys, poolBKeys, aiApiKey]);
+
+  /**
+   * onApiKey429: Rotate to next key in the appropriate pool after 429.
+   * Called by AI service hooks when Gemini returns 429.
+   */
+  const onApiKey429 = useCallback(() => {
+    if (profile?.is_super_admin) {
+      poolAIndexRef.current = (poolAIndexRef.current + 1) % Math.max(poolAKeys.length, 1);
+    } else {
+      poolBIndexRef.current = (poolBIndexRef.current + 1) % Math.max(poolBKeys.length, 1);
+    }
+  }, [profile?.is_super_admin, poolAKeys.length, poolBKeys.length]);
+
   // Custom Fields (local state for now)
   const addCustomField = useCallback((field: Omit<CustomFieldDefinition, 'id'>) => {
     const newField = { ...field, id: crypto.randomUUID() };
@@ -426,6 +533,16 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       discardLead,
       refresh: fetchSettings,
       saveAISettings,
+      // Pool A/B
+      poolAKeys,
+      addPoolAKey,
+      removePoolAKey,
+      poolBKeys,
+      addPoolBKey,
+      removePoolBKey,
+      isSavingKeys,
+      resolveApiKey,
+      onApiKey429,
     }),
     [
       loading,
@@ -465,6 +582,15 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       discardLead,
       fetchSettings,
       saveAISettings,
+      poolAKeys,
+      addPoolAKey,
+      removePoolAKey,
+      poolBKeys,
+      addPoolBKey,
+      removePoolBKey,
+      isSavingKeys,
+      resolveApiKey,
+      onApiKey429,
     ]
   );
 

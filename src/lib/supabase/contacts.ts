@@ -275,7 +275,7 @@ export const companiesService = {
       // V9.9.6: Selecionar colunas conhecidas em vez de * para evitar 400
       // quando o schema do PostgREST tem colunas extras não mapeadas no DbCompany.
       const { data, error } = await supabase
-        .from('companies')
+        .from('crm_companies')  // fix: era 'companies' (tenant table)
         .select('id, name, industry, website, created_at, owner_id')
         .order('created_at', { ascending: false });
 
@@ -298,13 +298,13 @@ export const companiesService = {
       const ownerId = session?.user?.id || null;
 
       const { data, error } = await supabase
-        .from('companies')
+        .from('crm_companies')  // fix: era 'companies' (tenant table)
         .insert({
           name: company.name,
           industry: company.industry || null,
           website: company.website || null,
           owner_id: ownerId,
-          // NOTA: company_id não existe nesta tabela — isolamento via owner_id + RLS auth_only
+          // company_id é injetado automaticamente pelo trigger auto_company_id
         })
         .select('id, name, industry, website, created_at, owner_id')
         .single();
@@ -330,7 +330,7 @@ export const companiesService = {
       dbUpdates.updated_at = new Date().toISOString();
 
       const { error } = await supabase
-        .from('companies')
+        .from('crm_companies')  // fix: era 'companies' (tenant table)
         .update(dbUpdates)
         .eq('id', id);
 
@@ -343,7 +343,7 @@ export const companiesService = {
   async delete(id: string): Promise<{ error: Error | null }> {
     try {
       const { error } = await supabase
-        .from('companies')
+        .from('crm_companies')  // fix: era 'companies' (tenant table)
         .delete()
         .eq('id', id);
 

@@ -698,7 +698,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         setCreatingCompany(true);
                         try {
                           const { data: nc, error } = await supabase
-                            .from('companies')
+                            .from('crm_companies')  // fix: era 'companies' (tenant table — RLS block)
                             .insert({ name: newCompanyName.trim() })
                             .select('id')
                             .single();
