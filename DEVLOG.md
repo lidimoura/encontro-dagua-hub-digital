@@ -907,3 +907,62 @@ Ver entrada anterior `2026-04-24 â€” V9.9.2`.
 - `DEVLOG.md` â€” limpeza de nomes + entradas V9.9.2 e V9.9.3 adicionadas
 - `README.md` â€” limpeza de nomes reais em tabelas de rotas e permissÃµes
 - `USER_GUIDE.md` â€” renomeaÃ§Ã£o de seÃ§Ãµes e correÃ§Ã£o de referÃªncias a nomes pessoais
+
+---
+
+## 2026-05-01 — V9.9.7: Contact Creation Fix, CRM Analysis Feedback, Language Normalization & Migration 051
+
+### Status: DEPLOYADO ? | Commit `87752dc` ? main ? Build verde Vercel
+
+### Diagnóstico (Auditoria de Código — Chunk 9)
+
+**Bug 1 — Empresa salva, Contato não:**
+- **Causa raiz**: `onError` do `createContactMutation` em `useContactsController.ts` fechava o modal **silenciosamente** sem exibir o erro real. A falha de persistência era invisível ao usuário.
+- **Causa secundária**: `lastPurchaseDate` ausente no payload enviado para `contactsService.create` — campo presente no schema TypeScript mas não enviado, causando falha silenciosa de validação upstream.
+
+**Bug 2 — Botão "Analyse CRM" sem resposta visual:**
+- **Causa raiz**: `runAllAnalyzers()` em `useDecisionQueue.ts` executava a análise heurística mas não emitia nenhum toast de feedback — o usuário via o spinner desaparecer e nada mais.
+
+**Bug 3 — Jury UI em Inglês para usuária PT:**
+- **Causa raiz**: `DEFAULT_LANG = IS_DEMO ? 'en' : 'pt'` em `appConfig.ts`. Sessão de demonstração anterior gravava `'en'` no `localStorage` e no campo `preferred_language` do perfil no banco.
+
+### Correções Aplicadas
+
+#### `useContactsController.ts` — Contact Creation Error Handling
+- `onError` reescrito: **não fecha o modal**; exibe o detalhe real do erro via toast (`err?.message || err?.details`)
+- Payload corrigido: campo `lastPurchaseDate: ''` adicionado
+- `status: 'ACTIVE' as const` para type-safety
+
+#### `useDecisionQueue.ts` — Analyse CRM Visual Feedback
+- Importado `useToast` do `ToastContext`
+- Toast de CRM vazio: `'Sem dados no CRM para analisar. Adicione deals ou atividades primeiro.'`
+- Toast de sucesso sem itens urgentes: `'? Análise concluída. Nenhum item urgente encontrado em X deals e Y atividades.'`
+- Toast de sucesso com decisões: `'? N nova(s) decisão(es) encontrada(s)! Revise abaixo.'`
+- Toast de erro: `'Erro na análise: [detalhe]'`
+
+#### `051_fix_super_admin_language_and_contacts_notes.sql` — Migration de Estabilização
+- `UPDATE profiles SET preferred_language = 'pt' WHERE email = 'lidimfc@gmail.com'` — reset de idioma
+- `ALTER TABLE contacts ALTER COLUMN notes DROP NOT NULL` — remove constraint que causava falhas silenciosas
+- `CREATE INDEX IF NOT EXISTS idx_crm_companies_company_id` — índice de performance
+- `CREATE INDEX IF NOT EXISTS idx_contacts_company_id` — índice de performance
+
+### Tabela de Funcionalidades V9.9.7
+
+| Funcionalidade | Lead/Tenant (Amanda) EN | Super Admin (PT) |
+|---|---|---|
+| Criar Contato + Empresa | ? Feedback de erro real, modal não fecha | ? Idem |
+| Analyse CRM | ? Toast de feedback em todos os cenários | ? Idem |
+| Jury (Gerador de Contratos) | ? EN se language=en | ? PT após migration 051 |
+| Pool A (Super Admin AI keys) | N/A | ? Round-robin automático |
+| Pool B (Demo AI keys) | ? Fallback automático | N/A |
+| Admin — isolamento de usuários | ? Lead vê apenas "Acesso Restrito" | ? Vê todos os tenants |
+
+### Regra de Ouro Documentada V9.9.7
+> **`onError` nunca deve fechar o modal automaticamente.** Fechar silenciosamente em caso de erro é pior do que mostrar a mensagem: o usuário perde os dados preenchidos e não sabe o que aconteceu. Mostre o erro, deixe o usuário decidir.
+
+### Arquivos Modificados
+- `src/features/contacts/hooks/useContactsController.ts` — error handling + lastPurchaseDate
+- `src/features/decisions/hooks/useDecisionQueue.ts` — toast feedback completo
+- `supabase/migrations/051_fix_super_admin_language_and_contacts_notes.sql` — [NOVO]
+
+---

@@ -1,7 +1,7 @@
 # Guia do Usuário — Prova D'água CRM
 
-> **Versão atual:** `V9.9.5` | **Plataforma:** Prova D'água (Multi-Tenant SaaS)
-> **Última atualização:** 2026-04-26
+> **Versão atual:** `V9.9.7` | **Plataforma:** Prova D'água (Multi-Tenant SaaS)
+> **Última atualização:** 2026-05-01
 
 ## Visão Geral
 Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento com clientes com IA integrada. Cada lead (tenant) possui um ambiente **completamente isolado** via Row Level Security (RLS) no banco de dados. Nenhum dado de um tenant é visível para outro.
@@ -11,6 +11,67 @@ Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento c
 ---
 
 ## Funcionalidades Principais
+
+### 0. Sistema de IA — Pool de Chaves (Três Níveis)
+
+O sistema gerencia as chaves de API do Gemini em **três níveis**, garantindo que todas as contas tenham acesso à IA mesmo sem chave própria:
+
+| Nível | Quem usa | De onde vem a chave |
+|---|---|---|
+| **Nível 1 — Chave Própria do Lead** | Qualquer usuário que cadastrou sua própria chave Gemini em Configurações | Campo `Minha Chave Gemini` em `/#/settings` |
+| **Nível 2 — Pool B (Demo Global)** | Leads sem chave própria | Super Admin cadastra em `Configurações → Painel Super Admin → Pool B` |
+| **Nível 3 — Pool A (Super Admin Exclusivo)** | Apenas a Super Admin (`lidimfc@gmail.com`) | Super Admin cadastra em `Configurações → Painel Super Admin → Pool A` |
+
+**Roteamento automático:**
+1. Se o usuário for a Super Admin → usa **Pool A** (round-robin entre as chaves cadastradas)
+2. Se for um Lead com chave própria → usa a chave do **Nível 1**
+3. Se for um Lead sem chave → faz fallback para **Pool B** (round-robin)
+4. Se Pool B estiver vazio → usa `VITE_GEMINI_API_KEY` (variável de ambiente — último recurso)
+
+**Rotação automática (Anti-429):** Quando o Gemini retorna erro 429 (quota excedida), o sistema avança automaticamente para a próxima chave do pool ativo sem interromper a operação.
+
+#### Como a Super Admin gerencia os Pools
+1. Acesse `/#/settings` enquanto logada como `lidimfc@gmail.com`
+2. Role até a seção **"Painel Super Admin — Gerenciamento de Chaves de IA"**
+3. Na aba **Pool A**: adicione chaves exclusivas para sua própria operação
+4. Na aba **Pool B**: adicione chaves de demonstração que serão compartilhadas com leads sem chave própria
+5. Use o botão **Remover** para revogar qualquer chave individualmente
+
+> ⚠️ **Segurança**: As chaves são armazenadas em `user_settings` (JSONB) no banco de dados, isoladas por `company_id`. Nunca são expostas em logs ou URLs.
+
+---
+
+### 0.1. Suporte Bilíngue — EN/PT para Amanda e Super Admin
+
+O sistema suporta **Português (PT-BR)** e **Inglês (EN-US)** de forma completa e simultânea. Cada usuária pode ter idioma diferente — não há conflito.
+
+**Para a Amanda (Lead — Inglês):**
+1. No canto superior direito, clique no ícone de bandeira 🇧🇷 / 🇦🇺
+2. Selecione **🇦🇺 English (US)**
+3. Toda a interface troca instantaneamente: menus, botões, Jury, Precy, mensagens de erro
+4. A preferência é salva automaticamente no banco (`preferred_language = 'en'`)
+5. Na próxima sessão, a plataforma já abre em inglês
+
+**Para a Super Admin (Português):**
+1. O padrão do sistema é sempre **PT-BR** para contas de produção
+2. Se por algum motivo a interface aparecer em inglês, acesse `Configurações → Idioma → Português`
+3. A Migration 051 (2026-05-01) garantiu que a conta da Super Admin tem `preferred_language = 'pt'` no banco
+
+**Cobertura de Tradução:**
+
+| Módulo | EN ✅ | PT ✅ |
+|---|---|---|
+| Navegação lateral | ✅ | ✅ |
+| CRM (Deals, Contacts, Boards) | ✅ | ✅ |
+| Jury (Gerador de Contratos) | ✅ | ✅ |
+| Precy (Precificação) | ✅ | ✅ |
+| Decisions (Analyse CRM) | ✅ | ✅ |
+| Settings (Configurações) | ✅ | ✅ |
+| Mensagens de erro e toast | ✅ | ✅ |
+| Admin Panel | Parcial | ✅ |
+
+---
+
 
 ### 1. Link d'Água — Sua Vitrine Digital (Produto Principal)
 O **Link d'Água** é o ponto de entrada da sua presença digital:
