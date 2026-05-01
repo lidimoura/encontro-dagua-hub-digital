@@ -72,8 +72,10 @@ const ManifestoPage = lazy(() =>
 const ClientPortalPage = lazy(() =>
   import('@/pages/ClientPortalPage').then(m => ({ default: m.ClientPortalPage }))
 );
-// Showcase LP — High Ticket pitch for health professionals (unified V3.0)
-const ShowcasePage = lazy(() => import('@/pages/ShowcasePage'));
+// Showcase LP — CRM demo com vídeo e galeria (V9.9.6 — substitui ShowcasePage legado)
+const ShowcaseLP = lazy(() =>
+  import('@/features/showcase/ShowcaseLP').then(m => ({ default: m.ShowcaseLP }))
+);
 // ── V4.1 Checkout pages (Stripe + WhatsApp fallback) ───────────────────────
 const CheckoutSuccessPage = lazy(() => import('@/pages/CheckoutSuccessPage'));
 const CheckoutCancelPage  = lazy(() => import('@/pages/CheckoutCancelPage'));
@@ -210,10 +212,11 @@ const App: React.FC = () => {
                     <ErrorBoundary>
                       <Routes>
                         {/* PUBLIC ROUTES - NO AUTH REQUIRED */}
-                        <Route path="/" element={isProvaHost ? <ShowcasePage /> : <LandingPage />} />
-                        {/* ── Showcase LP: High Ticket pitch — Provadágua V5.3 ── */}
-                        <Route path="/showcase" element={<ShowcasePage />} />
-                        <Route path="/showcase-hub" element={<ShowcasePage />} />
+                        <Route path="/" element={isProvaHost ? <ShowcaseLP /> : <LandingPage />} />
+                        {/* Showcase LP: CRM demo com vídeo e galeria — V9.9.6 */}
+                        <Route path="/showcase" element={<ShowcaseLP />} />
+                        <Route path="/showcase-hub" element={<ShowcaseLP />} />
+                        <Route path="/provadagua" element={<ShowcaseLP />} />
                         <Route path="/login" element={<Login />} />
                         {/* ── V5.3 Trial Expired — Upsell + Feedback ────────── */}
                         <Route path="/trial-expired" element={<TrialExpiredPage />} />
