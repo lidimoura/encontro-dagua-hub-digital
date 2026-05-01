@@ -918,12 +918,21 @@ const ShowcasePage: React.FC = () => {
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: lang === 'pt' ? 'Board Kanban' : 'Kanban Board', icon: '📋', color: '#A855F7' },
-              { label: lang === 'pt' ? 'Contatos + IA' : 'Contacts + AI', icon: '🧠', color: '#C4B5FD' },
-              { label: lang === 'pt' ? 'Dashboard Analytics' : 'Analytics', icon: '📊', color: '#F59E0B' },
+              {
+                src: '/showcase/boards-squadIA.png',
+                alt: 'Squad de IA atuando nos Boards',
+              },
+              {
+                src: '/showcase/decision-center.png',
+                alt: 'Decision Center com ações proativas',
+              },
+              {
+                src: '/showcase/inbox-foco.png',
+                alt: 'Inbox no Modo Foco',
+              },
             ].map((screen, i) => (
               <div key={i} className="screen-mock" style={{ cursor: 'pointer' }}
-                onClick={() => { trackShowcaseCTA(`screenshot_${screen.label}`); setIsModalOpen(true); }}
+                onClick={() => { trackShowcaseCTA(`screenshot_${screen.alt}`); setIsModalOpen(true); }}
               >
                 <div className="scanline" />
                 <div style={{
@@ -931,17 +940,22 @@ const ShowcasePage: React.FC = () => {
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', gap: '6px',
                   background: 'linear-gradient(180deg, #180B2E 0%, #0A0320 100%)',
+                  overflow: 'hidden',
                 }}>
-                  <div style={{ fontSize: '1.8rem' }}>{screen.icon}</div>
-                  <span style={{ fontSize: '0.68rem', color: screen.color, fontWeight: 600 }}>{screen.label}</span>
-                  <div style={{ display: 'flex', gap: '2px', alignItems: 'flex-end', height: '16px' }}>
-                    {[60,90,45,75,100,65,80].map((h, j) => (
-                      <div key={j} style={{
-                        width: '3px', height: `${h * 0.16}px`, borderRadius: '2px',
-                        background: `rgba(168,85,247,${0.2 + h / 200})`,
-                      }} />
-                    ))}
-                  </div>
+                  <img
+                    src={screen.src}
+                    alt={screen.alt}
+                    loading="lazy"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 </div>
               </div>
             ))}
