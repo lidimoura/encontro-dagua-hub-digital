@@ -5,12 +5,14 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useCRM } from '@/context/CRMContext';
+import { useToast } from '@/context/ToastContext';
 import { Decision, DecisionStats, SuggestedAction, ActionPayload } from '../types';
 import decisionQueueService from '../services/decisionQueueService';
 import { runAllAnalyzers } from '../analyzers';
 
 export function useDecisionQueue() {
   const { deals, activities, addActivity, updateActivity, updateDeal } = useCRM();
+  const { addToast } = useToast();
   
   const [decisions, setDecisions] = useState<Decision[]>(() => 
     decisionQueueService.getPendingDecisions()
@@ -34,16 +36,37 @@ export function useDecisionQueue() {
 
   // Run all analyzers
   const runAnalyzers = useCallback(async () => {
+    if (deals.length === 0 && activities.length === 0) {
+      addToast('Sem dados no CRM para analisar. Adicione deals ou atividades primeiro.', 'info' as any);
+      return;
+    }
+
     setIsAnalyzing(true);
     
     try {
       const result = await runAllAnalyzers(deals, activities);
       refreshDecisions();
+
+      // Feedback ao usuário (resolve o "botão não faz nada")
+      if (result.addedDecisions === 0) {
+        addToast(
+          `✅ Análise concluída. Nenhum item urgente encontrado em ${deals.length} deals e ${activities.length} atividades.`,
+          'success'
+        );
+      } else {
+        addToast(
+          `⚡ ${result.addedDecisions} nova(s) decisão(es) encontrada(s)! Revise abaixo.`,
+          'success'
+        );
+      }
+
       return result;
+    } catch (err: any) {
+      addToast(`Erro na análise: ${err?.message || 'Tente novamente.'}`, 'error');
     } finally {
       setIsAnalyzing(false);
     }
-  }, [deals, activities, refreshDecisions]);
+  }, [deals, activities, refreshDecisions, addToast]);
 
   // Execute action based on type
   const executeAction = useCallback(async (

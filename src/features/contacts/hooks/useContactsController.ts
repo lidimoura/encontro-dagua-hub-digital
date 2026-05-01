@@ -157,20 +157,22 @@ export const useContactsController = () => {
           phone: formData.phone,
           role: formData.role,
           companyId: companyId || '',
-          status: 'ACTIVE',
+          status: 'ACTIVE' as const,
           stage: formData.stage || ContactStage.LEAD,
           source: formData.source,
+          lastPurchaseDate: '',  // fix: campo obrigatório no schema — sem isso 400 silencioso
           totalValue: 0,
         },
         {
           onSuccess: () => {
             (addToast || showToast)('Contato criado!', 'success');
-            setIsModalOpen(false); // V9.9.4: fechar imediatamente ao salvar — não depende do refetch de companies
+            setIsModalOpen(false);
           },
-          onError: (err) => {
-            console.error('❌ Erro ao criar contato:', err);
-            (addToast || showToast)('Erro ao criar contato. Verifique sua conexão.', 'error');
-            setIsModalOpen(false); // V9.9.4: fechar mesmo com erro — nunca congelar
+          onError: (err: any) => {
+            const detail = err?.message || err?.details || JSON.stringify(err) || 'Erro desconhecido';
+            console.error('❌ Erro ao criar contato:', detail);
+            // fix: NÃO fechar o modal — deixar o usuário corrigir e tentar novamente
+            (addToast || showToast)(`Erro ao criar contato: ${detail}`, 'error');
           },
         }
       );
