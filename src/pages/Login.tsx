@@ -371,11 +371,33 @@ const Login: React.FC = () => {
     setSigninLoading(true);
     setSigninError(null);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
         email:    signinEmail.trim().toLowerCase(),
         password: signinPassword,
       });
       if (error) throw error;
+
+      // V9.9.7: checar se conta está suspensa antes de deixar entrar
+      const userId = signInData.user?.id;
+      if (userId) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('access_level, status')
+          .eq('id', userId)
+          .maybeSingle();
+
+        const isSuspended =
+          prof?.access_level === 'suspended' ||
+          prof?.status === 'suspended';
+
+        if (isSuspended) {
+          await supabase.auth.signOut();
+          setSigninError(txt.errSuspended);
+          setSigninLoading(false);
+          return;
+        }
+      }
+
       initGA4();
       trackLogin('showcase_signin');
       navigate('/dashboard');

@@ -83,15 +83,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
-  // NEXUS DEBUG: Monitor navigation state
-  useEffect(() => {
-    console.log("🧭 NEXUS DEBUG: Navigation Update", {
-      pathname: location.pathname,
-      search: location.search,
-      hash: location.hash,
-      timestamp: new Date().toISOString()
-    });
-  }, [location]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
@@ -116,23 +107,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     };
   }, [isMobileMenuOpen]);
 
-  // Fetch notifications
+  // Fetch notifications from in_app_notifications (migrated from legacy 'notifications' table)
   useEffect(() => {
-    if (!profile?.company_id) return;
+    if (!profile?.id) return;
 
     const fetchNotifications = async () => {
       setLoadingNotifications(true);
       try {
         const { data, error } = await supabase
-          .from('notifications')
+          .from('in_app_notifications')
           .select('*')
-          .eq('company_id', profile.company_id)
+          .eq('user_id', profile.id)
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(15);
 
         if (!error && data) {
           setNotifications(data);
-          setUnreadCount(data.filter(n => !n.read).length);
+          setUnreadCount(data.filter((n: any) => !n.read).length);
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -143,16 +134,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     fetchNotifications();
 
-    // Subscribe to real-time updates
+    // Realtime: atualiza sininho ao chegar nova notificação
     const channel = supabase
-      .channel('notifications')
+      .channel('in_app_notifications_bell')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
-          table: 'notifications',
-          filter: `company_id=eq.${profile.company_id}`
+          table: 'in_app_notifications',
+          filter: `user_id=eq.${profile.id}`
         },
         () => fetchNotifications()
       )
@@ -161,16 +152,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [profile?.company_id]);
+  }, [profile?.id]);
 
-  // Mark notification as read
+  // Mark notification as read via RPC (SECURITY DEFINER)
   const markAsRead = async (notificationId: string) => {
     try {
-      await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('id', notificationId);
-
+      await supabase.rpc('mark_notification_read', { p_notification_id: notificationId });
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
       );

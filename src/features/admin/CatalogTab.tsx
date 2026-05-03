@@ -18,9 +18,10 @@ interface ProductModalProps {
     product: Product | null;
     onClose: () => void;
     onSave: (data: ProductFormData, id?: string) => Promise<void>;
+    currencySymbol: string;
 }
 
-function ProductModal({ product, onClose, onSave }: ProductModalProps) {
+function ProductModal({ product, onClose, onSave, currencySymbol }: ProductModalProps) {
     const { t } = useTranslation();
     const [formData, setFormData] = useState<ProductFormData>({
         name: product?.name || '',
@@ -80,7 +81,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Preço (R$) *
+                                Preço ({currencySymbol}) *
                             </label>
                             <input
                                 type="number"
@@ -184,6 +185,12 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
 export default function CatalogTab() {
     const { t } = useTranslation();
     const { profile } = useAuth();
+    const currencySymbol = profile?.preferred_currency === 'AUD' ? 'A$'
+        : profile?.preferred_currency === 'USD' ? '$'
+        : 'R$';
+    const currencyLocale = profile?.preferred_currency === 'AUD' ? 'en-AU'
+        : profile?.preferred_currency === 'USD' ? 'en-US'
+        : 'pt-BR';
     const isSuperAdmin = profile?.is_super_admin === true;
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -353,7 +360,7 @@ export default function CatalogTab() {
 
                                     <div className="flex items-center gap-2 flex-wrap mb-2">
                                         <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                                            R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            {currencySymbol} {product.price.toLocaleString(currencyLocale, { minimumFractionDigits: 2 })}
                                         </span>
                                         <span className="text-xs text-slate-500 dark:text-slate-400">
                                             / {product.unit}
@@ -399,6 +406,7 @@ export default function CatalogTab() {
                     product={null}
                     onClose={() => setShowCreateModal(false)}
                     onSave={handleSaveProduct}
+                    currencySymbol={currencySymbol}
                 />
             )}
 
@@ -407,6 +415,7 @@ export default function CatalogTab() {
                     product={editingProduct}
                     onClose={() => setEditingProduct(null)}
                     onSave={handleSaveProduct}
+                    currencySymbol={currencySymbol}
                 />
             )}
         </div>

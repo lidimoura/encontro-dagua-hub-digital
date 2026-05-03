@@ -412,7 +412,7 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
       : { name: 'Yara', role: 'Assistente de Vendas', behavior: 'Profissional e proativa' };
 
     onCreate({
-      name: boardToCreate.boardName,
+      name: boardToCreate.name || boardToCreate.boardName || 'Novo Board',
       description: boardToCreate.description,
       linkedLifecycleStage: boardToCreate.linkedLifecycleStage,
       template: 'CUSTOM',
