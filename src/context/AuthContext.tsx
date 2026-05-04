@@ -7,19 +7,24 @@ interface Profile {
     email: string;
     company_id: string;
     role: 'admin' | 'equipe' | 'cliente' | 'cliente_restrito' | 'user' | 'super_admin';
-    user_type?: 'team_member' | 'client';
+    user_type?: 'lead_provadagua' | 'team_member' | 'client' | string;
+    full_name?: string | null;
     first_name?: string | null;
     last_name?: string | null;
     nickname?: string | null;
     phone?: string | null;
     avatar_url?: string | null;
     created_at?: string;
-    referred_by?: string | null; // UUID of user who referred this user
-    discount_credits: number; // Number of 20% discount coupons accumulated
-    is_super_admin?: boolean; // Super admin flag for global access
-    status?: string; // God Mode: User status (active, inactive, etc)
-    access_level?: string[]; // God Mode: Access permissions array
-    access_expires_at?: string | null; // Trial expiry timestamp (ISO)
+    referred_by?: string | null;
+    discount_credits: number;
+    is_super_admin?: boolean;
+    status?: string;
+    access_level?: 'trial' | 'suspended' | 'paid' | 'free' | string;
+    access_expires_at?: string | null;
+    trial_expires_at?: string | null;      // V9.9.7
+    preferred_language?: 'pt' | 'en' | 'es'; // V9.9.7
+    preferred_currency?: 'BRL' | 'AUD' | 'USD'; // V9.9.7
+    plan_type?: 'free' | 'monthly' | 'annual'; // V9.9.7
 }
 
 interface AuthContextType {

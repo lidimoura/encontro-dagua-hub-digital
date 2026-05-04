@@ -43,6 +43,12 @@ export interface Profile {
     role: 'user' | 'admin' | 'super_admin' | 'equipe' | 'cliente' | 'cliente_restrito';
     plan_type?: 'free' | 'monthly' | 'annual';
     status?: 'active' | 'inactive' | 'suspended';
+    access_level?: 'trial' | 'suspended' | 'paid' | 'free' | string;  // V9.9.7
+    user_type?: 'lead_provadagua' | 'team_member' | 'client' | string; // V9.9.7
+    trial_expires_at?: string | null;  // V9.9.7
+    is_super_admin?: boolean;          // V9.9.7
+    preferred_language?: 'pt' | 'en' | 'es'; // V9.9.7 from migration 037
+    preferred_currency?: 'BRL' | 'AUD' | 'USD'; // V9.9.7 from migration 037
     company_id?: string;
     created_at?: string;
 }
@@ -321,6 +327,7 @@ export interface Lead {
     id: string;
     name: string;
     email: string;
+    phone?: string;   // V9.9.7
     companyName: string;
     role?: string;
     source: string;
