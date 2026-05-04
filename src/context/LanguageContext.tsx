@@ -26,9 +26,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
 
     const [currency, setCurrencyState] = useState<CurrencyCode>(() => {
-        if (!IS_DEMO) return 'BRL';
         const stored = localStorage.getItem(CURRENCY_STORAGE_KEY) as CurrencyCode | null;
-        return stored || 'AUD';
+        return stored || 'BRL'; // Default BRL for all non-demo
     });
 
     // Track authenticated user ID for DB writes
@@ -56,7 +55,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
                 localStorage.setItem(LANG_STORAGE_KEY, lang);
             }
 
-            if (IS_DEMO && data.preferred_currency && ['BRL', 'AUD', 'USD'].includes(data.preferred_currency)) {
+            if (data.preferred_currency && ['BRL', 'AUD', 'USD'].includes(data.preferred_currency)) {
                 const curr = data.preferred_currency as CurrencyCode;
                 setCurrencyState(curr);
                 localStorage.setItem(CURRENCY_STORAGE_KEY, curr);
@@ -80,7 +79,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
                 setUserId(null);
                 // On logout: reset to defaults
                 setLanguageState(DEFAULT_LANG);
-                if (IS_DEMO) setCurrencyState('AUD');
+                setCurrencyState('BRL');
             }
         });
 
@@ -136,21 +135,19 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
      */
     const setCurrency = useCallback((c: CurrencyCode) => {
         setCurrencyState(c);
-        if (IS_DEMO) {
-            localStorage.setItem(CURRENCY_STORAGE_KEY, c);
+        localStorage.setItem(CURRENCY_STORAGE_KEY, c);
 
-            if (userId) {
-                supabase
-                    .from('profiles')
-                    .update({ preferred_currency: c })
-                    .eq('id', userId)
-                    .then(({ error }) => {
-                        if (error) console.warn('[LanguageCtx] DB currency persist failed:', error.message);
-                        else console.log(`[LanguageCtx] ✅ Currency saved to DB: ${c}`);
-                    });
-            }
+        if (userId) {
+            supabase
+                .from('profiles')
+                .update({ preferred_currency: c })
+                .eq('id', userId)
+                .then(({ error }) => {
+                    if (error) console.warn('[LanguageCtx] DB currency persist failed:', error.message);
+                    else console.log(`[LanguageCtx] ✅ Currency saved to DB: ${c}`);
+                });
         }
-    }, [userId, IS_DEMO]);
+    }, [userId]);
 
     useEffect(() => {
         document.documentElement.lang = language;

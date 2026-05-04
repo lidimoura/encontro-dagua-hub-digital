@@ -11,7 +11,8 @@ import { NotificationsSection } from './components/NotificationsSection';
 import { UsersPage } from './UsersPage';
 import { SuperAdminKeyPanel } from './components/SuperAdminKeyPanel';
 import { useAuth } from '@/context/AuthContext';
-import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell, ShieldCheck } from 'lucide-react';
+import { useLanguage, CurrencyCode } from '@/context/LanguageContext';
+import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell, ShieldCheck, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -19,7 +20,22 @@ const GeneralSettings: React.FC = () => {
   const controller = useSettingsController();
   const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
+  const { currency, setCurrency } = useLanguage();
   const [updatingHome, setUpdatingHome] = useState(false);
+  const [currencySavedMsg, setCurrencySavedMsg] = useState(false);
+
+  const CURRENCY_OPTIONS: { code: CurrencyCode; label: string; symbol: string; descKey: string }[] = [
+    { code: 'BRL', label: 'R$', symbol: 'R$', descKey: 'currencyBRL' },
+    { code: 'AUD', label: 'A$', symbol: 'A$', descKey: 'currencyAUD' },
+    { code: 'USD', label: '$',  symbol: '$',  descKey: 'currencyUSD' },
+  ];
+
+  const handleCurrencyChange = (c: CurrencyCode) => {
+    setCurrency(c);
+    setCurrencySavedMsg(true);
+    setTimeout(() => setCurrencySavedMsg(false), 2500);
+  };
+
 
   const handleSetHomePage = async (path: string) => {
     try {
@@ -93,6 +109,43 @@ const GeneralSettings: React.FC = () => {
             <div className="font-medium text-slate-900 dark:text-white text-center">{t('inboxTitle')}</div>
           </label>
         </div>
+      </div>
+
+      {/* ====== CURRENCY SETTINGS ====== */}
+      <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-slate-200 dark:border-white/10">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+          <DollarSign size={20} className="text-primary-500" />
+          {t('currencySettings')}
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+          {t('currencySettingsDesc')}
+        </p>
+        <div className="flex gap-3">
+          {CURRENCY_OPTIONS.map(opt => (
+            <label
+              key={opt.code}
+              className={`flex-1 cursor-pointer border-2 rounded-xl p-4 text-center transition-all ${
+                currency === opt.code
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+              }`}
+            >
+              <input
+                type="radio"
+                name="currency"
+                value={opt.code}
+                checked={currency === opt.code}
+                onChange={() => handleCurrencyChange(opt.code)}
+                className="sr-only"
+              />
+              <div className="text-2xl font-bold text-primary-600 dark:text-primary-400 mb-1">{opt.symbol}</div>
+              <div className="text-xs font-medium text-slate-700 dark:text-slate-300">{t(opt.descKey)}</div>
+            </label>
+          ))}
+        </div>
+        {currencySavedMsg && (
+          <p className="text-xs text-emerald-500 mt-3 font-medium">✅ {t('currencySaved')}</p>
+        )}
       </div>
 
       <TagsManager

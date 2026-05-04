@@ -1,6 +1,7 @@
 import React from 'react';
 import { List, Target } from 'lucide-react';
 import { ViewMode } from '../hooks/useInboxController';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ViewModeToggleProps {
   mode: ViewMode;
@@ -8,6 +9,8 @@ interface ViewModeToggleProps {
 }
 
 export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="inline-flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-1 border border-slate-200 dark:border-white/10">
       <button
@@ -19,7 +22,7 @@ export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }
         }`}
       >
         <List size={16} />
-        Lista
+        {t('inboxViewList')}
       </button>
       <button
         onClick={() => onChange('focus')}
@@ -30,7 +33,7 @@ export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }
         }`}
       >
         <Target size={16} />
-        Foco
+        {t('inboxViewFocus')}
       </button>
     </div>
   );

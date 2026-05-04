@@ -58,6 +58,32 @@ export const translations = {
         // --- INBOX ---
         inboxTitle: "Inbox",
         inboxSubtitle: "Sua mesa de trabalho.",
+        inboxViewList: "Lista",
+        inboxViewFocus: "Foco",
+        inboxViewInternal: "Mensagem Interna",
+        inboxNewMessage: "Nova Mensagem",
+        inboxMarkAllRead: "Marcar todas como lidas",
+
+        // --- ACTIVITIES ---
+        activityTypeCall: "Ligação",
+        activityTypeEmail: "E-mail",
+        activityTypeMeeting: "Reunião",
+        activityTypeTask: "Tarefa",
+        activityTypeNote: "Nota",
+        activityTypeStatusChange: "Mudança de Status",
+        activityCompleted: "Concluída",
+        activityPending: "Pendente",
+        activityOverdue: "Atrasada",
+        markComplete: "Marcar como concluída",
+
+        // --- CURRENCY SETTINGS ---
+        currencySettings: "Moeda Padrão",
+        currencySettingsDesc: "Defina a moeda exibida em deals, catálogo e propostas.",
+        currencyBRL: "Real Brasileiro (R$)",
+        currencyAUD: "Dólar Australiano (A$)",
+        currencyUSD: "Dólar Americano ($)",
+        currencySaved: "Moeda salva com sucesso!",
+
 
         // --- REPORTS ---
         reportsTitle: "Relatórios de Performance",
@@ -778,6 +804,32 @@ export const translations = {
         // --- INBOX ---
         inboxTitle: "Inbox",
         inboxSubtitle: "Your workbench.",
+        inboxViewList: "List",
+        inboxViewFocus: "Focus",
+        inboxViewInternal: "Internal Message",
+        inboxNewMessage: "New Message",
+        inboxMarkAllRead: "Mark all as read",
+
+        // --- ACTIVITIES ---
+        activityTypeCall: "Call",
+        activityTypeEmail: "Email",
+        activityTypeMeeting: "Meeting",
+        activityTypeTask: "Task",
+        activityTypeNote: "Note",
+        activityTypeStatusChange: "Status Change",
+        activityCompleted: "Completed",
+        activityPending: "Pending",
+        activityOverdue: "Overdue",
+        markComplete: "Mark as complete",
+
+        // --- CURRENCY SETTINGS ---
+        currencySettings: "Default Currency",
+        currencySettingsDesc: "Set the currency displayed in deals, catalog and proposals.",
+        currencyBRL: "Brazilian Real (R$)",
+        currencyAUD: "Australian Dollar (A$)",
+        currencyUSD: "US Dollar ($)",
+        currencySaved: "Currency saved successfully!",
+
 
         // --- REPORTS ---
         reportsTitle: "Performance Reports",
