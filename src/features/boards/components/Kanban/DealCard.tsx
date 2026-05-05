@@ -3,6 +3,8 @@ import { DealView, DealStatus } from '@/types';
 import { Building2, Hourglass, QrCode, Scan } from 'lucide-react';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/components/CurrencySwitcher';
 import { useClientQREngagement } from '@/lib/query/hooks/useContactsQuery';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
@@ -40,6 +42,7 @@ export const DealCard: React.FC<DealCardProps> = ({
   const [localDragging, setLocalDragging] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const { t } = useTranslation();
+  const { currency } = useLanguage();
   const { moveDeal, boards } = useCRM();
   const { addToast } = useToast();
 
@@ -206,7 +209,7 @@ export const DealCard: React.FC<DealCardProps> = ({
             />
           )}
           <span className="text-sm font-bold text-slate-700 dark:text-slate-200 font-mono">
-            ${deal.value.toLocaleString()}
+            {formatCurrency(deal.value, currency)}
           </span>
         </div>
 

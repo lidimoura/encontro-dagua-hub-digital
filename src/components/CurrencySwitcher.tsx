@@ -21,7 +21,7 @@ export const CurrencySwitcher: React.FC<CurrencySwitcherProps> = ({
   const current = CURRENCIES.find(c => c.code === currency) ?? CURRENCIES[0];
 
   if (variant === 'header') {
-    // Compact cycle button — matches the language toggle style in Layout.tsx
+    // Compact cycle button — MUST match the language toggle in Layout.tsx exactly
     return (
       <button
         id="btn-currency-switcher"
@@ -30,12 +30,11 @@ export const CurrencySwitcher: React.FC<CurrencySwitcherProps> = ({
           const next = CURRENCIES[(idx + 1) % CURRENCIES.length];
           setCurrency(next.code);
         }}
-        className={`p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95 relative ring-2 ring-slate-200 dark:ring-slate-700 ${className}`}
+        className={`p-2.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all active:scale-95 z-[70] relative ring-2 ring-slate-200 dark:ring-slate-700 ${className}`}
         title={`Currency: ${current.code} — click to switch`}
+        style={{ display: 'block', visibility: 'visible' }}
       >
-        <span className="text-[11px] font-bold leading-none block tabular-nums">
-          {current.label}
-        </span>
+        <span className="text-lg leading-none block">{current.flag}</span>
       </button>
     );
   }

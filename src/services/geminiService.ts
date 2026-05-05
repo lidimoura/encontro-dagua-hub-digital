@@ -13,31 +13,83 @@ export interface AIConfig {
   anthropicCaching: boolean;
 }
 
-// --- API FALLBACK HELPER ---
+// =============================================================================
+// ANTI-SPAM CIRCUIT BREAKER
+// Rules:
+//   1. On 429 → wait 2s, try secondary key ONCE. If still 429, throw immediately.
+//   2. On 5xx → throw immediately, no retry (caller handles gracefully).
+//   3. A per-key "cooldown" flag blocks NEW requests for 10s after a 429 to
+//      prevent the front-end loop from hammering the API while it's rate-limited.
+// =============================================================================
+const _cooldowns: Record<string, number> = {};   // key → timestamp when cooldown expires
+const COOLDOWN_MS = 10_000;                       // 10-second cooldown per API key
+const RETRY_DELAY_MS = 2_000;                     // back-off before retrying with secondary key
+
+function _isRateLimitError(error: any): boolean {
+  return (
+    error?.response?.status === 429 ||
+    error?.status === 429 ||
+    String(error).includes('429') ||
+    String(error?.message).includes('Too Many Requests')
+  );
+}
+
+async function _sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const generateTextWithFallback = async (
   params: Parameters<typeof generateText>[0],
   provider: 'google' | 'openai' | 'anthropic',
   modelId: string,
   primaryKey: string
 ) => {
+  // ── Cooldown gate: if primary key is in cooldown, fail fast ──────────────
+  const now = Date.now();
+  if (_cooldowns[primaryKey] && now < _cooldowns[primaryKey]) {
+    const remaining = Math.ceil((_cooldowns[primaryKey] - now) / 1000);
+    throw new Error(`API_COOLDOWN:${remaining}s — Gemini rate limited. Retry in ${remaining}s.`);
+  }
+
   try {
     return await generateText(params);
   } catch (error: any) {
-    const isQuota = error?.response?.status === 429 || error?.status === 429 || error?.toString().includes('429');
-    const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
+    if (_isRateLimitError(error)) {
+      // Enter cooldown for the primary key
+      _cooldowns[primaryKey] = Date.now() + COOLDOWN_MS;
+      console.warn(`⚠️ [Gemini] 429 on primary key. Cooldown for ${COOLDOWN_MS / 1000}s.`);
 
-    if (isQuota && secondaryKey && primaryKey !== secondaryKey) {
-      console.warn('⚠️ Quota exceeded (429). Switching to Secondary API Key...');
-      const fallbackModel = getModel(provider, secondaryKey, modelId);
-      return await generateText({ ...params, model: fallbackModel });
+      const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
+      if (secondaryKey && primaryKey !== secondaryKey && !(_cooldowns[secondaryKey] && Date.now() < _cooldowns[secondaryKey])) {
+        console.warn('🔄 [Gemini] Switching to Secondary API Key (1 attempt)...');
+        await _sleep(RETRY_DELAY_MS);
+        try {
+          const fallbackModel = getModel(provider, secondaryKey, modelId);
+          return await generateText({ ...params, model: fallbackModel });
+        } catch (fallbackError: any) {
+          if (_isRateLimitError(fallbackError)) {
+            _cooldowns[secondaryKey] = Date.now() + COOLDOWN_MS;
+            console.error('❌ [Gemini] Secondary key also rate-limited. Aborting.');
+          }
+          throw fallbackError;
+        }
+      }
     }
     throw error;
   }
 };
 
+// Language instruction injected at the top of every prompt
+function _langInstruction(language?: string): string {
+  if (!language || language === 'pt') return 'Responda sempre em Português (Brasil).';
+  if (language === 'es') return 'Responde siempre en Español.';
+  return 'Always respond in English.';
+}
+
 export const analyzeLead = async (
   deal: Deal | DealView,
-  config?: AIConfig
+  config?: AIConfig,
+  language?: string
 ): Promise<{ suggestion: string; probabilityScore: number }> => {
   // Fallback to default if no config (legacy support)
   const provider = config?.provider || 'google';
@@ -49,6 +101,7 @@ export const analyzeLead = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
+    ${_langInstruction(language)}
     Analyze this sales opportunity (Deal) and provide:
     1. A short and actionable suggestion on what to do next (max 2 sentences).
     2. A closing probability score (0 to 100) based on the data.
@@ -459,7 +512,8 @@ interface CRMContext {
 export const chatWithCRM = async (
   message: string,
   context: CRMContext,
-  config?: AIConfig
+  config?: AIConfig,
+  language?: string
 ): Promise<string> => {
   // Fallback to default if no config (legacy support)
   const provider = config?.provider || 'google';
@@ -471,6 +525,7 @@ export const chatWithCRM = async (
   const model = getModel(provider, apiKey, modelId);
 
   const prompt = `
+    ${_langInstruction(language)}
     You are a CRM assistant. The user said: "${message}".
     Current context: ${JSON.stringify(context)}.
     Answer in a helpful and concise way.
