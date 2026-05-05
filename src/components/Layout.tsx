@@ -185,7 +185,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
 
       // Tools - All Users
-      { to: '/qrdagua', icon: QrCode, label: t('qrWater'), prefetch: 'qrdagua' as RouteName },
+      { to: '/qrdagua', icon: QrCode, label: "QR d'água", prefetch: 'qrdagua' as RouteName },
       { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
 
       // Settings - Admin & Vendedor
@@ -334,6 +334,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Currency Switcher — cycles BRL → USD → AUD */}
             <CurrencySwitcher variant="header" />
+
+            {/* Visual separator between currency and language */}
+            <span className="w-px h-6 bg-slate-200 dark:bg-white/10 rounded-full mx-0.5 shrink-0" aria-hidden="true" />
 
             {/* Language Toggle - Trilingual cycle: PT → EN → ES → PT */}
             <button

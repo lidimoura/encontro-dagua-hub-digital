@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useCRM } from '@/context/CRMContext';
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import ConfirmModal from '@/components/ConfirmModal';
 import { DealStatus, Activity } from '@/types';
@@ -116,6 +117,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     aiAnthropicCaching,
   } = useCRM();
   const { addToast } = useToast();
+  const { profile } = useAuth();
 
   const deal = deals.find(d => d.id === dealId);
   const contact = deal ? contacts.find(c => c.id === deal.contactId) : null;
@@ -699,7 +701,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                         try {
                           const { data: nc, error } = await supabase
                             .from('crm_companies')  // fix: era 'companies' (tenant table — RLS block)
-                            .insert({ name: newCompanyName.trim() })
+                            .insert({ name: newCompanyName.trim(), company_id: profile?.company_id })
                             .select('id')
                             .single();
                           if (!error && nc?.id) {
@@ -875,6 +877,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                                   phone: newContactPhone.trim() || null,
                                   status: 'ACTIVE',
                                   stage: 'LEAD',
+                                  company_id: profile?.company_id,
                                 })
                                 .select('id')
                                 .single();

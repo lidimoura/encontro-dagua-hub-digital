@@ -210,7 +210,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       // Fetch products from Supabase
       // Force cache-busting for production by passing a timestamp (handled in service)
-      const { data: productsData } = await productsService.getAll({ timestamp: Date.now() });
+      // Pass company_id so the fallback query can filter by tenant (fixes empty catalog for Leads)
+      const { data: productsData } = await productsService.getAll({
+        timestamp: Date.now(),
+        companyId: profile.company_id,
+      });
       if (productsData) {
         setProducts(productsData);
       }

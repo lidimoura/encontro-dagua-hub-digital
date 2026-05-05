@@ -11,7 +11,7 @@ export const productsService = {
      * Get all active catalog products via strict Database RPC (excludes tech_stack, infra)
      * Used by the Deal products tab.
      */
-    async getAll(options?: { timestamp?: number }) {
+    async getAll(options?: { timestamp?: number; companyId?: string }) {
         // DEMO branch: return empty catalog — no real products shown in sandbox
         if (IS_DEMO) return { data: [], error: null };
 
@@ -25,6 +25,7 @@ export const productsService = {
             });
 
         // Primary: Use RPC for strict DB-level filtering (bypasses CDN cache)
+        // The RPC function already filters by company_id via RLS context
         const { data: rpcData, error: rpcError } = await supabase.rpc('get_crm_catalog_products');
 
         if (!rpcError && rpcData) {
@@ -32,8 +33,9 @@ export const productsService = {
         }
 
         // Fallback: strict multi-column query when RPC not deployed
+        // CRITICAL: filter by company_id so Lead RLS doesn't block results
         console.warn('[productsService] RPC unavailable, using fallback:', rpcError?.message);
-        const { data, error } = await supabase
+        let query = supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
@@ -41,6 +43,12 @@ export const productsService = {
             .not('product_type', 'in', `(${BLOCKED_TYPES.map(t => `"${t}"`).join(',')})`)
             .order('name');
 
+        // If company_id is provided, scope to tenant; otherwise rely on RLS
+        if (options?.companyId) {
+            query = query.eq('company_id', options.companyId);
+        }
+
+        const { data, error } = await query;
         if (error) return { data: [], error };
         return { data: applyNameFilter(data || []), error: null };
     },
