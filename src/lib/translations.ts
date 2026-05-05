@@ -360,6 +360,13 @@ export const translations = {
         precyDesc: "Calcula preço justo baseado em custo, horas e impacto. Inclui precificação social.",
         mazoDesc: "Focada em retenção, empatia e saúde do cliente. Previne churn proativamente.",
         juryDesc: "Gera contratos usando templates da biblioteca. Garante compliance e segurança.",
+        // --- AI TEAM & INSIGHTS PANEL ---
+        aiTeam: "Equipe de IA",
+        aiTeamDesc: "Agentes especializados para acelerar seu processo",
+        aiSuggestions: "Automações Sugeridas",
+        aiSuggestionsDesc: "Dicas da IA para otimizar este processo.",
+        boardSettings: "Configurações do Board",
+
 
         // --- MÓDULO BRIDGE PAGES (antes: Link d'Água / QR d'Água) ---
         qrPageTitle: "QR d'água",
@@ -915,6 +922,13 @@ export const translations = {
         precyDesc: "Calculates fair price based on cost, hours, and impact. Includes social pricing.",
         mazoDesc: "Focused on retention, empathy, and customer health. Proactively prevents churn.",
         juryDesc: "Generates contracts using library templates. Ensures compliance and security.",
+        // --- AI TEAM & INSIGHTS PANEL ---
+        aiTeam: "AI Team",
+        aiTeamDesc: "Specialized agents to accelerate your process",
+        aiSuggestions: "AI Suggestions",
+        aiSuggestionsDesc: "AI tips to optimize this process.",
+        boardSettings: "Board Settings",
+
         inviteUsersDesc: "Invite new users to the Hub",
         generateInviteButton: "GENERATE INVITE (ANTI-CRASH)",
         inviteCreated: "✅ INVITE CREATED! COPY BELOW:",

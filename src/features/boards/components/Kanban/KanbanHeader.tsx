@@ -57,7 +57,7 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
                     <button
                         onClick={() => onEditBoard(activeBoard)}
                         className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
-                        title="Configurações do Board"
+                        title={t('boardSettings')}
                     >
                         <Settings size={20} />
                     </button>
@@ -79,10 +79,10 @@ export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
                             <div className="p-4 border-b border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-slate-900/50">
                                 <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Lightbulb size={16} className="text-yellow-500" />
-                                    Automações Sugeridas
+                                    {t('aiSuggestions')}
                                 </h4>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                    Dicas da IA para otimizar este processo.
+                                    {t('aiSuggestionsDesc')}
                                 </p>
                             </div>
                             <div className="p-2">

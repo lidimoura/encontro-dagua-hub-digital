@@ -37,6 +37,7 @@ import { FloatingAIWidget } from './FloatingAIWidget';
 import { AiflowSupport } from './AiflowSupport';
 import { supabase } from '@/lib/supabase/client';
 import { IS_DEMO } from '@/lib/appConfig';
+import { CurrencySwitcher } from './CurrencySwitcher';
 
 // Lazy load AI Assistant (heavy component with Gemini SDK)
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -330,6 +331,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
             </button>
+
+            {/* Currency Switcher — cycles BRL → USD → AUD */}
+            <CurrencySwitcher variant="header" />
 
             {/* Language Toggle - Trilingual cycle: PT → EN → ES → PT */}
             <button

@@ -55,10 +55,10 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({ boardId, dealId })
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold font-display bg-gradient-to-r from-solimoes-400 to-solimoes-500 bg-clip-text text-transparent">
-                            Equipe de IA
+                            {t('aiTeam')}
                         </h2>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                            Agentes especializados para acelerar seu processo
+                            {t('aiTeamDesc')}
                         </p>
                     </div>
                 </div>

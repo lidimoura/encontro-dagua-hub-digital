@@ -1044,15 +1044,15 @@ Agora, gere o prompt perfeito:`;
 
               <div className="relative z-10">
                 <span className="inline-block px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400 text-xs font-bold uppercase tracking-widest mb-4">
-                  🌏 Provadágua — Acesso Gratuito por 7 dias
+                  🌏 Provadágua — {language === 'en' ? 'Free Access for 7 Days' : 'Acesso Gratuito por 7 dias'}
                 </span>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 leading-tight">
-                  {t('language') === 'en'
+                  {language === 'en'
                     ? 'Try the Provadágua: Your business ecosystem in 7 days'
                     : 'Experimente a Provadágua: O seu ecossistema de gestão em 7 dias'}
                 </h2>
                 <p className="text-slate-400 text-sm mb-6 max-w-xl mx-auto">
-                  {t('language') === 'en'
+                  {language === 'en'
                     ? 'CRM with AI, isolated data per company, SDR agent 24/7 and LGPD compliance. No credit card.'
                     : 'CRM com IA, dados isolados por empresa, agente SDR 24/7 e conformidade LGPD. Sem cartão de crédito.'}
                 </p>
@@ -1061,7 +1061,7 @@ Agora, gere o prompt perfeito:`;
                   href="/#/showcase"
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 text-white font-extrabold text-base shadow-lg shadow-purple-500/30 transition-all active:scale-[0.98] hover:-translate-y-0.5"
                 >
-                  {t('language') === 'en'
+                  {language === 'en'
                     ? 'Discover the Provadágua →'
                     : 'Experimente a Provadágua →'}
                 </a>
