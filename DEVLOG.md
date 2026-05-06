@@ -1,4 +1,4 @@
-﻿# DEVLOG — Provadágua Hub Digital
+# DEVLOG — Provadágua Hub Digital
 
 > **⚠️ PADRÃO OBRIGATÓRIO DE ENTRADA (leia antes de escrever qualquer entrada):**
 > Toda entrada no DEVLOG DEVE conter:
@@ -1036,12 +1036,105 @@ Responsável técnico: Antigravity (Tech Lead IA) | Aprovado por: Lidi (Super Ad
 | Admin � isolamento de usu�rios | ? Lead v� apenas "Acesso Restrito" | ? V� todos os tenants |
 
 ### Regra de Ouro Documentada V9.9.7
-> **`onError` nunca deve fechar o modal automaticamente.** Fechar silenciosamente em caso de erro � pior do que mostrar a mensagem: o usu�rio perde os dados preenchidos e n�o sabe o que aconteceu. Mostre o erro, deixe o usu�rio decidir.
+> **`onError` nunca deve fechar o modal automaticamente.** Fechar silenciosamente em caso de erro é pior do que mostrar a mensagem: o usuário perde os dados preenchidos e não sabe o que aconteceu. Mostre o erro, deixe o usuário decidir.
 
 ### Arquivos Modificados
-- `src/features/contacts/hooks/useContactsController.ts` � error handling + lastPurchaseDate
-- `src/features/decisions/hooks/useDecisionQueue.ts` � toast feedback completo
-- `supabase/migrations/051_fix_super_admin_language_and_contacts_notes.sql` � [NOVO]
+- `src/features/contacts/hooks/useContactsController.ts` — error handling + lastPurchaseDate
+- `src/features/decisions/hooks/useDecisionQueue.ts` — toast feedback completo
+- `supabase/migrations/051_fix_super_admin_language_and_contacts_notes.sql` — [NOVO]
 
 ---
 
+## 2026-05-05 — V9.9.7 CHUNK 17: POST-MORTEM OOM · Catálogo · Branding · UI
+
+### Status: DEPLOYADO — Commit `87f7b76` · main · Build verde (exit 0)
+
+---
+
+### POST-MORTEM: OOM nos Inserts Inline do DealDetailModal
+
+**Impacto:** Criação de Empresa e Contato via formulários rápidos dentro do modal de Deal falhava silenciosamente com erro de RLS (403/OOM). Catálogo de produtos aparecia vazio para contas Lead no Board.
+
+**Investigação de Regressão (Auditoria Git — git log + code review):**
+
+| Hipótese investigada | Resultado |
+|---|---|
+| Loop em `useContactsQuery` | ❌ Falso — `staleTime: 2min`, sem retry automático em `onError` |
+| Loop em `CRMContext` re-fetch | ❌ Falso — sem `useEffect` com re-fetch em falha |
+| **Root cause real** | ✅ Inserts inline em `DealDetailModal` sem `company_id` |
+
+**Causa Raiz Confirmada:**
+Os formulários rápidos de "Nova Empresa" (L702) e "Novo Contato" (L872) dentro do `DealDetailModal` foram adicionados sem injetar `company_id` no payload. A Migration 056 (RLS puro JWT) rejeita qualquer INSERT sem `company_id` válido. O erro era silencioso pois o `catch` exibia apenas um toast genérico.
+
+O fluxo principal (criação via `useCreateContact()`) já passava `companyId` corretamente desde V9.6 — por isso funcionava nos formulários dedicados mas falhava exclusivamente nos atalhos inline do modal.
+
+**Causa Raiz Secundária — Catálogo Vazio para Leads:**
+`productsService.getAll()` tenta a RPC `get_crm_catalog_products`. Se indisponível, o fallback fazia `.from('products').select('*')` sem filtro `company_id`. A Migration 056 bloqueava o fetch para Leads, retornando `[]`.
+
+---
+
+### Correções Aplicadas
+
+| Arquivo | Fix |
+|---|---|
+| `DealDetailModal.tsx` | `useAuth` importado; `company_id: profile?.company_id` em 2 inserts inline |
+| `productsService.ts` | Param `companyId?` adicionado; fallback aplica `.eq('company_id', companyId)` |
+| `SettingsContext.tsx` | Passa `profile.company_id` para `productsService.getAll()` |
+| `Layout.tsx` | Separador `<span> w-px h-6` entre Moeda/Idioma; `"QR d'água"` como string estática |
+
+### Regra de Ouro (Chunk 17)
+
+> **Inserts inline em modais SEMPRE devem injetar `company_id` via `profile?.company_id` explicitamente.** O JWT garante isolamento no banco, mas o payload deve carregar o valor — RLS não injeta automaticamente.
+
+---
+
+## 2026-05-06 — V10.1: CHUNK 18 — ARQUITETURA FASE 9: Link D'água ↔ CRM
+
+### Status: MIGRATION 057 GERADA E COMMITADA — Banco preparado · Commit `2eb383c`
+
+---
+
+### Objetivo da Fase 9
+
+Conectar o ecossistema "Link D'água" ao CRM de forma nativa: briefings de usuários e KPIs de engajamento (cliques QR, projetos criados) alimentam Cards do Kanban e histórico de atividades automaticamente.
+
+---
+
+### Decisões Técnicas Validadas
+
+**[1] Trigger Anti-Recursão: `pg_trigger_depth() = 0` — ADOTADO**
+
+```sql
+-- Na função log_briefing_to_activities():
+IF pg_trigger_depth() > 0 THEN RETURN NEW; END IF;
+```
+
+`is_internal_update` foi descartado (requer coluna extra, frágil se `activities` ganhar triggers próprios). `pg_trigger_depth()` é nativo, zero overhead, e cobre todos os níveis de re-entrada.
+
+**[2] View vs Materialized View: View Padrão — ADOTADO**
+
+Kanban precisa de dados em tempo real. Materialized View introduz lag. `v_deal_kpis` usa LATERAL JOIN com índices em `qr_codes(client_email)` + `qr_links(client_email)`. Upgrade path: Materialized View + `pg_cron REFRESH 15min` se volume >10k deals.
+
+**[3] RLS Puro JWT: CONFIRMADO (padrão Migration 056)**
+
+Zero subqueries em `profiles` nas políticas de `crm_briefings`. Padrão único:
+```sql
+company_id = (auth.jwt() ->> 'company_id')::uuid
+```
+
+---
+
+### Migration 057 — Componentes
+
+**Arquivo:** `supabase/migrations/057_fase9_crm_briefings_kpi_view.sql`
+
+| Componente | Descrição |
+|---|---|
+| `crm_briefings` | Tabela versionada com `content JSONB`, `is_active`, trigger auto-versão |
+| `log_briefing_to_activities()` | Trigger AFTER INSERT/UPDATE com `pg_trigger_depth()` guard |
+| `v_deal_kpis` | View LATERAL JOIN: deals + contacts + qr_codes + qr_links + briefing ativo |
+| `upsert_briefing()` | RPC atômica para o Link D'água gravar briefings via `supabase.rpc()` |
+
+### Ação Obrigatória
+
+> ⚠️ Aplicar Migration 057 no SQL Editor do Supabase antes de conectar o Link D'água ao CRM.

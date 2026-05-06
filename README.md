@@ -1,139 +1,156 @@
-
 <div align="center">
-
   <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
-
-<div align="center">
-
-  <img src="./public/logos/logo-icon-gold-transp.png" alt="Logo CRM Hub" width="120">
-
-  <h1>Encontro D'Ãƒ gua Hub & CRM</h1>
-
-  <p>Ecossistema de GestÃƒÂ£o com IA Ã¢â‚¬â€  Multi-Tenant Ã‚Â· Bilingue Ã‚Â· LGPD-Ready</p>
-
+  <h1>Encontro D'Água Hub & CRM</h1>
+  <p>Ecossistema de Gestão com IA · Multi-Tenant · Bilingue · LGPD-Ready</p>
 </div>
 
-### CRM de Produção `V9.9.6` — FK Fix · RLS Ativo · Trigger Robusto · Showcase Gallery (2026-04-30)
+### CRM de Produção `V10.1` — OOM Fix · Catálogo JWT · Fase 9 Link D'água (2026-05-06)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
-> CRM interno para gestão de leads reais, automação WhatsApp e operação SDR.
-> **V9.9.6**: Fix de FK no trigger (INSERT em `companies` antes de `profiles`), blindagem de RLS em tabelas críticas, retry com backoff no AuthContext e galeria multimedia na Showcase LP.
+>
+> **V10.1:** Fix definitivo de OOM em inserts inline (company_id JWT), catálogo de produtos conectado ao Board para todos os roles, separador visual Moeda/Idioma, nome "QR d'água" estático, e Migration 057 da Fase 9 (crm_briefings + v_deal_kpis + anti-recursão).
 
 ## Demo
 
 > **Vídeo:** [demo-provadagua.mp4](/showcase/demo-provadagua.mp4)
-> *Vídeo de demonstração do login e onboarding de boards com Inteligência Artificial*
+> *Demonstração do login e onboarding de boards com Inteligência Artificial*
 
 | Squad de IA no Kanban | Decision Center | Inbox — Modo Foco |
 |---|---|---|
-| ![Visão do Board no CRM mostrando o Squad de IA com os agentes Precy, Mazô e Jury atuando nos cards](./public/showcase/boards-squadIA.png) | ![Decision Center do CRM sugerindo ações proativas como reagendamentos e ligações para negócios parados](./public/showcase/decision-center.png) | ![Inbox do CRM no Modo Foco destacando um negócio urgente parado há mais de 7 dias](./public/showcase/inbox-foco.png) |
+| ![Board Kanban com Squad de IA](./public/showcase/boards-squadIA.png) | ![Decision Center com sugestões proativas](./public/showcase/decision-center.png) | ![Inbox Modo Foco com negócio urgente](./public/showcase/inbox-foco.png) |
 
 ---
 
-## Arquitetura Multi-Tenant (Hub vs ProvadÃƒÂ¡gua)
+## Arquitetura Multi-Tenant (Hub vs Provadágua)
 
 O projeto opera em **dois contextos distintos**:
 
 | Contexto | URL | Branch | Acesso | Perfil |
 |---|---|---|---|---|
 | **Hub Digital** | `hub.encontrodagua.com` | `main` | Super Admin apenas | `is_super_admin = true` |
-| **ProvadÃƒÂ¡gua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate Ã¢â€ â€™ trial 7d | `access_level = provadagua-trial` |
+| **Provadágua** | `prova.encontrodagua.com` | `provadagua` | Keyword Gate → trial 7d | `access_level = provadagua-trial` |
 
-### Fluxo ProvadÃƒÂ¡gua (V8.0 Ã¢â‚¬â€ sem Edge Function)
+### Fluxo Provadágua (V8.0 — sem Edge Function)
 ```
-/#/showcase  Ã¢â€ â€™  [CTA "Experimentar"]  Ã¢â€ â€™  /#/login?from=showcase
-              Ã¢â€ â€™  Aba "Novo Cadastro" (padrÃƒÂ£o)
-              Ã¢â€ â€™  Preenche Palavra-chave + Nome + E-mail + Senha
-              Ã¢â€ â€™  supabase.auth.signUp() nativo (sem CORS, sem Edge Function)
-              Ã¢â€ â€™  auto-login  Ã¢â€ â€™  /dashboard  (trial ativo 7 dias)
-              Ã¢â€ â€™  Lead inserido em contacts (CRM) automaticamente
+/#/showcase  →  [CTA "Experimentar"]  →  /#/login?from=showcase
+              →  Aba "Novo Cadastro" (padrão)
+              →  Preenche Palavra-chave + Nome + E-mail + Senha
+              →  supabase.auth.signUp() nativo (sem CORS, sem Edge Function)
+              →  auto-login  →  /dashboard  (trial ativo 7 dias)
+              →  Lead inserido em contacts (CRM) automaticamente
 ```
 
 ### Fluxo Hub
 ```
-/#/login  Ã¢â€ â€™  Aba "Entrar" (ÃƒÂºnica)  Ã¢â€ â€™  SignIn com e-mail/senha
-          Ã¢â€ â€™  Valida is_super_admin  Ã¢â€ â€™  /dashboard
-          Ã¢â€ â€™  NÃƒÂ£o-admin: bloqueado + link para /#/showcase
+/#/login  →  Aba "Entrar" (única)  →  SignIn com e-mail/senha
+          →  Valida is_super_admin  →  /dashboard
+          →  Não-admin: bloqueado + link para /#/showcase
 ```
 
 ---
 
 ## Endpoints Principais
 
-| Rota | Acesso | DescriÃƒÂ§ÃƒÂ£o |
+| Rota | Acesso | Descrição |
 |---|---|---|
-| `/#/` | PÃƒÂºblico | LandingPage Hub |
-| `/#/showcase` | PÃƒÂºblico | ShowcasePage ProvadÃƒÂ¡gua (LP pitch) |
-| `/#/login` | PÃƒÂºblico | Login Hub (sÃƒÂ³ SignIn) |
-| `/#/login?from=showcase` | PÃƒÂºblico | Login ProvadÃƒÂ¡gua (SignUp com Keyword + SignIn) |
+| `/#/` | Público | LandingPage Hub |
+| `/#/showcase` | Público | ShowcasePage Provadágua (LP pitch) |
+| `/#/login` | Público | Login Hub (só SignIn) |
+| `/#/login?from=showcase` | Público | Login Provadágua (SignUp + Keyword + SignIn) |
 | `/#/dashboard` | Auth | Dashboard CRM (ProtectedRoute) |
-| `/#/trial-expired` | Auth | PÃƒÂ¡gina pÃƒÂ³s-trial com NPS + CTA fechar negÃƒÂ³cio |
-| `/#/admin` | Admin | Painel CRUD de usuarios (Super Admin) |
-| `/#/admin/leads` | Admin | Painel de leads ProvadÃƒÂ¡gua com trial control |
-| `/#/settings` | Auth | ConfiguraÃƒÂ§ÃƒÂµes Ã¢â‚¬â€ usuÃƒÂ¡rios filtrados por `company_id` |
+| `/#/boards` | Auth | Kanban multi-board com Squad de IA |
+| `/#/contacts` | Auth | Contatos isolados por `company_id` |
+| `/#/qrdagua` | Auth | QR d'água — Projetos de Links e QR Codes |
+| `/#/trial-expired` | Auth | Pós-trial com NPS + CTA fechar negócio |
+| `/#/admin` | Admin | Painel CRUD de usuários (Super Admin) |
+| `/#/admin/leads` | Admin | Painel de leads Provadágua com trial control |
+| `/#/settings` | Auth | Configurações — usuários filtrados por `company_id` |
 
 ### Edge Functions (Supabase)
 
-| FunÃƒÂ§ÃƒÂ£o | MÃƒÂ©todo | DescriÃƒÂ§ÃƒÂ£o |
+| Função | Método | Descrição |
 |---|---|---|
-| ~~`signup-showcase`~~ | ~~POST~~ | **DESCONTINUADA V6.6** Ã¢â‚¬â€ substituÃƒÂ­da por `supabase.auth.signUp()` nativo |
-| `form-lp-lead` | POST | Captura lead via LeadCaptureModal Ã¢â€ â€™ Board |
+| ~~`signup-showcase`~~ | ~~POST~~ | **DESCONTINUADA V6.6** — substituída por `supabase.auth.signUp()` nativo |
+| `form-lp-lead` | POST | Captura lead via LeadCaptureModal → Board |
 | `qr-redirect` | GET | Redireciona slug QR Code para URL real |
 
 ---
 
-## GestÃƒÂ£o de Leads e Multi-tenancy (V8.0)
+## Gestão de Leads e Multi-tenancy (V8.0)
 
-### SeparaÃƒÂ§ÃƒÂ£o de VisÃƒÂµes: Super Admin vs Owner/Lead
+### Separação de Visões: Super Admin vs Owner/Lead
 
-O sistema usa `company_id` como parede de isolamento total entre organizaÃƒÂ§ÃƒÂµes:
-
-| Papel | VisÃƒÂ£o | Rota |
+| Papel | Visão | Rota |
 |---|---|---|
-| **Super Admin** | Todos os usuÃƒÂ¡rios do sistema | `/#/admin` |
-| **Owner/Lead (Tenant)** | Apenas usuÃƒÂ¡rios da propria `company_id` | `/#/settings` |
+| **Super Admin** | Todos os usuários do sistema | `/#/admin` |
+| **Owner/Lead (Tenant)** | Apenas usuários da própria `company_id` | `/#/settings` |
 
 ### Sistema de Trial (7 dias)
 
 ```
 Lead se cadastra via Keyword Gate
-  Ã¢â€ â€™ supabase.auth.signUp() + metadata { user_type: 'lead_provadagua' }
-  Ã¢â€ â€™ trial_expires_at = now() + 7 dias (setado no profile)
-  Ã¢â€ â€™ access_level = 'trial'
-  Ã¢â€ â€™ Lead inserido em contacts com source='showcase'
+  → supabase.auth.signUp() + metadata { user_type: 'lead_provadagua' }
+  → trial_expires_at = now() + 7 dias (setado no profile)
+  → access_level = 'trial'
+  → Lead inserido em contacts com source='showcase'
 ```
 
-**Renovacao Manual (Super Admin):**
-1. Acessar `/#/admin` Ã¢â€ â€™ aba UsuÃƒÂ¡rios
+**Renovação Manual (Super Admin):**
+1. Acessar `/#/admin` → aba Usuários
 2. Localizar o lead pela coluna E-mail
-3. Clicar em **+7d** para estender a partir da data atual ou do trial vigente
+3. Clicar em **+7d** para estender o trial
 4. Ou clicar em **Suspender** para bloquear acesso imediatamente
 5. O modal **Editar** permite ajuste fino: `trial_expires_at`, `access_level`, plano e role
-
-**Filtro de Privacy (`/#/settings`):**
-- Query Supabase com `.eq('company_id', currentUser.company_id)`
-- O Lead/Tenant **nunca** ve os dados de outros tenants
-- O Lead/Tenant **so** ve a si mesmo e quem ele convidar
 
 ---
 
 ## Funcionalidades
 
-| MÃƒÂ³dulo | DescriÃƒÂ§ÃƒÂ£o |
+| Módulo | Descrição | Status |
+|---|---|---|
+| **Board Kanban** | Multi-board; leads mapeados ao funil via tag `🤖 sdr` | ✅ Produção |
+| **Contatos** | Base isolada por `company_id` (RLS JWT estrito) | ✅ Produção |
+| **Catálogo de Produtos** | Conectado ao Board — filtra por `company_id` via JWT | ✅ V10.1 |
+| **Deals** | Create/Update/Move com RLS multi-tenant | ✅ Produção |
+| **Jury** | Contratos BR + Common Law, PDF inline | ✅ Produção |
+| **Precy** | Precificação BRL/USD/AUD com catálogo | ✅ Produção |
+| **QR d'água** | QR Codes + Bridge Pages + galeria pública | ✅ Produção |
+| **Reports** | Pipeline + Win/Loss real (sem dados demo) | ✅ Produção |
+| **Admin** | Usuários, `access_expires_at`, Tech Stack, Super Admin | ✅ Produção |
+| **Amazô** | Agente IA: CS/SDR nas LPs + CRM nativo | ✅ Produção |
+| **Prompt Lab** | Engenharia de prompts multi-persona | ✅ Produção |
+| **Circuit Breaker IA** | Cooldown 10s em erro 429; sem spam de API | ✅ V9.9.7 |
+| **Global Currency** | BRL/USD/AUD com seletor no header | ✅ V9.9.7 |
+| **ShowcasePage** | LP pública `/showcase` bilingue com FAQ + QA + Tech | ✅ Produção |
+| **Trial Gate** | Keyword `provadagua` → signup imediato · 7d trial | ✅ Produção |
+| **TrialExpiredPage** | NPS + feedback + CTA fechar negócio | ✅ Produção |
+| **crm_briefings** | Tabela Fase 9 — briefings versionados do Link D'água | 🔧 Migration 057 |
+| **v_deal_kpis** | View KPI: deals + QR scans + briefing ativo | 🔧 Migration 057 |
+
+---
+
+## Padrão de Segurança RLS (Obrigatório desde Migration 056)
+
+**Regra de ouro:** Nenhuma política RLS pode fazer `SELECT` em `profiles`. O `company_id` e `is_super_admin` são lidos **exclusivamente** via claims do JWT:
+
+```sql
+-- CORRETO (Migration 056+):
+company_id = (auth.jwt() ->> 'company_id')::uuid
+(auth.jwt() ->> 'is_super_admin') = 'true'
+
+-- PROIBIDO (causa recursão/OOM):
+(SELECT company_id FROM profiles WHERE id = auth.uid())
+```
+
+### Migrations Críticas
+
+| Migration | Descrição |
 |---|---|
-| **Board Kanban** | Leads mapeados ao funil automaticamente (tag `Ã°Å¸Â¤â€“ sdr` Ã¢â€ â€™ estÃƒÂ¡gio 1) |
-| **Contatos** | Base isolada por `company_id` (RLS ativo) |
-| **Jury** | Contratos BR + Common Law, PDF inline |
-| **Precy** | PrecificaÃƒÂ§ÃƒÂ£o BRL/USD/EUR com catÃƒÂ¡logo |
-| **QR D'ÃƒÂ¡gua** | QR Codes + Bridge Pages + galeria pÃƒÂºblica |
-| **Reports** | Pipeline + Win/Loss real (sem dados demo) |
-| **Admin** | UsuÃƒÂ¡rios, `access_expires_at`, Tech Stack, Super Admin |
-| **AmazÃƒÂ´** | Agente IA: CS/SDR nas LPs + CRM nativo |
-| **Prompt Lab** | Engenharia de prompts multi-persona |
-| **ShowcasePage** | LP pÃƒÂºblica `/showcase` bilingue com FAQ + QA + Tech |
-| **Trial Gate** | Keyword `provadagua` Ã¢â€ â€™ signup imediato Ã‚Â· 7d trial |
-| **TrialExpiredPage** | NPS + feedback + CTA fechar negÃƒÂ³cio |
+| `054` | Fix recursão infinita em RLS de `profiles` |
+| `055` | JWT company_id em inserts de contacts/deals |
+| `056` | RLS puro JWT em contacts, deals, crm_companies — zero subqueries em profiles |
+| `057` | Fase 9: `crm_briefings` + `v_deal_kpis` + `upsert_briefing()` |
 
 ---
 
@@ -141,52 +158,44 @@ Lead se cadastra via Keyword Gate
 
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
 - **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
-- **IA**: Google Gemini (principal), OpenAI, Anthropic (fallback)
-- **Deploy**: Vercel (banch-based: `main` Ã¢â€ â€™ hub / `provadagua` Ã¢â€ â€™ prova)
+- **IA**: Google Gemini (principal), OpenAI, Anthropic (fallback) + Circuit Breaker
+- **Deploy**: Vercel (branch-based: `main` → hub / `provadagua` → prova)
 - **Webhook SDR**: Supabase Edge Function `form-lp-lead`
-- **Pagamentos**: Stripe (Prompt Lab Mensal R$3 Ã‚Â· Anual R$29,90 Ã‚Â· Agente IA R$80)
+- **Pagamentos**: Stripe (Prompt Lab Mensal R$3 · Anual R$29,90 · Agente IA R$80)
 
 ---
 
-## VariÃƒÂ¡veis de Ambiente
+## Variáveis de Ambiente
 
 ```env
-# Ã¢â€â‚¬Ã¢â€â‚¬ PÃƒÂºblicas (bundled no client JS) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ── Públicas (bundled no client JS) ──────────────────────────────────
 VITE_APP_MODE=PRODUCTION          # DEMO em prova.encontrodagua.com
 VITE_SUPABASE_URL=https://...     # Supabase Project URL
-VITE_SUPABASE_ANON_KEY=eyJ...     # Anon key (segura Ã¢â‚¬â€ scoped por RLS)
-VITE_GEMINI_API_KEY=AIza...       # Google Gemini (pÃƒÂºblico by design)
+VITE_SUPABASE_ANON_KEY=eyJ...     # Anon key (segura — scoped por RLS)
+VITE_GEMINI_API_KEY=AIza...       # Google Gemini principal
+VITE_GEMINI_API_KEY_SECONDARY=... # Google Gemini fallback (Circuit Breaker)
 VITE_GA4_MEASUREMENT_ID=G-...     # Google Analytics 4
-VITE_ACCESS_KEYWORD=provadagua    # Keyword Gate Ã¢â‚¬â€ mude para aumentar seguranÃƒÂ§a
-VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (pÃƒÂºblico)
+VITE_ACCESS_KEYWORD=provadagua    # Keyword Gate — mude para aumentar segurança
+VITE_VAPID_PUBLIC_KEY=BE-...      # Web Push (público)
 
-# Ã¢â€â‚¬Ã¢â€â‚¬ Privadas (APENAS Vercel Secrets / .env local) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor Ã¢â‚¬â€ server-only / Edge Functions
+# ── Privadas (APENAS Vercel Secrets / .env local) ─────────────────────
+SUPABASE_SERVICE_ROLE_KEY=...     # NUNCA expor — server-only / Edge Functions
 ```
 
-> Ã¢Å¡Â Ã¯Â¸  `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** Ã¢â‚¬â€ se tiver, rotate imediatamente.
-
----
-
-## SeguranÃƒÂ§a & RLS
-
-- Todas as tabelas crÃƒÂ­ticas tÃƒÂªm `company_id UUID` + RLS policy com bypass `is_super_admin`
-- Dados de demo isolados por `is_demo_data = true`
-- `access_expires_at` controlado por usuÃƒÂ¡rio Ã¢â‚¬â€ ProtectedRoute verifica em toda rota autenticada
-- `SUPABASE_SERVICE_ROLE_KEY` apenas em Vercel Secrets + `.env` local (nunca commitada)
+> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` **jamais deve ter prefixo `VITE_`** — se tiver, rotate imediatamente.
 
 ---
 
 ## Deploy
 
 ```bash
-# ProvadÃƒÂ¡gua (branch provadagua)
+# Provadágua (branch provadagua)
 git push origin provadagua
-# Vercel detecta Ã¢â€ â€™ build Ã¢â€ â€™ prova.encontrodagua.com
+# Vercel detecta → build → prova.encontrodagua.com
 
 # Hub (branch main)
 git push origin main
-# Vercel detecta Ã¢â€ â€™ build Ã¢â€ â€™ hub.encontrodagua.com
+# Vercel detecta → build → hub.encontrodagua.com
 ```
 
 ---
@@ -196,39 +205,38 @@ git push origin main
 ```
 src/
   pages/
-    LandingPage.tsx      # Hub LP Ã¢â‚¬â€ inclui CTA ProvadÃƒÂ¡gua apÃƒÂ³s CRMSimulator
-    ShowcasePage.tsx     # ProvadÃƒÂ¡gua pitch LP bilingue completa
+    LandingPage.tsx      # Hub LP — inclui CTA Provadágua após CRMSimulator
+    ShowcasePage.tsx     # Provadágua pitch LP bilingue completa
     Login.tsx            # Multi-rota: Hub SignIn / Showcase SignUp+Keyword
-    TrialExpiredPage.tsx # PÃƒÂ³s-trial: NPS + fechar negÃƒÂ³cio
-  features/              # MÃƒÂ³dulos CRM (boards, contacts, admin, ...)
+    TrialExpiredPage.tsx # Pós-trial: NPS + fechar negócio
+  features/              # Módulos CRM (boards, contacts, admin, qrdagua, ...)
   lib/
-    supabase/            # Services com IS_DEMO guards
+    supabase/            # Services com IS_DEMO guards + companyId filtros
     analytics.ts         # GA4 eventos (trial_start, lead_capture, login, sign_up)
   hooks/
-    useTranslation.ts    # i18n PT-BR / EN
+    useTranslation.ts    # i18n PT-BR / EN / ES
+  components/
+    Layout.tsx           # Header com Currency + Language separados por divisor
+    CurrencySwitcher.tsx # BRL/USD/AUD — reativo via contexto global
+  services/
+    geminiService.ts     # Circuit Breaker: cooldown 10s em 429, 1 tentativa fallback
 ```
 
 ---
 
-*Mantido pela equipe Encontro d'Ãƒ gua | Manager: Antigravity AI | V8.0 Ã¢â‚¬â€ Go-Live ProvadÃƒÂ¡gua*
-
----
-
-## Roadmap / PrÃ³ximos Passos (PÃ³s-ValidaÃ§Ã£o V9.5)
-
-> Funcionalidades planejadas que estÃ£o fora do escopo do MVP Go-Live:
+## Roadmap / Próximos Passos (Pós-Validação V10.x)
 
 | Feature | Status | Prioridade |
 |---|---|---|
-| **GestÃ£o AutÃ´noma de Equipes** â€” convite por link com company_id | ðŸ”’ Em breve | Alta |
-| ConfirmaÃ§Ã£o de e-mail de convite via Supabase | ðŸ”’ Backlog | Alta |
-| NotificaÃ§Ã£o automÃ¡tica no WA ao expirar o trial | ðŸ• Planejado | MÃ©dia |
-| i18n completo em BoardTemplates e CreateBoardModal | ðŸ• Backlog | Baixa |
-| Dashboard de mÃ©tricas por company_id para o lead | ðŸ• Planejado | MÃ©dia |
-| Export de contatos / deals em CSV | ðŸ• Planejado | Baixa |
+| **Fase 9: Aplicar Migration 057** | ⚠️ Ação obrigatória | **Crítica** |
+| **Fase 9: Frontend crm_briefings** — card KPI no Kanban | 🔧 Em desenvolvimento | Alta |
+| **Link D'água → CRM Sync** — `upsert_briefing()` na jornada do usuário | 🔧 Planejado | Alta |
+| **Gestão Autônoma de Equipes** — convite por link com company_id | 📋 Em breve | Alta |
+| Confirmação de e-mail de convite via Supabase | 📋 Backlog | Alta |
+| Notificação automática no WA ao expirar o trial | 🕐 Planejado | Média |
+| Materialized View `v_deal_kpis` + pg_cron (se >10k deals) | 🕐 Upgrade path | Média |
+| Export de contatos / deals em CSV | 🕐 Planejado | Baixa |
 
 ---
 
-*Atualizado automaticamente pelo Manager (Antigravity AI) â€” V9.8 Strict RLS, Isolation & MVP Banner*
-
-
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V10.1 — Fase 9 Link D'água*
