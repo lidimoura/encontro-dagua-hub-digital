@@ -1,7 +1,7 @@
-# Guia do Usuário — Prova D'água CRM
+# Guia do Usuário — QR d'água Hub & CRM
 
-> **Versão atual:** `V9.9.7` | **Plataforma:** Prova D'água (Multi-Tenant SaaS)
-> **Última atualização:** 2026-05-01
+> **Versão atual:** `V10.1` | **Plataforma:** QR d'água Hub (Multi-Tenant SaaS)
+> **Última atualização:** 2026-05-06
 
 ## Visão Geral
 Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento com clientes com IA integrada. Cada lead (tenant) possui um ambiente **completamente isolado** via Row Level Security (RLS) no banco de dados. Nenhum dado de um tenant é visível para outro.
@@ -121,6 +121,8 @@ Abra o card do lead no Kanban e você verá:
 #### Aba Produtos
 Um bloco **"Interesse declarado pelo Lead"** mostra, como badges coloridos, os serviços que o lead pediu
 (ex: "Link d'Água", "QR Code", "Consultoria"). Use isso para adicionar os produtos corretos abaixo.
+
+> **V10.1:** O catálogo de produtos agora é carregado automaticamente de acordo com o `company_id` do usuário. Leads e Super Admin veem apenas os produtos do próprio tenant — sem necessidade de configuração adicional.
 
 #### Aba Timeline
 Um card **"Briefing Automático — Amazô SDR"** aparece no topo com a mensagem original que o lead digitou
@@ -412,36 +414,20 @@ ORDER BY created_at DESC;
 2. Alterne para 🇺🇸 **English (US)**
 3. Todos os menus, labels, botões e mensagens do sistema mudam para EN
 4. O widget de suporte azul (**Aiflow**) também muda: título, cards e formulário ficam em inglês
-5. A preferência salva automaticamente no `localStorage`
-
-### Usando o Suporte Aiflow
-
-1. Clique no botão azul ❓ no canto inferior esquerdo
-2. Escolha o tema de suporte:
-   - **Forgot password** — instruções de recuperação
-   - **Didn't receive the email** — dica sobre spam
-   - **Access error** — troubleshoot de login
-   - **Report Bug / Feedback** — abre formulario que notifica o Super Admin
-   - **Direct support** — abre WhatsApp com a equipe
-3. O idioma do painel Aiflow segue o idioma selecionado no sistema
-
----
-
-*Atualizado automaticamente pelo Manager (Antigravity AI) — V8.0 Go-Live Provadágua*
+*Atualizado automaticamente pelo Manager (Antigravity AI) — V10.1 Fase 9 Link D'água*
 
 ---
 
 ## Nota para o Lead/Tenant: Convidar Membros para o Time
 
-A funcionalidade de **convidar s�cias e colaboradoras** diretamente pela aba **Team Members** (/#/settings/team) est� temporariamente em manuten��o.
+A funcionalidade de **convidar sócias e colaboradoras** diretamente pela aba **Team Members** (`/#/settings`) está temporariamente em manutenção.
 
-> **Status: ?? Em breve � previsto para a pr�xima atualiza��o p�s-valida��o.**
+> **Status:** 📋 Em breve — previsto para a próxima atualização pós-validação.
 
-### O que j� funciona:
+### O que já funciona:
 - Visualizar os membros da sua equipe (filtrado pela sua empresa)
 - Ver roles (Admin, Membro, Sales Rep)
 
-### O que est� em desenvolvimento:
 - Envio de convite por WhatsApp ou E-mail com link direto para a sua �rea
 - Integra��o autom�tica do convidado ao seu time (via company_id)
 

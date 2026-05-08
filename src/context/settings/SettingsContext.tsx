@@ -178,19 +178,37 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
           setAiApiKeyState(settings.aiApiKey);
           if (settings.aiApiKeySecondary) setAiApiKeySecondaryState(settings.aiApiKeySecondary);
         } else if (!profile.is_super_admin) {
-          // Lead sem chave — herda silenciosamente da super_admin via JOIN com profiles
+          // Lead sem chave — herda silenciosamente da super_admin
           try {
             const { supabase } = await import('@/lib/supabase/client');
-            const { data: adminSettings } = await supabase
-              .from('user_settings')
-              .select('ai_api_key, ai_api_key_secondary, profiles!inner(is_super_admin)')
-              .eq('profiles.is_super_admin', true)
-              .maybeSingle();
-            const inheritedKey = (adminSettings as any)?.ai_api_key || import.meta.env.VITE_GEMINI_API_KEY || '';
-            const inheritedSecondary = (adminSettings as any)?.ai_api_key_secondary || import.meta.env.VITE_GEMINI_API_KEY_SECONDARY || '';
+            
+            // 1. Achar o ID do super admin (Pode retornar vazio se RLS bloquear o lead)
+            const { data: adminProfiles } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('is_super_admin', true)
+              .limit(1);
+
+            let inheritedKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+            let inheritedSecondary = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY || '';
+
+            if (adminProfiles && adminProfiles.length > 0) {
+              // 2. Buscar as chaves do super admin
+              const { data: adminSettings } = await supabase
+                .from('user_settings')
+                .select('ai_api_key, ai_api_key_secondary')
+                .eq('user_id', adminProfiles[0].id)
+                .maybeSingle();
+                
+              if (adminSettings?.ai_api_key) inheritedKey = adminSettings.ai_api_key;
+              if (adminSettings?.ai_api_key_secondary) inheritedSecondary = adminSettings.ai_api_key_secondary;
+            }
+
             setAiApiKeyState(inheritedKey);
             if (inheritedSecondary) setAiApiKeySecondaryState(inheritedSecondary);
-            if (inheritedKey) console.info('[SettingsContext] API key herdada da super_admin (modo demo)');
+            if (inheritedKey && adminProfiles && adminProfiles.length > 0) {
+                console.info('[SettingsContext] API key herdada da super_admin (modo demo)');
+            }
           } catch {
             // Fallback final: env var
             setAiApiKeyState(import.meta.env.VITE_GEMINI_API_KEY || '');

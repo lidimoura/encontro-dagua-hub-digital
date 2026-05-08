@@ -136,9 +136,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [aiResult, setAiResult] = useState<{ suggestion: string; score: number } | null>(null);
   const [emailDraft, setEmailDraft] = useState<string | null>(null);
   const [newNote, setNewNote] = useState('');
-  const [activeTab, setActiveTab] = useState<'timeline' | 'products' | 'info' | 'documents'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'products' | 'info' | 'documents' | 'briefing'>('timeline');
   // ── Conversion state ─────────────────────────────────────────
   const [isConverting, setIsConverting] = useState(false);
+
+  // ── Briefing state ───────────────────────────────────────────
+  const [dbBriefing, setDbBriefing] = useState<any>(null);
+  const [isLoadingBriefing, setIsLoadingBriefing] = useState(false);
 
   // ── Documents tab state ───────────────────────────────────────
   const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
@@ -246,6 +250,30 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   }, [activeTab, deal?.contactId, contacts]);
 
   if (!isOpen || !deal) return null;
+
+  // ── Fetch Briefing from crm_briefings ───────────────────────
+  useEffect(() => {
+    if (activeTab !== 'briefing' || !deal) return;
+
+    setIsLoadingBriefing(true);
+    let query = `deal_id.eq.${deal.id}`;
+    if (deal.contactId) query += `,contact_id.eq.${deal.contactId}`;
+    
+    supabase
+      .from('crm_briefings')
+      .select('content, version, created_at, source')
+      .or(query)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setDbBriefing(data);
+        }
+        setIsLoadingBriefing(false);
+      });
+  }, [activeTab, deal?.id, deal?.contactId]);
 
   // ── briefing_json helper ──────────────────────────────────────
   const contactObj = contacts.find(c => c.id === deal.contactId);
@@ -878,6 +906,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                                   status: 'ACTIVE',
                                   stage: 'LEAD',
                                   company_id: profile?.company_id,
+                                  owner_id: profile?.id,
                                 })
                                 .select('id')
                                 .single();
@@ -1123,6 +1152,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                       QR
                     </span>
                   )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('briefing')}
+                  className={`text-sm font-bold h-14 border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'briefing' ? 'border-teal-500 text-teal-600 dark:text-teal-300' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+                >
+                  <FileText size={14} />
+                  Briefing Link d'Água
                 </button>
               </div>
             </div>
@@ -1701,6 +1737,96 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                     </div>
                   </div>
                 )}
+              
+              {/* ── BRIEFING TAB ───────────────────────────────────── */}
+              {activeTab === 'briefing' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg text-teal-600 dark:text-teal-400">
+                      <FileText size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white">Briefing Link d'Água</h3>
+                      <p className="text-xs text-slate-500">Dados estruturados coletados do cliente</p>
+                    </div>
+                  </div>
+
+                  {isLoadingBriefing ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 size={28} className="animate-spin text-teal-500" />
+                    </div>
+                  ) : !dbBriefing ? (
+                    <div className="text-center py-10 text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+                      <FileText size={32} className="mx-auto mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Nenhum briefing encontrado no banco de dados.</p>
+                      <p className="text-xs mt-1">O contato não preencheu o formulário avançado do Link d'Água.</p>
+                    </div>
+                  ) : (
+                    <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden shadow-sm">
+                      <div className="bg-teal-50 dark:bg-teal-900/20 px-4 py-3 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-teal-700 dark:text-teal-400">Versão {dbBriefing.version || 1}</span>
+                          <span className="text-[10px] bg-teal-100 dark:bg-teal-800/40 text-teal-800 dark:text-teal-300 px-2 py-0.5 rounded-full uppercase">
+                            {dbBriefing.source || 'link-dagua'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(dbBriefing.created_at).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                      <div className="p-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Nome Informado</p>
+                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{dbBriefing.content?.name || 'Não informado'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">WhatsApp</p>
+                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 font-mono">{dbBriefing.content?.whatsapp || 'Não informado'}</p>
+                          </div>
+                        </div>
+
+                        {dbBriefing.content?.services && dbBriefing.content.services.length > 0 && (
+                          <div className="pt-3 border-t border-slate-100 dark:border-white/5">
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-2">Serviços de Interesse</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {dbBriefing.content.services.map((s: string, i: number) => (
+                                <span key={i} className="text-xs font-semibold px-2 py-1 rounded bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-100 dark:border-teal-800/50">
+                                  {s}
+                               </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {dbBriefing.content?.message && (
+                          <div className="pt-3 border-t border-slate-100 dark:border-white/5">
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-2">Mensagem do Lead</p>
+                            <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap bg-slate-50 dark:bg-black/20 p-3 rounded-lg border border-slate-100 dark:border-white/5">
+                              {dbBriefing.content.message}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Custom fields loop for anything else */}
+                        {Object.entries(dbBriefing.content || {}).filter(([k]) => !['name', 'whatsapp', 'services', 'message', 'source', 'landed_via', 'capture_time'].includes(k)).length > 0 && (
+                           <div className="pt-3 border-t border-slate-100 dark:border-white/5">
+                             <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-2">Dados Adicionais</p>
+                             <div className="grid grid-cols-2 gap-3">
+                               {Object.entries(dbBriefing.content || {}).filter(([k]) => !['name', 'whatsapp', 'services', 'message', 'source', 'landed_via', 'capture_time'].includes(k)).map(([key, value]) => (
+                                 <div key={key}>
+                                   <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">{key}</p>
+                                   <p className="text-sm text-slate-700 dark:text-slate-300 font-mono break-all">{String(value)}</p>
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

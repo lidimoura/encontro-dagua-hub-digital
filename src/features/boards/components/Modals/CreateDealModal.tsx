@@ -21,7 +21,7 @@ interface DealItem {
 }
 
 export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClose, initialStageId }) => {
-    const { addDeal, activeBoard, activeBoardId, products } = useCRM();
+    const { addDeal, activeBoard, activeBoardId, products, refresh } = useCRM();
     const { profile } = useAuth();
     const { t } = useTranslation();
 
@@ -117,6 +117,10 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     contactId = existingContact.id;
                 } else {
                     // Create new contact
+                    if (!profile?.company_id || !profile?.id) {
+                        throw new Error('Sessão inválida. Faça login novamente.');
+                    }
+                    
                     const { data: newContact, error: contactError } = await supabase
                         .from('contacts')
                         .insert({
@@ -205,10 +209,10 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
             setNewDealData({ title: '', companyName: '', contactName: '', email: '', phone: '' });
             setDealItems([]);
 
-            // Refresh page to show new deal - OPTIMIZED: Use context refresh if available, else reload
-            // window.location.reload(); // Hard reload is last resort, but acceptable for stability
-            // Ideally we should use a refreshDeals() from context, but reload is safe for "Ghost Deal" fix.
-            window.location.reload();
+            // Refresh context state instead of window.location.reload() to avoid OOM loops
+            if (refresh) {
+                await refresh();
+            }
         } catch (error: any) {
             console.error('Error creating deal:', error);
             addToast(error.message || 'Failed to create deal', 'error');

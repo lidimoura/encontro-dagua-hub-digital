@@ -5,7 +5,7 @@ import { ActivityStatusIcon } from './ActivityStatusIcon';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLanguage } from '@/context/LanguageContext';
 import { formatCurrency } from '@/components/CurrencySwitcher';
-import { useClientQREngagement } from '@/lib/query/hooks/useContactsQuery';
+import { useQuery } from '@tanstack/react-query';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/lib/supabase/client';
@@ -46,8 +46,29 @@ export const DealCard: React.FC<DealCardProps> = ({
   const { moveDeal, boards } = useCRM();
   const { addToast } = useToast();
 
-  // Cross-app analytics: fetch QR engagement for this deal's contact email
-  const { data: qrEngagement } = useClientQREngagement(deal.contactEmail || undefined);
+  // Cross-App analytics: fetch QR engagement from v_deal_kpis view (Phase 9 integration)
+  const { data: qrEngagement } = useQuery({
+    queryKey: ['deal-kpis', deal.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('v_deal_kpis')
+        .select('qr_codes_count, qr_links_count, total_scans, total_projects')
+        .eq('deal_id', deal.id)
+        .maybeSingle();
+
+      if (error || !data) {
+        return { qrCodesCount: 0, qrLinksCount: 0, totalScans: 0, totalProjects: 0 };
+      }
+      
+      return {
+        qrCodesCount: data.qr_codes_count || 0,
+        qrLinksCount: data.qr_links_count || 0,
+        totalScans: data.total_scans || 0,
+        totalProjects: data.total_projects || 0,
+      };
+    },
+    staleTime: 60000, // 1 minute cache to avoid hammering DB on every render
+  });
 
   const handleQuickConvert = async (e: React.MouseEvent) => {
     e.stopPropagation();
