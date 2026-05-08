@@ -169,10 +169,14 @@ export const useBoardsController = () => {
   // Helper to synchronously promote a ghost deal to a real deal
   const promoteGhostDeal = async (ghostId: string): Promise<string> => {
     if (!ghostId.startsWith('auto-')) return ghostId;
+    if (!profile?.company_id || !profile?.id) {
+      console.error('[promoteGhostDeal] Sessão inválida — company_id ou id ausente');
+      return ghostId;
+    }
     const contactId = ghostId.replace('auto-', '');
     const autoDeal = deals.find(d => d.id === ghostId);
 
-    // Create real deal in Supabase
+    // Create real deal in Supabase with explicit tenant fields for RLS
     const { data, error } = await supabase.from('deals')
       .insert({
         title: autoDeal?.title || 'Novo Deal',
@@ -183,12 +187,14 @@ export const useBoardsController = () => {
         status: autoDeal?.status || activeBoard?.stages[0]?.id,
         priority: 'medium',
         probability: 10,
+        company_id: profile.company_id,
+        owner_id: profile.id,
       })
       .select('id')
       .single();
 
     if (error || !data) {
-      console.error('Error promoting auto-deal:', error);
+      console.error('[promoteGhostDeal] Error promoting auto-deal:', error);
       return ghostId;
     }
 

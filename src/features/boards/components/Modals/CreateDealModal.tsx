@@ -7,6 +7,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { dispatchWebhookEvent } from '@/services/n8nService';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query/queryKeys';
 
 interface CreateDealModalProps {
     isOpen: boolean;
@@ -21,9 +23,10 @@ interface DealItem {
 }
 
 export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClose, initialStageId }) => {
-    const { addDeal, activeBoard, activeBoardId, products, refresh } = useCRM();
+    const { addDeal, activeBoard, activeBoardId, products } = useCRM();
     const { profile } = useAuth();
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
 
     const [newDealData, setNewDealData] = useState({
         title: '',
@@ -77,14 +80,44 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
 
     const handleCreateDeal = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return; // Prevent double-submit
         setLoading(true);
 
         try {
-            if (!profile?.company_id) {
-                throw new Error('Company ID not found');
+            if (!profile?.company_id || !profile?.id) {
+                throw new Error('Sessão inválida. Faça login novamente.');
             }
 
-            // 1. Create or find contact
+            // ── Step 0: Company dedup (before creating contact) ──────────
+            let companyId: string | null = null;
+            if (newDealData.companyName?.trim()) {
+                // Check if company already exists for this tenant
+                const { data: existingCompany } = await supabase
+                    .from('crm_companies')
+                    .select('id')
+                    .eq('company_id', profile.company_id)
+                    .ilike('name', newDealData.companyName.trim())
+                    .limit(1)
+                    .maybeSingle();
+
+                if (existingCompany) {
+                    companyId = existingCompany.id;
+                } else {
+                    // Create new company (best-effort, non-blocking)
+                    const { data: newCompany } = await supabase
+                        .from('crm_companies')
+                        .insert({
+                            name: newDealData.companyName.trim(),
+                            owner_id: profile.id,
+                            company_id: profile.company_id,
+                        })
+                        .select('id')
+                        .maybeSingle();
+                    if (newCompany) companyId = newCompany.id;
+                }
+            }
+
+            // ── Step 1: Create or find contact ──────────────────────────
             let contactId: string | null = null;
 
             if (newDealData.email || newDealData.contactName) {
@@ -97,7 +130,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         .select('id')
                         .eq('email', newDealData.email)
                         .eq('company_id', profile.company_id)
-                        .single();
+                        .maybeSingle();
                     existingContact = data;
                 }
 
@@ -116,11 +149,6 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 if (existingContact) {
                     contactId = existingContact.id;
                 } else {
-                    // Create new contact
-                    if (!profile?.company_id || !profile?.id) {
-                        throw new Error('Sessão inválida. Faça login novamente.');
-                    }
-                    
                     const { data: newContact, error: contactError } = await supabase
                         .from('contacts')
                         .insert({
@@ -137,7 +165,10 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         .select('id')
                         .single();
 
-                    if (contactError) throw contactError;
+                    if (contactError) {
+                        console.error('[CreateDealModal] Contact insert failed:', contactError);
+                        throw contactError;
+                    }
                     contactId = newContact.id;
                 }
             }
@@ -182,6 +213,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                     title: newDealData.title,
                     value: calculateTotalValue(),
                     contact_id: contactId,
+                    crm_company_id: companyId,
                     board_id: activeBoardId,
                     stage_id: finalStageId,
                     status: finalStageId, // Must match stage.id for Kanban column mapping
@@ -197,25 +229,25 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                 .select()
                 .single();
 
-            if (dealError) throw dealError;
+            if (dealError) {
+                console.error('[CreateDealModal] Deal insert failed:', dealError);
+                throw dealError;
+            }
 
             // Trigger deal.created webhook
-            if (profile?.company_id) {
-                dispatchWebhookEvent('deal.created', newDeal, profile.company_id);
-            }
+            dispatchWebhookEvent('deal.created', newDeal, profile.company_id);
 
             addToast(t('dealCreated' as any) || 'Deal created successfully!', 'success');
             onClose();
             setNewDealData({ title: '', companyName: '', contactName: '', email: '', phone: '' });
             setDealItems([]);
 
-            // Refresh context state instead of window.location.reload() to avoid OOM loops
-            if (refresh) {
-                await refresh();
-            }
+            // ── TARGETED invalidation (no full refresh = no OOM) ──────────
+            queryClient.invalidateQueries({ queryKey: queryKeys.deals.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
         } catch (error: any) {
-            console.error('Error creating deal:', error);
-            addToast(error.message || 'Failed to create deal', 'error');
+            console.error('[CreateDealModal] Error creating deal:', error);
+            addToast(error.message || 'Falha ao criar deal. Verifique os dados.', 'error');
         } finally {
             setLoading(false);
         }

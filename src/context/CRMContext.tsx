@@ -320,11 +320,32 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     let finalCompanyId = deal.companyId;
     let finalContactId = deal.contactId;
 
-    // Handle Company
+    // Handle Company — DB-level dedup to prevent duplicates
     if (relatedData?.companyName) {
-      const existingCompany = companies.find(
+      // First try in-memory cache (fast path)
+      let existingCompany = companies.find(
         c => c.name.toLowerCase() === relatedData.companyName!.toLowerCase()
       );
+
+      // If not found in memory, check DB (handles stale cache)
+      if (!existingCompany && profile?.company_id) {
+        try {
+          const { supabase } = await import('@/lib/supabase/client');
+          const { data: dbCompany } = await supabase
+            .from('crm_companies')
+            .select('id, name')
+            .eq('company_id', profile.company_id)
+            .ilike('name', relatedData.companyName.trim())
+            .limit(1)
+            .maybeSingle();
+          if (dbCompany) {
+            existingCompany = { id: dbCompany.id, name: dbCompany.name } as any;
+          }
+        } catch {
+          // Non-blocking — continue with in-memory result
+        }
+      }
+
       if (existingCompany) {
         finalCompanyId = existingCompany.id;
       } else {
