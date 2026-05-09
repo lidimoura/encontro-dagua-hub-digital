@@ -399,8 +399,13 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         )}
                     </div>
 
-                    <button type="submit" className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 rounded-lg mt-2 shadow-lg shadow-primary-600/20 transition-all">
-                        {t('createDeal')}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 rounded-lg mt-2 shadow-lg shadow-primary-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {loading && <Loader2 size={16} className="animate-spin" />}
+                        {loading ? (t('creating' as any) || 'Creating...') : t('createDeal')}
                     </button>
                 </form>
             </div>

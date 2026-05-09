@@ -38,11 +38,11 @@ export interface User {
 export interface Profile {
     id: string;
     email: string;
-    full_name?: string;
+    full_name?: string;                // shared with Link d'Água profiles
     phone?: string;
     role: 'user' | 'admin' | 'super_admin' | 'equipe' | 'cliente' | 'cliente_restrito';
     plan_type?: 'free' | 'monthly' | 'annual';
-    status?: 'active' | 'inactive' | 'suspended';
+    status?: 'active' | 'inactive' | 'suspended';  // shared: Link d'Água also uses this
     access_level?: 'trial' | 'suspended' | 'paid' | 'free' | string;  // V9.9.7
     user_type?: 'lead_provadagua' | 'team_member' | 'client' | string; // V9.9.7
     trial_expires_at?: string | null;  // V9.9.7
@@ -50,7 +50,12 @@ export interface Profile {
     preferred_language?: 'pt' | 'en' | 'es'; // V9.9.7 from migration 037
     preferred_currency?: 'BRL' | 'AUD' | 'USD'; // V9.9.7 from migration 037
     company_id?: string;
+    avatar_url?: string;               // shared: Link d'Água profiles
+    onboarding_completed?: boolean;    // shared: Link d'Água profiles
+    referral_code?: string;            // shared: Link d'Água profiles
+    referred_by?: string;              // shared: Link d'Água profiles
     created_at?: string;
+    updated_at?: string;
 }
 
 // ============================================
@@ -334,4 +339,71 @@ export interface Lead {
     status?: string | 'LEAD' | 'QUALIFIED' | 'CONTACTED' | 'NEW';
     notes?: string;
     createdAt: string;
+}
+
+// ============================================
+// SHARED SUPABASE TABLES (Link d'Água ecosystem)
+// Synced from shared Supabase schema — do NOT modify DB columns without coordination.
+// ============================================
+
+/** Global app settings (GA4, feature flags, etc.) — super_admin only */
+export interface AppSetting {
+    id: string;
+    key: string;
+    value: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+}
+
+/** Briefing collected via concierge flow (Link d'Água → CRM) */
+export interface CrmBriefing {
+    id: string;
+    company_id: string;
+    profile_id: string;
+    deal_id?: string | null;
+    contact_id?: string | null;
+    content: Record<string, unknown>;
+    source: string;
+    version: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at?: string;
+}
+
+/** QR Code project (CRM-managed) */
+export interface QrCode {
+    id: string;
+    client_name?: string;
+    client_email?: string;  // used for cross-app engagement queries
+    total_scans?: number;
+    company_id?: string;
+    created_at: string;
+    updated_at?: string;
+}
+
+/** Digital Card (Link d'Água ecosystem) */
+export interface DigitalCard {
+    id: string;
+    user_id: string;
+    card_data: Record<string, unknown>;
+    is_published?: boolean;
+    created_at: string;
+    updated_at?: string;
+}
+
+/** QR Link (Link d'Água ecosystem) */
+export interface QrLink {
+    id: string;
+    user_id: string;
+    name: string;
+    short_code: string;
+    destination_url: string;
+    total_scans: number;
+    plan_type: string;
+    customization?: Record<string, unknown>;
+    landing_enabled: boolean;
+    is_public: boolean;
+    client_email?: string;  // cross-app engagement join key
+    created_at: string;
+    updated_at: string;
 }

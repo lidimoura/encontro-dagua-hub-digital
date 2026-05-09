@@ -67,6 +67,27 @@ const handleMutationError = (error: unknown, _variables: unknown, _context: unkn
 
 // ============ QUERY CLIENT ============
 
+/**
+ * Smart retry: NEVER retry 4xx errors (schema mismatch, RLS denial, auth).
+ * These are deterministic failures — retrying them causes OOM loops.
+ * Only retry 5xx (server errors) and network errors.
+ */
+const shouldRetryQuery = (failureCount: number, error: unknown): boolean => {
+  if (failureCount >= 2) return false;  // max 2 retries for transient errors
+  if (error && typeof error === 'object') {
+    const status = (error as any).status || (error as any).code;
+    // 400 Bad Request, 403 Forbidden, 404 Not Found, 409 Conflict, 422 Unprocessable
+    if (typeof status === 'number' && status >= 400 && status < 500) return false;
+    // Supabase PostgREST error codes (string like '42501')
+    const pgCode = (error as any).code;
+    if (typeof pgCode === 'string' && /^(42|23|22)/.test(pgCode)) return false;
+    // Check message for known non-retryable patterns
+    const msg = (error as any).message || '';
+    if (/permission denied|violates|not found|already exists|company_id/i.test(msg)) return false;
+  }
+  return true;  // retry network errors, 5xx, timeouts
+};
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -74,20 +95,20 @@ export const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000,
       // Cache time: 30 minutes
       gcTime: 30 * 60 * 1000,
-      // Retry failed requests 3 times
-      retry: 3,
-      // Retry delay with exponential backoff
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-      // Refetch on window focus for fresh data
-      refetchOnWindowFocus: true,
+      // Smart retry: skip 4xx errors that cause OOM loops
+      retry: shouldRetryQuery,
+      // Retry delay with exponential backoff (capped at 10s)
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
+      // DISABLED: refetchOnWindowFocus was triggering cascading re-renders after errors
+      refetchOnWindowFocus: false,
       // Don't refetch on mount if data is fresh
       refetchOnMount: true,
       // Refetch on reconnect
       refetchOnReconnect: true,
     },
     mutations: {
-      // Retry mutations once
-      retry: 1,
+      // NEVER retry mutations — a failed INSERT/UPDATE should show error, not loop
+      retry: false,
     },
   },
   queryCache: new QueryCache({
