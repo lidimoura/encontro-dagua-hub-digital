@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Shield, Mail, UserPlus, Crown, Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/lib/supabase/client';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -22,6 +23,11 @@ export const UsersPage: React.FC = () => {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteRole, setInviteRole] = useState<'admin' | 'vendedor'>('vendedor');
+    const [isInviting, setIsInviting] = useState(false);
+    const { addToast } = useToast();
 
     // ── Fetch ONLY users from the same company_id (privacy wall) ────────────
     useEffect(() => {
@@ -74,6 +80,34 @@ export const UsersPage: React.FC = () => {
     const isOwner = (member: TeamMember) =>
         member.role === 'admin' || member.role === 'super_admin';
 
+    const handleInvite = async () => {
+        if (!inviteEmail || !inviteEmail.includes('@')) {
+            addToast(isEn ? 'Please enter a valid email address.' : 'Por favor, insira um e-mail válido.', 'error');
+            return;
+        }
+
+        setIsInviting(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('invite-users', {
+                body: { emails: [inviteEmail.trim()], role: inviteRole },
+            });
+
+            if (error) throw error;
+            
+            if (data?.success) {
+                addToast(isEn ? 'Invitation sent successfully!' : 'Convite enviado com sucesso!', 'success');
+                setInviteEmail('');
+            } else {
+                throw new Error(data?.error || data?.message || 'Error sending invite');
+            }
+        } catch (err: any) {
+            console.error('Error inviting user:', err);
+            addToast(err.message || (isEn ? 'Failed to send invitation.' : 'Falha ao enviar convite.'), 'error');
+        } finally {
+            setIsInviting(false);
+        }
+    };
+
     return (
         <div className="p-6 max-w-5xl mx-auto">
             {/* Header */}
@@ -91,34 +125,48 @@ export const UsersPage: React.FC = () => {
                 </p>
             </div>
 
-            {/* Invite Form — V9.5: COMING SOON (convite por link está em backlog) */}
-            <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl opacity-70">
-                <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
-                    <UserPlus size={16} />
-                    {isEn ? 'Invite a Teammate' : 'Convidar Sócia / Membro'}
-                </h2>
-                <div className="flex gap-3">
-                    <input
-                        type="text"
-                        disabled
-                        placeholder={isEn ? 'E-mail or WhatsApp number' : 'E-mail ou número do WhatsApp'}
-                        className="flex-1 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-400 text-sm cursor-not-allowed"
-                    />
-                    <button
-                        type="button"
-                        disabled
-                        className="px-4 py-2 bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-bold cursor-not-allowed flex items-center gap-2"
-                    >
-                        <UserPlus size={14} />
-                        {isEn ? '🔒 Coming Soon' : '🔒 Em breve'}
-                    </button>
+            {/* Invite Form */}
+            {currentUser?.role === 'admin' || currentUser?.role === 'super_admin' ? (
+                <div className="mb-6 p-5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm">
+                    <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <UserPlus size={18} className="text-primary-500" />
+                        {isEn ? 'Invite a Teammate' : 'Convidar Membro para Equipe'}
+                    </h2>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <input
+                            type="email"
+                            value={inviteEmail}
+                            onChange={(e) => setInviteEmail(e.target.value)}
+                            placeholder={isEn ? 'E-mail address' : 'Endereço de e-mail'}
+                            className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-shadow"
+                            onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
+                        />
+                        <select
+                            value={inviteRole}
+                            onChange={(e) => setInviteRole(e.target.value as 'admin' | 'vendedor')}
+                            className="px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 sm:w-40"
+                        >
+                            <option value="vendedor">{isEn ? 'Sales Rep' : 'Vendedor(a)'}</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <button
+                            type="button"
+                            onClick={handleInvite}
+                            disabled={isInviting || !inviteEmail}
+                            className="px-6 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 min-w-[140px] shadow-sm hover:shadow"
+                        >
+                            {isInviting ? (
+                                <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                                <>
+                                    <Mail size={16} />
+                                    {isEn ? 'Send Invite' : 'Enviar Convite'}
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                    {isEn
-                        ? 'Team invitations are under development and will be available soon.'
-                        : 'Convites para o time estão em desenvolvimento e serão liberados em breve.'}
-                </p>
-            </div>
+            ) : null}
 
             {/* Team Table */}
             <div className="glass rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
