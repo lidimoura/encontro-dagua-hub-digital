@@ -249,9 +249,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     return () => { supabase.removeChannel(channel); };
   }, [activeTab, deal?.contactId, contacts]);
 
-  if (!isOpen || !deal) return null;
-
-  // ── Fetch Briefing from crm_briefings ───────────────────────
+  // ── Fetch Briefing from crm_briefings ─────────────────────────────────────
+  // ⚠️ HOTFIX #310: Este useEffect DEVE ficar ANTES do `if (!isOpen || !deal) return null`
+  // para não violar as Rules of Hooks (hooks não podem ser chamados após um return condicional).
   useEffect(() => {
     if (activeTab !== 'briefing' || !deal) return;
 
@@ -274,6 +274,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
         setIsLoadingBriefing(false);
       });
   }, [activeTab, deal?.id, deal?.contactId]);
+
+  if (!isOpen || !deal) return null;
 
   // ── briefing_json helper ──────────────────────────────────────
   const contactObj = contacts.find(c => c.id === deal.contactId);

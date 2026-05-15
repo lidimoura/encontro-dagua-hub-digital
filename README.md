@@ -4,7 +4,7 @@
   <p>Ecossistema de Gestão com IA · Multi-Tenant · Bilingue · LGPD-Ready</p>
 </div>
 
-### CRM de Produção `V10.1` — OOM Fix · Catálogo JWT · Fase 9 Link D'água (2026-05-06)
+### CRM de Produção `V10.2` — Kommo Partner · Messenger Hub · Data Science (2026-05-14)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
@@ -159,8 +159,9 @@ company_id = (auth.jwt() ->> 'company_id')::uuid
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
 - **Backend**: Supabase (PostgreSQL + Auth + RLS + Edge Functions)
 - **IA**: Google Gemini (principal), OpenAI, Anthropic (fallback) + Circuit Breaker
+- **CRM**: Kommo (Parceiro Certificado — integração Messenger-first)
 - **Deploy**: Vercel (branch-based: `main` → hub / `provadagua` → prova)
-- **Webhook SDR**: Supabase Edge Function `form-lp-lead`
+- **Contato Principal**: Facebook Messenger (`m.me/encontrodagua`)
 - **Pagamentos**: Stripe (Prompt Lab Mensal R$3 · Anual R$29,90 · Agente IA R$80)
 
 ---
@@ -239,4 +240,4 @@ src/
 
 ---
 
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V10.1 — Fase 9 Link D'água*
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V10.2 — Kommo Partner · Messenger Hub*

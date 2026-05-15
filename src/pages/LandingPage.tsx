@@ -10,6 +10,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { QRCode } from 'react-qrcode-logo';
 import { ApplicationModal } from '@/components/ApplicationModal';
+import { KommoPartnerSection } from '@/components/KommoPartnerSection';
 import { PhoneSimulator } from '@/components/PhoneSimulator';
 import { CRMSimulator } from '@/components/CRMSimulator';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -91,13 +92,13 @@ export default function LandingPage() {
     {
       id: 'lidi',
       name: "Lidi Moura",
-      role: t('founderRole'),
+      role: "Founder · Kommo Partner · Data Science & OCI",
       type: "human",
       image: "/profile.png",
       color: "border-amber-500 text-amber-400",
       linkedin: "https://linkedin.com/in/lidimoura",
       github: "https://github.com/lidimoura",
-      pitch: t('founderPitch')
+      pitch: "Formação e experiência em Psicologia. Parceira Certificada Kommo, Especialista em Data Science e OCI. Reflorestar o Digital com CRM inteligente e IA."
     },
     {
       id: 'precy',
@@ -636,7 +637,7 @@ Agora, gere o prompt perfeito:`;
                     <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mês</span>
                   </button>
                 <a
-                    href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Vi o Agente de IA (R$ 80/mês) no Hub e tenho interesse. Pode me contar mais?')}`}
+                    href="https://m.me/encontrodagua"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
@@ -1102,7 +1103,7 @@ Agora, gere o prompt perfeito:`;
               <h3 className="text-xl font-bold text-white mb-2">{translations.en.noOneLeftBehind}</h3>
               <p className="text-slate-400 text-sm mb-6">{translations.en.socialImpact}</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open(`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Conheci o Hub e quero conversar sobre uma implementação sob medida para minha operação.')}`, '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                <button onClick={() => window.open('https://m.me/encontrodagua', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
                   <MessageCircle size={18} /> {t('socialConsult')}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
@@ -1151,7 +1152,8 @@ Agora, gere o prompt perfeito:`;
           </div>
         </section>
 
-
+        {/* KOMMO PARTNER — Hidden by default, expandable */}
+        <KommoPartnerSection />
 
         {/* FOOTER */}
         <footer className="py-12 text-center text-slate-600 text-xs bg-[#02040a] border-t border-white/5">
@@ -1160,7 +1162,7 @@ Agora, gere o prompt perfeito:`;
               <Leaf className="w-4 h-4 text-teal-500" />
               <p className="text-white font-bold">Encontro D'água Hub</p>
             </div>
-            <p className="text-slate-500 mb-1">Lidi Moura: Formada em Psicologia e Especialista em Dados</p>
+            <p className="text-slate-500 mb-1">Lidi Moura · Formação e experiência em Psicologia · Parceira Certificada Kommo · Data Science · OCI</p>
             <p className="text-slate-600 mb-4">"Reflorestar o Digital" — Tecnologia acessível com impacto social real.</p>
             <div className="flex items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
               <span>20% + 20% desconto por indicação (máx 50%)</span>

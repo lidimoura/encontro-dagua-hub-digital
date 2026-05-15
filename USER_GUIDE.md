@@ -159,7 +159,7 @@ no chatbot, incluindo data/hora de captura e canal de entrada.
 5. **Configure seu Link d'Água**: Acesse `/qrdagua` e crie sua vitrine digital.
 
 ## Suporte e Contato
-Para suporte técnico, feedback ou encerramento de trial, entre em contato exclusivo pelo **WhatsApp Business (Administrativo Hub e Provadágua)**: `+55 (41) 99255-7600`.
+Para suporte técnico, feedback ou encerramento de trial, entre em contato pelo **Messenger Hub**: [m.me/encontrodagua](https://m.me/encontrodagua).
 ---
 
 ## 7. Acesso, God Mode e Upsell (V5.3)

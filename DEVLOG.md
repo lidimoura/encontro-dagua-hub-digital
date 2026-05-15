@@ -10,6 +10,73 @@
 
 ---
 
+## 2026-05-15 — V10.3: Hotfix React #310 + LP Polish + Branding Dinâmico
+
+### Status: ✅ BUILD VERDE — Exit code: 0 | `npm run build` 13.49s
+
+---
+
+### MISSÃO 1 — Hotfix React Error #310 (Rules of Hooks Violation)
+
+**Causa raiz identificada:**
+`DealDetailModal.tsx` possuía um `useEffect` (fetch de `crm_briefings`) declarado **após** o `if (!isOpen || !deal) return null` condicional na linha 252. O React Error #310 é disparado quando hooks são chamados após um `return` condicional — violação direta das Rules of Hooks.
+
+**Fix aplicado:**
+- `src/features/boards/components/Modals/DealDetailModal.tsx`: O `useEffect` do briefing foi movido para **antes** do `if (!isOpen || !deal) return null`. Comentário `⚠️ HOTFIX #310` adicionado para referência futura.
+- Todos os outros hooks do componente (useEffect de reset, useEffect de qr_codes) já estavam corretamente posicionados antes do return condicional.
+
+**CORS / NexusBridge:**
+- `src/lib/nexusWebhook.ts`: Confirmado — já possui `try/catch` silencioso + `AbortController(3s)`. Nenhuma alteração necessária.
+
+**Resultado:** Build limpo, zero erros. React Error #310 eliminado.
+
+---
+
+### MISSÃO 2 — Refinamento da Landing Page
+
+**KommoPartnerSection.tsx:**
+- CTA renomeado: "Falar sobre Kommo" → **"Solicitar Consultoria e Teste Grátis"**
+- Link externo "Conhecer o Kommo" removido (proteção de comissão de parceiro)
+- CTA aponta **exclusivamente** para `https://m.me/encontrodagua`
+- Layout centralizado: `flex-col items-center text-center` aplicado em todo o conteúdo expandido
+- Tradução dos rótulos: "Certified Partner" → "Parceiro Certificado"; "Compliance & LGPD" mantido PT
+
+**Correção de Perfil (Lidi Moura) — Innegociável:**
+- `src/pages/LandingPage.tsx` linha 101 (`TEAM_MEMBERS.pitch`): removida a palavra "Psicóloga"
+- `src/pages/LandingPage.tsx` linha 1165 (rodapé): removida a palavra "Psicóloga"
+- Texto exato aplicado nos dois locais:
+  > *"Formação e experiência em Psicologia. Parceira Certificada Kommo, Especialista em Data Science e OCI. Reflorestar o Digital com CRM inteligente e IA."*
+
+**i18n — Vazamentos de inglês:**
+- `KommoPartnerSection.tsx`: auditado — zero inglês hardcoded após reescrita
+- "Certified Partner" → "Parceiro Certificado"; "Messenger-First Pipeline" → "Pipeline Messenger-First"; "Compliance & LGPD" → mantido (sigla internacional)
+
+---
+
+### MISSÃO 3 — Branding Dinâmico e Feedback
+
+**Layout.tsx — Branding Condicional:**
+- Sidebar: `IS_DEMO ? "Prova d'Água" : "Hub d'Água"` substituído por lógica baseada em `profile?.is_super_admin`
+  - Super Admin (`lidimfc@gmail.com`): exibe **"Hub d'Água"**
+  - Lead / Showcase / Usuário comum: exibe **"Prova d'Água CRM"**
+
+**Botão de Feedback:**
+- Adicionado `<a id="btn-feedback" href="https://m.me/encontrodagua">` com ícone `MessageSquarePlus` no header
+- Visível para todos os roles — direciona diretamente para o Messenger para reportar bugs/dúvidas
+- Estilo: hover fúcsia para se destacar sem poluir a interface
+
+---
+
+### Arquivos Alterados
+| Arquivo | Tipo de Mudança |
+|---|---|
+| `src/features/boards/components/Modals/DealDetailModal.tsx` | fix(hooks): useEffect briefing movido antes do return condicional |
+| `src/components/KommoPartnerSection.tsx` | feat(lp): CTA exclusivo Messenger, centralização, i18n PT-BR |
+| `src/components/Layout.tsx` | feat(branding): marca condicional is_super_admin + botão Feedback |
+| `src/pages/LandingPage.tsx` | fix(profile): bio Lidi sem "Psicóloga" (2 locais) |
+
+---
+
 ## 2026-04-30 — V9.9.6: Fix de FK no Trigger, RLS Blindado e Showcase Gallery
 
 ### 1. Erro de Foreign Key no Trigger `handle_new_user`

@@ -91,10 +91,10 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onCl
                     <p className="text-slate-300 mb-6">Entraremos em contato em até 24h.</p>
 
                     <a
-                        href="https://wa.me/5592992943998?text=Olá! Gostaria de agendar uma consultoria gratuita."
+                        href="https://m.me/encontrodagua"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block w-full px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold mb-4 hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg"
+                        className="block w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold mb-4 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg"
                     >
                         💬 Quero uma consultoria free
                     </a>

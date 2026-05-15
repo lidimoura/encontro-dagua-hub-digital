@@ -32,7 +32,7 @@ export default function CheckoutCancelPage() {
         </p>
         <p className="text-slate-400 mb-8">
           Mudou de ideia? Tudo bem! Você pode tentar novamente quando quiser,
-          ou falar diretamente com nossa equipe pelo WhatsApp.
+          ou falar diretamente com nossa equipe pelo Messenger.
         </p>
 
         {/* Planos reminder */}
@@ -59,12 +59,12 @@ export default function CheckoutCancelPage() {
             <RefreshCcw className="w-5 h-5" /> Tentar novamente
           </button>
           <a
-            href="https://wa.me/5592992943998?text=Quero saber mais sobre o Hub Digital"
+            href="https://m.me/encontrodagua"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-green-700/80 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-3 transition-all"
+            className="w-full bg-blue-700/80 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-3 transition-all"
           >
-            <MessageCircle className="w-5 h-5" /> Falar no WhatsApp
+            <MessageCircle className="w-5 h-5" /> Falar pelo Messenger
           </a>
           <button
             onClick={() => navigate('/')}

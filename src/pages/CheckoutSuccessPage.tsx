@@ -50,14 +50,14 @@ export default function CheckoutSuccessPage() {
           <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-4 text-left">
             <p className="text-white font-semibold text-sm mb-1">💬 Entre em contato</p>
             <p className="text-slate-400 text-xs">
-              Dúvidas? WhatsApp:{' '}
+              Dúvidas? Messenger:{' '}
               <a
-                href="https://wa.me/5592992943998?text=Acabei de assinar o Hub!"
+                href="https://m.me/encontrodagua"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-400 hover:text-green-300 underline"
+                className="text-blue-400 hover:text-blue-300 underline"
               >
-                (92) 99294-3998
+                Encontro d'Água Hub
               </a>
             </p>
           </div>

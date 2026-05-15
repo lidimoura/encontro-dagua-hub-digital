@@ -11,8 +11,8 @@
  * ══════════════════════════════════════════════════════════════════════════
  */
 
-// ── WhatsApp Business — Gestão Humana (Lidi Moura) ─────────────────────────
-export const LIDI_WHATSAPP = '5541992557600';
+// ── Messenger Hub — Canal Principal de Contato ─────────────────────────
+export const MESSENGER_HUB = 'https://m.me/encontrodagua';
 
 // Mensagens estratégicas — URL encoded
 export const WA_MSGS = {
@@ -69,8 +69,8 @@ export const STRIPE_CONFIG = {
   },
   successUrl: `${window.location.origin}/#/checkout-success`,
   cancelUrl: `${window.location.origin}/#/checkout-cancel`,
-  // WhatsApp Business da proprietária — gestão humana
-  whatsappFallback: LIDI_WHATSAPP,
+  // Messenger Hub — canal principal
+  messengerFallback: MESSENGER_HUB,
 };
 
 export type PlanType = 'monthly' | 'annual' | 'agenteIA';
@@ -89,9 +89,8 @@ export async function handleStripeCheckout(plan: PlanType): Promise<void> {
     return;
   }
 
-  // Fallback: WhatsApp Business com mensagem Lidi-branded
-  const waUrl = `https://wa.me/${STRIPE_CONFIG.whatsappFallback}?text=${config.whatsappMsg}`;
-  window.open(waUrl, '_blank', 'noopener,noreferrer');
+  // Fallback: Messenger Hub com canal da equipe
+  window.open(STRIPE_CONFIG.messengerFallback, '_blank', 'noopener,noreferrer');
 }
 
 /**

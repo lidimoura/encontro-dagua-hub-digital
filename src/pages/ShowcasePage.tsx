@@ -1813,7 +1813,7 @@ const ShowcasePage: React.FC = () => {
 
               {/* Secondary CTA - WhatsApp Business (Lidi Moura - gestão humana) */}
               <a
-                href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização para o meu negócio.')}`}
+                href="https://m.me/encontrodagua"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -1899,7 +1899,7 @@ const ShowcasePage: React.FC = () => {
             💼 LinkedIn
           </a>
           <a
-            href={`https://wa.me/5541992557600?text=${encodeURIComponent('Olá, Lidi! Estou testando a demo e tenho uma dúvida sobre a personalização para o meu negócio.')}`}
+            href="https://m.me/encontrodagua"
             target="_blank" rel="noopener noreferrer"
             style={{ color: S.slateDim, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '5px', transition: 'color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#25D366'; }}

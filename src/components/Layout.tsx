@@ -26,6 +26,7 @@ import {
   Shield,
   BookOpen,
   Package,
+  MessageSquarePlus,
 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { MVPBanner } from '@/components/MVPBanner';
@@ -261,6 +262,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
         {/* Logo - Clickable */}
+        {/* Branding dinâmico: Super Admin (Lidi) vê "Hub d'Água"; leads/usuários veem "Prova d'Água CRM" */}
         <Link to="/" className="h-16 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
           <img
             src={darkMode
@@ -270,7 +272,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="h-9 w-9 object-contain"
           />
           <span className="text-sm font-bold bg-gradient-to-r from-acai-900 to-solimoes-600 bg-clip-text text-transparent tracking-wide">
-            {IS_DEMO ? "Prova d'Água" : "Hub d'Água"}
+            {profile?.is_super_admin ? "Hub d'Água" : "Prova d'Água CRM"}
           </span>
         </Link>
 
@@ -444,6 +446,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
+
+            {/* Feedback Button — visível para leads em teste reportarem bugs/dúvidas */}
+            <a
+              id="btn-feedback"
+              href="https://m.me/encontrodagua"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-slate-500 hover:text-fuchsia-600 dark:text-slate-400 dark:hover:text-fuchsia-400 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/20 rounded-full transition-all flex items-center gap-1"
+              title="Enviar feedback ou reportar bug"
+              aria-label="Feedback"
+            >
+              <MessageSquarePlus size={20} />
+            </a>
 
             {/* Help Button - Opens AiFlow */}
             <button

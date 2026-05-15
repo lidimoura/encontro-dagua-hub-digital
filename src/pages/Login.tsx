@@ -9,10 +9,8 @@ import { initGA4, trackTrialStart, trackLogin, trackSignUp } from '@/lib/analyti
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const ACCESS_KEYWORD = import.meta.env.VITE_ACCESS_KEYWORD || 'provadagua';
-const WHATSAPP_SUPPORT = '5541992557600';
-const WHATSAPP_KEYWORD_MSG = encodeURIComponent(
-  'Olá, Lidi! Estou na vitrine da Provadágua e quero minha Palavra-Chave para testar o CRM agora.'
-);
+const MESSENGER_SUPPORT = 'https://m.me/encontrodagua';
+const MESSENGER_KEYWORD_MSG = ''; // No longer needed — Messenger opens the conversation directly
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 type ShowcaseView = 'register' | 'signin';
@@ -349,9 +347,7 @@ const Login: React.FC = () => {
   // V7.0: humaniza erros do Supabase Auth — nenhuma mensagem técnica vaza
   const smartSignInError = (err: any): string => {
     const msg = (err?.message || '').toLowerCase();
-    const waUrl = `https://wa.me/${WHATSAPP_SUPPORT}?text=${encodeURIComponent(
-      isEn ? 'Hi Lidi! My Provadágua trial access is not working.' : 'Oi Lidi! Meu acesso à Provadágua não está funcionando.'
-    )}`;
+    const waUrl = MESSENGER_SUPPORT;
     if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('wrong password') || msg.includes('email not confirmed')) {
       return txt.errInvalidCreds;
     }
@@ -689,7 +685,7 @@ const Login: React.FC = () => {
                   <p className="text-xs text-slate-600">{txt.regNoKey}</p>
                   <a
                     id="btn-request-keyword"
-                    href={`https://wa.me/${WHATSAPP_SUPPORT}?text=${WHATSAPP_KEYWORD_MSG}`}
+                    href={MESSENGER_SUPPORT}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-green-400 hover:text-green-300 transition-colors"

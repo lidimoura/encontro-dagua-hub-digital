@@ -140,7 +140,7 @@ export const AiflowSupport: React.FC = () => {
             title: isEn ? 'Direct support' : 'Suporte direto',
             description: isEn ? 'Talk to the team' : 'Falar com a equipe',
             action: () => {
-                window.open(`https://wa.me/5592992943998?text=${encodeURIComponent(isEn ? 'Hello! I need technical help with the Hub.' : 'Olá! Preciso de ajuda técnica com o Hub.')}`, '_blank');
+                window.open('https://m.me/encontrodagua', '_blank');
                 setIsOpen(false);
             }
         }

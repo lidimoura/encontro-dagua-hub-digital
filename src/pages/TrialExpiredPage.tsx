@@ -16,7 +16,7 @@ const C = {
   white:       '#f8fafc',
 };
 
-const WA_SUPPORT = '5541992557600';
+const MESSENGER_SUPPORT = 'https://m.me/encontrodagua';
 
 const TrialExpiredPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,10 +62,7 @@ const TrialExpiredPage: React.FC = () => {
   };
 
   const closeBusiness = () => {
-    window.open(
-      `https://wa.me/${WA_SUPPORT}?text=${encodeURIComponent('Olá Lidi! Testei o Provadágua e quero fechar negócio pelo CRM personalizado. Podemos conversar?')}`,
-      '_blank'
-    );
+    window.open(MESSENGER_SUPPORT, '_blank');
   };
 
   const referralShare = () => {

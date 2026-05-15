@@ -494,10 +494,10 @@ export default function AdminPage() {
                                                     <div className="flex items-center justify-end gap-1.5 flex-wrap">
                                                         {/* WA */}
                                                         {profile.email && (profile.role === 'user' || (profile as any).user_type === 'lead_provadagua') && (
-                                                            <a href={`https://wa.me/5541992557600?text=${encodeURIComponent(`Oi Lidi! Lead: ${profile.email}`)}`}
+                                                            <a href="https://m.me/encontrodagua"
                                                                 target="_blank" rel="noopener noreferrer"
-                                                                className="px-2 py-1.5 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-500 text-white transition">
-                                                                💬 WA
+                                                                className="px-2 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition">
+                                                                💬 MSG
                                                             </a>
                                                         )}
                                                         {/* +7d */}
