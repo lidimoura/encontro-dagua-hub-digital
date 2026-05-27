@@ -512,7 +512,7 @@ const Login: React.FC = () => {
               title="Hub Digital"
             >
               <img
-                src="/logos/logo-icon-gold-transp.png"
+                src="/logos/logo-light.png"
                 alt="Encontro d'\u00c1gua Hub"
                 className="h-16 w-16 object-contain mx-auto"
               />
@@ -621,7 +621,7 @@ const Login: React.FC = () => {
             className="inline-block mb-2 opacity-90 hover:opacity-100 transition-opacity"
           >
             <img
-              src="/logos/logo-icon-gold-transp.png"
+              src="/logos/logo-light.png"
               alt="Encontro d'Água Hub"
               className="h-14 w-14 object-contain mx-auto"
             />

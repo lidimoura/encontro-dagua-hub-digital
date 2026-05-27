@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, X, Mail, Lock, Navigation, MessageCircle, Bug, Send, ArrowLeft } from 'lucide-react';
+import { HelpCircle, X, Mail, Lock, Navigation, MessageCircle, Bug, Send, ArrowLeft, Search, BookOpen, LayoutDashboard, Users, KanbanSquare, CalendarCheck, Sparkles, QrCode, Wand2, Settings, BarChart3, Crosshair } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
@@ -7,28 +7,46 @@ import { supabase } from '@/lib/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 
 /**
- * Aiflow Support Component
- * Technical support agent for Login and Hub routes
- * Provides help with: password reset, access errors, navigation, bug reporting
- * Visual theme: Blue/Tech (distinct from Amazô's fuchsia)
+ * AiflowSupport — Help Center + Technical Support (V10.4)
+ * Two tabs: Quick Guide (feature reference from USER_GUIDE) + Support (bug reports, help topics)
+ * Fully bilingual via t() translation keys
  */
+
+interface GuideItem {
+    icon: React.ElementType;
+    titleKey: string;
+    descKey: string;
+    route: string;
+}
+
+const GUIDE_ITEMS: GuideItem[] = [
+    { icon: LayoutDashboard, titleKey: 'helpCenter.dashboardTitle', descKey: 'helpCenter.dashboardDesc', route: '/dashboard' },
+    { icon: Users, titleKey: 'helpCenter.contactsTitle', descKey: 'helpCenter.contactsDesc', route: '/contacts' },
+    { icon: KanbanSquare, titleKey: 'helpCenter.boardsTitle', descKey: 'helpCenter.boardsDesc', route: '/boards' },
+    { icon: CalendarCheck, titleKey: 'helpCenter.activitiesTitle', descKey: 'helpCenter.activitiesDesc', route: '/activities' },
+    { icon: Sparkles, titleKey: 'helpCenter.aiHubTitle', descKey: 'helpCenter.aiHubDesc', route: '/ai' },
+    { icon: QrCode, titleKey: 'helpCenter.linkDaguaTitle', descKey: 'helpCenter.linkDaguaDesc', route: '/qrdagua' },
+    { icon: Wand2, titleKey: 'helpCenter.promptLabTitle', descKey: 'helpCenter.promptLabDesc', route: '/prompt-lab' },
+    { icon: BarChart3, titleKey: 'helpCenter.reportsTitle', descKey: 'helpCenter.reportsDesc', route: '/reports' },
+    { icon: Crosshair, titleKey: 'helpCenter.decisionsTitle', descKey: 'helpCenter.decisionsDesc', route: '/decisions' },
+    { icon: Settings, titleKey: 'helpCenter.settingsTitle', descKey: 'helpCenter.settingsDesc', route: '/settings' },
+];
+
 export const AiflowSupport: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [view, setView] = useState<'menu' | 'bugForm'>('menu');
+    const [view, setView] = useState<'guide' | 'support' | 'bugForm'>('guide');
     const [bugDesc, setBugDesc] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const { addActivity } = useCRM();
     const { addToast } = useToast();
     const { profile } = useAuth();
-    const { language } = useTranslation();
-    const isEn = language === 'en';
-
-    const { user: activityUser } = useAuth();
+    const { t, language } = useTranslation();
 
     const handleSubmitBug = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!bugDesc.trim()) return;
 
-        // 1. Create Task in CRM
+        // Create Task in CRM
         addActivity({
             title: `Feedback/Bug: ${bugDesc.slice(0, 30)}...`,
             type: 'TASK',
@@ -40,7 +58,7 @@ export const AiflowSupport: React.FC = () => {
             user: { name: 'User', avatar: '' }
         });
 
-        // Insert visual notification for Admin
+        // Insert notification for Admin
         try {
             await supabase.from('notifications').insert({
                 company_id: profile?.company_id,
@@ -53,29 +71,23 @@ export const AiflowSupport: React.FC = () => {
             console.error('Failed to create notification', err);
         }
 
-        // 2. Create Notification for Admin (using supabase directly)
+        // Create Notification for Admin
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                // Get company_id from profile or metadata. 
-                // Assuming current user's company is the target.
-                // Or if this is a global support request, maybe we notify a specific admin?
-                // For now, let's notify the current company's admins.
-
-                // Get user profile to get company_id
-                const { data: profile } = await supabase
+                const { data: userProfile } = await supabase
                     .from('profiles')
                     .select('company_id')
                     .eq('id', user.id)
                     .single();
 
-                if (profile?.company_id) {
+                if (userProfile?.company_id) {
                     await supabase.from('notifications').insert({
-                        company_id: profile.company_id,
+                        company_id: userProfile.company_id,
                         title: '🐛 Novo Report de Bug',
                         message: `Um usuário reportou: "${bugDesc.slice(0, 50)}..."`,
                         read: false,
-                        link: '/activities', // Or wherever bugs are tracked
+                        link: '/activities',
                         created_at: new Date().toISOString()
                     });
                 }
@@ -85,60 +97,68 @@ export const AiflowSupport: React.FC = () => {
         }
 
         addToast(
-            isEn
+            language === 'en'
                 ? 'Feedback sent! Our team will review it.'
-                : 'Feedback enviado com sucesso! Nosso time vai analisar.',
+                : language === 'es'
+                    ? '¡Feedback enviado! Nuestro equipo lo revisará.'
+                    : 'Feedback enviado com sucesso! Nosso time vai analisar.',
             'success'
         );
         setBugDesc('');
-        setView('menu');
+        setView('guide');
         setIsOpen(false);
     };
 
     const helpTopics = [
         {
             icon: Lock,
-            title: isEn ? 'Forgot password' : 'Esqueci minha senha',
-            description: isEn ? 'Recover access to your account' : 'Recupere o acesso à sua conta',
+            title: t('forgotPassword'),
+            description: language === 'en' ? 'Recover access to your account' : language === 'es' ? 'Recupera el acceso a tu cuenta' : 'Recupere o acesso à sua conta',
             action: () => {
-                alert(isEn
+                alert(language === 'en'
                     ? '💡 Tip: On the login screen, enter your email and click "Forgot password". You will receive a recovery link by email.'
-                    : '💡 Dica: Na tela de login, digite seu email e clique em "Esqueci minha senha". Você receberá um link de recuperação por email.');
+                    : language === 'es'
+                        ? '💡 Consejo: En la pantalla de inicio de sesión, ingresa tu correo y haz clic en "Olvidé mi contraseña".'
+                        : '💡 Dica: Na tela de login, digite seu email e clique em "Esqueci minha senha". Você receberá um link de recuperação por email.');
                 setIsOpen(false);
             }
         },
         {
             icon: Mail,
-            title: isEn ? "Didn't receive the email" : 'Não recebi o email',
-            description: isEn ? 'Issues with confirmation email' : 'Problemas com email de confirmação',
+            title: language === 'en' ? "Didn't receive the email" : language === 'es' ? 'No recibí el correo' : 'Não recebi o email',
+            description: language === 'en' ? 'Issues with confirmation email' : language === 'es' ? 'Problemas con el correo de confirmación' : 'Problemas com email de confirmação',
             action: () => {
-                alert(isEn
-                    ? '💡 Tip: Check your spam folder. If not found, wait a few minutes and try again. Emails can take up to 5 minutes to arrive.'
-                    : '💡 Dica: Verifique sua caixa de spam. Se não encontrar, aguarde alguns minutos e tente novamente. Emails podem levar até 5 minutos para chegar.');
+                alert(language === 'en'
+                    ? '💡 Tip: Check your spam folder. If not found, wait a few minutes and try again.'
+                    : language === 'es'
+                        ? '💡 Consejo: Revisa tu carpeta de spam. Si no lo encuentras, espera unos minutos e intenta de nuevo.'
+                        : '💡 Dica: Verifique sua caixa de spam. Se não encontrar, aguarde alguns minutos e tente novamente.');
                 setIsOpen(false);
             }
         },
         {
             icon: Navigation,
-            title: isEn ? 'Access error' : 'Erro de acesso',
-            description: isEn ? 'Issues logging in' : 'Problemas ao fazer login',
+            title: language === 'en' ? 'Access error' : language === 'es' ? 'Error de acceso' : 'Erro de acesso',
+            description: language === 'en' ? 'Issues logging in' : language === 'es' ? 'Problemas al iniciar sesión' : 'Problemas ao fazer login',
             action: () => {
-                alert(isEn
+                alert(language === 'en'
                     ? '💡 Tip: Check your email and password. If the issue persists, clear your browser cache (Ctrl+Shift+Del) and try again.'
-                    : '💡 Dica: Verifique se seu email e senha estão corretos. Se o problema persistir, limpe o cache do navegador (Ctrl+Shift+Del) e tente novamente.');
+                    : language === 'es'
+                        ? '💡 Consejo: Verifica tu correo y contraseña. Si el problema persiste, limpia la caché del navegador.'
+                        : '💡 Dica: Verifique se seu email e senha estão corretos. Se o problema persistir, limpe o cache do navegador (Ctrl+Shift+Del) e tente novamente.');
                 setIsOpen(false);
             }
         },
         {
             icon: Bug,
-            title: isEn ? 'Report Bug / Feedback' : 'Reportar Bug / Feedback',
-            description: isEn ? 'Found an error? Let us know!' : 'Encontrou um erro? Avise-nos!',
+            title: language === 'en' ? 'Report Bug / Feedback' : language === 'es' ? 'Reportar Bug / Feedback' : 'Reportar Bug / Feedback',
+            description: language === 'en' ? 'Found an error? Let us know!' : language === 'es' ? '¿Encontraste un error? ¡Avísanos!' : 'Encontrou um erro? Avise-nos!',
             action: () => setView('bugForm')
         },
         {
             icon: MessageCircle,
-            title: isEn ? 'Direct support' : 'Suporte direto',
-            description: isEn ? 'Talk to the team' : 'Falar com a equipe',
+            title: language === 'en' ? 'Direct support' : language === 'es' ? 'Soporte directo' : 'Suporte direto',
+            description: language === 'en' ? 'Talk to the team' : language === 'es' ? 'Habla con el equipo' : 'Falar com a equipe',
             action: () => {
                 window.open('https://m.me/encontrodagua', '_blank');
                 setIsOpen(false);
@@ -146,10 +166,19 @@ export const AiflowSupport: React.FC = () => {
         }
     ];
 
+    // Filter guide items by search query
+    const filteredGuide = searchQuery.trim()
+        ? GUIDE_ITEMS.filter(item =>
+            t(item.titleKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            t(item.descKey).toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : GUIDE_ITEMS;
+
     const resetState = () => {
         setIsOpen(false);
-        setView('menu');
+        setView('guide');
         setBugDesc('');
+        setSearchQuery('');
     };
 
     return (
@@ -179,30 +208,101 @@ export const AiflowSupport: React.FC = () => {
                     />
 
                     {/* Panel */}
-                    <div className="fixed bottom-24 left-6 z-[9999] w-[320px] bg-slate-900 border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 text-white flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                {view === 'bugForm' && (
-                                    <button
-                                        onClick={() => setView('menu')}
-                                        className="mr-1 hover:bg-white/20 p-1 rounded-full transition-colors"
-                                    >
-                                        <ArrowLeft size={16} />
-                                    </button>
-                                )}
-                                <HelpCircle size={20} />
-                                <h3 className="font-bold text-lg">
-                                    {view === 'menu'
-                                        ? (isEn ? 'Aiflow Support' : 'Aiflow Suporte')
-                                        : (isEn ? 'Report Bug' : 'Reportar Bug')}
-                                </h3>
+                    <div className="fixed bottom-24 left-6 z-[9999] w-[360px] max-w-[calc(100vw-3rem)] bg-slate-900 border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
+                        {/* Header with Tabs */}
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 text-white">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    {view === 'bugForm' && (
+                                        <button
+                                            onClick={() => setView('support')}
+                                            className="mr-1 hover:bg-white/20 p-1 rounded-full transition-colors"
+                                        >
+                                            <ArrowLeft size={16} />
+                                        </button>
+                                    )}
+                                    <HelpCircle size={20} />
+                                    <h3 className="font-bold text-lg">
+                                        {view === 'bugForm'
+                                            ? (language === 'en' ? 'Report Bug' : language === 'es' ? 'Reportar Bug' : 'Reportar Bug')
+                                            : t('helpCenter.title')}
+                                    </h3>
+                                </div>
                             </div>
+
+                            {/* Tab Switcher */}
+                            {view !== 'bugForm' && (
+                                <div className="flex gap-1 bg-white/10 rounded-lg p-1">
+                                    <button
+                                        onClick={() => setView('guide')}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                                            view === 'guide' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80 hover:text-white'
+                                        }`}
+                                    >
+                                        <BookOpen size={13} />
+                                        {t('helpCenter.quickGuide')}
+                                    </button>
+                                    <button
+                                        onClick={() => setView('support')}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                                            view === 'support' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80 hover:text-white'
+                                        }`}
+                                    >
+                                        <MessageCircle size={13} />
+                                        {t('helpCenter.support')}
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Content */}
                         <div className="p-4 max-h-[400px] overflow-y-auto">
-                            {view === 'menu' ? (
+                            {view === 'guide' ? (
+                                <div className="space-y-2">
+                                    {/* Search */}
+                                    <div className="relative mb-3">
+                                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder={t('helpCenter.searchPlaceholder')}
+                                            className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    {/* Guide Cards */}
+                                    {filteredGuide.map((item, index) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <button
+                                                key={index}
+                                                onClick={() => {
+                                                    window.location.hash = `#${item.route}`;
+                                                    resetState();
+                                                }}
+                                                className="w-full text-left p-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded-xl transition-all group"
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <div className="w-9 h-9 bg-blue-600/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600/30 transition-colors">
+                                                        <Icon size={18} className="text-blue-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-white font-semibold text-sm mb-0.5">{t(item.titleKey)}</h4>
+                                                        <p className="text-slate-400 text-xs leading-relaxed">{t(item.descKey)}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+
+                                    {filteredGuide.length === 0 && (
+                                        <p className="text-center text-slate-500 text-sm py-4">
+                                            {language === 'en' ? 'No results found' : language === 'es' ? 'Sin resultados' : 'Nenhum resultado encontrado'}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : view === 'support' ? (
                                 <div className="space-y-2">
                                     {helpTopics.map((topic, index) => {
                                         const Icon = topic.icon;
@@ -228,23 +328,27 @@ export const AiflowSupport: React.FC = () => {
                             ) : (
                                 <form onSubmit={handleSubmitBug} className="space-y-4">
                                     <p className="text-xs text-slate-400">
-                                        {isEn
+                                        {language === 'en'
                                             ? 'Describe the error or suggestion. This will create an automatic task for our team.'
-                                            : 'Descreva o erro ou sugestão. Isso criará uma tarefa automática para nossa equipe.'}
+                                            : language === 'es'
+                                                ? 'Describe el error o sugerencia. Esto creará una tarea automática para nuestro equipo.'
+                                                : 'Descreva o erro ou sugestão. Isso criará uma tarefa automática para nossa equipe.'}
                                     </p>
                                     <textarea
                                         value={bugDesc}
                                         onChange={(e) => setBugDesc(e.target.value)}
-                                        placeholder={isEn
+                                        placeholder={language === 'en'
                                             ? 'E.g.: The save button is not working on the contacts page...'
-                                            : 'Ex: O botão de salvar não está funcionando na página de contatos...'}
+                                            : language === 'es'
+                                                ? 'Ej: El botón de guardar no funciona en la página de contactos...'
+                                                : 'Ex: O botão de salvar não está funcionando na página de contatos...'}
                                         className="w-full h-32 bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-slate-500"
                                         required
                                     />
                                     <button type="submit" disabled={!bugDesc.trim()}
                                         className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                         <Send size={16} />
-                                        {isEn ? 'Send Report' : 'Enviar Report'}
+                                        {language === 'en' ? 'Send Report' : language === 'es' ? 'Enviar Reporte' : 'Enviar Report'}
                                     </button>
                                 </form>
                             )}
@@ -253,7 +357,7 @@ export const AiflowSupport: React.FC = () => {
                         {/* Footer */}
                         <div className="p-3 bg-slate-800/50 border-t border-slate-700 text-center">
                             <p className="text-xs text-slate-400">
-                                {isEn ? '🤖 Aiflow • Technical Support' : '🤖 Aiflow • Suporte Técnico'}
+                                {language === 'en' ? '🤖 Aiflow • Help Center' : language === 'es' ? '🤖 Aiflow • Centro de Ayuda' : '🤖 Aiflow • Central de Ajuda'}
                             </p>
                         </div>
                     </div>

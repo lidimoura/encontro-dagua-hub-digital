@@ -536,7 +536,7 @@ const ShowcasePage: React.FC = () => {
         {/* Logo — no contexto Showcase, retorna para /#/showcase */}
         <a href="/#/showcase" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
           <img
-            src="/logos/logo-icon-gold-transp.png"
+            src="/logos/logo-light.png"
             alt="Encontro d'Agua Hub"
             aria-hidden="true"
             style={{
@@ -1808,7 +1808,7 @@ const ShowcasePage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 12px 48px rgba(16, 185, 129, 0.4)';
                 }}
               >
-                <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0) invert(1)' }} /> Falar com a Amazô 
+                <img src="/logos/logo-light.png" alt="Hub AI" style={{ width: '18px', height: '18px', filter: 'brightness(0) invert(1)' }} /> Falar com a Amazô 
               </button>
 
               {/* Secondary CTA - WhatsApp Business (Lidi Moura - gestão humana) */}
@@ -1862,7 +1862,7 @@ const ShowcasePage: React.FC = () => {
         background: 'rgba(0,0,0,0.15)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
-          <img src="/logos/logo-icon-gold-transp.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
+          <img src="/logos/logo-light.png" alt="Encontro d'Água Hub" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
           <span style={{ color: S.textSecondary, fontSize: '0.88rem', fontWeight: 600 }}>{t.footer_built}</span>
         </div>
         {/* Bio contextualizada — lugar correto */}

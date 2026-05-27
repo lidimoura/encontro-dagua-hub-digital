@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, ArrowRight, X, DollarSign } from 'lucide-react';
 import { IS_DEMO } from '@/lib/appConfig';
 import { useLanguage, CurrencyCode } from '@/context/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /**
  * Props for the OnboardingModal component
@@ -19,7 +20,7 @@ const CURRENCY_OPTIONS: { code: CurrencyCode; label: string; symbol: string }[] 
 ];
 
 /**
- * OnboardingModal - First-time user onboarding experience
+ * OnboardingModal - First-time user onboarding experience (V10.4 - Fully bilingual)
  */
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     isOpen,
@@ -27,6 +28,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     onSkip
 }) => {
     const { currency, setCurrency } = useLanguage();
+    const { t } = useTranslation();
 
     if (!isOpen) return null;
 
@@ -54,20 +56,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
                         {/* Title */}
                         <h1 className="text-4xl font-bold mb-4">
-                            Welcome to your CRM! 👋
+                            {t('onboarding.welcomeTitle')}
                         </h1>
 
                         {/* Description */}
-                        <p className="text-xl text-white/90 mb-8 max-w-xl mx-auto">
-                            Let's set up your <strong>first personalised board</strong> in under 30 seconds.
-                        </p>
+                        <p className="text-xl text-white/90 mb-8 max-w-xl mx-auto"
+                           dangerouslySetInnerHTML={{ __html: t('onboarding.welcomeDesc') }}
+                        />
 
                         {/* Currency selector — Demo mode only */}
                         {IS_DEMO && (
                             <div className="mb-8">
                                 <div className="flex items-center justify-center gap-2 mb-3 text-white/80">
                                     <DollarSign size={16} />
-                                    <span className="text-sm font-semibold uppercase tracking-wide">Preferred Currency</span>
+                                    <span className="text-sm font-semibold uppercase tracking-wide">{t('onboarding.preferredCurrency')}</span>
                                 </div>
                                 <div className="flex justify-center gap-3 flex-wrap">
                                     {CURRENCY_OPTIONS.map(opt => (
@@ -85,7 +87,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                     ))}
                                 </div>
                                 <p className="text-xs text-white/55 mt-2">
-                                    You can change this later in Settings
+                                    {t('onboarding.changeLater')}
                                 </p>
                             </div>
                         )}
@@ -94,20 +96,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
                             <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm">
                                 <div className="text-2xl mb-2">🎯</div>
-                                <h3 className="font-semibold mb-1">Ready Templates</h3>
-                                <p className="text-sm text-white/80">Sales, Onboarding, CS and more</p>
+                                <h3 className="font-semibold mb-1">{t('onboarding.readyTemplates')}</h3>
+                                <p className="text-sm text-white/80">{t('onboarding.readyTemplatesDesc')}</p>
                             </div>
 
                             <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm">
                                 <div className="text-2xl mb-2">✨</div>
-                                <h3 className="font-semibold mb-1">AI Creation</h3>
-                                <p className="text-sm text-white/80">Describe your business in 1 sentence</p>
+                                <h3 className="font-semibold mb-1">{t('onboarding.aiCreation')}</h3>
+                                <p className="text-sm text-white/80">{t('onboarding.aiCreationDesc')}</p>
                             </div>
 
                             <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm">
                                 <div className="text-2xl mb-2">⚡</div>
-                                <h3 className="font-semibold mb-1">Super Fast</h3>
-                                <p className="text-sm text-white/80">Less than 30 seconds</p>
+                                <h3 className="font-semibold mb-1">{t('onboarding.superFast')}</h3>
+                                <p className="text-sm text-white/80">{t('onboarding.superFastDesc')}</p>
                             </div>
                         </div>
 
@@ -117,7 +119,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 onClick={onStart}
                                 className="px-8 py-4 bg-white text-primary-600 font-bold rounded-xl hover:bg-white/90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg"
                             >
-                                Get started
+                                {t('onboarding.getStarted')}
                                 <ArrowRight size={20} />
                             </button>
 
@@ -125,13 +127,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 onClick={onSkip}
                                 className="px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm"
                             >
-                                Explore on my own
+                                {t('onboarding.exploreAlone')}
                             </button>
                         </div>
 
                         {/* Small print */}
                         <p className="mt-6 text-sm text-white/60">
-                            You can create as many boards as you like later 😊
+                            {t('onboarding.createBoardsLater')}
                         </p>
                     </div>
                 </div>

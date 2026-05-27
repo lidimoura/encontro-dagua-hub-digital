@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-05-27 — V10.4: Gamified Onboarding + Help Center + Logo Refresh
+
+### Status: ✅ BUILD VERDE — Exit code: 0
+
+---
+
+### MISSÃO 1 — Onboarding Gamificado e Interativo (react-joyride)
+- **GamifiedOnboarding.tsx**: Novo componente criado e importado no `DashboardPage.tsx`
+- **react-joyride**: Instalado e configurado para apresentar o tour `data-tour` via seletores.
+- **canvas-confetti**: Adicionado efeito de confetti na conclusão das missões e do onboarding geral.
+- **useFirstVisit.ts**: Refatorado para rastrear missões concluídas no `localStorage` sob a chave `crm_onboarding_missions`.
+
+### MISSÃO 2 — Help Center Bilingue (AiflowSupport)
+- **AiflowSupport.tsx**: Componente reescrito como Help Center flutuante com abas separadas (Guia Rápido e Suporte).
+- **Conteúdo Indexado**: O Guia exibe os tópicos referenciando o `USER_GUIDE.md` filtráveis via input de busca, cobrindo os painéis e ferramentas do sistema.
+
+### MISSÃO 3 — Logo Refresh (.png)
+- Substituídos arquivos antigos de logo em `.png` para versões padronizadas `logo-dark.png`, `logo-light.png` e `logo-transp.png`.
+- Alterados em `Layout.tsx`, `LandingPage.tsx`, `Login.tsx`, `ShowcasePage.tsx`, `ShowcaseLP.tsx`, `TrialExpiredPage.tsx` e meta tags do `index.html`.
+- Imagens antigas deletadas do diretório `public/logos`.
+
+### MISSÃO 4 — Documentação
+- `USER_GUIDE.md` atualizado para conter as explicações do V10.4
+
+### MISSÃO 5 — Typescript e Qualidade de Código
+- Tipagem do `react-joyride` adaptada para a versão `3.x` (usando named imports).
+- Erros de propriedades ausentes (`stage`, `source`) mitigados nos mocks de testes e corrigida a assinatura em `activitiesService.create`.
+
+---
+
 ## 2026-05-15 — V10.3: Hotfix React #310 + LP Polish + Branding Dinâmico
 
 ### Status: ✅ BUILD VERDE — Exit code: 0 | `npm run build` 13.49s

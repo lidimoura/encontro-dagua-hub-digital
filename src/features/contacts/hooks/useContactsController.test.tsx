@@ -155,6 +155,8 @@ describe('useContactsController', () => {
       phone: '',
       role: '',
       companyName: '',
+      stage: ContactStage.LEAD,
+      source: '',
     });
   });
 
@@ -168,6 +170,8 @@ describe('useContactsController', () => {
         phone: '123456789',
         role: 'Developer',
         companyName: 'Acme Corp',
+        stage: ContactStage.LEAD,
+        source: '',
       });
     });
 

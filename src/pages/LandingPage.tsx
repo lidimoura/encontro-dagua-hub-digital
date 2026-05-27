@@ -125,7 +125,7 @@ export default function LandingPage() {
       name: "Antigravity",
       role: t('devRole'),
       type: "ai",
-      image: "/logos/logo-icon-gold-transp.png",
+      image: "/logos/logo-light.png",
       color: "border-purple-500 text-purple-400",
       pitch: t('antigravityPitch')
     }
@@ -346,7 +346,7 @@ Agora, gere o prompt perfeito:`;
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <img
-              src="/logos/logo-full-dark-gold.png"
+              src="/logos/logo-transp.png"
               alt="Encontro d'Água"
               className="h-10 object-contain"
             />
@@ -656,7 +656,7 @@ Agora, gere o prompt perfeito:`;
                     {/* Bot avatar */}
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-14 h-14 rounded-2xl bg-[#0f0c0b] border border-white/10 flex items-center justify-center shadow-lg overflow-hidden p-2">
-                        <img src="/logos/logo-icon-gold-transp.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(200,147,58,0.4)]" />
+                        <img src="/logos/logo-light.png" alt="Hub AI" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(200,147,58,0.4)]" />
                       </div>
                       <div>
                         <p className="font-bold text-white">Agente de IA</p>

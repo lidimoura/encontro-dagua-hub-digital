@@ -1,43 +1,80 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 const ONBOARDING_KEY = 'crm_onboarding_completed';
+const MISSIONS_KEY = 'crm_onboarding_missions';
+const TOUR_KEY = 'hasSeenTour';
+
+export interface OnboardingMissions {
+    addLead: boolean;
+    createBoard: boolean;
+    moveCard: boolean;
+    createActivity: boolean;
+    testAI: boolean;
+}
+
+const DEFAULT_MISSIONS: OnboardingMissions = {
+    addLead: false,
+    createBoard: false,
+    moveCard: false,
+    createActivity: false,
+    testAI: false,
+};
 
 /**
- * useFirstVisit - Hook to track and manage first-time user onboarding status
+ * useFirstVisit - Extended hook for gamified onboarding (V10.4)
  * 
- * Checks if the user has completed onboarding by reading from localStorage.
- * Provides functions to mark onboarding as complete or reset it for testing.
+ * Tracks first-time visit status AND individual mission completion.
+ * Missions persist in localStorage and trigger confetti on completion.
  * 
- * @returns {Object} Onboarding state and control functions
- * @returns {boolean} isFirstVisit - True if user hasn't completed onboarding
- * @returns {() => void} completeOnboarding - Function to mark onboarding as complete
- * @returns {() => void} resetOnboarding - Function to reset onboarding status (for testing)
- * 
- * @example
- * const { isFirstVisit, completeOnboarding } = useFirstVisit();
- * 
- * if (isFirstVisit) {
- *   return <OnboardingModal onComplete={completeOnboarding} />;
- * }
+ * @returns Onboarding state, mission tracking, and control functions
  */
 export const useFirstVisit = () => {
     const [isFirstVisit, setIsFirstVisit] = useState<boolean>(() => {
-        const completed = localStorage.getItem(ONBOARDING_KEY);
-        return completed !== 'true';
+        return localStorage.getItem(ONBOARDING_KEY) !== 'true';
     });
 
-    const completeOnboarding = () => {
+    const [missions, setMissions] = useState<OnboardingMissions>(() => {
+        try {
+            const saved = localStorage.getItem(MISSIONS_KEY);
+            return saved ? JSON.parse(saved) : DEFAULT_MISSIONS;
+        } catch {
+            return DEFAULT_MISSIONS;
+        }
+    });
+
+    const completeMission = useCallback((key: keyof OnboardingMissions) => {
+        setMissions(prev => {
+            if (prev[key]) return prev; // already completed
+            const next = { ...prev, [key]: true };
+            localStorage.setItem(MISSIONS_KEY, JSON.stringify(next));
+            return next;
+        });
+    }, []);
+
+    const completedCount = Object.values(missions).filter(Boolean).length;
+    const totalMissions = Object.keys(missions).length;
+    const allComplete = completedCount === totalMissions;
+
+    const completeOnboarding = useCallback(() => {
         localStorage.setItem(ONBOARDING_KEY, 'true');
         setIsFirstVisit(false);
-    };
+    }, []);
 
-    const resetOnboarding = () => {
+    const resetOnboarding = useCallback(() => {
         localStorage.removeItem(ONBOARDING_KEY);
+        localStorage.removeItem(MISSIONS_KEY);
+        localStorage.removeItem(TOUR_KEY);
         setIsFirstVisit(true);
-    };
+        setMissions(DEFAULT_MISSIONS);
+    }, []);
 
     return {
         isFirstVisit,
+        missions,
+        completeMission,
+        completedCount,
+        totalMissions,
+        allComplete,
         completeOnboarding,
         resetOnboarding
     };

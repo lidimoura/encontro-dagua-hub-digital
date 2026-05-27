@@ -360,7 +360,7 @@ export const ShowcaseLP: React.FC = () => {
       <nav style={s.nav}>
         <div style={s.navInner}>
           <img
-            src="/logos/logo-full-dark-gold.png"
+            src="/logos/logo-transp.png"
             alt="Encontro d'Água Hub"
             style={s.logo}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -683,7 +683,7 @@ export const ShowcaseLP: React.FC = () => {
       <footer style={s.footer}>
         <div style={s.footerInner}>
           <img
-            src="/logos/logo-full-dark-gold.png"
+            src="/logos/logo-transp.png"
             alt="Hub"
             style={s.footerLogo}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

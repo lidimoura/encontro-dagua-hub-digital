@@ -53,17 +53,20 @@ const NavItem = ({
   label,
   active,
   prefetch,
+  dataTour,
 }: {
   to: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   label: string;
   active: boolean;
   prefetch?: RouteName;
+  dataTour?: string;
 }) => (
   <Link
     to={to}
     onMouseEnter={prefetch ? () => prefetchRoute(prefetch) : undefined}
     onFocus={prefetch ? () => prefetchRoute(prefetch) : undefined}
+    data-tour={dataTour}
     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium
     ${active
         ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-900/50'
@@ -174,19 +177,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = React.useMemo(() => {
     const items = [
       // Core CRM - Admin & Vendedor
-      { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as RouteName },
-      { to: '/boards', icon: KanbanSquare, label: t('boards'), prefetch: 'board' as RouteName },
-      { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as RouteName },
+      { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), prefetch: 'dashboard' as RouteName, dataTour: 'nav-dashboard' },
+      { to: '/boards', icon: KanbanSquare, label: t('boards'), prefetch: 'board' as RouteName, dataTour: 'nav-boards' },
+      { to: '/contacts', icon: Users, label: t('contacts'), prefetch: 'contacts' as RouteName, dataTour: 'nav-contacts' },
       { to: '/inbox', icon: Inbox, label: t('inbox'), prefetch: 'inbox' as RouteName },
-      { to: '/activities', icon: CalendarCheck, label: t('activities'), prefetch: 'activities' as RouteName },
+      { to: '/activities', icon: CalendarCheck, label: t('activities'), prefetch: 'activities' as RouteName, dataTour: 'nav-activities' },
 
       // Analytics & AI - Admin & Vendedor
       { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as RouteName },
-      { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName },
+      { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName, dataTour: 'nav-ai' },
       { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
 
       // Tools - All Users
-      { to: '/qrdagua', icon: QrCode, label: "QR d'água", prefetch: 'qrdagua' as RouteName },
+      { to: '/qrdagua', icon: QrCode, label: "QR d'água", prefetch: 'qrdagua' as RouteName, dataTour: 'nav-qrdagua' },
       { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
 
       // Settings - Admin & Vendedor
@@ -266,9 +269,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Link to="/" className="h-16 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
           <img
             src={darkMode
-              ? '/logos/logo-icon-gold-transp.png'
-              : '/logos/logo-icon-black-transp.png'}
-            alt="Encontro d'Água"
+              ? '/logos/logo-light.png'
+              : '/logos/logo-dark.png'}
+            alt="Encontro d'Água Hub"
             className="h-9 w-9 object-contain"
           />
           <span className="text-sm font-bold bg-gradient-to-r from-acai-900 to-solimoes-600 bg-clip-text text-transparent tracking-wide">
@@ -286,6 +289,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               label={item.label}
               active={location.pathname === item.to}
               prefetch={item.prefetch}
+              dataTour={(item as any).dataTour}
             />
           ))}
         </nav>

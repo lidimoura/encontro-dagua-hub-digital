@@ -103,7 +103,7 @@ const TrialExpiredPage: React.FC = () => {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <img src="/logos/logo-icon-gold-transp.png" alt="Hub" style={{ width: '64px', height: '64px', objectFit: 'contain', margin: '0 auto 1rem' }} />
+          <img src="/logos/logo-light.png" alt="Hub" style={{ width: '64px', height: '64px', objectFit: 'contain', margin: '0 auto 1rem' }} />
           <div style={{
             display: 'inline-block',
             background: 'rgba(109,40,168,0.12)',

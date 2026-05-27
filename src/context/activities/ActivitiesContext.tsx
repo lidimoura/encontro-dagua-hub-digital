@@ -65,7 +65,7 @@ export const ActivitiesProvider: React.FC<{ children: ReactNode }> = ({ children
         return null;
       }
 
-      const { data, error: addError } = await activitiesService.create(activity, profile.company_id);
+      const { data, error: addError } = await activitiesService.create(activity);
 
       if (addError) {
         setError(addError.message);

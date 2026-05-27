@@ -64,9 +64,10 @@ const GeneralSettings: React.FC = () => {
       localStorage.removeItem('has_seen_tutorial');
       localStorage.removeItem('first_visit_completed');
 
-      // Active keys
+      // Active keys (V10.4 gamified onboarding)
       localStorage.removeItem('crm_onboarding_completed'); // from useFirstVisit.ts
-      localStorage.removeItem('hasSeenTour'); // from OnboardingTour.tsx
+      localStorage.removeItem('crm_onboarding_missions'); // mission progress
+      localStorage.removeItem('hasSeenTour'); // from OnboardingTour.tsx / GamifiedOnboarding.tsx
 
       window.location.reload();
     }
