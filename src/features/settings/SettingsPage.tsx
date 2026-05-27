@@ -65,11 +65,15 @@ const GeneralSettings: React.FC = () => {
       localStorage.removeItem('first_visit_completed');
 
       // Active keys (V10.4 gamified onboarding)
-      localStorage.removeItem('crm_onboarding_completed'); // from useFirstVisit.ts
-      localStorage.removeItem('crm_onboarding_missions'); // mission progress
-      localStorage.removeItem('hasSeenTour'); // from OnboardingTour.tsx / GamifiedOnboarding.tsx
+      localStorage.removeItem('crm_onboarding_completed');
+      localStorage.removeItem('crm_onboarding_missions');
+      localStorage.removeItem('hasSeenTour');
 
-      window.location.reload();
+      // Dispatch event so GamifiedOnboarding re-launches tour without page reload
+      window.dispatchEvent(new CustomEvent('crm:onboarding-reset'));
+
+      // Small delay then reload so state reinitializes cleanly
+      setTimeout(() => window.location.reload(), 150);
     }
   };
 

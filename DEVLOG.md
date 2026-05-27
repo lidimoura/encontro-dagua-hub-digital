@@ -10,6 +10,69 @@
 
 ---
 
+## 2026-05-27 — V10.4.1: HOTFIX i18n Keys + Tour Expansion + Auto-Start
+
+### Status: ✅ BUILD VERDE — Exit code: 0
+
+---
+
+### MISSÃO 1 — FIX CRÍTICO DE I18N (Vazamento de chaves)
+
+**Causa raiz identificada:**
+A função `t()` em `LanguageContext.tsx` usava `key.split('.')` para resolver chaves como objetos aninhados (`translations.pt['onboarding']['missionTitle']`), mas o dicionário armazena chaves **planas** com ponto no nome (`translations.pt['onboarding.missionTitle']`). Resultado: fallback retornava a chave nua.
+
+**Fix aplicado:**
+`LanguageContext.tsx` — `resolve()` agora tenta **flat key lookup** primeiro (`dict[key]`), e só depois nested path resolution. Zero risco de regressão: chaves sem ponto continuam funcionando normalmente.
+
+**Resultado:** Todas as chaves `onboarding.*` e `helpCenter.*` agora resolvem corretamente em PT-BR, EN-US e ES.
+
+---
+
+### MISSÃO 2 — Expansão do Tour Completo (11 steps)
+
+**GamifiedOnboarding.tsx** — Reescrita completa com 11 tour steps cobrindo:
+1. Welcome (boas-vindas ao ecossistema)
+2. Dashboard (KPIs, pipeline, carteira, funil)
+3. Contatos & Leads (cadastro, filtros, conversão para deal)
+4. Boards & Kanban (IA, templates, drag & drop, cards)
+5. Atividades (ligações, reuniões, tarefas, notas)
+6. AI Hub — **Precy** (precificação), **Jury** (contratos), **Amazô** (diagnóstico)
+7. Link d'Água (cartão digital, QR Code)
+8. Prompt Lab (engenharia de prompts)
+9. Central de Decisões (deals estagnados, ações proativas)
+10. Configurações (geral, tags, API keys, equipe)
+11. Wrap-up com chamada para missões
+
+**Textos inline** — Todos em PT-BR direto no componente (sem dependência de `t()`) para garantir zero key leakage.
+
+---
+
+### MISSÃO 3 — Auto-Start & State Fix
+
+**useFirstVisit.ts** — Hook mantido estável.
+
+**GamifiedOnboarding.tsx** — Auto-start corrigido:
+- `useEffect` roda no mount verificando `localStorage` diretamente (`hasSeenTour` e `crm_onboarding_completed`)
+- Se ambos estão limpos → tour inicia automaticamente com delay de 1.2s
+- `beacon: { display: 'none' }` remove os beacons visuais — tooltip já aparece direto
+
+**SettingsPage.tsx** — Reset Onboarding corrigido:
+- Limpa todas as 3 chaves de localStorage
+- Dispara `window.dispatchEvent(new CustomEvent('crm:onboarding-reset'))`
+- Reload após 150ms garante reinicialização limpa do estado
+
+**Layout.tsx** — `data-tour` adicionado a Decisions, Prompt Lab e Settings (faltavam no V10.4).
+
+### Arquivos Alterados
+| Arquivo | Tipo de Mudança |
+|---|---|
+| `src/context/LanguageContext.tsx` | fix(i18n): flat key lookup antes de nested path resolution |
+| `src/components/GamifiedOnboarding.tsx` | feat(tour): 11 steps expandidos, textos inline PT-BR, auto-start fix |
+| `src/components/Layout.tsx` | fix(tour): data-tour em Decisions, Prompt Lab, Settings |
+| `src/features/settings/SettingsPage.tsx` | fix(reset): dispatcha evento + reload limpo |
+
+---
+
 ## 2026-05-27 — V10.4: Gamified Onboarding + Help Center + Logo Refresh
 
 ### Status: ✅ BUILD VERDE — Exit code: 0

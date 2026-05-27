@@ -186,14 +186,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // Analytics & AI - Admin & Vendedor
       { to: '/reports', icon: BarChart3, label: t('reports'), prefetch: 'reports' as RouteName },
       { to: '/ai', icon: Sparkles, label: t('aiHub'), prefetch: 'ai' as RouteName, dataTour: 'nav-ai' },
-      { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName },
+      { to: '/decisions', icon: Crosshair, label: t('decisions'), prefetch: 'decisions' as RouteName, dataTour: 'nav-decisions' },
 
       // Tools - All Users
       { to: '/qrdagua', icon: QrCode, label: "QR d'água", prefetch: 'qrdagua' as RouteName, dataTour: 'nav-qrdagua' },
-      { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName },
+      { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName, dataTour: 'nav-promptlab' },
 
       // Settings - Admin & Vendedor
-      { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName },
+      { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName, dataTour: 'nav-settings' },
     ];
 
     // Admin-only items

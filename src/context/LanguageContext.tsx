@@ -88,13 +88,18 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     /**
      * Translation — trilingual fallback chain: ES → EN → PT
+     * Supports BOTH flat dot-keys ('onboarding.missionTitle') stored directly
+     * in the translation map AND nested object paths (legacy).
      * Guarantees zero empty strings while ES translations fill in.
      */
     const t = useCallback((key: string): string => {
-        const keys = key.split('.');
-
         const resolve = (lang: Language): string | undefined => {
-            let value: any = translations[lang];
+            const dict = translations[lang] as Record<string, any>;
+            // 1. Try flat key first (e.g. dict['onboarding.missionTitle'])
+            if (typeof dict[key] === 'string') return dict[key];
+            // 2. Try nested path (e.g. dict['onboarding']['missionTitle'])
+            const keys = key.split('.');
+            let value: any = dict;
             for (const k of keys) value = value?.[k];
             return typeof value === 'string' ? value : undefined;
         };
