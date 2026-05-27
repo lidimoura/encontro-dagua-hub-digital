@@ -4,7 +4,7 @@ import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/context/LanguageContext';
 
 /**
  * AiflowSupport — Help Center + Technical Support (V10.4)
@@ -40,7 +40,7 @@ export const AiflowSupport: React.FC = () => {
     const { addActivity } = useCRM();
     const { addToast } = useToast();
     const { profile } = useAuth();
-    const { t, language } = useTranslation();
+    const { t, language } = useLanguage();
 
     const handleSubmitBug = async (e: React.FormEvent) => {
         e.preventDefault();

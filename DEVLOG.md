@@ -10,6 +10,58 @@
 
 ---
 
+## 2026-05-27 — V10.4.2: HOTFIX UX Overhaul, Reactive I18N & AI Context Fix
+
+### Status: ✅ BUILD VERDE
+
+---
+
+### MISSÃO 1 — Reactive I18N (Tour & Help Center)
+
+**Causa raiz:** `GamifiedOnboarding.tsx` usava strings inline hardcoded em PT-BR (sem `t()`). `AiflowSupport.tsx` usava `useTranslation()` (hook standalone com `useState` isolado) em vez de `useLanguage()` (LanguageContext global). Nenhum dos dois reagia à troca de idioma no header.
+
+**Fix aplicado:**
+- `GamifiedOnboarding.tsx` — Refatorado para usar `useLanguage()`. Tour steps construídos dentro de `useMemo([t, language])`, re-derivando automaticamente quando o idioma muda. Locale do Joyride também reativo.
+- `AiflowSupport.tsx` — Import trocado de `useTranslation` → `useLanguage`. Agora reage instantaneamente à troca PT/EN/ES.
+- `translations.ts` — Adicionadas todas as 11 chaves de tour step + 7 chaves de navegação (tourPrev, tourNext, tourSkip, etc.) nos 3 idiomas.
+
+**Resultado:** Troca de idioma reflete imediatamente no Tour e na Central de Ajuda sem reload.
+
+---
+
+### MISSÃO 2 — UX Overhaul (Micro-copywriting)
+
+**Problema:** Balões do tour tinham parágrafos inteiros, listas com 4-5 itens, divs aninhados. Prejudicava escaneabilidade.
+
+**Fix aplicado:** Cada passo agora tem:
+- 1 ícone + 1 título curto (bold, 14px)
+- 1 linha descritiva (12px, slate-300)
+- Zero parágrafos, zero listas, zero cards aninhados
+- Tooltip maxWidth reduzido de 380px → 320px
+- Padding reduzido de 20/24px → 16/20px
+
+**Resultado:** Tour limpo, rápido de ler, experiência premium.
+
+---
+
+### MISSÃO 3 — Business Logic (Equipe de IA)
+
+**Problema:** Precy, Jury e Amazô estavam descritos no step "AI Hub". Incorreto — eles operam dentro dos **Boards**.
+
+**Fix aplicado:**
+- Step **Boards & Kanban** → agora menciona: "Precy, Jury e Amazô operam aqui."
+- Step **AI Hub** → agora descreve apenas: "Central de configuração e integrações globais das IAs."
+- Mesma correção aplicada nas chaves `helpCenter.boardsDesc` e `helpCenter.aiHubDesc` nos 3 idiomas.
+
+### Arquivos Alterados
+| Arquivo | Tipo de Mudança |
+|---|---|
+| `src/components/GamifiedOnboarding.tsx` | refactor: useLanguage(), useMemo steps, micro-copy, AI context fix |
+| `src/components/AiflowSupport.tsx` | fix: useTranslation → useLanguage (reactive i18n) |
+| `src/lib/translations.ts` | feat: 11 tour steps × 3 langs, 7 nav keys × 3 langs, boards/aiHub desc fix |
+
+---
+
 ## 2026-05-27 — V10.4.1: HOTFIX i18n Keys + Tour Expansion + Auto-Start
 
 ### Status: ✅ BUILD VERDE — Exit code: 0
