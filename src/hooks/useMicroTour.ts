@@ -1,11 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
- * useMicroTour — Per-route tour state management for Just-in-Time onboarding (V10.4.4).
+ * useMicroTour — Per-route tour state management for Just-in-Time onboarding (V10.4.5).
  *
- * Each route gets its own localStorage flag so tours fire independently.
- * Supports on-demand re-trigger via a custom DOM event `microTour:retrigger:{routeKey}`.
- * This allows AiflowSupport to force the tour even for users who already saw it.
+ * Two trigger modes:
+ *
+ * 1. AUTO (first visit): fires once when localStorage flag is absent.
+ *    An 800ms delay lets the DOM render data-tour targets before Joyride attaches.
+ *
+ * 2. FORCED (Help Center): AiflowSupport navigates with
+ *    `navigate(route, { state: { forceMicroTour: true } })`.
+ *    The hook reads location.state SYNCHRONOUSLY on mount — no setTimeout, no race condition.
+ *    localStorage flag is cleared and tour runs immediately.
+ *    window.history.replaceState() scrubs the flag from history so F5 doesn't replay the tour.
  */
 
 export type RouteKey =
@@ -24,42 +32,41 @@ export type RouteKey =
 
 const STORAGE_PREFIX = 'microTour_seen_';
 
-/** Custom event name for on-demand re-trigger from AiflowSupport */
-export const getMicroTourRetriggerEvent = (routeKey: RouteKey) =>
-    `microTour:retrigger:${routeKey}`;
-
 export function useMicroTour(routeKey: RouteKey) {
     const storageKey = `${STORAGE_PREFIX}${routeKey}`;
-    const retriggerEvent = getMicroTourRetriggerEvent(routeKey);
+    const location = useLocation();
 
     const [shouldShow, setShouldShow] = useState(false);
     const [stepIndex, setStepIndex] = useState(0);
 
-    /* Auto-trigger on first visit (flag not set) */
     useEffect(() => {
+        const forced = (location.state as Record<string, unknown> | null)?.forceMicroTour === true;
+
+        if (forced) {
+            // MISSION 2 & 3: Forced trigger from Help Center.
+            // Clear the localStorage flag so we bypass the "already seen" gate.
+            localStorage.removeItem(storageKey);
+            // Scrub the Router state from history immediately so F5 won't replay the tour.
+            window.history.replaceState({}, document.title);
+            // Show the tour RIGHT NOW — no setTimeout needed.
+            // The component tree is already mounted when this effect runs.
+            setStepIndex(0);
+            setShouldShow(true);
+            return;
+        }
+
+        // AUTO mode: first visit only (flag absent in localStorage)
         const seen = localStorage.getItem(storageKey);
         if (!seen) {
-            // Delay to let DOM render data-tour targets
+            // Delay to let DOM render data-tour targets before Joyride attaches.
             const timer = setTimeout(() => {
                 setStepIndex(0);
                 setShouldShow(true);
             }, 800);
             return () => clearTimeout(timer);
         }
-    }, [storageKey]);
-
-    /* On-demand re-trigger via DOM event dispatched by AiflowSupport */
-    useEffect(() => {
-        const handler = () => {
-            localStorage.removeItem(storageKey);
-            setStepIndex(0);
-            setShouldShow(false);
-            // Small delay to allow Joyride to fully unmount before re-mounting
-            setTimeout(() => setShouldShow(true), 150);
-        };
-        window.addEventListener(retriggerEvent, handler);
-        return () => window.removeEventListener(retriggerEvent, handler);
-    }, [storageKey, retriggerEvent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [storageKey]); // location.state intentionally excluded: we only need it on mount
 
     const markSeen = useCallback(() => {
         localStorage.setItem(storageKey, 'true');

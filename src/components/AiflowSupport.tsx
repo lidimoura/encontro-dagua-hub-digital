@@ -11,7 +11,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
-import { resetAllMicroTours, getMicroTourRetriggerEvent, type RouteKey } from '@/hooks/useMicroTour';
+import { resetAllMicroTours } from '@/hooks/useMicroTour';
 
 /**
  * AiflowSupport — Rich Knowledge Base + Technical Support (V10.4.3)
@@ -190,20 +190,16 @@ export const AiflowSupport: React.FC = () => {
         }
     ];
 
-    /* ── Trigger micro-tour from Help Center (V10.4.4 fix) ──────────── */
+    /* ── Trigger micro-tour from Help Center (V10.4.5 — Router State) ─── */
     const triggerMicroTour = (tourRouteKey: string, route: string) => {
-        // 1. Close the help center drawer
+        // 1. Close the help center drawer immediately
         resetState();
-        // 2. Navigate to the route via React Router (SPA — no full reload)
-        navigate(route);
-        // 3. After navigation, dispatch the retrigger event so the MicroTour
-        //    on the target page fires even for users who already completed it.
-        //    The 300ms delay lets the page component mount its event listener first.
-        setTimeout(() => {
-            window.dispatchEvent(
-                new CustomEvent(getMicroTourRetriggerEvent(tourRouteKey as RouteKey))
-            );
-        }, 300);
+        // 2. Navigate with Router State — forceMicroTour is available synchronously
+        //    on the target page's first render. No setTimeout, no race condition.
+        //    The useMicroTour hook reads location.state on mount and fires the tour.
+        navigate(route, { state: { forceMicroTour: true } });
+        // tourRouteKey kept as parameter for future analytics — no longer used for DOM events
+        void tourRouteKey;
     };
 
     /* ── Filter KB items ─────────────────────────────────────────── */
