@@ -14,11 +14,12 @@ export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
     const { t } = useLanguage();
 
     return (
-        <div className="mb-4">
+        <div className="mb-4" data-tour="boards-tabs">
             {/* Tab Navigation */}
             <div className="flex items-center gap-2 mb-4 border-b border-slate-200 dark:border-white/10">
                 <button
                     onClick={() => setActiveTab('strategy')}
+                    data-tour="boards-tab-strategy"
                     className={`px-4 py-2 font-semibold text-sm transition-all relative ${activeTab === 'strategy'
                         ? 'text-acai-900 dark:text-acai-400'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
@@ -35,6 +36,7 @@ export const BoardTabs: React.FC<BoardTabsProps> = ({ board }) => {
 
                 <button
                     onClick={() => setActiveTab('insights')}
+                    data-tour="boards-tab-ai"
                     className={`px-4 py-2 font-semibold text-sm transition-all relative ${activeTab === 'insights'
                         ? 'text-acai-900 dark:text-acai-400'
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'

@@ -41,8 +41,30 @@ export const BoardsPage: React.FC = () => {
             <MicroTour
                 routeKey="boards"
                 steps={[
-                    { target: '[data-tour="boards-pipeline"]', titleKey: 'microTour.boards.title', descKey: 'microTour.boards.desc', placement: 'bottom' },
-                    { target: '[data-tour="boards-pipeline"]', titleKey: 'microTour.boards.title', descKey: 'microTour.boards.aiTeam', placement: 'bottom' },
+                    {
+                        target: '[data-tour="boards-pipeline"]',
+                        titleKey: 'microTour.boards.title',
+                        descKey: 'microTour.boards.desc',
+                        placement: 'bottom',
+                    },
+                    {
+                        target: '[data-tour="boards-deal-card"]',
+                        titleKey: 'microTour.boards.dealCard.title',
+                        descKey: 'microTour.boards.dealCard.desc',
+                        placement: 'right',
+                    },
+                    {
+                        target: '[data-tour="boards-tab-strategy"]',
+                        titleKey: 'microTour.boards.strategy.title',
+                        descKey: 'microTour.boards.strategy.desc',
+                        placement: 'bottom',
+                    },
+                    {
+                        target: '[data-tour="boards-tab-ai"]',
+                        titleKey: 'microTour.boards.aiTeam.title',
+                        descKey: 'microTour.boards.aiTeam.desc',
+                        placement: 'bottom',
+                    },
                 ]}
                 onLearnMore={() => {
                     const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;

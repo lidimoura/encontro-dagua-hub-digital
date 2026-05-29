@@ -7,8 +7,6 @@ import { StatCard } from './components/StatCard';
 import { ActivityFeedItem } from './components/ActivityFeedItem';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
-import { GamifiedOnboarding } from '@/components/GamifiedOnboarding';
-import { useFirstVisit } from '@/hooks/useFirstVisit';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MicroTour } from '@/components/MicroTour';
 
@@ -17,7 +15,6 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { activities, checkWalletHealth } = useCRM();
   const { addToast } = useToast();
-  const { isFirstVisit, missions, completeMission, completedCount, totalMissions, allComplete, completeOnboarding } = useFirstVisit();
 
   useEffect(() => {
     console.log('DashboardPage mounted');
@@ -266,16 +263,6 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Gamified Onboarding (V10.4) */}
-      <GamifiedOnboarding
-        isFirstVisit={isFirstVisit}
-        missions={missions}
-        completeMission={completeMission}
-        completedCount={completedCount}
-        totalMissions={totalMissions}
-        allComplete={allComplete}
-        completeOnboarding={completeOnboarding}
-      />
     </div>
   );
 };

@@ -73,8 +73,24 @@ export const ContactsPage: React.FC = () => {
             <MicroTour
                 routeKey="contacts"
                 steps={[
-                    { target: '[data-tour="contacts-page"]', titleKey: 'microTour.contacts.title', descKey: 'microTour.contacts.desc', placement: 'bottom' },
-                    { target: '[data-tour="contacts-new-btn"]', titleKey: 'microTour.contacts.title', descKey: 'microTour.contacts.newBtn', placement: 'bottom' },
+                    {
+                        target: '[data-tour="contacts-page"]',
+                        titleKey: 'microTour.contacts.title',
+                        descKey: 'microTour.contacts.desc',
+                        placement: 'bottom',
+                    },
+                    {
+                        target: '[data-tour="contacts-new-btn"]',
+                        titleKey: 'microTour.contacts.newBtn.title',
+                        descKey: 'microTour.contacts.newBtn.desc',
+                        placement: 'bottom',
+                    },
+                    {
+                        target: '[data-tour="contacts-form"]',
+                        titleKey: 'microTour.contacts.form.title',
+                        descKey: 'microTour.contacts.form.desc',
+                        placement: 'right',
+                    },
                 ]}
                 onLearnMore={() => {
                     const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;

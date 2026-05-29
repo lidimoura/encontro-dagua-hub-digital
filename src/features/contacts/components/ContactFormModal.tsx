@@ -36,7 +36,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+      <div data-tour="contacts-form" className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
         <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
             {editingContact ? 'Editar Contato' : 'Novo Contato'}

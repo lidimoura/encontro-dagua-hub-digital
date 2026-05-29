@@ -133,6 +133,7 @@ export const DealCard: React.FC<DealCardProps> = ({
   return (
     <div
       data-deal-id={deal.id}
+      data-tour="boards-deal-card"
       draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}

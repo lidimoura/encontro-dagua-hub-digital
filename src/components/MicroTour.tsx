@@ -1,26 +1,26 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Joyride, STATUS, ACTIONS, EVENTS, EventData, Step } from 'react-joyride';
+import React, { useCallback, useMemo } from 'react';
+import { Joyride, STATUS, ACTIONS, EVENTS, type EventData, type Step } from 'react-joyride';
 import { HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { useMicroTour } from '@/hooks/useMicroTour';
+import { useMicroTour, type RouteKey } from '@/hooks/useMicroTour';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
 /* ------------------------------------------------------------------ */
 
-type RouteKey = 'contacts' | 'boards' | 'activities' | 'ai' | 'qrdagua' | 'promptLab' | 'decisions' | 'settings' | 'techStack' | 'catalog' | 'dashboard' | 'reports';
+export type { RouteKey };
 
-interface MicroTourStepDef {
+export interface MicroTourStepDef {
     target: string;
     titleKey: string;
     descKey: string;
-    placement?: 'top' | 'bottom' | 'left' | 'right' | 'center';
+    placement?: 'top' | 'bottom' | 'left' | 'right' | 'center' | 'auto';
 }
 
 interface MicroTourProps {
     routeKey: RouteKey;
     steps: MicroTourStepDef[];
-    /** Fires when user clicks "Learn more" — should open AiflowSupport to this section */
+    /** Fires when user clicks "Learn more" — opens AiflowSupport to this section */
     onLearnMore?: () => void;
 }
 
@@ -30,14 +30,14 @@ interface MicroTourProps {
 
 export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs, onLearnMore }) => {
     const { t } = useLanguage();
-    const { shouldShow, markSeen } = useMicroTour(routeKey);
-    const [stepIndex, setStepIndex] = useState(0);
+    const { shouldShow, stepIndex, setStepIndex, markSeen } = useMicroTour(routeKey);
 
-    /* Build Joyride steps reactively from translation keys */
+    /* Build Joyride steps from translation keys */
     const joyrideSteps: Step[] = useMemo(() =>
         stepDefs.map(def => ({
             target: def.target,
-            placement: (def.placement || 'bottom') as any,
+            placement: (def.placement || 'bottom') as Step['placement'],
+            disableBeacon: true,
             content: (
                 <div>
                     <h3 className="font-bold text-white text-sm mb-1">{t(def.titleKey)}</h3>
@@ -75,7 +75,7 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
         if (action === ACTIONS.CLOSE) {
             markSeen();
         }
-    }, [markSeen]);
+    }, [markSeen, setStepIndex]);
 
     if (!shouldShow || joyrideSteps.length === 0) return null;
 
@@ -103,7 +103,6 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
                 textColor: '#e2e8f0',
                 overlayColor: 'rgba(0,0,0,0.60)',
                 showProgress: true,
-                buttons: ['back', 'close', 'primary', 'skip'],
                 overlayClickAction: 'close',
                 blockTargetInteraction: true,
             }}
@@ -113,7 +112,7 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
                     padding: '14px 18px',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
                     border: '1px solid rgba(139,92,246,0.25)',
-                    maxWidth: 300,
+                    maxWidth: 320,
                 },
                 tooltipContainer: { textAlign: 'left' },
                 buttonPrimary: {
@@ -126,8 +125,7 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
                 buttonBack: { color: '#94a3b8', marginRight: 8, fontSize: 12 },
                 buttonSkip: { color: '#64748b', fontSize: 11 },
                 buttonClose: { color: '#94a3b8' },
-                spotlight: {},
-                beacon: { display: 'none' },
+                beacon: { display: 'none' } as React.CSSProperties,
             }}
         />
     );
