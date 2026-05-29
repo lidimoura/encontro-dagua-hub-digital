@@ -1,52 +1,77 @@
 import React, { useState } from 'react';
-import { HelpCircle, X, Mail, Lock, Navigation, MessageCircle, Bug, Send, ArrowLeft, Search, BookOpen, LayoutDashboard, Users, KanbanSquare, CalendarCheck, Sparkles, QrCode, Wand2, Settings, BarChart3, Crosshair } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+    HelpCircle, X, Mail, Lock, Navigation, MessageCircle, Bug, Send,
+    ArrowLeft, Search, BookOpen, LayoutDashboard, Users, KanbanSquare,
+    CalendarCheck, Sparkles, QrCode, Wand2, Settings, BarChart3,
+    Crosshair, ChevronRight, ChevronDown, PlayCircle,
+} from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
+import { resetAllMicroTours } from '@/hooks/useMicroTour';
 
 /**
- * AiflowSupport — Help Center + Technical Support (V10.4)
- * Two tabs: Quick Guide (feature reference from USER_GUIDE) + Support (bug reports, help topics)
- * Fully bilingual via t() translation keys
+ * AiflowSupport — Rich Knowledge Base + Technical Support (V10.4.3)
+ *
+ * Three views:
+ *   - guide:   Accordion knowledge base with expandable rich content per feature
+ *   - support: Help topics (password, email, access, bug report, direct support)
+ *   - bugForm: Bug report form
+ *
+ * Each guide category:
+ *   - Expands to show didactic, bilingual content in-place (no route redirect)
+ *   - Has a "Run interactive tutorial" button that triggers the per-route MicroTour
  */
 
-interface GuideItem {
+/* ------------------------------------------------------------------ */
+/*  Knowledge base item definition                                      */
+/* ------------------------------------------------------------------ */
+
+interface KBItem {
     icon: React.ElementType;
-    titleKey: string;
-    descKey: string;
-    route: string;
+    titleKey: string;     // kb.*.title
+    contentKey: string;   // kb.*.content  (rich text shown on expand)
+    tourRouteKey?: string; // route key for MicroTour trigger
+    route: string;        // for navigation fallback
 }
 
-const GUIDE_ITEMS: GuideItem[] = [
-    { icon: LayoutDashboard, titleKey: 'helpCenter.dashboardTitle', descKey: 'helpCenter.dashboardDesc', route: '/dashboard' },
-    { icon: Users, titleKey: 'helpCenter.contactsTitle', descKey: 'helpCenter.contactsDesc', route: '/contacts' },
-    { icon: KanbanSquare, titleKey: 'helpCenter.boardsTitle', descKey: 'helpCenter.boardsDesc', route: '/boards' },
-    { icon: CalendarCheck, titleKey: 'helpCenter.activitiesTitle', descKey: 'helpCenter.activitiesDesc', route: '/activities' },
-    { icon: Sparkles, titleKey: 'helpCenter.aiHubTitle', descKey: 'helpCenter.aiHubDesc', route: '/ai' },
-    { icon: QrCode, titleKey: 'helpCenter.linkDaguaTitle', descKey: 'helpCenter.linkDaguaDesc', route: '/qrdagua' },
-    { icon: Wand2, titleKey: 'helpCenter.promptLabTitle', descKey: 'helpCenter.promptLabDesc', route: '/prompt-lab' },
-    { icon: BarChart3, titleKey: 'helpCenter.reportsTitle', descKey: 'helpCenter.reportsDesc', route: '/reports' },
-    { icon: Crosshair, titleKey: 'helpCenter.decisionsTitle', descKey: 'helpCenter.decisionsDesc', route: '/decisions' },
-    { icon: Settings, titleKey: 'helpCenter.settingsTitle', descKey: 'helpCenter.settingsDesc', route: '/settings' },
+const KB_ITEMS: KBItem[] = [
+    { icon: LayoutDashboard, titleKey: 'kb.dashboard.title',  contentKey: 'kb.dashboard.content',  tourRouteKey: 'dashboard', route: '/dashboard' },
+    { icon: Users,           titleKey: 'kb.contacts.title',   contentKey: 'kb.contacts.content',   tourRouteKey: 'contacts', route: '/contacts' },
+    { icon: KanbanSquare,    titleKey: 'kb.boards.title',     contentKey: 'kb.boards.content',     tourRouteKey: 'boards',   route: '/boards' },
+    { icon: CalendarCheck,   titleKey: 'kb.activities.title',  contentKey: 'kb.activities.content', tourRouteKey: 'activities', route: '/activities' },
+    { icon: Sparkles,        titleKey: 'kb.aiHub.title',      contentKey: 'kb.aiHub.content',      tourRouteKey: 'ai', route: '/ai' },
+    { icon: QrCode,          titleKey: 'kb.qrdagua.title',    contentKey: 'kb.qrdagua.content',    tourRouteKey: 'qrdagua', route: '/qrdagua' },
+    { icon: Wand2,           titleKey: 'kb.promptLab.title',  contentKey: 'kb.promptLab.content',  tourRouteKey: 'promptLab', route: '/prompt-lab' },
+    { icon: BarChart3,       titleKey: 'kb.reports.title',    contentKey: 'kb.reports.content',    tourRouteKey: 'reports', route: '/reports' },
+    { icon: Crosshair,       titleKey: 'kb.decisions.title',  contentKey: 'kb.decisions.content',  tourRouteKey: 'decisions', route: '/decisions' },
+    { icon: Settings,        titleKey: 'kb.settings.title',   contentKey: 'kb.settings.content',   tourRouteKey: 'settings', route: '/settings' },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                           */
+/* ------------------------------------------------------------------ */
 
 export const AiflowSupport: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState<'guide' | 'support' | 'bugForm'>('guide');
+    const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
     const [bugDesc, setBugDesc] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const { addActivity } = useCRM();
     const { addToast } = useToast();
     const { profile } = useAuth();
     const { t, language } = useLanguage();
+    const navigate = useNavigate();
 
+    /* ── Bug form submission ─────────────────────────────────────── */
     const handleSubmitBug = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!bugDesc.trim()) return;
 
-        // Create Task in CRM
         addActivity({
             title: `Feedback/Bug: ${bugDesc.slice(0, 30)}...`,
             type: 'TASK',
@@ -58,7 +83,6 @@ export const AiflowSupport: React.FC = () => {
             user: { name: 'User', avatar: '' }
         });
 
-        // Insert notification for Admin
         try {
             await supabase.from('notifications').insert({
                 company_id: profile?.company_id,
@@ -71,7 +95,6 @@ export const AiflowSupport: React.FC = () => {
             console.error('Failed to create notification', err);
         }
 
-        // Create Notification for Admin
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
@@ -109,6 +132,7 @@ export const AiflowSupport: React.FC = () => {
         setIsOpen(false);
     };
 
+    /* ── Support topics ──────────────────────────────────────────── */
     const helpTopics = [
         {
             icon: Lock,
@@ -166,19 +190,31 @@ export const AiflowSupport: React.FC = () => {
         }
     ];
 
-    // Filter guide items by search query
-    const filteredGuide = searchQuery.trim()
-        ? GUIDE_ITEMS.filter(item =>
+    /* ── Trigger micro-tour from Help Center ─────────────────────── */
+    const triggerMicroTour = (tourRouteKey: string, route: string) => {
+        // Remove the "seen" flag so the MicroTour fires again
+        localStorage.removeItem(`microTour_seen_${tourRouteKey}`);
+        // Close the help center first
+        resetState();
+        // Navigate to the route using React Router (SPA navigation — no full reload)
+        navigate(route);
+        // The MicroTour on that page will auto-trigger because the flag was cleared
+    };
+
+    /* ── Filter KB items ─────────────────────────────────────────── */
+    const filteredKB = searchQuery.trim()
+        ? KB_ITEMS.filter(item =>
             t(item.titleKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
-            t(item.descKey).toLowerCase().includes(searchQuery.toLowerCase())
+            t(item.contentKey).toLowerCase().includes(searchQuery.toLowerCase())
         )
-        : GUIDE_ITEMS;
+        : KB_ITEMS;
 
     const resetState = () => {
         setIsOpen(false);
         setView('guide');
         setBugDesc('');
         setSearchQuery('');
+        setExpandedIdx(null);
     };
 
     return (
@@ -208,7 +244,7 @@ export const AiflowSupport: React.FC = () => {
                     />
 
                     {/* Panel */}
-                    <div className="fixed bottom-24 left-6 z-[9999] w-[360px] max-w-[calc(100vw-3rem)] bg-slate-900 border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
+                    <div className="fixed bottom-24 left-6 z-[9999] w-[380px] max-w-[calc(100vw-3rem)] bg-slate-900 border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
                         {/* Header with Tabs */}
                         <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 text-white">
                             <div className="flex items-center justify-between mb-3">
@@ -234,7 +270,7 @@ export const AiflowSupport: React.FC = () => {
                             {view !== 'bugForm' && (
                                 <div className="flex gap-1 bg-white/10 rounded-lg p-1">
                                     <button
-                                        onClick={() => setView('guide')}
+                                        onClick={() => { setView('guide'); setExpandedIdx(null); }}
                                         className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                                             view === 'guide' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80 hover:text-white'
                                         }`}
@@ -256,7 +292,7 @@ export const AiflowSupport: React.FC = () => {
                         </div>
 
                         {/* Content */}
-                        <div className="p-4 max-h-[400px] overflow-y-auto">
+                        <div className="p-4 max-h-[440px] overflow-y-auto">
                             {view === 'guide' ? (
                                 <div className="space-y-2">
                                     {/* Search */}
@@ -271,32 +307,57 @@ export const AiflowSupport: React.FC = () => {
                                         />
                                     </div>
 
-                                    {/* Guide Cards */}
-                                    {filteredGuide.map((item, index) => {
+                                    {/* Knowledge Base Accordion */}
+                                    {filteredKB.map((item, index) => {
                                         const Icon = item.icon;
+                                        const isExpanded = expandedIdx === index;
                                         return (
-                                            <button
-                                                key={index}
-                                                onClick={() => {
-                                                    window.location.hash = `#${item.route}`;
-                                                    resetState();
-                                                }}
-                                                className="w-full text-left p-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded-xl transition-all group"
-                                            >
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-9 h-9 bg-blue-600/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600/30 transition-colors">
+                                            <div key={index} className="rounded-xl border border-slate-700 overflow-hidden transition-all">
+                                                {/* Accordion Header */}
+                                                <button
+                                                    onClick={() => setExpandedIdx(isExpanded ? null : index)}
+                                                    className={`w-full text-left p-3 flex items-center gap-3 transition-all group ${
+                                                        isExpanded
+                                                            ? 'bg-blue-600/10 border-b border-blue-500/20'
+                                                            : 'bg-slate-800 hover:bg-slate-700'
+                                                    }`}
+                                                >
+                                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                                                        isExpanded ? 'bg-blue-600/30' : 'bg-blue-600/20 group-hover:bg-blue-600/30'
+                                                    }`}>
                                                         <Icon size={18} className="text-blue-400" />
                                                     </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="text-white font-semibold text-sm mb-0.5">{t(item.titleKey)}</h4>
-                                                        <p className="text-slate-400 text-xs leading-relaxed">{t(item.descKey)}</p>
+                                                    <h4 className="text-white font-semibold text-sm flex-1">{t(item.titleKey)}</h4>
+                                                    {isExpanded
+                                                        ? <ChevronDown size={16} className="text-blue-400 flex-shrink-0" />
+                                                        : <ChevronRight size={16} className="text-slate-500 flex-shrink-0" />
+                                                    }
+                                                </button>
+
+                                                {/* Expanded Content */}
+                                                {isExpanded && (
+                                                    <div className="p-3 bg-slate-800/50">
+                                                        <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line">
+                                                            {t(item.contentKey)}
+                                                        </p>
+
+                                                        {/* "Run interactive tutorial" button */}
+                                                        {item.tourRouteKey && (
+                                                            <button
+                                                                onClick={() => triggerMicroTour(item.tourRouteKey!, item.route)}
+                                                                className="mt-3 w-full py-2 text-xs text-violet-400 border border-violet-500/30 rounded-lg hover:bg-violet-500/10 transition-colors flex items-center justify-center gap-1.5"
+                                                            >
+                                                                <PlayCircle size={13} />
+                                                                {t('kb.runTour')}
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                </div>
-                                            </button>
+                                                )}
+                                            </div>
                                         );
                                     })}
 
-                                    {filteredGuide.length === 0 && (
+                                    {filteredKB.length === 0 && (
                                         <p className="text-center text-slate-500 text-sm py-4">
                                             {language === 'en' ? 'No results found' : language === 'es' ? 'Sin resultados' : 'Nenhum resultado encontrado'}
                                         </p>
@@ -366,20 +427,12 @@ export const AiflowSupport: React.FC = () => {
 
             {/* Animation Styles */}
             <style>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(20px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
+                @keyframes slide-up {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to   { transform: translateY(0); opacity: 1; }
+                }
+                .animate-slide-up { animation: slide-up 0.3s ease-out; }
+            `}</style>
         </>
     );
 };

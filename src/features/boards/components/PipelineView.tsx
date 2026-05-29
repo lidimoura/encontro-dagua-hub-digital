@@ -150,7 +150,7 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" data-tour="boards-pipeline">
       {!activeBoard ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
           <div className="w-24 h-24 bg-primary-50 dark:bg-primary-900/20 rounded-full flex items-center justify-center mb-6">

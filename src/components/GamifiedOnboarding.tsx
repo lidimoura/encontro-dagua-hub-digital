@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Joyride, STATUS, Step, ACTIONS, EVENTS, EventData } from 'react-joyride';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import {
-    Target, Layout, Move, FileText, Bot, QrCode,
+    Target, Layout, Move, FileText, Bot,
     Trophy, X, ChevronUp, ChevronDown, Sparkles,
-    CheckCircle2, Circle, Users, BarChart3, Wand2,
-    Settings, Crosshair, PlayCircle,
+    CheckCircle2, Circle, PlayCircle,
 } from 'lucide-react';
 import { OnboardingMissions } from '@/hooks/useFirstVisit';
 import { useLanguage } from '@/context/LanguageContext';
@@ -71,7 +69,8 @@ const fireAllCompleteConfetti = () => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Component                                                           */
+/*  Component — Mission Widget ONLY (no global tour)                    */
+/*  Micro-tours are now handled per-route by MicroTour component       */
 /* ------------------------------------------------------------------ */
 
 export const GamifiedOnboarding: React.FC<GamifiedOnboardingProps> = ({
@@ -83,193 +82,25 @@ export const GamifiedOnboarding: React.FC<GamifiedOnboardingProps> = ({
     allComplete,
     completeOnboarding,
 }) => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
 
-    const [runTour, setRunTour] = useState(false);
-    const [stepIndex, setStepIndex] = useState(0);
     const [isWidgetOpen, setIsWidgetOpen] = useState(false);
     const [showCelebration, setShowCelebration] = useState(false);
     const [prevCompleted, setPrevCompleted] = useState(completedCount);
 
-    /* ── Build tour steps reactively (re-derives on language change) ── */
-    const tourSteps: Step[] = useMemo(() => [
-        /* 0 — Welcome */
-        {
-            target: 'body',
-            placement: 'center' as const,
-            content: (
-                <div className="text-center py-2">
-                    <div className="text-4xl mb-2">🌊</div>
-                    <h3 className="text-lg font-bold text-white">{t('onboarding.tourStep1Title')}</h3>
-                    <p className="text-sm text-slate-300 mt-1">{t('onboarding.tourStep1Desc')}</p>
-                </div>
-            ),
-        },
-        /* 1 — Dashboard */
-        {
-            target: '[data-tour="nav-dashboard"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <BarChart3 size={16} className="text-blue-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep2Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep2Desc')}</p>
-                </div>
-            ),
-        },
-        /* 2 — Contacts */
-        {
-            target: '[data-tour="nav-contacts"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Users size={16} className="text-purple-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep3Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep3Desc')}</p>
-                </div>
-            ),
-        },
-        /* 3 — Boards (+ AI Team context) */
-        {
-            target: '[data-tour="nav-boards"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Layout size={16} className="text-emerald-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep4Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep4Desc')}</p>
-                </div>
-            ),
-        },
-        /* 4 — Activities */
-        {
-            target: '[data-tour="nav-activities"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <FileText size={16} className="text-orange-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep5Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep5Desc')}</p>
-                </div>
-            ),
-        },
-        /* 5 — AI Hub (config center only) */
-        {
-            target: '[data-tour="nav-ai"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Bot size={16} className="text-violet-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep6Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep6Desc')}</p>
-                </div>
-            ),
-        },
-        /* 6 — Link d'Água */
-        {
-            target: '[data-tour="nav-qrdagua"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <QrCode size={16} className="text-cyan-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep7Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep7Desc')}</p>
-                </div>
-            ),
-        },
-        /* 7 — Prompt Lab */
-        {
-            target: '[data-tour="nav-promptlab"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Wand2 size={16} className="text-pink-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep8Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep8Desc')}</p>
-                </div>
-            ),
-        },
-        /* 8 — Decisions */
-        {
-            target: '[data-tour="nav-decisions"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Crosshair size={16} className="text-red-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep9Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep9Desc')}</p>
-                </div>
-            ),
-        },
-        /* 9 — Settings */
-        {
-            target: '[data-tour="nav-settings"]',
-            placement: 'right' as const,
-            content: (
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Settings size={16} className="text-slate-400" />
-                        <h3 className="font-bold text-white text-sm">{t('onboarding.tourStep10Title')}</h3>
-                    </div>
-                    <p className="text-xs text-slate-300">{t('onboarding.tourStep10Desc')}</p>
-                </div>
-            ),
-        },
-        /* 10 — Wrap-up */
-        {
-            target: 'body',
-            placement: 'center' as const,
-            content: (
-                <div className="text-center py-2">
-                    <Trophy size={40} className="mx-auto mb-2 text-amber-400" />
-                    <h3 className="text-lg font-bold text-white">{t('onboarding.tourStep11Title')}</h3>
-                    <p className="text-sm text-slate-300 mt-1">{t('onboarding.tourStep11Desc')}</p>
-                </div>
-            ),
-        },
-    ], [t, language]); // Re-derive when language changes
-
-    /* ── Joyride locale (reactive) ───────────────────────────────── */
-    const joyrideLocale = useMemo(() => ({
-        back: t('onboarding.tourPrev'),
-        close: t('onboarding.tourClose'),
-        last: t('onboarding.tourFinish'),
-        next: t('onboarding.tourNext'),
-        skip: t('onboarding.tourSkip'),
-        open: t('onboarding.tourOpen'),
-    }), [t, language]);
-
-    /* ── Auto-start on first visit ───────────────────────────────── */
+    // Auto-open widget on first visit after a delay
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenTour');
-        const onboardingDone = localStorage.getItem('crm_onboarding_completed');
-
-        if (!hasSeenTour && !onboardingDone) {
+        const hasSeenWidget = localStorage.getItem('hasSeenMissionWidget');
+        if (!hasSeenWidget && isFirstVisit) {
             const timer = setTimeout(() => {
-                setRunTour(true);
-                setStepIndex(0);
-            }, 1200);
+                setIsWidgetOpen(true);
+                localStorage.setItem('hasSeenMissionWidget', 'true');
+            }, 2000);
             return () => clearTimeout(timer);
         }
-    }, []);
+    }, [isFirstVisit]);
 
-    /* ── Detect mission completion → confetti ────────────────────── */
+    // Detect mission completion → fire confetti
     useEffect(() => {
         if (completedCount > prevCompleted) {
             fireMissionConfetti();
@@ -283,82 +114,12 @@ export const GamifiedOnboarding: React.FC<GamifiedOnboardingProps> = ({
         setPrevCompleted(completedCount);
     }, [completedCount, prevCompleted, allComplete]);
 
-    /* ── Joyride event handler ───────────────────────────────────── */
-    const handleJoyrideEvent = useCallback((data: EventData) => {
-        const { status, action, type, index } = data;
-
-        if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
-            setRunTour(false);
-            localStorage.setItem('hasSeenTour', 'true');
-            if (status === STATUS.FINISHED) {
-                setTimeout(() => setIsWidgetOpen(true), 600);
-            }
-            return;
-        }
-
-        if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-            setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
-        }
-
-        if (action === ACTIONS.CLOSE) {
-            setRunTour(false);
-            localStorage.setItem('hasSeenTour', 'true');
-        }
-    }, []);
-
-    /* ── Derived values ──────────────────────────────────────────── */
     const earnedXP = MISSION_DEFS.reduce((sum, m) => sum + (missions[m.key] ? m.xp : 0), 0);
     const progressPercent = totalMissions > 0 ? (completedCount / totalMissions) * 100 : 0;
     const showWidget = !allComplete || showCelebration;
 
     return (
         <>
-            {/* ── Joyride Tour ─────────────────────────────────────── */}
-            <Joyride
-                steps={tourSteps}
-                run={runTour}
-                stepIndex={stepIndex}
-                continuous
-                scrollToFirstStep
-                onEvent={handleJoyrideEvent}
-                locale={joyrideLocale}
-                options={{
-                    primaryColor: '#8b5cf6',
-                    zIndex: 10000,
-                    arrowColor: '#1e293b',
-                    backgroundColor: '#1e293b',
-                    textColor: '#e2e8f0',
-                    overlayColor: 'rgba(0,0,0,0.68)',
-                    showProgress: true,
-                    buttons: ['back', 'close', 'primary', 'skip'],
-                    overlayClickAction: 'close',
-                    blockTargetInteraction: true,
-                }}
-                styles={{
-                    tooltip: {
-                        borderRadius: 16,
-                        padding: '16px 20px',
-                        boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
-                        border: '1px solid rgba(139,92,246,0.3)',
-                        maxWidth: 320,
-                    },
-                    tooltipContainer: { textAlign: 'left' },
-                    tooltipTitle: { color: '#f1f5f9', fontWeight: 700, fontSize: 14 },
-                    buttonPrimary: {
-                        borderRadius: 10,
-                        padding: '8px 20px',
-                        fontWeight: 700,
-                        fontSize: 13,
-                        background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-                    },
-                    buttonBack: { color: '#94a3b8', marginRight: 10, fontSize: 13 },
-                    buttonSkip: { color: '#64748b', fontSize: 12 },
-                    buttonClose: { color: '#94a3b8' },
-                    spotlight: {},
-                    beacon: { display: 'none' },
-                }}
-            />
-
             {/* ── Celebration Overlay ───────────────────────────────── */}
             {showCelebration && (
                 <div className="fixed inset-0 z-[9997] flex items-center justify-center bg-black/75 backdrop-blur-sm">
@@ -402,7 +163,6 @@ export const GamifiedOnboarding: React.FC<GamifiedOnboardingProps> = ({
                                     </button>
                                 </div>
                                 <p className="text-white/65 text-xs">{t('onboarding.missionSubtitle')}</p>
-                                {/* Progress bar */}
                                 <div className="mt-3 bg-white/20 rounded-full h-2 overflow-hidden">
                                     <div
                                         className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full transition-all duration-700 ease-out"
@@ -454,21 +214,6 @@ export const GamifiedOnboarding: React.FC<GamifiedOnboardingProps> = ({
                                         </div>
                                     );
                                 })}
-                            </div>
-
-                            {/* Footer — restart tour */}
-                            <div className="px-3 pb-3">
-                                <button
-                                    onClick={() => {
-                                        setStepIndex(0);
-                                        setRunTour(true);
-                                        setIsWidgetOpen(false);
-                                    }}
-                                    className="w-full py-2 text-xs text-violet-400 border border-violet-500/30 rounded-lg hover:bg-violet-500/10 transition-colors flex items-center justify-center gap-1.5"
-                                >
-                                    <PlayCircle size={13} />
-                                    {t('onboarding.reviewTour')}
-                                </button>
                             </div>
                         </div>
                     )}

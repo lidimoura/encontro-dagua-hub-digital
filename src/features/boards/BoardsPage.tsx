@@ -3,6 +3,7 @@ import { useBoardsController } from './hooks/useBoardsController';
 import { PipelineView } from './components/PipelineView';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { useFirstVisit } from '@/hooks/useFirstVisit';
+import { MicroTour } from '@/components/MicroTour';
 
 export const BoardsPage: React.FC = () => {
     const controller = useBoardsController();
@@ -36,6 +37,19 @@ export const BoardsPage: React.FC = () => {
 
     return (
         <>
+            {/* Micro-tour: fires on first visit to /boards */}
+            <MicroTour
+                routeKey="boards"
+                steps={[
+                    { target: '[data-tour="boards-pipeline"]', titleKey: 'microTour.boards.title', descKey: 'microTour.boards.desc', placement: 'bottom' },
+                    { target: '[data-tour="boards-pipeline"]', titleKey: 'microTour.boards.title', descKey: 'microTour.boards.aiTeam', placement: 'bottom' },
+                ]}
+                onLearnMore={() => {
+                    const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                    if (btn) btn.click();
+                }}
+            />
+
             <PipelineView {...controller} />
 
             <OnboardingModal

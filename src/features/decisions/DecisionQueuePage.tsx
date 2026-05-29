@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { MicroTour } from '@/components/MicroTour';
 import {
   Crosshair,
   Sparkles,
@@ -59,7 +60,18 @@ export const DecisionQueuePage: React.FC = () => {
   const lowDecisions = decisions.filter(d => d.priority === 'low');
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6" data-tour="decisions-page">
+      <MicroTour
+        routeKey="decisions"
+        steps={[
+          { target: '[data-tour="decisions-page"]', titleKey: 'microTour.decisions.title', descKey: 'microTour.decisions.desc', placement: 'bottom' },
+          { target: '[data-tour="decisions-analyze-btn"]', titleKey: 'microTour.decisions.title', descKey: 'microTour.decisions.analyzeBtn', placement: 'bottom' },
+        ]}
+        onLearnMore={() => {
+          const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+          if (btn) btn.click();
+        }}
+      />
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -77,6 +89,7 @@ export const DecisionQueuePage: React.FC = () => {
             <button
               onClick={runAnalyzers}
               disabled={isAnalyzing}
+              data-tour="decisions-analyze-btn"
               className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               {isAnalyzing ? (

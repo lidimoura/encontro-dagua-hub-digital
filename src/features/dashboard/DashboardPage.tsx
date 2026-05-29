@@ -10,6 +10,7 @@ import { LazyFunnelChart, ChartWrapper } from '@/components/charts';
 import { GamifiedOnboarding } from '@/components/GamifiedOnboarding';
 import { useFirstVisit } from '@/hooks/useFirstVisit';
 import { useTranslation } from '@/hooks/useTranslation';
+import { MicroTour } from '@/components/MicroTour';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -48,7 +49,17 @@ const DashboardPage: React.FC = () => {
   } = useDashboardMetrics();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="dashboard-page">
+      <MicroTour
+        routeKey="dashboard"
+        steps={[
+          { target: '[data-tour="dashboard-page"]', titleKey: 'microTour.dashboard.title', descKey: 'microTour.dashboard.desc', placement: 'bottom' },
+        ]}
+        onLearnMore={() => {
+          const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+          if (btn) btn.click();
+        }}
+      />
 
 
       <div className="flex justify-between items-center">

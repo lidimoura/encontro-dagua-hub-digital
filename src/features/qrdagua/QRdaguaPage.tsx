@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MicroTour } from '@/components/MicroTour';
 import { QrCode, Sparkles, Save, Link as LinkIcon, Palette, FileText, Edit2, Trash2, Smartphone, Globe, CreditCard, Copy, ExternalLink, X, Share2 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
@@ -715,7 +716,17 @@ export const QRdaguaPage: React.FC = () => {
     const showConditionalFields = formData.projectType !== 'LINK';
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4">
+        <div className="w-full max-w-7xl mx-auto px-4" data-tour="qrdagua-page">
+            <MicroTour
+                routeKey="qrdagua"
+                steps={[
+                    { target: '[data-tour="qrdagua-page"]', titleKey: 'microTour.qrdagua.title', descKey: 'microTour.qrdagua.desc', placement: 'bottom' },
+                ]}
+                onLearnMore={() => {
+                    const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                    if (btn) btn.click();
+                }}
+            />
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="p-3 bg-gradient-to-br from-acai-900 to-acai-700 rounded-xl shadow-lg shadow-acai-900/30">

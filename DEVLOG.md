@@ -10,6 +10,66 @@
 
 ---
 
+## 2026-05-27 — V10.4.3: JUST-IN-TIME ONBOARDING & RICH KNOWLEDGE BASE
+
+### Arquitetura
+
+**Antes (V10.4.2):** Tour monolítico de 11 passos no login → sobrecarga cognitiva. Help Center apenas redirecionava rotas.
+
+**Depois (V10.4.3):** Micro-tours contextuais por rota + Knowledge Base com conteúdo expandível in-place.
+
+---
+
+### MISSÃO 1 — Micro-Tours Contextuais (Just-in-Time)
+
+**Novo hook `useMicroTour(routeKey)`:** Cada rota tem flag independente no localStorage (`microTour_seen_contacts`, `microTour_seen_boards`, etc.). Tour dispara apenas na primeira visita à rota.
+
+**Novo componente `MicroTour.tsx`:** Wrapper de Joyride para tours de 1-3 passos por rota. Cada tooltip inclui botão "Saiba mais" que abre o Help Center na seção correspondente. I18n reativo via `useLanguage()`.
+
+**Integração:**
+- `ContactsPage.tsx` → Tour de 2 passos (visão geral + botão "Novo Contato")
+- `BoardsPage.tsx` → Tour de 2 passos (pipeline/drag-drop + "Precy, Jury e Amazô operam aqui")
+- `data-tour` attributes adicionados em `ContactsHeader.tsx` e `PipelineView.tsx`
+
+**`GamifiedOnboarding.tsx` refatorado:** Removido o Joyride global de 11 passos. Mantido APENAS o widget flutuante de missões (XP, progresso, confetti).
+
+---
+
+### MISSÃO 2 — Rich Knowledge Base (AiflowSupport)
+
+**Refatoração completa do `AiflowSupport.tsx`:**
+- Clique em uma categoria agora **expande um Accordion** com conteúdo didático e bilíngue (PT/EN/ES)
+- Zero redirecionamento de rota — tudo é exibido in-place
+- Conteúdo derivado do `USER_GUIDE.md`, cada seção com ~3-4 linhas instrucionais
+- 10 categorias: Dashboard, Contatos, Boards, Atividades, AI Hub, Link d'Água, Prompt Lab, Relatórios, Decisões, Configurações
+
+**Novas chaves em `translations.ts`:** 20 chaves × 3 idiomas = 60 entradas (`kb.*` e `microTour.*`)
+
+---
+
+### MISSÃO 3 — On-Demand Tour Trigger
+
+- Cada categoria expandida no Help Center exibe botão **"Ver tutorial interativo"** (apenas para rotas com MicroTour)
+- Clicar limpa o flag `microTour_seen_*` no localStorage, navega para a rota, e fecha o Help Center
+- O `MicroTour` da rota dispara automaticamente porque a flag foi removida
+- `SettingsPage.tsx` → "Reset Onboarding" agora também limpa todos os micro-tour flags via `resetAllMicroTours()`
+
+### Arquivos Alterados / Criados
+| Arquivo | Tipo |
+|---|---|
+| `src/hooks/useMicroTour.ts` | **[NEW]** Hook per-route micro-tour state |
+| `src/components/MicroTour.tsx` | **[NEW]** Joyride wrapper contextual |
+| `src/components/GamifiedOnboarding.tsx` | refactor: removido tour global, mantido widget |
+| `src/components/AiflowSupport.tsx` | refactor: Rich Knowledge Base com accordion |
+| `src/features/contacts/ContactsPage.tsx` | feat: MicroTour integrado |
+| `src/features/boards/BoardsPage.tsx` | feat: MicroTour integrado |
+| `src/features/contacts/components/ContactsHeader.tsx` | feat: data-tour attr |
+| `src/features/boards/components/PipelineView.tsx` | feat: data-tour attr |
+| `src/features/settings/SettingsPage.tsx` | feat: resetAllMicroTours() |
+| `src/lib/translations.ts` | feat: 60 novas chaves i18n (kb.*, microTour.*) |
+
+---
+
 ## 2026-05-27 — V10.4.2: HOTFIX UX Overhaul, Reactive I18N & AI Context Fix
 
 ### Status: ✅ BUILD VERDE

@@ -12,8 +12,10 @@ import { UsersPage } from './UsersPage';
 import { SuperAdminKeyPanel } from './components/SuperAdminKeyPanel';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage, CurrencyCode } from '@/context/LanguageContext';
+import { resetAllMicroTours } from '@/hooks/useMicroTour';
 import { Settings as SettingsIcon, Users, Database, LayoutDashboard, AlertTriangle, Bell, ShieldCheck, DollarSign } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { MicroTour } from '@/components/MicroTour';
 import { supabase } from '@/lib/supabase/client';
 
 const GeneralSettings: React.FC = () => {
@@ -68,6 +70,10 @@ const GeneralSettings: React.FC = () => {
       localStorage.removeItem('crm_onboarding_completed');
       localStorage.removeItem('crm_onboarding_missions');
       localStorage.removeItem('hasSeenTour');
+      localStorage.removeItem('hasSeenMissionWidget');
+
+      // V10.4.3 micro-tour flags
+      resetAllMicroTours();
 
       // Dispatch event so GamifiedOnboarding re-launches tour without page reload
       window.dispatchEvent(new CustomEvent('crm:onboarding-reset'));
@@ -219,7 +225,17 @@ const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto py-8 px-4" data-tour="settings-page">
+      <MicroTour
+        routeKey="settings"
+        steps={[
+          { target: '[data-tour="settings-page"]', titleKey: 'microTour.settings.title', descKey: 'microTour.settings.desc', placement: 'bottom' },
+        ]}
+        onLearnMore={() => {
+          const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+          if (btn) btn.click();
+        }}
+      />
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 border-b border-slate-200 dark:border-white/10 pb-4">
         {t('settings')}
       </h1>

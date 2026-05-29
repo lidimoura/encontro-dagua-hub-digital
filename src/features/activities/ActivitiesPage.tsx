@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MicroTour } from '@/components/MicroTour';
 import { useActivitiesController } from './hooks/useActivitiesController';
 import { ActivitiesHeader } from './components/ActivitiesHeader';
 import { ActivitiesFilters } from './components/ActivitiesFilters';
@@ -66,7 +67,18 @@ export const ActivitiesPage: React.FC = () => {
     };
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto">
+        <div className="p-8 max-w-[1600px] mx-auto" data-tour="activities-page">
+            <MicroTour
+                routeKey="activities"
+                steps={[
+                    { target: '[data-tour="activities-page"]', titleKey: 'microTour.activities.title', descKey: 'microTour.activities.desc', placement: 'bottom' },
+                    { target: '[data-tour="activities-new-btn"]', titleKey: 'microTour.activities.title', descKey: 'microTour.activities.newBtn', placement: 'bottom' },
+                ]}
+                onLearnMore={() => {
+                    const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                    if (btn) btn.click();
+                }}
+            />
             <ActivitiesHeader
                 viewMode={viewMode}
                 setViewMode={setViewMode}

@@ -10,6 +10,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import { MazoSuggestionCard } from '@/components/MazoSuggestionCard';
 import { MazoInviteModal } from '@/components/MazoInviteModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import { MicroTour } from '@/components/MicroTour';
 
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
@@ -67,8 +68,19 @@ export const ContactsPage: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto overflow-x-hidden">
-            {/* Debug banner removed for production */}
+        <div className="space-y-6 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto overflow-x-hidden" data-tour="contacts-page">
+            {/* Micro-tour: fires on first visit to /contacts */}
+            <MicroTour
+                routeKey="contacts"
+                steps={[
+                    { target: '[data-tour="contacts-page"]', titleKey: 'microTour.contacts.title', descKey: 'microTour.contacts.desc', placement: 'bottom' },
+                    { target: '[data-tour="contacts-new-btn"]', titleKey: 'microTour.contacts.title', descKey: 'microTour.contacts.newBtn', placement: 'bottom' },
+                ]}
+                onLearnMore={() => {
+                    const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                    if (btn) btn.click();
+                }}
+            />
 
             <ContactsHeader
                 viewMode={controller.viewMode}

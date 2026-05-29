@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MicroTour } from '@/components/MicroTour';
 import { Wand2, Copy, Check, Sparkles, Loader2, Trash2, X } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useToast } from '@/context/ToastContext';
@@ -323,7 +324,17 @@ Agora, gere o prompt perfeito:`;
 
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 py-8">
+        <div className="w-full max-w-7xl mx-auto px-4 py-8" data-tour="promptlab-page">
+            <MicroTour
+                routeKey="promptLab"
+                steps={[
+                    { target: '[data-tour="promptlab-page"]', titleKey: 'microTour.promptLab.title', descKey: 'microTour.promptLab.desc', placement: 'bottom' },
+                ]}
+                onLearnMore={() => {
+                    const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
+                    if (btn) btn.click();
+                }}
+            />
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
