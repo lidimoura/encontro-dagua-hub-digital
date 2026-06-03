@@ -4,12 +4,14 @@
   <p>Ecossistema de Gestão com IA · Multi-Tenant · Bilingue · LGPD-Ready</p>
 </div>
 
-### CRM de Produção `V10.2` — Kommo Partner · Messenger Hub · Data Science (2026-05-14)
+### CRM de Produção `V10.4.6` — Hotfix Onboarding Architecture (2026-06-03)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
 >
-> **V10.1:** Fix definitivo de OOM em inserts inline (company_id JWT), catálogo de produtos conectado ao Board para todos os roles, separador visual Moeda/Idioma, nome "QR d'água" estático, e Migration 057 da Fase 9 (crm_briefings + v_deal_kpis + anti-recursão).
+> **V10.4.6:** Robust Just-in-Time Context-based Micro-tours and HashRouter fixes.
+> **V10.4.5:** React Router state triggers for MicroTours.
+> **V10.4.4:** Deep-dive MicroTour expansions and legacy Joyride cleanup.
 
 ## Demo
 

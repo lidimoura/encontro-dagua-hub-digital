@@ -1,19 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
 
 /**
- * useMicroTour — Per-route tour state management for Just-in-Time onboarding (V10.4.5).
+ * useMicroTour — Per-route tour state management (V10.4.6)
  *
- * Two trigger modes:
+ * Trigger modes:
+ * 1. AUTO: fires once on first visit (localStorage flag absent, 800ms delay for DOM)
+ * 2. FORCED: MicroTourContext calls the registered trigger callback → immediate fire
  *
- * 1. AUTO (first visit): fires once when localStorage flag is absent.
- *    An 800ms delay lets the DOM render data-tour targets before Joyride attaches.
- *
- * 2. FORCED (Help Center): AiflowSupport navigates with
- *    `navigate(route, { state: { forceMicroTour: true } })`.
- *    The hook reads location.state SYNCHRONOUSLY on mount — no setTimeout, no race condition.
- *    localStorage flag is cleared and tour runs immediately.
- *    window.history.replaceState() scrubs the flag from history so F5 doesn't replay the tour.
+ * The Context approach is router-agnostic (works with HashRouter, BrowserRouter, etc.)
  */
 
 export type RouteKey =
@@ -34,52 +28,55 @@ const STORAGE_PREFIX = 'microTour_seen_';
 
 export function useMicroTour(routeKey: RouteKey) {
     const storageKey = `${STORAGE_PREFIX}${routeKey}`;
-    const location = useLocation();
 
     const [shouldShow, setShouldShow] = useState(false);
     const [stepIndex, setStepIndex] = useState(0);
+    const [runKey, setRunKey] = useState(0); // bump to force Joyride re-mount
 
+    /* AUTO mode: first visit only */
     useEffect(() => {
-        const forced = (location.state as Record<string, unknown> | null)?.forceMicroTour === true;
-
-        if (forced) {
-            // MISSION 2 & 3: Forced trigger from Help Center.
-            // Clear the localStorage flag so we bypass the "already seen" gate.
-            localStorage.removeItem(storageKey);
-            // Scrub the Router state from history immediately so F5 won't replay the tour.
-            window.history.replaceState({}, document.title);
-            // Show the tour RIGHT NOW — no setTimeout needed.
-            // The component tree is already mounted when this effect runs.
-            setStepIndex(0);
-            setShouldShow(true);
-            return;
-        }
-
-        // AUTO mode: first visit only (flag absent in localStorage)
         const seen = localStorage.getItem(storageKey);
+        console.log(`[MicroTour:${routeKey}] mount — seen=${seen}, will auto-trigger=${!seen}`);
         if (!seen) {
-            // Delay to let DOM render data-tour targets before Joyride attaches.
             const timer = setTimeout(() => {
+                console.log(`[MicroTour:${routeKey}] AUTO-TRIGGER firing (first visit)`);
                 setStepIndex(0);
+                setRunKey(k => k + 1);
                 setShouldShow(true);
             }, 800);
             return () => clearTimeout(timer);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [storageKey]); // location.state intentionally excluded: we only need it on mount
+    }, [storageKey]);
+
+    /** Called by MicroTourContext when AiflowSupport requests a forced trigger */
+    const forceTrigger = useCallback(() => {
+        console.log(`[MicroTour:${routeKey}] FORCE-TRIGGER from Help Center`);
+        localStorage.removeItem(storageKey);
+        // Reset Joyride fully: hide → reset index → bump runKey → show
+        setShouldShow(false);
+        setStepIndex(0);
+        // Two-tick cycle: first tick unmounts Joyride, second tick remounts fresh
+        setTimeout(() => {
+            setRunKey(k => k + 1);
+            setShouldShow(true);
+        }, 50);
+    }, [routeKey, storageKey]);
 
     const markSeen = useCallback(() => {
+        console.log(`[MicroTour:${routeKey}] markSeen`);
         localStorage.setItem(storageKey, 'true');
         setShouldShow(false);
-    }, [storageKey]);
+    }, [routeKey, storageKey]);
 
     const reset = useCallback(() => {
         localStorage.removeItem(storageKey);
         setStepIndex(0);
+        setRunKey(k => k + 1);
         setShouldShow(true);
     }, [storageKey]);
 
-    return { shouldShow, setShouldShow, stepIndex, setStepIndex, markSeen, reset };
+    return { shouldShow, setShouldShow, stepIndex, setStepIndex, runKey, markSeen, reset, forceTrigger };
 }
 
 /** Reset ALL micro-tour flags (used by Settings "Reset Onboarding") */

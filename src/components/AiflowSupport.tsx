@@ -11,7 +11,8 @@ import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
-import { resetAllMicroTours } from '@/hooks/useMicroTour';
+import { resetAllMicroTours, type RouteKey } from '@/hooks/useMicroTour';
+import { useMicroTourContext } from '@/context/MicroTourContext';
 
 /**
  * AiflowSupport — Rich Knowledge Base + Technical Support (V10.4.3)
@@ -66,6 +67,7 @@ export const AiflowSupport: React.FC = () => {
     const { profile } = useAuth();
     const { t, language } = useLanguage();
     const navigate = useNavigate();
+    const { requestTour } = useMicroTourContext();
 
     /* ── Bug form submission ─────────────────────────────────────── */
     const handleSubmitBug = async (e: React.FormEvent) => {
@@ -190,16 +192,17 @@ export const AiflowSupport: React.FC = () => {
         }
     ];
 
-    /* ── Trigger micro-tour from Help Center (V10.4.5 — Router State) ─── */
+    /* ── Trigger micro-tour from Help Center (V10.4.6 — Context API) ─── */
     const triggerMicroTour = (tourRouteKey: string, route: string) => {
-        // 1. Close the help center drawer immediately
+        // 1. Close the help center drawer
         resetState();
-        // 2. Navigate with Router State — forceMicroTour is available synchronously
-        //    on the target page's first render. No setTimeout, no race condition.
-        //    The useMicroTour hook reads location.state on mount and fires the tour.
-        navigate(route, { state: { forceMicroTour: true } });
-        // tourRouteKey kept as parameter for future analytics — no longer used for DOM events
-        void tourRouteKey;
+        // 2. Navigate to the route (SPA, no reload)
+        navigate(route);
+        // 3. Request the tour via global Context — router-agnostic, works with HashRouter.
+        //    If the page is already mounted (same route), fires immediately.
+        //    If navigation is pending, the request is queued and consumed when the
+        //    page component mounts and registers its trigger callback.
+        requestTour(tourRouteKey as RouteKey);
     };
 
     /* ── Filter KB items ─────────────────────────────────────────── */

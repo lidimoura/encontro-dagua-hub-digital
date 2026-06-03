@@ -42,24 +42,28 @@ export const BoardsPage: React.FC = () => {
                 routeKey="boards"
                 steps={[
                     {
+                        // ALWAYS present — the pipeline outer wrapper div
                         target: '[data-tour="boards-pipeline"]',
                         titleKey: 'microTour.boards.title',
                         descKey: 'microTour.boards.desc',
                         placement: 'bottom',
                     },
                     {
+                        // Present only when board has deals — DOM-filter will skip if absent
                         target: '[data-tour="boards-deal-card"]',
                         titleKey: 'microTour.boards.dealCard.title',
                         descKey: 'microTour.boards.dealCard.desc',
                         placement: 'right',
                     },
                     {
+                        // Present only when board is active — DOM-filter will skip if absent
                         target: '[data-tour="boards-tab-strategy"]',
                         titleKey: 'microTour.boards.strategy.title',
                         descKey: 'microTour.boards.strategy.desc',
                         placement: 'bottom',
                     },
                     {
+                        // Present only when board is active — DOM-filter will skip if absent
                         target: '[data-tour="boards-tab-ai"]',
                         titleKey: 'microTour.boards.aiTeam.title',
                         descKey: 'microTour.boards.aiTeam.desc',

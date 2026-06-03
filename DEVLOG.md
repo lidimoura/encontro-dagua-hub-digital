@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-06-03 — V10.4.6: HOTFIX Onboarding Architecture & React Router HashRouter State Drop Fix
+
+### Arquitetura
+**Problema:** A versão V10.4.5 usou `navigate(route, { state: { forceMicroTour: true } })` para evitar Race Conditions (que ocorriam com `CustomEvent + setTimeout`). Entretanto, o `HashRouter` do React Router v6 pode silenciosamente descartar o `location.state` durante transições de rota, falhando em engatilhar o tour.
+Além disso, o `react-joyride` aborta silenciosamente a renderização se o elemento alvo (`target`) de um dos steps não for encontrado no DOM no exato momento da montagem (ex: botões em modais fechados ou cards em boards vazios).
+
+**Fix Aplicado (V10.4.6):**
+1. **`MicroTourContext` (Context API Global):** Substituído o gatilho baseado em rotas por um Contexto Global (`requestTour`, `registerTrigger`). Totalmente imune a drops de estado do HashRouter.
+2. **Joyride Target Pre-filtering:** `MicroTour.tsx` agora varre os `targets` via `document.querySelector` antes de passá-los ao Joyride. Steps cujos elementos não existam no DOM (como modais ocultos) são omitidos, permitindo que o tour renderize com sucesso.
+3. **Verbose Joyride Lifecycle Logs:** Adicionados dezenas de `console.log` cobrindo montagem, triggers do Context, filtros DOM, e cada evento de navegação do Joyride, para facilitar debug no DevTools.
+4. **Target Condicionais Removidos:** Refatorados `ContactsPage` (removido `contacts-form`) e `BoardsPage` (garantindo que o target `boards-pipeline` execute primeiro, seguido de opcionais).
+
+---
+
 ## 2026-05-27 — V10.4.3: JUST-IN-TIME ONBOARDING & RICH KNOWLEDGE BASE
 
 ### Arquitetura

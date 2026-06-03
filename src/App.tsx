@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { QueryProvider } from '@/lib/query';
+import { MicroTourProvider } from '@/context/MicroTourContext';
 import Layout from '@/components/Layout';
 import { PageLoader } from '@/components/PageLoader';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -205,6 +206,7 @@ const App: React.FC = () => {
             <AuthProvider>
               <CRMProvider>
                 <HashRouter>
+                  <MicroTourProvider>
                   <TypebotVisibilityController />
                   <Suspense fallback={<PageLoader />}>
                     <ErrorBoundary>
@@ -318,6 +320,7 @@ const App: React.FC = () => {
                       </Routes>
                     </ErrorBoundary>
                   </Suspense>
+                  </MicroTourProvider>
                 </HashRouter>
               </CRMProvider>
             </AuthProvider>

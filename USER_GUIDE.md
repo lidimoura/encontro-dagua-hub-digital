@@ -73,7 +73,15 @@ O sistema suporta **Português (PT-BR)** e **Inglês (EN-US)** de forma completa
 ---
 
 
-### 1. Link d'Água — Sua Vitrine Digital (Produto Principal)
+### 0. Tours and Onboarding (V10.4.6 Updates)
+
+The platform now incorporates an advanced, context-driven **Just-in-Time MicroTour System**. 
+- **Automatic mode**: A contextual tour triggers once on the first visit to key pages.
+- **Manual mode**: Users can force-replay a tour at any time by accessing the **Help Center / Aiflow Support** drawer and clicking the interactive tour button.
+
+The tour seamlessly ignores missing conditional targets (such as closed form modals) and securely triggers across HashRouter bounds using a robust global Context API.
+
+## 1. Link d'Água — Sua Vitrine Digital (Produto Principal)
 O **Link d'Água** é o ponto de entrada da sua presença digital:
 - **Link único** para WhatsApp, Instagram, portfólio e agendamento.
 - **Vitrine de produtos e serviços** com fotos.

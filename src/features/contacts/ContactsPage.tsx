@@ -74,23 +74,22 @@ export const ContactsPage: React.FC = () => {
                 routeKey="contacts"
                 steps={[
                     {
+                        // Always present — the page wrapper itself
                         target: '[data-tour="contacts-page"]',
                         titleKey: 'microTour.contacts.title',
                         descKey: 'microTour.contacts.desc',
                         placement: 'bottom',
                     },
                     {
+                        // Always present in the header — never conditional
                         target: '[data-tour="contacts-new-btn"]',
                         titleKey: 'microTour.contacts.newBtn.title',
                         descKey: 'microTour.contacts.newBtn.desc',
                         placement: 'bottom',
                     },
-                    {
-                        target: '[data-tour="contacts-form"]',
-                        titleKey: 'microTour.contacts.form.title',
-                        descKey: 'microTour.contacts.form.desc',
-                        placement: 'right',
-                    },
+                    // NOTE: contacts-form step removed — modal is closed on page load,
+                    // so [data-tour="contacts-form"] is absent from DOM and would abort Joyride.
+                    // Form instructions are covered in the KB content of AiflowSupport.
                 ]}
                 onLearnMore={() => {
                     const btn = document.querySelector('[aria-label="Aiflow Technical Support"]') as HTMLButtonElement;
