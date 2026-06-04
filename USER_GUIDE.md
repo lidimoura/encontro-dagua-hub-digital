@@ -1,7 +1,7 @@
 # Guia do Usuário — QR d'água Hub & CRM
 
-> **Versão atual:** `V10.1` | **Plataforma:** QR d'água Hub (Multi-Tenant SaaS)
-> **Última atualização:** 2026-05-06
+> **Versão atual:** `V10.4.7` | **Plataforma:** QR d'água Hub (Multi-Tenant SaaS)
+> **Última atualização:** 2026-06-04
 
 ## Visão Geral
 Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento com clientes com IA integrada. Cada lead (tenant) possui um ambiente **completamente isolado** via Row Level Security (RLS) no banco de dados. Nenhum dado de um tenant é visível para outro.

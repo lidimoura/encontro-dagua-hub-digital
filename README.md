@@ -4,14 +4,15 @@
   <p>Ecossistema de Gestão com IA · Multi-Tenant · Bilingue · LGPD-Ready</p>
 </div>
 
-### CRM de Produção `V10.4.6` — Hotfix Onboarding Architecture (2026-06-03)
+### CRM de Produção `V10.4.7` — Hotfix MicroTour DOM Timing & Beacon Freeze (2026-06-04)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
 >
-> **V10.4.6:** Robust Just-in-Time Context-based Micro-tours and HashRouter fixes.
-> **V10.4.5:** React Router state triggers for MicroTours.
-> **V10.4.4:** Deep-dive MicroTour expansions and legacy Joyride cleanup.
+> **V10.4.7:** Fix DOM timing async (useMemo → useEffect+setTimeout 800ms) + triple beacon kill.
+> **V10.4.6:** Context API global para MicroTours (HashRouter-safe).
+> **V10.4.5:** React Router state triggers para MicroTours.
+
 
 ## Demo
 

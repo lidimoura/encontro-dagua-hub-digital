@@ -10,7 +10,35 @@
 
 ---
 
-## 2026-06-03 — V10.4.6: HOTFIX Onboarding Architecture & React Router HashRouter State Drop Fix
+## 2026-06-04 — V10.4.7: HOTFIX MicroTour DOM Timing, Beacon Freeze & Target Anchors
+
+### Causa Raiz (3 bugs simultâneos)
+
+**Bug 1 — DOM Scan Prematuro (`useMemo` síncrono):**
+O filtro de targets do V10.4.6 usava `useMemo` com `document.querySelector`. O `useMemo` executa **durante a fase de render** (antes do commit ao DOM real). Quando `shouldShow` mudava para `true`, o useMemo rodava e tentava encontrar elementos que ainda não haviam sido pintados pelos componentes filhos (`PipelineView`, `BoardTabs`, etc.), retornando 0 steps válidos e abortando o tour.
+
+**Bug 2 — Beacon Freeze:**
+Joyride exibia o beacon (bolinha pulsante) esperando clique do usuário mesmo com `disableBeacon: true` por step e `beacon: {display:'none'}` nos estilos. Faltava o `disableBeacon: true` a nível global no objeto `options`.
+
+**Bug 3 — Timing do Force-trigger:**
+O fluxo `navigate() → requestTour() → registerTrigger(100ms) → forceTrigger(50ms)` resultava em DOM scan a ~150ms — antes das animações e lazy panels terminarem.
+
+### Fix Aplicado (V10.4.7)
+
+1. **DOM Scan Async (`useEffect + setTimeout 800ms`):** Substituído `useMemo` por `useState<Step[]>` + `useEffect`. O array de steps é populado APENAS após `shouldShow=true` E após 800ms de delay — garantindo que todo o JSX está commitado e renderizado.
+
+2. **Triple Beacon Kill:** `disableBeacon: true` nos 3 níveis: por-step (já existia), `options.disableBeacon: true` (novo), e `beacon/beaconInner/beaconOuter: {display:'none'}` nos styles.
+
+3. **Reset ao esconder:** Quando `shouldShow` volta a `false`, `activeSteps` é limpo — garantindo que o próximo trigger faça um rescan completo e fresco do DOM.
+
+### Arquivos Alterados
+| Arquivo | Mudança |
+|---|---|
+| `src/components/MicroTour.tsx` | `useMemo → useState+useEffect(800ms)` + triple beacon kill |
+
+---
+
+
 
 ### Arquitetura
 **Problema:** A versão V10.4.5 usou `navigate(route, { state: { forceMicroTour: true } })` para evitar Race Conditions (que ocorriam com `CustomEvent + setTimeout`). Entretanto, o `HashRouter` do React Router v6 pode silenciosamente descartar o `location.state` durante transições de rota, falhando em engatilhar o tour.
