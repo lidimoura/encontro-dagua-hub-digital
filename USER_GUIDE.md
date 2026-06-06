@@ -1,7 +1,7 @@
 # Guia do Usuário — QR d'água Hub & CRM
 
-> **Versão atual:** `V10.4.7` | **Plataforma:** QR d'água Hub (Multi-Tenant SaaS)
-> **Última atualização:** 2026-06-04
+> **Versão atual:** `V10.4.8` | **Plataforma:** QR d'água Hub (Multi-Tenant SaaS)
+> **Última atualização:** 2026-06-05
 
 ## Visão Geral
 Bem-vindo ao **Prova D'água CRM** — plataforma de gestão de relacionamento com clientes com IA integrada. Cada lead (tenant) possui um ambiente **completamente isolado** via Row Level Security (RLS) no banco de dados. Nenhum dado de um tenant é visível para outro.
@@ -73,13 +73,18 @@ O sistema suporta **Português (PT-BR)** e **Inglês (EN-US)** de forma completa
 ---
 
 
-### 0. Tours and Onboarding (V10.4.6 Updates)
+### 0. Tours and Onboarding (V10.4.8 Updates)
 
-The platform now incorporates an advanced, context-driven **Just-in-Time MicroTour System**. 
+The platform incorporates an advanced, context-driven **Just-in-Time MicroTour System**.
 - **Automatic mode**: A contextual tour triggers once on the first visit to key pages.
 - **Manual mode**: Users can force-replay a tour at any time by accessing the **Help Center / Aiflow Support** drawer and clicking the interactive tour button.
 
 The tour seamlessly ignores missing conditional targets (such as closed form modals) and securely triggers across HashRouter bounds using a robust global Context API.
+
+**V10.4.8 Fixes:**
+- **Beacon Freeze eliminated**: Every step is now force-mapped with `disableBeacon: true` before injection into Joyride, preventing the pulsating beacon from freezing the tour.
+- **Continuous flow guaranteed**: `continuous={true}`, `disableOverlayClose={true}`, and `spotlightClicks={true}` are physically defined in the JSX.
+- **Pipeline tag always present**: The `data-tour="boards-pipeline"` anchor is now rendered even during loading states, ensuring the DOM scan never reports "target absent".
 
 ## 1. Link d'Água — Sua Vitrine Digital (Produto Principal)
 O **Link d'Água** é o ponto de entrada da sua presença digital:

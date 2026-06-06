@@ -145,7 +145,9 @@ export const PipelineView: React.FC<PipelineViewProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-slate-500">{t('loading')}</div>
+      <div className="h-full flex flex-col" data-tour="boards-pipeline">
+        <div className="flex items-center justify-center flex-1 text-slate-500">{t('loading')}</div>
+      </div>
     );
   }
 

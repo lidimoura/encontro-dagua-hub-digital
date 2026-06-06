@@ -164,13 +164,20 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
     /* Guard: nothing to render until async scan populates steps */
     if (!shouldShow || activeSteps.length === 0) return null;
 
+    /* HOTFIX V10.4.8 — MISSÃO 1: Force disableBeacon on EVERY step.
+     * Belt-and-suspenders: even though buildSteps() already sets it,
+     * this .map() guarantees no beacon can ever slip through. */
+    const safeSteps = activeSteps.map(step => ({ ...step, disableBeacon: true }));
+
     return (
         <Joyride
             key={runKey}           /* Force full Joyride remount on each new trigger */
-            steps={activeSteps}
+            steps={safeSteps}      /* MISSÃO 1 — beacon-safe steps */
             run={true}             /* shouldShow is already guaranteed true at this point */
             stepIndex={stepIndex}
-            continuous
+            continuous={true}      /* MISSÃO 2 — explicit continuous flow */
+            disableOverlayClose={true}  /* MISSÃO 2 — prevent overlay dismiss */
+            spotlightClicks={true}      /* MISSÃO 2 — allow clicks on spotlighted elements */
             scrollToFirstStep
             disableScrolling={false}
             onEvent={handleEvent}

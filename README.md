@@ -4,14 +4,14 @@
   <p>Ecossistema de Gestão com IA · Multi-Tenant · Bilingue · LGPD-Ready</p>
 </div>
 
-### CRM de Produção `V10.4.7` — Hotfix MicroTour DOM Timing & Beacon Freeze (2026-06-04)
+### CRM de Produção `V10.4.8` — HOTFIX Beacon Freeze, Continuous Flow & Pipeline Tag (2026-06-05)
 
 > **Branch `main` → hub.encontrodagua.com** — Acesso restrito à equipe interna
 > **Branch `provadagua` → prova.encontrodagua.com** — Trial pública 7 dias via Keyword Gate
 >
+> **V10.4.8:** Force step-level `disableBeacon` via `.map()` + explicit `continuous/disableOverlayClose/spotlightClicks` props + `data-tour` on loading state.
 > **V10.4.7:** Fix DOM timing async (useMemo → useEffect+setTimeout 800ms) + triple beacon kill.
 > **V10.4.6:** Context API global para MicroTours (HashRouter-safe).
-> **V10.4.5:** React Router state triggers para MicroTours.
 
 
 ## Demo
@@ -243,4 +243,4 @@ src/
 
 ---
 
-*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V10.2 — Kommo Partner · Messenger Hub*
+*Mantido pela equipe Encontro d'Água | Manager: Antigravity AI | V10.4.8 — Kommo Partner · Messenger Hub*

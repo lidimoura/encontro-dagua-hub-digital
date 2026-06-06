@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-06-05 — V10.4.8: HOTFIX Beacon Freeze, Continuous Flow Props & Pipeline Tag
+
+### Status: ✅ BUILD VERDE
+
+### Causa Raiz (Beacon Freeze Silencioso em Produção)
+
+**Bug 1 — Beacon Freeze (event type=beacon):**
+Apesar de `disableBeacon: true` estar presente por step (no `buildSteps()`) e no objeto `options`, o `react-joyride` em certas condições de race ignora a config global e renderiza o beacon pulsante, travando o tour em `event type=beacon`. A única garantia absoluta é forçar `disableBeacon = true` diretamente em cada objeto Step antes da injeção.
+
+**Bug 2 — Props implícitas no JSX:**
+A prop `continuous` estava como bare attribute (`continuous` em vez de `continuous={true}`). As props `disableOverlayClose` e `spotlightClicks` não estavam fisicamente no JSX, dependendo de defaults da biblioteca que podem mudar entre versões.
+
+**Bug 3 — `data-tour="boards-pipeline"` ausente durante loading:**
+`PipelineView.tsx` tinha um early-return para `isLoading` que renderizava uma div SEM o atributo `data-tour="boards-pipeline"`. Quando o MicroTour fazia o DOM scan (800ms após mount), se o board ainda estava carregando, o `document.querySelector('[data-tour="boards-pipeline"]')` retornava `null`, logando "target absent from DOM" e abortando o step.
+
+### Fix Aplicado (V10.4.8)
+
+1. **MISSÃO 1 — Force Step-Level Beacon Disable:** Adicionado `.map()` em `MicroTour.tsx` que cria `safeSteps` com `disableBeacon: true` forçado em CADA step antes de passar ao `<Joyride>`. Belt-and-suspenders sobre o `buildSteps()` e `options.disableBeacon`.
+
+2. **MISSÃO 2 — Continuous Flow Props:** Props agora fisicamente explícitas no JSX: `continuous={true}`, `disableOverlayClose={true}`, `spotlightClicks={true}`.
+
+3. **MISSÃO 3 — Pipeline Tag no Loading State:** O early-return de `isLoading` em `PipelineView.tsx` agora renderiza a div container com `data-tour="boards-pipeline"`, garantindo que o target existe no DOM durante QUALQUER estado do componente.
+
+### Arquivos Alterados
+| Arquivo | Mudança |
+|---|---|
+| `src/components/MicroTour.tsx` | `.map(step => disableBeacon:true)` + `continuous={true}` + `disableOverlayClose={true}` + `spotlightClicks={true}` |
+| `src/features/boards/components/PipelineView.tsx` | `data-tour="boards-pipeline"` no loading state |
+
+---
+
 ## 2026-06-04 — V10.4.7: HOTFIX MicroTour DOM Timing, Beacon Freeze & Target Anchors
 
 ### Causa Raiz (3 bugs simultâneos)
