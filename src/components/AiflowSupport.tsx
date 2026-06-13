@@ -4,7 +4,7 @@ import {
     HelpCircle, X, Mail, Lock, Navigation, MessageCircle, Bug, Send,
     ArrowLeft, Search, BookOpen, LayoutDashboard, Users, KanbanSquare,
     CalendarCheck, Sparkles, QrCode, Wand2, Settings, BarChart3,
-    Crosshair, ChevronRight, ChevronDown, PlayCircle,
+    Crosshair, ChevronRight, ChevronDown, PlayCircle, Package, ShoppingBag,
 } from 'lucide-react';
 import { useCRM } from '@/context/CRMContext';
 import { useToast } from '@/context/ToastContext';
@@ -50,6 +50,8 @@ const KB_ITEMS: KBItem[] = [
     { icon: BarChart3,       titleKey: 'kb.reports.title',    contentKey: 'kb.reports.content',    tourRouteKey: 'reports', route: '/reports' },
     { icon: Crosshair,       titleKey: 'kb.decisions.title',  contentKey: 'kb.decisions.content',  tourRouteKey: 'decisions', route: '/decisions' },
     { icon: Settings,        titleKey: 'kb.settings.title',   contentKey: 'kb.settings.content',   tourRouteKey: 'settings', route: '/settings' },
+    { icon: Package,         titleKey: 'kb.techStack.title',  contentKey: 'kb.techStack.content',  tourRouteKey: 'techStack', route: '/admin/tech-stack' },
+    { icon: ShoppingBag,     titleKey: 'kb.catalog.title',    contentKey: 'kb.catalog.content',    tourRouteKey: 'catalog', route: '/catalog' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -211,7 +213,11 @@ export const AiflowSupport: React.FC = () => {
             t(item.titleKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
             t(item.contentKey).toLowerCase().includes(searchQuery.toLowerCase())
         )
-        : KB_ITEMS;
+        : KB_ITEMS.filter(item => {
+            // V11.0: Hide admin-only KB items from non-admins
+            if (item.tourRouteKey === 'techStack' && profile?.role !== 'admin') return false;
+            return true;
+        });
 
     const resetState = () => {
         setIsOpen(false);

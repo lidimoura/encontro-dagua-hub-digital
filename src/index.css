@@ -4,15 +4,15 @@
 
 @layer base {
 
-  /* CRITICAL: Force scroll unlock globally */
-  html,
-  body {
-    overflow-x: hidden !important;
-    /* Prevent horizontal scroll */
-    overflow-y: auto !important;
-    /* FORCE vertical scroll to work */
+  /* V11.0: Scoped overflow — allow inner containers to scroll horizontally */
+  html, body {
+    overflow-y: auto;
     min-height: 100vh;
     height: auto;
+    overscroll-behavior-x: none; /* Prevent bounce without blocking inner scroll */
+  }
+  #root {
+    overflow-x: hidden; /* Scope horizontal clip to root, not html/body */
   }
 
   body {

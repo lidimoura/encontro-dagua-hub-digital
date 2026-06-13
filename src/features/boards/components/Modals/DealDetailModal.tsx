@@ -565,7 +565,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[85vh] md:h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
         {/* HEADER (Stage Bar + Won/Lost) */}
         <div className="bg-slate-50 dark:bg-black/20 border-b border-slate-200 dark:border-white/10 p-6 shrink-0">
           <div className="flex justify-between items-start mb-6">
@@ -628,7 +628,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                 </p>
               )}
             </div>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 md:gap-3 flex-wrap">
               {/* Converter para Cliente button */}
               {deal.status !== 'CUSTOMER' && deal.status !== DealStatus.CLOSED_WON && (
                 <button
@@ -686,9 +686,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
           />
         </div>
 
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Left Sidebar (Static Info + Custom Fields) */}
-          <div className="w-1/3 border-r border-slate-200 dark:border-white/5 p-6 overflow-y-auto bg-white dark:bg-dark-card">
+          <div className="w-full md:w-1/3 max-h-[40vh] md:max-h-full border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 p-4 md:p-6 overflow-y-auto bg-white dark:bg-dark-card shrink-0">
             <div className="space-y-6">
               <div>
                 <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
@@ -1165,7 +1165,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30 dark:bg-black/10">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/30 dark:bg-black/10">
               {activeTab === 'timeline' && (
                 <div className="space-y-6">
                   {/* ══════════════════════════════════════════════════════════

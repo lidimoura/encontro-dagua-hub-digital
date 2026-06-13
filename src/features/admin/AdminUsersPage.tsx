@@ -160,6 +160,7 @@ export const AdminUsersPage: React.FC = () => {
                 options: {
                     data: {
                         full_name: newUserData.name.trim(),
+                        company_id: profile?.company_id,
                     },
                     emailRedirectTo: `${window.location.origin}/#/login`,
                 },
@@ -184,6 +185,7 @@ export const AdminUsersPage: React.FC = () => {
                     last_name: lastName,
                     name: newUserData.name.trim(),
                     role: 'user',
+                    company_id: profile?.company_id,
                 }, { onConflict: 'id', ignoreDuplicates: false });
 
             addToast(`✅ Usuário ${newUserData.name} criado! Um e-mail de confirmação foi enviado para ${newUserData.email}.`, 'success');

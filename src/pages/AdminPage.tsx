@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import {
   Users, RefreshCw, PlusCircle, Trash2, ShieldOff, ShieldCheck,
   Clock, Mail, Loader2, AlertCircle, CheckCircle2, Eye, EyeOff, X
@@ -40,6 +41,7 @@ interface CreateModalProps {
   onCreated: () => void;
 }
 const CreateUserModal: React.FC<CreateModalProps> = ({ onClose, onCreated }) => {
+  const { profile: adminProfile } = useAuth();
   const [form, setForm] = useState({ email: '', password: '', name: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,12 +54,25 @@ const CreateUserModal: React.FC<CreateModalProps> = ({ onClose, onCreated }) => 
     try {
       // Usa signUp nativo (admin não tem acesso ao admin.createUser no frontend)
       const trialExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const newCompanyId = adminProfile?.company_id || crypto.randomUUID();
       const { error: signUpError } = await supabase.auth.signUp({
         email:    form.email.trim().toLowerCase(),
         password: form.password,
-        options:  { data: { full_name: form.name.trim(), user_type: 'lead_provadagua' } },
+        options:  { data: { full_name: form.name.trim(), user_type: 'lead_provadagua', company_id: newCompanyId } },
       });
       if (signUpError) throw signUpError;
+
+      // V11.0: Ensure companies row exists
+      if (!adminProfile?.company_id) {
+        const { data: signUpData } = await supabase.auth.getUser();
+        await supabase.from('companies').insert({
+          id: newCompanyId,
+          name: `${form.name.trim()}`,
+          created_by: signUpData?.user?.id ?? null,
+        }).then(({ error: compErr }) => {
+          if (compErr) console.warn('[Admin] companies insert fallback:', compErr.message);
+        });
+      }
 
       // Aguarda trigger criar o perfil (≈ 1s) e depois atualiza trial
       await new Promise(r => setTimeout(r, 1200));

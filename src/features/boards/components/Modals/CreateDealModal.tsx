@@ -275,7 +275,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('company')}</label>
                             <input
@@ -299,7 +299,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
                             <input
@@ -399,6 +399,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         )}
                     </div>
 
+                    <div className="sticky bottom-0 bg-white dark:bg-dark-card z-10 pt-2">
                     <button
                         type="submit"
                         disabled={loading}
@@ -407,6 +408,7 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClos
                         {loading && <Loader2 size={16} className="animate-spin" />}
                         {loading ? (t('creating' as any) || 'Creating...') : t('createDeal')}
                     </button>
+                    </div>
                 </form>
             </div>
         </div>

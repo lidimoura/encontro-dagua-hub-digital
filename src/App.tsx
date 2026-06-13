@@ -61,6 +61,9 @@ const AdminPage = lazy(() => import('@/features/admin/AdminPage'));
 const TechStackPage = lazy(() =>
   import('@/features/admin/TechStackPage').then(m => ({ default: m.TechStackPage }))
 );
+const CatalogPage = lazy(() =>
+  import('@/features/catalog/CatalogPage').then(m => ({ default: m.CatalogPage }))
+);
 const BridgePage = lazy(() =>
   import('@/pages/BridgePage').then(m => ({ default: m.BridgePage }))
 );
@@ -312,6 +315,11 @@ const App: React.FC = () => {
                           <Route path="profile" element={<ProfilePage />} />
                           <Route path="qrdagua" element={<QRdaguaPage />} />
                           <Route path="prompt-lab" element={<PromptLabPage />} />
+                          <Route path="catalog" element={
+                            <RoleBasedRoute allowedRoles={['admin', 'vendedor']}>
+                              <CatalogPage />
+                            </RoleBasedRoute>
+                          } />
                           <Route path="portal" element={<ClientPortalPage />} />
                         </Route>
 

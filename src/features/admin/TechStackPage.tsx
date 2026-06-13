@@ -3,6 +3,9 @@ import { supabase } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/context/AuthContext';
+import { MicroTour } from '@/components/MicroTour';
+import { useMicroTour } from '@/hooks/useMicroTour';
+import { useMicroTourContext } from '@/context/MicroTourContext';
 import {
     Server,
     Database,
@@ -82,6 +85,21 @@ export const TechStackPage: React.FC = () => {
     const [categoryFilter, setCategoryFilter] = useState<string>('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<TechStackProduct | null>(null);
+
+    // V11.0: MicroTour integration
+    const tourState = useMicroTour('techStack');
+    const { registerTrigger, unregisterTrigger, consumePendingRequest } = useMicroTourContext();
+    useEffect(() => {
+        registerTrigger('techStack', tourState.forceTrigger);
+        const pending = consumePendingRequest('techStack');
+        if (pending) setTimeout(() => tourState.forceTrigger(), 100);
+        return () => unregisterTrigger('techStack');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const tourSteps = [
+        { target: '[data-tour="techstack-page"]', titleKey: 'microTour.techStack.title', descKey: 'microTour.techStack.desc', placement: 'bottom' as const },
+        { target: '[data-tour="techstack-add-btn"]', titleKey: 'microTour.techStack.addBtn.title', descKey: 'microTour.techStack.addBtn.desc', placement: 'bottom' as const },
+    ];
 
     const [formData, setFormData] = useState({
         name: '',
@@ -224,7 +242,7 @@ export const TechStackPage: React.FC = () => {
     // V9.9.2: guard removido — RLS no banco garante isolamento por company_id
 
     return (
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="p-8 max-w-7xl mx-auto" data-tour="techstack-page">
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
@@ -237,6 +255,7 @@ export const TechStackPage: React.FC = () => {
                         </p>
                     </div>
                     <button
+                        data-tour="techstack-add-btn"
                         onClick={() => {
                             resetForm();
                             setEditingProduct(null);
@@ -606,6 +625,7 @@ export const TechStackPage: React.FC = () => {
                     </div>
                 </div>
             )}
+            <MicroTour routeKey="techStack" steps={tourSteps} />
         </div>
     );
 };

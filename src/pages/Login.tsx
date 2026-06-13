@@ -248,6 +248,7 @@ const Login: React.FC = () => {
       const normalizedEmail = leadEmail.trim().toLowerCase();
 
       // V6.5: usa supabase.auth.signUp() nativo — elimina CORS da Edge Function
+      const newCompanyId = crypto.randomUUID();
       const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
         email:    normalizedEmail,
         password: leadPassword,
@@ -255,6 +256,9 @@ const Login: React.FC = () => {
           data: {
             full_name:  leadName.trim(),
             user_type:  'lead_provadagua',
+            company_id: newCompanyId,
+            is_demo_data: true,
+            app_source: 'login_keyword',
           },
         },
       });
@@ -285,6 +289,17 @@ const Login: React.FC = () => {
       }
 
       if (signUpError) throw signUpError;
+
+      // V11.0: Create matching companies row so JWT token hook succeeds
+      if (signUpResult?.user?.id) {
+        await supabase.from('companies').insert({
+          id: newCompanyId,
+          name: `${leadName.trim()}`,
+          created_by: signUpResult.user.id,
+        }).then(({ error: compErr }) => {
+          if (compErr) console.warn('[SignUp] companies insert fallback:', compErr.message);
+        });
+      }
 
       // Auto-login após cadastro bem-sucedido
       const { error: loginError } = await supabase.auth.signInWithPassword({

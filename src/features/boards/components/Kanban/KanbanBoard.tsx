@@ -57,7 +57,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         return (
           <div
             key={stage.id}
-            className={`min-w-[20rem] flex-1 flex flex-col rounded-xl border-2 overflow-visible h-full max-h-full transition-all duration-200
+            className={`min-w-[16rem] sm:min-w-[20rem] flex-1 flex flex-col rounded-xl border-2 overflow-visible h-full max-h-full transition-all duration-200
                             ${isOver
                 ? 'border-green-500 bg-green-100/20 dark:bg-green-900/30 scale-[1.02] shadow-xl shadow-green-500/30'
                 : 'border-slate-200/50 dark:border-white/10 glass'

@@ -191,6 +191,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // Tools - All Users
       { to: '/qrdagua', icon: QrCode, label: "QR d'água", prefetch: 'qrdagua' as RouteName, dataTour: 'nav-qrdagua' },
       { to: '/prompt-lab', icon: Wand2, label: t('promptLab'), prefetch: 'prompt-lab' as RouteName, dataTour: 'nav-promptlab' },
+      { to: '/catalog', icon: Package, label: t('catalog'), prefetch: 'admin' as RouteName, dataTour: 'nav-catalog' },
 
       // Settings - Admin & Vendedor
       { to: '/settings', icon: Settings, label: t('settings'), prefetch: 'settings' as RouteName, dataTour: 'nav-settings' },
@@ -296,7 +297,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden overflow-y-auto relative">
         {/* Ambient background glow */}
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-acai-900/20 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-solimoes-400/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -536,15 +537,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Boards & AI Hub use overflow-hidden + h-full for Kanban/chat layouts */}
         {/* All other pages use overflow-y-auto for normal scrolling */}
         <main
-          className={`flex-1 min-h-0 w-full max-w-full overflow-x-hidden
+          className={`flex-1 min-h-0 w-full max-w-full
             ${['/boards', '/ai'].some(p => location.pathname.startsWith(p))
-              ? 'overflow-hidden flex flex-col bg-slate-50 dark:bg-dark-bg'
-              : 'overflow-y-auto bg-slate-50 dark:bg-dark-bg'
+              ? 'overflow-hidden md:overflow-hidden flex flex-col bg-slate-50 dark:bg-dark-bg'
+              : 'overflow-y-auto overflow-x-hidden bg-slate-50 dark:bg-dark-bg'
             }`}
         >
           {/* pt-16 sempre presente no mobile (compensa o fixed header h-16) */}
           {/* md:pt-0 remove o padding no desktop onde o header é relativo */}
-          <div className={`pt-16 md:pt-0 ${['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-hidden flex flex-col h-full' : 'h-full p-4 md:p-6'}`}>
+          <div className={`pt-16 md:pt-0 ${['/boards', '/ai'].some(p => location.pathname.startsWith(p)) ? 'flex-1 min-h-0 overflow-auto md:overflow-hidden flex flex-col h-full' : 'h-full p-4 md:p-6'}`}>
             {children}
           </div>
         </main>
