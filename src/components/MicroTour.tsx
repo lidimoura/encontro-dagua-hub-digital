@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Joyride, STATUS, ACTIONS, EVENTS, type EventData, type Step } from 'react-joyride';
+import { Joyride, STATUS, ACTIONS, type CallBackProps, type Step } from 'react-joyride';
 import { HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useMicroTour, type RouteKey } from '@/hooks/useMicroTour';
@@ -31,8 +31,8 @@ interface MicroTourProps {
 
 /**
  * Builds the Joyride Step array ONLY after the DOM has been painted.
- * Called inside a useEffect + setTimeout so we never race against React's
- * async commit phase. Returns [] if no targets are found.
+ * disableBeacon: true is set per-step — this is the ONLY correct way
+ * to prevent the beacon in react-joyride (options.disableBeacon is NOT valid).
  */
 function buildSteps(
     stepDefs: MicroTourStepDef[],
@@ -46,15 +46,14 @@ function buildSteps(
     for (const def of stepDefs) {
         const el = document.querySelector(def.target);
         if (!el) {
-            console.warn(
-                `[MicroTour:${routeKey}] MISSÃO 1 — target absent from DOM: ${def.target}`,
-            );
+            console.warn(`[MicroTour:${routeKey}] target absent from DOM: ${def.target}`);
             continue;
         }
         built.push({
             target: def.target,
             placement: (def.placement || 'bottom') as Step['placement'],
-            disableBeacon: true,   // MISSÃO 3 — never show beacon, open tooltip instantly
+            // ✅ ROOT FIX: disableBeacon per-step is the ONLY valid API for this
+            disableBeacon: true,
             content: (
                 <div>
                     <h3 className="font-bold text-white text-sm mb-1">{t(def.titleKey)}</h3>
@@ -77,9 +76,7 @@ function buildSteps(
         });
     }
 
-    console.log(
-        `[MicroTour:${routeKey}] DOM scan: ${built.length}/${stepDefs.length} targets present`,
-    );
+    console.log(`[MicroTour:${routeKey}] DOM scan: ${built.length}/${stepDefs.length} targets present`);
     return built;
 }
 
@@ -87,46 +84,46 @@ function buildSteps(
 /*  Component                                                           */
 /* ------------------------------------------------------------------ */
 
-/** Delay in ms before we scan the DOM for tour targets.
- *  Must be ≥ the longest animation / async render in child components.
- *  800ms covers lazy-loaded panels, skeleton-to-content swaps, etc. */
-const DOM_SCAN_DELAY_MS = 800;
+/** Delay in ms before we scan the DOM for tour targets. */
+const DOM_SCAN_DELAY_MS = 900;
 
 export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs, onLearnMore }) => {
     const { t } = useLanguage();
-    const { shouldShow, stepIndex, setStepIndex, runKey, markSeen, forceTrigger } = useMicroTour(routeKey);
-    const { registerTrigger, unregisterTrigger } = useMicroTourContext();
+    // ✅ ROOT FIX: Do NOT destructure stepIndex/setStepIndex — use UNCONTROLLED mode
+    const { shouldShow, runKey, markSeen, forceTrigger } = useMicroTour(routeKey);
+    const { registerTrigger, unregisterTrigger, consumePendingRequest } = useMicroTourContext();
 
-    // MISSÃO 2 — activeSteps lives in state, populated AFTER DOM paint via setTimeout
     const [activeSteps, setActiveSteps] = useState<Step[]>([]);
 
-    /* Register forceTrigger with the global context on mount */
+    /* Register forceTrigger with the global context on mount.
+     * Also consume any pending request that was queued before this component mounted
+     * (e.g. user clicked "Run tour" in AiflowSupport before navigation completed). */
     useEffect(() => {
         registerTrigger(routeKey, forceTrigger);
+        // Check if AiflowSupport already requested a tour for this route
+        // while navigation was in progress
+        if (consumePendingRequest(routeKey)) {
+            console.log(`[MicroTour:${routeKey}] Consuming pending tour request on mount`);
+            setTimeout(() => forceTrigger(), 150);
+        }
         return () => unregisterTrigger(routeKey);
-    }, [routeKey, forceTrigger, registerTrigger, unregisterTrigger]);
+    }, [routeKey, forceTrigger, registerTrigger, unregisterTrigger, consumePendingRequest]);
 
-    /* MISSÃO 2 — Async DOM scan: only runs AFTER shouldShow is true
-     * and only after DOM_SCAN_DELAY_MS has elapsed.
-     * This guarantees all child components have been committed to the DOM
-     * by React before we call document.querySelector(). */
+    /* Async DOM scan — only runs when shouldShow becomes true.
+     * runKey change means a new forceTrigger was called → rescan. */
     useEffect(() => {
         if (!shouldShow) {
-            // Reset steps when tour is hidden so next trigger rescans DOM
             setActiveSteps([]);
             return;
         }
 
-        console.log(
-            `[MicroTour:${routeKey}] shouldShow=true, scheduling DOM scan in ${DOM_SCAN_DELAY_MS}ms (runKey=${runKey})`,
-        );
+        console.log(`[MicroTour:${routeKey}] shouldShow=true, scanning DOM in ${DOM_SCAN_DELAY_MS}ms (runKey=${runKey})`);
 
         const timer = setTimeout(() => {
             const steps = buildSteps(stepDefs, routeKey, t, onLearnMore, markSeen);
             if (steps.length === 0) {
                 console.error(
-                    `[MicroTour:${routeKey}] 0 valid steps after DOM scan — ` +
-                    `all targets still missing. Tour will not show. Targets: ` +
+                    `[MicroTour:${routeKey}] 0 valid steps after DOM scan. Targets: ` +
                     stepDefs.map(d => d.target).join(', '),
                 );
             }
@@ -134,53 +131,47 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
         }, DOM_SCAN_DELAY_MS);
 
         return () => clearTimeout(timer);
-        // runKey is intentionally included: a new forceTrigger resets and rescans
     }, [shouldShow, runKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleEvent = useCallback((data: EventData) => {
-        const { status, action, type, index } = data;
-        console.log(
-            `[MicroTour:${routeKey}] event type=${type} action=${action} status=${status} index=${index}`,
-        );
+    /* ✅ ROOT FIX: Use `callback` (not `onEvent`) and UNCONTROLLED mode.
+     * Do NOT pass stepIndex prop. Let Joyride manage its own internal state.
+     * This is what makes disableBeacon actually skip the beacon and show the tooltip. */
+    const handleCallback = useCallback((data: CallBackProps) => {
+        const { status, action, type } = data;
+        console.log(`[MicroTour:${routeKey}] cb type=${type} action=${action} status=${status}`);
 
+        // Tour finished or skipped — mark as seen
         if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
             console.log(`[MicroTour:${routeKey}] Tour ended (${status}), marking seen`);
             markSeen();
-            return;
         }
 
-        if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-            const next = index + (action === ACTIONS.PREV ? -1 : 1);
-            console.log(`[MicroTour:${routeKey}] Step advance: ${index} → ${next}`);
-            setStepIndex(next);
-        }
-
+        // User pressed X / close
         if (action === ACTIONS.CLOSE) {
             console.log(`[MicroTour:${routeKey}] Tour closed by user`);
             markSeen();
         }
-    }, [routeKey, markSeen, setStepIndex]);
+    }, [routeKey, markSeen]);
 
     /* Guard: nothing to render until async scan populates steps */
     if (!shouldShow || activeSteps.length === 0) return null;
 
-    /* HOTFIX V10.4.8 — MISSÃO 1: Force disableBeacon on EVERY step.
-     * Belt-and-suspenders: even though buildSteps() already sets it,
-     * this .map() guarantees no beacon can ever slip through. */
-    const safeSteps = activeSteps.map(step => ({ ...step, disableBeacon: true }));
-
     return (
         <Joyride
             key={runKey}           /* Force full Joyride remount on each new trigger */
-            steps={safeSteps}      /* MISSÃO 1 — beacon-safe steps */
-            run={true}             /* shouldShow is already guaranteed true at this point */
-            stepIndex={stepIndex}
-            continuous={true}      /* MISSÃO 2 — explicit continuous flow */
-            disableOverlayClose={true}  /* MISSÃO 2 — prevent overlay dismiss */
-            spotlightClicks={true}      /* MISSÃO 2 — allow clicks on spotlighted elements */
+            steps={activeSteps}
+            run={true}
+            /* ✅ ROOT FIX: NO stepIndex prop — uncontrolled mode.
+             * In controlled mode (stepIndex passed in), Joyride emits beacon events
+             * waiting for external stepIndex advances, which blocks tooltip display.
+             * In uncontrolled mode, disableBeacon:true on each step works correctly. */
+            continuous={true}
+            showSkipButton={true}
+            disableOverlayClose={false}
+            spotlightClicks={true}
             scrollToFirstStep
             disableScrolling={false}
-            onEvent={handleEvent}
+            callback={handleCallback}
             locale={{
                 back: t('onboarding.tourPrev'),
                 close: t('onboarding.tourClose'),
@@ -189,19 +180,19 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
                 skip: t('onboarding.tourSkip'),
                 open: t('onboarding.tourOpen'),
             }}
-            options={{
-                primaryColor: '#8b5cf6',
-                zIndex: 10000,
-                arrowColor: '#1e293b',
-                backgroundColor: '#1e293b',
-                textColor: '#e2e8f0',
-                overlayColor: 'rgba(0,0,0,0.60)',
-                showProgress: true,
-                overlayClickAction: 'close',
-                blockTargetInteraction: false,
-                disableBeacon: true, // MISSÃO 3 — global beacon disable
+            floaterProps={{
+                // ✅ Ensure tooltip appears immediately without any beacon animation
+                disableAnimation: false,
             }}
             styles={{
+                options: {
+                    primaryColor: '#8b5cf6',
+                    zIndex: 10000,
+                    arrowColor: '#1e293b',
+                    backgroundColor: '#1e293b',
+                    textColor: '#e2e8f0',
+                    overlayColor: 'rgba(0,0,0,0.60)',
+                },
                 tooltip: {
                     borderRadius: 14,
                     padding: '14px 18px',
@@ -220,7 +211,7 @@ export const MicroTour: React.FC<MicroTourProps> = ({ routeKey, steps: stepDefs,
                 buttonBack: { color: '#94a3b8', marginRight: 8, fontSize: 12 },
                 buttonSkip: { color: '#64748b', fontSize: 11 },
                 buttonClose: { color: '#94a3b8' },
-                // MISSÃO 3 — hide beacon element entirely via CSS as belt-and-suspenders
+                // Belt-and-suspenders: hide any beacon that might slip through
                 beacon: { display: 'none' } as React.CSSProperties,
                 beaconInner: { display: 'none' } as React.CSSProperties,
                 beaconOuter: { display: 'none' } as React.CSSProperties,

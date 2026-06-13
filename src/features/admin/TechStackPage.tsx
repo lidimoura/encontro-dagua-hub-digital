@@ -4,8 +4,6 @@ import { useToast } from '@/context/ToastContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/context/AuthContext';
 import { MicroTour } from '@/components/MicroTour';
-import { useMicroTour } from '@/hooks/useMicroTour';
-import { useMicroTourContext } from '@/context/MicroTourContext';
 import {
     Server,
     Database,
@@ -86,16 +84,7 @@ export const TechStackPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<TechStackProduct | null>(null);
 
-    // V11.0: MicroTour integration
-    const tourState = useMicroTour('techStack');
-    const { registerTrigger, unregisterTrigger, consumePendingRequest } = useMicroTourContext();
-    useEffect(() => {
-        registerTrigger('techStack', tourState.forceTrigger);
-        const pending = consumePendingRequest('techStack');
-        if (pending) setTimeout(() => tourState.forceTrigger(), 100);
-        return () => unregisterTrigger('techStack');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // V11.0: MicroTour integration (registration handled by MicroTour.tsx)
     const tourSteps = [
         { target: '[data-tour="techstack-page"]', titleKey: 'microTour.techStack.title', descKey: 'microTour.techStack.desc', placement: 'bottom' as const },
         { target: '[data-tour="techstack-add-btn"]', titleKey: 'microTour.techStack.addBtn.title', descKey: 'microTour.techStack.addBtn.desc', placement: 'bottom' as const },
