@@ -20,49 +20,54 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import { translations } from '@/lib/translations';
 
 
-// ── IcebergDetails: detalhes técnicos ocultos (Earth-Neon V4.1) ─────────────
-// Visíveis apenas para quem quer explorar mais — não polui o copy acessível
+// ── Canais Oficiais de Roteamento (V10.3) ──────────────────────────────────
+const AMAZO_G10_URL = 'https://amazo-guia-g10.streamlit.app/';
+const WA_BUSINESS_PHONE = '5541992557600';
+const HUB_EMAIL = 'encontrodaguahub@gmail.com';
+const HUB_CALENDAR_URL = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Consultoria%20%26%20Diagn%C3%B3stico%20%E2%80%94%20Encontro%20d%27%C3%81gua%20Hub&add=${encodeURIComponent(HUB_EMAIL)}&details=${encodeURIComponent('Olá Lídi Moura (encontrodaguahub@gmail.com), gostaria de agendar uma consultoria/diagnóstico estratégico de Dados, IA e Kommo CRM.')}`;
+
+// ── IcebergDetails: detalhes técnicos e credenciais (Responsivo V10.3) ──────
 function IcebergDetails() {
   const [open, setOpen] = React.useState(false);
   const items = [
     {
-      title: 'Infraestrutura Oracle Cloud (OCI)',
-      content: 'Backend seguro em Supabase (PaaS sobre OCI). Row Level Security (RLS) ativo em todas as tabelas. Isolamento por company_id — nenhum dado de um cliente vaza para outro.',
+      title: 'Análise de Dados, BI & Estruturação',
+      content: 'Organização completa de dados, regras de negócio, catálogos e documentos do zero. Dashboards executivos e pesquisas de satisfação automatizadas com Power BI (Certificada Fundação Bradesco), Python e Streamlit.',
     },
     {
-      title: 'API & Webhooks',
-      content: 'API REST completa via Supabase. Webhooks configuráveis para integrar com WhatsApp, n8n, Zapier ou qualquer outro sistema. Edge Functions para lógica serverless.',
+      title: 'IA Aplicada, RAG & Automação (G10 & G11 ONE)',
+      content: 'Arquitetura de Agentes de IA no GPTMaker integrados ao Kommo CRM e sistemas SDR-RAG auditáveis (Amazô.guia G10). Especializações G10 IA for Tech e G11 IA for Business (Oracle Next Education + Alura).',
     },
     {
-      title: 'Segurança & Conformidade',
-      content: 'RLS (Row Level Security) PostgreSQL, variáveis de ambiente no Vercel, chaves rotacionadas por ambiente. LGPD-ready por design.',
+      title: 'Liderança Técnica & Data Science (Campeã G9)',
+      content: 'Formada em Data Science pelo programa ONE (G9) e Líder Técnica da equipe campeã em 1º lugar no Hackathon G9 NoCountry, conduzindo arquitetura de dados, integração Cloud e pitch oficial.',
     },
     {
-      title: 'Stack Técnica',
-      content: 'React 19 + TypeScript + Vite · Supabase (PostgreSQL + Auth + Realtime) · Google Gemini AI · TailwindCSS · Vercel CDN · Stripe Payments',
+      title: 'Cloud Oracle (OCI), Segurança & Stack',
+      content: 'Certificada OCI Foundations Associate e OCI AI Foundations Associate. Backend em Supabase (PostgreSQL + RLS multi-tenant), APIs REST, Webhooks, React/TypeScript e conformidade LGPD by design.',
     },
   ];
 
   return (
-    <div className="mt-10 text-center">
+    <div className="mt-6 w-full text-center">
       <button
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-xs font-medium transition-colors group"
+        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-all group"
       >
-        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
-        {open ? 'Ocultar detalhes técnicos' : 'Ver detalhes técnicos (para avaliadores)'}
-        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''} group-hover:text-slate-300`} />
+        <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+        {open ? 'Ocultar detalhes técnicos e credenciais' : 'Ver detalhes técnicos, certificações e stack (para clientes, recrutadores e hunters)'}
+        <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-left animate-in fade-in slide-in-from-top-2 duration-300">
           {items.map(item => (
-            <div key={item.title} className="bg-slate-900/40 border border-white/5 rounded-2xl p-5">
-              <h4 className="text-white font-semibold text-sm mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
+            <div key={item.title} className="bg-slate-900/70 border border-white/10 hover:border-amber-500/30 rounded-2xl p-5 transition-colors">
+              <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0" />
                 {item.title}
               </h4>
-              <p className="text-slate-500 text-xs leading-relaxed">{item.content}</p>
+              <p className="text-slate-300 text-xs leading-relaxed">{item.content}</p>
             </div>
           ))}
         </div>
@@ -92,13 +97,22 @@ export default function LandingPage() {
     {
       id: 'lidi',
       name: "Lidi Moura",
-      role: "Founder · Kommo Partner · Data Science & OCI",
+      role: "Analista de Dados, IA e Automação · Parceira Certificada Kommo · OCI & OCI AI Foundations Associate",
       type: "human",
       image: "/profile.png",
       color: "border-amber-500 text-amber-400",
       linkedin: "https://linkedin.com/in/lidimoura",
       github: "https://github.com/lidimoura",
-      pitch: "Formação e experiência em Psicologia. Parceira Certificada Kommo, Especialista em Data Science e OCI. Reflorestar o Digital com CRM inteligente e IA."
+      portfolio: "https://link.encontrodagua.com/r/portifolio-lidimoura",
+      pitch: "Analista de Dados, IA e Automação com formação em Psicologia e +10 anos em Customer Success. Parceira Certificada Kommo CRM, certificada Oracle Cloud (OCI & OCI AI Foundations Associate) e Power BI (Fundação Bradesco). Concluiu Data Science no G9/ONE — onde foi Líder Técnica da equipe campeã (1º lugar) do Hackathon G9 NoCountry — e integra os programas G10 IA for Tech e G11 IA for Business do ONE (Oracle Next Education + Alura).",
+      badges: [
+        "📊 Analista de Dados, IA & Automação",
+        "🤝 Parceira Certificada Kommo CRM",
+        "☁️ OCI & OCI AI Foundations Associate",
+        "📈 Power BI (Fundação Bradesco)",
+        "🏆 1º Lugar Hackathon G9 NoCountry (Líder Técnica · Data Science)",
+        "🚀 ONE: G9 Data Science · G10 IA for Tech · G11 IA for Business"
+      ]
     },
     {
       id: 'precy',
@@ -143,44 +157,10 @@ export default function LandingPage() {
   const [showAIInsight, setShowAIInsight] = useState(true);
   const [cardMoved, setCardMoved] = useState(false);
 
-  // Amazo Init
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.innerHTML = `import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'; Typebot.initBubble({ typebot: "template-chatbot-amazo-landigpage", apiHost: "https://typebot.co", theme: { button: { backgroundColor: "#4a044e", customIconSrc: "https://s3.typebot.io/public/workspaces/cmcppn5am0002jx04z0h8go9a/typebots/al5llo2evf2ahjg5u4valfnc/bubble-icon?v=1766194905653", }, chatWindow: { backgroundColor: "#F8F8F8" } }, });`;
-    document.body.appendChild(script);
-    return () => { document.body.removeChild(script); document.querySelector('typebot-bubble')?.remove(); };
-  }, []);
-
-  // AMAZÔ CHAT - Keep user on page (NO new tab)
+  // AMAZÔ.GUIA G10 — Redireciona diretamente para a versão atualizada do G10
+  useEffect(() => { document.querySelector('typebot-bubble')?.remove(); }, []);
   const openAmazoChat = () => {
-    // Try Typebot.open() first
-    if (typeof window !== 'undefined' && (window as any).Typebot) {
-      try {
-        (window as any).Typebot.open();
-        return;
-      } catch (error) {
-        console.warn('Typebot.open() failed:', error);
-      }
-    }
-
-    // Fallback: Visual cue to floating widget
-    const bubble = document.querySelector('typebot-bubble');
-    if (bubble) {
-      // Scroll to bottom where widget is
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
-      // Show visual indicator
-      const indicator = document.createElement('div');
-      indicator.innerHTML = '⬇️ Chat Amazô no canto inferior direito';
-      indicator.style.cssText = 'position: fixed; bottom: 100px; right: 20px; background: linear-gradient(135deg, #d946ef, #a855f7); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; z-index: 9999; animation: bounce 1s infinite; box-shadow: 0 4px 20px rgba(217, 70, 239, 0.5);';
-      document.body.appendChild(indicator);
-
-      setTimeout(() => indicator.remove(), 4000);
-    } else {
-      // Last resort: alert
-      alert('🤖 Amazô IA está carregando. Aguarde alguns segundos e tente novamente.');
-    }
+    window.open(AMAZO_G10_URL, '_blank', 'noopener,noreferrer');
   };
 
   // Test Prompt with correct API config
@@ -355,6 +335,7 @@ Agora, gere o prompt perfeito:`;
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#solucoes" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('solutions')}</a>
+            <a href="#servicos" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{language === 'en' ? 'Solutions & Kommo' : 'Soluções & Kommo'}</a>
             <a href="#showcase" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('gallery')}</a>
             <a href="#sobre" className="text-slate-200 hover:text-amber-400 text-sm font-medium">{t('aboutUs')}</a>
 
@@ -372,7 +353,7 @@ Agora, gere o prompt perfeito:`;
             ) : (
               <div className="flex gap-4">
                 <button onClick={() => navigate('/login')} className="text-white text-sm font-bold">{t('login')}</button>
-                <button onClick={() => setIsApplicationModalOpen(true)} className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">{t('becomeClient')}</button>
+                <a href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vim%20pela%20LP%20do%20Encontro%20d%27%C3%81gua%20Hub%20e%20quero%20agendar%20um%20diagn%C3%B3stico%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-amber-500 text-black rounded-full text-sm font-bold hover:bg-amber-400 shadow-lg">{t('becomeClient')}</a>
               </div>
             )}
           </div>
@@ -423,6 +404,13 @@ Agora, gere o prompt perfeito:`;
                     {t('solutions')}
                   </a>
                   <a
+                    href="#servicos"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
+                  >
+                    {language === 'en' ? 'Solutions & Kommo' : 'Soluções & Kommo'}
+                  </a>
+                  <a
                     href="#showcase"
                     onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-amber-400 text-lg font-medium transition-colors"
@@ -469,7 +457,7 @@ Agora, gere o prompt perfeito:`;
                         {t('enter')}
                       </button>
                       <button
-                        onClick={() => { setIsMenuOpen(false); setIsApplicationModalOpen(true); }}
+                        onClick={() => { setIsMenuOpen(false); window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vim%20pela%20LP%20do%20Encontro%20d%27%C3%81gua%20Hub%20e%20quero%20agendar%20um%20diagn%C3%B3stico%20para%20o%20meu%20neg%C3%B3cio.', '_blank'); }}
                         className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black rounded-full text-sm font-bold transition-colors shadow-lg"
                       >
                         {t('becomeClient')}
@@ -554,12 +542,12 @@ Agora, gere o prompt perfeito:`;
                   <Bot className="w-6 h-6 text-amber-500" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">Agente de IA 24/7 <span className="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Lançamento</span></h3>
-                  <p className="text-slate-400 text-sm">Seu próprio SAC/SDR automatizado igual à Amazô.</p>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">Agente de IA (GPTMaker + Kommo) <span className="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Lançamento</span></h3>
+                  <p className="text-slate-400 text-sm">Atendimento inteligente com seus dados, catálogo e regras de negócio estruturados por especialista.</p>
                 </div>
               </div>
               <button className="px-6 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2">
-                Ver Detalhes (R$ 80/mês) <ChevronDown className="w-4 h-4" />
+                Ver Detalhes (A partir de R$ 80/mês + implementação) <ChevronDown className="w-4 h-4" />
               </button>
             </div>
           </section>
@@ -603,21 +591,23 @@ Agora, gere o prompt perfeito:`;
                   </span>
                 </h2>
                 <p className="text-slate-300 text-lg mb-2 leading-relaxed">
-                  Igual à <strong className="text-amber-400">Amazô</strong> — um agente SAC/FAQ treinado com a voz do seu negócio,
-                  respondendo leads no WhatsApp e no site enquanto você dorme.
+                  Igual à <strong className="text-amber-400">Amazô</strong> — estruturado no <strong className="text-white">GPTMaker</strong> e integrado ao <strong className="text-white">Kommo CRM</strong>, treinado com a voz e os dados reais do seu negócio para atender e qualificar leads no WhatsApp e Instagram.
+                  Não tem seus documentos, catálogo ou regras de negócio prontos? Nós organizamos e estruturamos toda a sua base de conhecimento do zero.
                 </p>
                 <p className="text-slate-500 text-sm mb-8">
-                  Por <strong className="text-white text-base">Lidi Moura</strong> — Formada em Psicologia e Especialista em Dados.
+                  Por <strong className="text-white text-base">Lidi Moura</strong> — Analista de Dados, IA e Automação · Parceira Certificada Kommo · Certificada OCI, OCI AI Foundations Associate & Power BI (Fundação Bradesco) · Campeã Hackathon G9 NoCountry (Líder Técnica) · ONE G9, G10 & G11.
                 </p>
 
                 {/* Feature checklist */}
                 <ul className="space-y-3 mb-10 text-left">
                   {[
-                    { icon: '💬', text: 'Atendimento automático no WhatsApp e site' },
+                    { icon: '💬', text: 'Atendimento inteligente no WhatsApp e Instagram com GPTMaker + Kommo CRM' },
+                    { icon: '🗂️', text: 'Organização completa dos seus dados: documentos, regras de negócio, catálogo e FAQ (se não tiver pronto, nós estruturamos)' },
                     { icon: '🤖', text: 'Configurado com a identidade e tom do seu negócio' },
                     { icon: '🗣️', text: 'Qualifica leads e encaminha para o CRM automaticamente' },
                     { icon: '📊', text: 'Relatórios de conversão e histórico de atendimentos' },
-                    { icon: '✅', text: 'Onboarding personalizado — pronto em até 48h' },
+                    { icon: '📋', text: 'Pesquisa de satisfação + Power BI para inteligência de dados' },
+                    { icon: '🫴', text: 'Qualificação de leads + onboarding personalizado' },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex items-start gap-3 text-sm text-slate-300">
                       <span className="text-base flex-shrink-0">{icon}</span>
@@ -630,19 +620,19 @@ Agora, gere o prompt perfeito:`;
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <button
                     id="btn-agente-ia-launch"
-                    onClick={openAgenteIAModal}
+                    onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20quero%20contratar%20meu%20Agente%20de%20IA%20%28a%20partir%20de%20R%24%2080%2Fm%C3%AAs%20%2B%20implementa%C3%A7%C3%A3o%29%20com%20GPTMaker%20e%20Kommo.', '_blank')}
                     className="group relative px-8 py-4 bg-teal-500 hover:bg-teal-400 text-[#02040a] font-black rounded-2xl transition-all shadow-2xl shadow-teal-500/30 hover:shadow-teal-500/50 hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
                   >
                     Quero meu Agente IA
-                    <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">R$ 80/mês</span>
+                    <span className="ml-1 bg-black/20 rounded-lg px-2 py-0.5 text-xs font-black">a partir de R$ 80/mês + implementação</span>
                   </button>
                 <a
-                    href="https://m.me/encontrodagua"
+                    href={HUB_CALENDAR_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                   >
-                    <MessageCircle size={18} /> Tirar dúvidas com a Lidi
+                    <MessageCircle size={18} /> Agendar Diagnóstico na Agenda do Hub
                   </a>
                 </div>
               </div>
@@ -662,7 +652,7 @@ Agora, gere o prompt perfeito:`;
                         <p className="font-bold text-white">Agente de IA</p>
                         <p className="text-xs text-amber-400 flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                          Online 24/7
+                          Atendimento Contínuo
                         </p>
                       </div>
                     </div>
@@ -673,10 +663,10 @@ Agora, gere o prompt perfeito:`;
                         Olá! Posso ajudar com informações sobre nossos serviços 😊
                       </div>
                       <div className="bg-amber-500/15 border border-amber-500/20 rounded-2xl rounded-tr-none px-4 py-3 text-sm text-amber-200 max-w-[85%] ml-auto text-right">
-                        Qual o preço da consulta?
+                        Como funciona a implementação para o meu negócio?
                       </div>
                       <div className="bg-white/5 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-300 max-w-[85%]">
-                        Nossa consulta inicial é R$ 200. Posso agendar para você? 📅
+                        Estruturamos seus documentos, catálogo e regras de negócio e configuramos seu Agente no GPTMaker + Kommo. Posso agendar seu diagnóstico? 📅
                       </div>
                     </div>
 
@@ -685,10 +675,10 @@ Agora, gere o prompt perfeito:`;
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-slate-500 text-xs">Plano Agente IA</p>
-                          <p className="text-white font-black text-2xl">R$ 80<span className="text-sm font-normal text-slate-400">/mês</span></p>
+                          <p className="text-white font-black text-lg">A partir de R$ 80<span className="text-xs font-normal text-slate-400">/mês + implementação</span></p>
                         </div>
                         <button
-                          onClick={openAgenteIAModal}
+                          onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20quero%20contratar%20meu%20Agente%20de%20IA%20%28a%20partir%20de%20R%24%2080%2Fm%C3%AAs%20%2B%20implementa%C3%A7%C3%A3o%29%20com%20GPTMaker%20e%20Kommo.', '_blank')}
                           className="px-4 py-2 bg-amber-500 text-black rounded-xl text-xs font-black hover:bg-amber-400 transition-colors"
                         >
                           Contratar
@@ -750,7 +740,7 @@ Agora, gere o prompt perfeito:`;
                     <Globe size={20} /> {t('viewShowcase')}
                   </a>
                   <button
-                    onClick={() => setIsApplicationModalOpen(true)}
+                    onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vim%20pela%20LP%20do%20Hub%20e%20quero%20solicitar%20meu%20cart%C3%A3o%20digital%20Link%20d%27%C3%81gua.', '_blank')}
                     className="px-8 py-4 bg-white/5 border border-teal-500/30 text-teal-300 font-bold rounded-2xl hover:bg-white/10 transition-all text-center"
                   >
                     {t('getMine')}
@@ -838,7 +828,7 @@ Agora, gere o prompt perfeito:`;
                     <button onClick={() => { navigator.clipboard.writeText(optimizedResult); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000) }} className="text-white bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
                       {copySuccess ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />} {t('copy')}
                     </button>
-                    <button onClick={() => setIsApplicationModalOpen(true)} className="bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg shadow-fuchsia-500/30">
+                    <button onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20testei%20o%20Prompt%20Lab%20do%20Hub%20e%20quero%20conversar%20sobre%20consultoria%20e%20agentes%20de%20IA.', '_blank')} className="bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg shadow-fuchsia-500/30">
                       <Sparkles size={16} /> {t('accessPro')}
                     </button>
                   </div>
@@ -874,45 +864,33 @@ Agora, gere o prompt perfeito:`;
             )}
 
 
-            <div className="mt-8 p-6 bg-gradient-to-br from-fuchsia-900/20 to-purple-900/20 border border-fuchsia-500/30 rounded-2xl max-w-2xl mx-auto">
-              <p className="text-lg font-bold text-fuchsia-300 mb-2">{t('wantJustPromptLab')}</p>
-              <div className="mb-5">
-                <p className="text-slate-400 text-sm mb-3">{t('promptLabBenefits')}</p>
+            <div className="mt-8 p-8 bg-gradient-to-br from-fuchsia-900/25 via-[#0d0718] to-purple-900/20 border border-fuchsia-500/30 rounded-3xl max-w-2xl mx-auto text-center shadow-2xl">
+              <span className="inline-block px-3 py-1 rounded-full bg-fuchsia-500/15 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-bold uppercase tracking-widest mb-3">
+                ✨ Cortesia Estratégica do Hub
+              </span>
+              <h4 className="text-2xl font-extrabold text-white mb-2">
+                Experimente a Engenharia de Prompts do Hub
+              </h4>
+              <p className="text-slate-300 text-sm mb-5 max-w-lg mx-auto leading-relaxed">
+                Disponibilizamos este laboratório interativo como cortesia para você testar na prática o padrão e o refinamento de prompts que aplicamos na criação de agentes inteligentes.
+              </p>
+              <div className="mb-6">
+                <p className="text-slate-400 text-xs mb-2.5 font-medium">Testado e calibrado para diversos papéis e contextos:</p>
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  {[t('softwareEngineer'), t('productManager'), t('dataScientist'), t('designer'), t('marketer'), t('teacher'), t('botArchitect'), t('llmTrainer'), t('webArchitect')].map((role) => (
-                    <span key={role} className="bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300 text-[10px] font-bold px-2 py-1 rounded-md">{role}</span>
+                  {['Engenheiro de Software', 'Product Manager', 'Cientista de Dados', 'Designer UI/UX', 'Especialista em Vendas', 'Arquiteto de Bots', 'Treinador de IA'].map((role) => (
+                    <span key={role} className="bg-fuchsia-500/10 border border-fuchsia-500/25 text-fuchsia-300 text-xs font-medium px-2.5 py-1 rounded-lg">{role}</span>
                   ))}
                 </div>
               </div>
 
-              {/* ══ CHECKOUT BUTTONS ═════════════════════════════ */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                <button
-                  id="btn-checkout-monthly"
-                  onClick={() => handleStripeCheckout('monthly')}
-                  className="flex flex-col items-center py-4 px-5 bg-gradient-to-br from-fuchsia-700 to-purple-700 hover:from-fuchsia-600 hover:to-purple-600 rounded-xl font-bold text-white transition-all shadow-lg shadow-fuchsia-500/20 active:scale-[0.98]"
-                >
-                  <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Mensal</span>
-                  <span className="text-2xl font-black">R$ 3,00</span>
-                  <span className="text-xs opacity-70">/mês</span>
-                </button>
-                <button
-                  id="btn-checkout-annual"
-                  onClick={() => handleStripeCheckout('annual')}
-                  className="flex flex-col items-center py-4 px-5 bg-gradient-to-br from-amber-700 to-orange-700 hover:from-amber-600 hover:to-orange-600 rounded-xl font-bold text-white transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98] relative"
-                >
-                  <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide">
-                    MELHOR OPÇÃO
-                  </span>
-                  <span className="text-xs uppercase tracking-widest mb-1 opacity-80">Pro Anual</span>
-                  <span className="text-2xl font-black">R$ 29,90</span>
-                  <span className="text-xs opacity-70">/ano • economia R$ 6</span>
-                </button>
-              </div>
-
-              <p className="text-[10px] text-slate-500 text-center">
-                ★ Lógica de indicação: 20% + 20% (máx 50%) &nbsp;|&nbsp; 60% off Impacto Social
-              </p>
+              <a
+                href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20testei%20o%20Prompt%20Lab%20do%20Hub%20e%20quero%20conversar%20sobre%20IA%20e%20automa%C3%A7%C3%B5es%20para%20o%20meu%20neg%C3%B3cio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 rounded-xl font-bold text-white text-sm shadow-lg shadow-fuchsia-500/25 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                <Sparkles size={16} /> Quero agentes de IA sob medida no WhatsApp →
+              </a>
             </div>
           </div>
         </section>
@@ -1045,33 +1023,279 @@ Agora, gere o prompt perfeito:`;
 
               <div className="relative z-10">
                 <span className="inline-block px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-400 text-xs font-bold uppercase tracking-widest mb-4">
-                  🌏 Provadágua — {language === 'en' ? 'Free Access for 7 Days' : 'Acesso Gratuito por 7 dias'}
+                  🌊 Prova d'Água Kommo CRM — {language === 'en' ? 'Guided Free Trial' : 'Teste Grátis Guiado'}
                 </span>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 leading-tight">
                   {language === 'en'
-                    ? 'Try the Provadágua: Your business ecosystem in 7 days'
-                    : 'Experimente a Provadágua: O seu ecossistema de gestão em 7 dias'}
+                    ? 'Your New Prova d\'Água: Try Kommo CRM with our guided setup'
+                    : 'Sua Prova d\'Água de Gestão: Experimente o Kommo CRM na prática'}
                 </h2>
                 <p className="text-slate-400 text-sm mb-6 max-w-xl mx-auto">
                   {language === 'en'
-                    ? 'CRM with AI, isolated data per company, SDR agent 24/7 and LGPD compliance. No credit card.'
-                    : 'CRM com IA, dados isolados por empresa, agente SDR 24/7 e conformidade LGPD. Sem cartão de crédito.'}
+                    ? 'As a Certified Kommo Partner and Data Analyst, we help you test Kommo CRM with your own business rules, catalog, WhatsApp, and GPTMaker AI Agent.'
+                    : 'Como Parceira Certificada Kommo e Analista de Dados, liberamos o teste gratuito do Kommo CRM acompanhado de orientação inicial para você ver na prática como organizar seus dados, catálogo, WhatsApp e Agente de IA (GPTMaker) em um único funil comercial.'}
                 </p>
-                <a
+                  <a
                   id="lp-cta-provadagua"
-                  href="/#/showcase"
+                  href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20quero%20solicitar%20minha%20Prova%20d%27%C3%81gua%20%28Teste%20Gr%C3%A1tis%20do%20Kommo%20CRM%29%20com%20orienta%C3%A7%C3%A3o%20do%20Hub."
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 text-white font-extrabold text-base shadow-lg shadow-purple-500/30 transition-all active:scale-[0.98] hover:-translate-y-0.5"
                 >
                   {language === 'en'
-                    ? 'Discover the Provadágua →'
-                    : 'Experimente a Provadágua →'}
+                    ? 'Request Kommo Free Trial on WhatsApp →'
+                    : 'Solicitar Teste Grátis do Kommo no WhatsApp →'}
                 </a>
+                <div className="mt-4">
+                  <a
+                    href={HUB_CALENDAR_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors"
+                  >
+                    📅 Prefere agendar direto? Agendar Diagnóstico na Agenda (encontrodaguahub@gmail.com) →
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── PRICING REMOVED V5.5 — checkout centralizado nos cards de produto ── */}
+        {/* ══════════════════════════════════════════════════════════════════════
+            SOLUÇÕES, DADOS ESTRUTURADOS E PACOTES KOMMO (USD) — ENCONTRO D'ÁGUA HUB
+            ══════════════════════════════════════════════════════════════════════ */}
+        <section id="servicos" className="py-24 px-6 bg-[#04020a] relative border-t border-white/5">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-purple-600/5 rounded-full blur-[140px] pointer-events-none" />
+
+          <div className="max-w-6xl mx-auto relative z-10">
+            {/* Header */}
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="inline-block px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold uppercase tracking-widest mb-4">
+                💼 Foco em Resultado, Organização de Dados & Satisfação
+              </span>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+                Como estruturamos e escalamos o seu negócio
+              </h2>
+              <p className="text-slate-400 text-base md:text-lg leading-relaxed">
+                Mais do que ferramentas soltas, entregamos a solução completa para o seu problema comercial — unindo <strong className="text-white">Análise e Organização de Dados</strong>, <strong className="text-white">GPTMaker</strong> e <strong className="text-white">Kommo CRM</strong> de acordo com a realidade da sua operação.
+              </p>
+            </div>
+
+            {/* 3 Formatos de Atuação (Foco em Valor, Sem Preços de Consultoria Expostos) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              <div className="p-8 rounded-3xl bg-slate-900/60 border border-white/10 hover:border-purple-500/40 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400 mb-6 text-xl">
+                    🧠
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">1. Diagnóstico, Consultoria & Mentoria</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    Mapeamento estratégico do seu processo atual, desenho da arquitetura comercial (StartSe AI Canvas), inteligência de dados e direcionamento prático para destravar gargalos de atendimento e vendas.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5">
+                  <p className="text-base font-bold text-purple-300">Atendimento Personalizado</p>
+                  <p className="text-xs text-slate-500 mt-1">Sessões estratégicas agendadas conforme sua necessidade</p>
+                </div>
+              </div>
+
+              <div className="p-8 rounded-3xl bg-gradient-to-b from-purple-950/40 to-slate-900/60 border border-purple-500/30 hover:border-purple-500/60 transition-all flex flex-col justify-between relative shadow-xl shadow-purple-950/30">
+                <span className="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-purple-500 text-white text-[10px] font-black uppercase tracking-wider">
+                  Colaborativo
+                </span>
+                <div>
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 mb-6 text-xl">
+                    🤝
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">2. Implementação Conjunta</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    Mão na massa em parceria com você ou sua equipe. Estruturamos dados, funis no Kommo e agentes no GPTMaker enquanto capacitamos seu time para operar com total segurança e autonomia.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5">
+                  <p className="text-base font-bold text-amber-300">Capacitação + Entrega Simultânea</p>
+                  <p className="text-xs text-slate-400 mt-1">Dimensionado de acordo com o momento do seu negócio</p>
+                </div>
+              </div>
+
+              <div className="p-8 rounded-3xl bg-slate-900/60 border border-white/10 hover:border-teal-500/40 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/25 flex items-center justify-center text-teal-400 mb-6 text-xl">
+                    ⚡
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">3. Implementação Completa & Suporte</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    Entrega ponta a ponta executada pela Lídi Moura: da organização inicial dos seus documentos e catálogos até a configuração completa, bateria de testes (QA) e acompanhamento contínuo.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5">
+                  <p className="text-base font-bold text-teal-300">Solução Chave na Mão (Turnkey)</p>
+                  <p className="text-xs text-slate-500 mt-1">Entrega validada por QA + evolução contínua sob demanda</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Destaque Especial: Organização e Estruturação de Dados (Analista de Dados) */}
+            <div className="mb-16 p-8 md:p-10 rounded-3xl bg-gradient-to-br from-teal-950/30 via-slate-900/70 to-purple-950/30 border border-teal-500/30 shadow-2xl">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7 space-y-4">
+                  <span className="inline-block px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
+                    🗂️ Diferencial Exclusivo · Analista de Dados
+                  </span>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+                    Não tem seus documentos, catálogo ou regras de negócio organizados? Nós fazemos isso por você.
+                  </h3>
+                  <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+                    Um Agente de IA ou CRM só entrega resultado real se a base de dados estiver limpa e bem estruturada. Como <strong className="text-white">Analista de Dados</strong>, Lídi Moura organiza e estrutura tudo o que o seu negócio precisa antes mesmo da automação entrar no ar:
+                  </p>
+                </div>
+                <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-200">
+                  <div className="p-4 rounded-2xl bg-black/35 border border-white/10">
+                    <p className="font-bold text-teal-300 mb-1">📄 Documentos & Base RAG</p>
+                    <p className="text-slate-400">Estruturação de manuais, políticas, PDFs e conhecimentos internos para alimentar a IA sem alucinações.</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-black/35 border border-white/10">
+                    <p className="font-bold text-amber-300 mb-1">🛍️ Catálogo & Ofertas</p>
+                    <p className="text-slate-400">Padronização de produtos, serviços, descrições, condições e perguntas frequentes (FAQ).</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-black/35 border border-white/10">
+                    <p className="font-bold text-purple-300 mb-1">⚙️ Regras de Negócio</p>
+                    <p className="text-slate-400">Mapeamento claro de etapas do funil, critérios de qualificação de leads e gatilhos de passagem para humanos.</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-black/35 border border-white/10">
+                    <p className="font-bold text-blue-300 mb-1">📊 Inteligência Analítica</p>
+                    <p className="text-slate-400">Pesquisa de satisfação automatizada, indicadores comerciais e dashboards em Power BI / Python.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Planos Oficiais do Kommo em Dólar (USD) + Agente IA GPTMaker */}
+            <div className="mb-16">
+              <div className="text-center max-w-3xl mx-auto mb-10">
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-400 block mb-2">
+                  Transparência Oficial · Plataforma Principal No-Code
+                </span>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-3">
+                  Pacotes Oficiais Kommo CRM (em USD) & Agente de IA (GPTMaker)
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Como as licenças da plataforma <strong className="text-white">Kommo</strong> são sempre cotadas oficialmente em dólar (USD), mantemos os valores oficiais em dólar para total transparência. Já nossos serviços de estruturação de dados, implementação e acompanhamento são apresentados sob medida após entendermos o seu cenário.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Kommo Base (USD) */}
+                <div className="p-6 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-blue-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs text-blue-400 font-bold uppercase tracking-wider block mb-2">Licença Kommo CRM</span>
+                    <h4 className="text-lg font-bold text-white mb-1">Plano Base</h4>
+                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">
+                      Centralização de WhatsApp, Instagram e e-mail em uma única caixa de entrada com funil de vendas visual (Kanban) para organizar cada cliente.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <p className="text-xs text-slate-500">Licença oficial da plataforma</p>
+                    <p className="text-2xl font-black text-white">US$ 15<span className="text-xs font-normal text-slate-400"> /usuário/mês</span></p>
+                    <p className="text-[10px] text-slate-500 mt-1">+ implementação e estruturação sob medida</p>
+                  </div>
+                </div>
+
+                {/* Kommo Avançado (USD) */}
+                <div className="p-6 rounded-2xl bg-gradient-to-b from-blue-900/30 to-slate-900/60 border border-blue-500/40 transition flex flex-col justify-between relative shadow-lg">
+                  <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-blue-500 text-white text-[9px] font-black uppercase">Mais Escolhido</span>
+                  <div>
+                    <span className="text-xs text-blue-300 font-bold uppercase tracking-wider block mb-2">Licença Kommo CRM</span>
+                    <h4 className="text-lg font-bold text-white mb-1">Plano Avançado</h4>
+                    <p className="text-slate-300 text-xs mb-4 leading-relaxed">
+                      Tudo do Base + Salesbot (robô de vendas), automações de pipeline sem código, follow-ups automáticos e relatórios de performance.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <p className="text-xs text-slate-400">Licença oficial da plataforma</p>
+                    <p className="text-2xl font-black text-white">US$ 25<span className="text-xs font-normal text-slate-300"> /usuário/mês</span></p>
+                    <p className="text-[10px] text-blue-300 mt-1">+ implementação e estruturação sob medida</p>
+                  </div>
+                </div>
+
+                {/* Kommo Empresarial (USD) */}
+                <div className="p-6 rounded-2xl bg-slate-900/40 border border-white/10 hover:border-blue-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-2">Licença Kommo CRM</span>
+                    <h4 className="text-lg font-bold text-white mb-1">Plano Empresarial</h4>
+                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">
+                      Tudo do Avançado + gestão para alto volume de leads, Lead Scoring, perfis avançados de segurança e atendimento em escala.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <p className="text-xs text-slate-500">Licença oficial da plataforma</p>
+                    <p className="text-2xl font-black text-white">US$ 45<span className="text-xs font-normal text-slate-400"> /usuário/mês</span></p>
+                    <p className="text-[10px] text-slate-500 mt-1">+ implementação e estruturação sob medida</p>
+                  </div>
+                </div>
+
+                {/* Agente de IA GPTMaker */}
+                <div className="p-6 rounded-2xl bg-gradient-to-b from-amber-900/25 to-slate-900/60 border border-amber-500/40 transition flex flex-col justify-between relative shadow-lg">
+                  <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-amber-500 text-black text-[9px] font-black uppercase">IA Conversacional</span>
+                  <div>
+                    <span className="text-xs text-amber-400 font-bold uppercase tracking-wider block mb-2">GPTMaker + Dados</span>
+                    <h4 className="text-lg font-bold text-white mb-1">Agente de IA 24/7</h4>
+                    <p className="text-slate-300 text-xs mb-4 leading-relaxed">
+                      Agente inteligente treinado com os documentos, catálogo e regras do seu negócio para atender no WhatsApp e integrar ao Kommo.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <p className="text-xs text-amber-300">Manutenção mensal acessível</p>
+                    <p className="text-xl font-black text-white">A partir de R$ 80<span className="text-xs font-normal text-slate-300">/mês</span></p>
+                    <p className="text-[10px] text-amber-300/90 mt-1">+ implementação e estruturação da base</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card de Transparência & Governança de Entrega */}
+            <div className="p-8 rounded-3xl bg-gradient-to-r from-blue-950/20 via-purple-950/20 to-slate-900/40 border border-blue-500/20 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-base font-bold text-blue-300 mb-2 flex items-center gap-2">
+                    ℹ️ Por que apresentamos o Kommo em USD e consultoria sob diagnóstico?
+                  </h4>
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    As licenças do <strong>Kommo CRM</strong> são cobradas oficialmente em dólar (USD) pela fornecedora. Já os serviços de organização de dados, criação de agentes no <strong>GPTMaker</strong> e implementação de funis variam conforme o momento de cada empresa — por isso construímos uma proposta justa e personalizada após ouvir você, garantindo que seu problema seja resolvido com total satisfação.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-purple-300 mb-2 flex items-center gap-2">
+                    💳 Condições de Contratação, QA e Entrega
+                  </h4>
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    Projetos e implementações iniciam institucionalmente com <strong>sinal de 30% a 50%</strong> conforme proposta aprovada, e o restante é acordado na entrega. Todas as entregas passam por bateria de testes, validação de qualidade (QA) e acompanhamento inicial de follow-up.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTAs Finais da Seção: WhatsApp Business + Agendamento Direto */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vim%20pela%20LP%20do%20Encontro%20d%27%C3%81gua%20Hub%20e%20quero%20conversar%20sobre%20como%20estruturar%20meus%20dados%2C%20Kommo%20CRM%20e%20Agente%20de%20IA."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm md:text-base rounded-2xl shadow-xl shadow-purple-600/30 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                <MessageCircle size={20} /> Falar no WhatsApp Business (55 41 99255-7600) →
+              </a>
+              <a
+                href={HUB_CALENDAR_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 border border-amber-500/40 hover:bg-white/10 text-amber-300 font-extrabold text-sm md:text-base rounded-2xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                📅 Agendar Consultoria (encontrodaguahub@gmail.com) →
+              </a>
+            </div>
+          </div>
+        </section>
 
         {/* ========== C. SOBRE NÓS (INSTITUTIONAL) ========== */}
 
@@ -1091,64 +1315,176 @@ Agora, gere o prompt perfeito:`;
         <section className="py-24 px-6 bg-[#02040a] text-center">
           <div className="max-w-5xl mx-auto">
             <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500"><Globe size={32} /></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{translations.en.techForAll}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{t('techForAll')}</h2>
 
             <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {["Atypical Parents", "Neurodivergent", "Indigenous & Reclaiming", "Entrepreneur Parents", "Local Businesses", "Riverside Communities", "PwD", "LGBTQIAPN+", "Black & Brown People", "Communities", "NGOs"].map((tag) => (
+              {(language === 'en' ? ["Atypical Parents", "Neurodivergent", "Indigenous & Reclaiming", "Entrepreneur Parents", "Local Businesses", "Riverside Communities", "PwD", "LGBTQIAPN+", "Black & Brown People", "Communities", "NGOs"] : ["Mães e Pais Atípicos", "Neurodivergentes", "Povos Indígenas & Originários", "Mães e Pais Empreendedores", "Negócios Locais", "Comunidades Ribeirinhas", "PcD", "LGBTQIAPN+", "Pessoas Pretas e Pardas", "Comunidades & Coletivos", "ONGs & Impacto Social"]).map((tag) => (
                 <span key={tag} className="px-5 py-2 rounded-full bg-slate-900 border border-white/10 text-slate-300 text-sm font-semibold cursor-default">{tag}</span>
               ))}
             </div>
 
-            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-white mb-2">{translations.en.noOneLeftBehind}</h3>
-              <p className="text-slate-400 text-sm mb-6">{translations.en.socialImpact}</p>
+            <div className="bg-gradient-to-r from-fuchsia-900/20 to-amber-900/20 p-8 rounded-3xl border border-white/10 max-w-3xl mx-auto text-center">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-widest mb-3">
+                🌱 Tecnologia Acessível & Impacto Social
+              </span>
+              <h3 className="text-2xl font-bold text-white mb-4">Condições Especiais com Propósito</h3>
+              <p className="text-slate-300 text-sm leading-relaxed mb-6 max-w-2xl mx-auto">
+                Projetos de impacto social, educação, economia colaborativa e iniciativas com propósito podem solicitar uma condição especial. Bolsas, descontos sociais ou escopos reduzidos são avaliados diretamente com Lídi Moura, considerando a finalidade do projeto, o escopo necessário e a sustentabilidade da operação.
+              </p>
               <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button onClick={() => window.open('https://m.me/encontrodagua', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
+                <button onClick={() => window.open('https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20gostaria%20de%20consultar%20sobre%20o%20programa%20Tecnologia%20para%20Todos%20(Impacto%20Social)', '_blank')} className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
                   <MessageCircle size={18} /> {t('socialConsult')}
                 </button>
                 <button onClick={openAmazoChat} className="px-6 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 w-full md:w-auto shadow-lg">
-                  <Bot size={18} /> {translations.en.chatWithAmazo}
+                  <Bot size={18} /> {language === 'en' ? 'Talk to Amazô.guia (G10)' : 'Falar com Amazô.guia (G10)'}
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 3. EQUIPE */}
-        <section id="time" className="py-20 px-6 bg-[#02040a] relative z-10">
-          <div className="text-center mb-12"><h2 className="text-3xl font-bold text-white">{t('team')}</h2></div>
-          <div className="relative max-w-lg mx-auto h-[400px] flex items-center justify-center">
-            <button onClick={() => setActiveTeamIndex((p) => p === 0 ? TEAM_MEMBERS.length - 1 : p - 1)} className="absolute left-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronLeft /></button>
+        {/* 3. EQUIPE — Layout Inteligente, Fluido e Responsivo (Sem sobreposição ao expandir detalhes) */}
+        <section id="time" className="py-20 px-4 sm:px-6 bg-[#02040a] relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">{t('team')}</h2>
+            <p className="text-slate-400 text-sm max-w-xl mx-auto">
+              Liderança humana especializada em Dados, IA e Automação combinada com esquadrão de agentes inteligentes.
+            </p>
+          </div>
 
-            <div className="text-center p-8 bg-[#0f0518] border border-white/10 rounded-3xl w-full mx-8 shadow-2xl flex flex-col items-center">
-              <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden`}>
+          <div className="max-w-3xl mx-auto">
+            {/* Barra seletora de membros + setas (responsiva para todos os dispositivos) */}
+            <div className="flex items-center justify-between gap-2 mb-6 px-2">
+              <button
+                onClick={() => setActiveTeamIndex((p) => p === 0 ? TEAM_MEMBERS.length - 1 : p - 1)}
+                className="p-2.5 bg-slate-800/90 hover:bg-slate-700 border border-white/10 rounded-full text-white transition-all shadow-lg flex-shrink-0"
+                aria-label="Membro anterior"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {TEAM_MEMBERS.map((member, idx) => (
+                  <button
+                    key={member.id}
+                    onClick={() => setActiveTeamIndex(idx)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                      activeTeamIndex === idx
+                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm'
+                        : 'bg-slate-900/60 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {member.name}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setActiveTeamIndex((p) => p === TEAM_MEMBERS.length - 1 ? 0 : p + 1)}
+                className="p-2.5 bg-slate-800/90 hover:bg-slate-700 border border-white/10 rounded-full text-white transition-all shadow-lg flex-shrink-0"
+                aria-label="Próximo membro"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            {/* Card Principal Dinâmico (h-auto: expande perfeitamente sem quebrar nem sobrepor seções) */}
+            <div className="text-center p-6 sm:p-8 md:p-10 bg-[#0f0518] border border-white/10 rounded-3xl w-full shadow-2xl flex flex-col items-center transition-all duration-300">
+              <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl border-2 ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[0]} bg-slate-800 mb-4 overflow-hidden shadow-xl`}>
                 {TEAM_MEMBERS[activeTeamIndex].image
-                  ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt="" className="w-full h-full object-cover" />
+                  ? <img src={TEAM_MEMBERS[activeTeamIndex].image} alt={TEAM_MEMBERS[activeTeamIndex].name} className="w-full h-full object-cover" />
                   : <span>{(TEAM_MEMBERS[activeTeamIndex] as any).emoji || '🤖'}</span>}
               </div>
-              <h3 className="text-2xl font-bold text-white mb-1">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
-              <span className={`text-xs uppercase font-bold tracking-widest mb-4 block ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>{TEAM_MEMBERS[activeTeamIndex].role}</span>
-              <p className="text-slate-300 text-sm italic mb-4">"{TEAM_MEMBERS[activeTeamIndex].pitch}"</p>
-              <div className="flex items-center justify-center gap-3">
+
+              <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">{TEAM_MEMBERS[activeTeamIndex].name}</h3>
+              <span className={`text-xs uppercase font-bold tracking-wider mb-4 block max-w-xl leading-relaxed ${TEAM_MEMBERS[activeTeamIndex].color.split(' ')[1]}`}>
+                {TEAM_MEMBERS[activeTeamIndex].role}
+              </span>
+
+              <p className="text-slate-200 text-sm md:text-base leading-relaxed max-w-2xl mb-6">
+                "{TEAM_MEMBERS[activeTeamIndex].pitch}"
+              </p>
+
+              {/* Badges estratégicas para Leads, Recrutadores, Hunters e Clientes (exibidas na Lídi) */}
+              {(TEAM_MEMBERS[activeTeamIndex] as any).badges && (
+                <div className="flex flex-wrap items-center justify-center gap-2 mb-6 max-w-2xl">
+                  {((TEAM_MEMBERS[activeTeamIndex] as any).badges as string[]).map((badge) => (
+                    <span
+                      key={badge}
+                      className="px-3 py-1.5 rounded-xl bg-white/5 border border-amber-500/25 text-amber-200 text-xs font-semibold"
+                    >
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Links Sociais + Portfólio + Canais Diretos */}
+              <div className="flex flex-wrap items-center justify-center gap-3 mb-2">
                 {TEAM_MEMBERS[activeTeamIndex].linkedin && (
-                  <a href={TEAM_MEMBERS[activeTeamIndex].linkedin} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-white transition-colors">
-                    <Linkedin size={20} />
+                  <a
+                    href={TEAM_MEMBERS[activeTeamIndex].linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 text-xs font-bold transition-colors"
+                  >
+                    <Linkedin size={16} /> LinkedIn
                   </a>
                 )}
                 {(TEAM_MEMBERS[activeTeamIndex] as any).github && (
-                  <a href={(TEAM_MEMBERS[activeTeamIndex] as any).github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
-                    <Github size={20} />
+                  <a
+                    href={(TEAM_MEMBERS[activeTeamIndex] as any).github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-slate-300 hover:bg-white/10 text-xs font-bold transition-colors"
+                  >
+                    <Github size={16} /> GitHub
+                  </a>
+                )}
+                {(TEAM_MEMBERS[activeTeamIndex] as any).portfolio && (
+                  <a
+                    href={(TEAM_MEMBERS[activeTeamIndex] as any).portfolio}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-300 hover:bg-teal-500/20 text-xs font-bold transition-colors"
+                  >
+                    <Briefcase size={16} /> Portfólio Link d'Água
                   </a>
                 )}
               </div>
+
               {activeTeamIndex === 0 && (
-                <div className="mt-2">
+                <>
                   <IcebergDetails />
-                </div>
+                  <div className="mt-6 pt-6 border-t border-white/10 w-full flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a
+                      href="https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vi%20seu%20perfil%20t%C3%A9cnico%20na%20LP%20do%20Hub%20e%20quero%20conversar%20sobre%20Dados%2C%20IA%2C%20Kommo%20ou%20oportunidades."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg"
+                    >
+                      <MessageCircle size={15} /> Falar no WhatsApp Business
+                    </a>
+                    <a
+                      href={HUB_CALENDAR_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all"
+                    >
+                      📅 Agendar Consultoria (encontrodaguahub@gmail.com)
+                    </a>
+                    <a
+                      href={AMAZO_G10_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-fuchsia-600/20 hover:bg-fuchsia-600/30 border border-fuchsia-500/40 text-fuchsia-300 text-xs font-bold transition-all"
+                    >
+                      <Bot size={15} /> Testar Amazô.guia (G10)
+                    </a>
+                  </div>
+                </>
               )}
             </div>
-
-            <button onClick={() => setActiveTeamIndex((p) => p === TEAM_MEMBERS.length - 1 ? 0 : p + 1)} className="absolute right-0 z-20 p-2 bg-slate-800 rounded-full text-white"><ChevronRight /></button>
           </div>
         </section>
 
@@ -1162,14 +1498,20 @@ Agora, gere o prompt perfeito:`;
               <Leaf className="w-4 h-4 text-teal-500" />
               <p className="text-white font-bold">Encontro D'água Hub</p>
             </div>
-            <p className="text-slate-500 mb-1">Lidi Moura · Formação e experiência em Psicologia · Parceira Certificada Kommo · Data Science · OCI</p>
-            <p className="text-slate-600 mb-4">"Reflorestar o Digital" — Tecnologia acessível com impacto social real.</p>
-            <div className="flex items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
-              <span>20% + 20% desconto por indicação (máx 50%)</span>
+            <p className="text-slate-400 mb-1">
+              Lidi Moura — Analista de Dados, IA e Automação · Parceira Certificada Kommo · Certificada OCI, OCI AI Foundations Associate & Power BI (Fundação Bradesco) · Líder Técnica Campeã Hackathon G9 NoCountry · ONE G9, G10 & G11
+            </p>
+            <p className="text-slate-500 mb-2">
+              Contato & Agendamento de Consultoria: <a href={HUB_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">encontrodaguahub@gmail.com</a> · WhatsApp Business: <a href="https://wa.me/5541992557600" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">+55 (41) 99255-7600</a>
+            </p>
+            <p className="text-slate-600 mb-2">"Reflorestar o Digital" — Tecnologia acessível com impacto social real.</p>
+            <p className="text-slate-700 text-[10px] mb-4">⚠️ Licenças da plataforma Kommo cobradas em dólar (USD) conforme tabela oficial da fornecedora; serviços de organização de dados, implementação e consultoria sob medida.</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-slate-700 text-[11px] mb-3">
+              <span>Sinal institucional de 30% a 50%</span>
               <span>•</span>
-              <span>60% off para Impacto Social</span>
+              <span>Condições especiais para Impacto Social sob consulta</span>
               <span>•</span>
-              <span>100% upfront ou 50/50</span>
+              <span>Entrega validada por QA & Follow-up</span>
             </div>
             <p className="text-slate-700">{t('footerRights')}</p>
           </div>

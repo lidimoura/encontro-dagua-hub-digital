@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Users, MessageCircle, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
+import { Users, MessageCircle, CheckCircle, Sparkles, TrendingUp, CalendarCheck } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface CRMSimulatorProps {
-    onCTAClick: () => void;
+    onCTAClick?: () => void;
 }
 
-export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
-    const { t } = useTranslation();
+export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
+    const { t, language } = useTranslation();
     const [showAIInsight, setShowAIInsight] = useState(true);
     const [cardMoved, setCardMoved] = useState(false);
 
@@ -16,16 +16,25 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
         setTimeout(() => setCardMoved(true), 300);
     };
 
+    const WA_KOMMO_TRIAL = "https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vi%20o%20simulador%20na%20LP%20do%20Hub%20e%20quero%20solicitar%20o%20Teste%20Gr%C3%A1tis%20do%20Kommo%20CRM%20%28Prova%20d%27%C3%81gua%29.";
+    const WA_AGENDA_DIAGNOSTICO = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Consultoria%20%26%20Diagn%C3%B3stico%20%E2%80%94%20Encontro%20d%27%C3%81gua%20Hub&add=encontrodaguahub%40gmail.com&details=Ol%C3%A1%20L%C3%ADdi%20Moura%20%28encontrodaguahub%40gmail.com%29%2C%20gostaria%20de%20agendar%20um%20diagn%C3%B3stico%20de%20Dados%2C%20IA%20e%20Kommo%20CRM.";
+
     return (
         <section className="py-20 px-6 bg-[#05020a]">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
-                        <TrendingUp className="w-3 h-3" /> {t('crmNative')}
+                        <TrendingUp className="w-3 h-3" /> {language === 'en' ? 'Kommo CRM + GPTMaker AI in Action' : 'Kommo CRM + Agente IA na Prática'}
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('smartManagement')}</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        {language === 'en'
+                            ? 'See how your sales funnel works with organized data & AI'
+                            : 'Veja como seu funil funciona com Dados Organizados + Kommo & IA'}
+                    </h2>
                     <p className="text-slate-400 mb-2 max-w-2xl mx-auto">
-                        {t('crmSimDesc')}
+                        {language === 'en'
+                            ? 'We organize your business rules, catalog, and documents so your AI Agent (GPTMaker) qualifies leads and moves opportunities automatically inside Kommo CRM.'
+                            : 'Estruturamos suas regras de negócio, catálogo e documentos para que o seu Agente de IA (GPTMaker) qualifique leads no WhatsApp e movimente oportunidades automaticamente dentro do Kommo CRM.'}
                     </p>
                     <p className="text-xs text-slate-500 max-w-2xl mx-auto italic">
                         {t('crmSimTip')}
@@ -110,23 +119,31 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = ({ onCTAClick }) => {
                         </div>
                     </div>
 
-                    {/* Credits Footer */}
+                    {/* Info Footer */}
                     <div className="mt-6 pt-4 border-t border-white/10 text-center">
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                            {t('crmCredits')}{' '}
-                            <span className="text-slate-400 font-semibold">Escola de Automação de Thales Laray</span>.{' '}
-                            Adaptado e potencializado pelo Hub Encontro D'água.
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                             Demonstração interativa de pipeline comercial estruturado pela <strong className="text-white">Lídi Moura (Parceira Certificada Kommo & Analista de Dados)</strong> integrando atendimento inteligente via <strong className="text-white">GPTMaker</strong>.
                         </p>
                     </div>
 
-                    {/* CTA Button */}
-                    <div className="mt-6 text-center">
-                        <button
-                            onClick={onCTAClick}
-                            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg"
+                    {/* CTA Buttons */}
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a
+                            href={WA_KOMMO_TRIAL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
                         >
-                            {t('crmInterest')}
-                        </button>
+                            <MessageCircle size={18} /> Solicitar Teste Grátis Kommo (Prova d'Água)
+                        </a>
+                        <a
+                            href={WA_AGENDA_DIAGNOSTICO}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-purple-500/40 text-purple-300 rounded-xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm"
+                        >
+                            <CalendarCheck size={18} /> Agendar Consultoria (encontrodaguahub@gmail.com)
+                        </a>
                     </div>
                 </div>
 
