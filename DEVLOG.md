@@ -1,5 +1,28 @@
 # 🛠️ DEVLOG — Encontro d'água Hub Digital
 
+## 2026-10-25 — V10.4: SUPORTE BILÍNGUE INTEGRAL (PT-BR / EN), RODAPÉ ENXUTO & RASTREAMENTO DE ORIGEM NOS CTAS (AGENDA OFICIAL + WHATSAPP BUSINESS) 🌍
+
+**Contexto:** Correção da internacionalização (`PT` / `US`) em todas as seções recém-atualizadas da LP do Hub (`LandingPage.tsx`, `KommoPartnerSection.tsx`, `CRMSimulator.tsx`), eliminação da repetição visual de 3 rodapés empilhados no final da página, atualização de todos os links de agendamento (incluindo o CTA do topo **"Become a Client" / "Torne-se Cliente"**) para a página oficial de agendamento do Google Calendar (`https://calendar.app.google/qztptMcM3QYkeo539`), e inclusão de tags estratégicas de rastreamento de origem (`[Origem: LP Hub - ...]`) em todas as mensagens pré-preenchidas do WhatsApp Business (`5541992557600`).
+
+### Alterações Principais (`LandingPage.tsx`, `KommoPartnerSection.tsx`, `CRMSimulator.tsx`)
+1. **Tradução Bilíngue 100% Funcional (`PT` / `US`):**
+   - Todas as seções que antes estavam em português fixo agora respondem dinamicamente ao seletor de idioma (`language === 'en'`):
+     - Banner colapsado e seção expandida do **Agente de IA 24/7 (`from R$ 80/mo + setup`)**
+     - Bloco de cortesia estratégica do **Prompt Lab**
+     - **Simulador Interativo de ROI (`CRMSimulator.tsx`)**
+     - Seção **`#servicos`**: 3 Formatos de Atuação, Bloco de Analista de Dados (Estruturação de Base de Conhecimento) e os 4 cards de planos (Agente IA + 3 planos oficiais Kommo em USD)
+     - Box de Impacto Social (**Technology for All / Tecnologia para Todos**)
+     - Seção **`#time` (Equipe)**: cargos, pitches, credenciais estratégicas de Lídi Moura e painel expansível **`IcebergDetails`**
+     - Seção **Parceira Oficial Kommo (`KommoPartnerSection.tsx`)** e **`<footer>`**
+2. **Rodapé Enxuto (Fim dos "3 Rodapés Repetidos"):**
+   - Removida de `KommoPartnerSection.tsx` a tabela duplicada dos 3 planos Kommo USD e os disclaimers repetidos que já apareciam logo acima em `#servicos`.
+   - Simplificado o `<footer>` em `LandingPage.tsx` para um formato executivo enxuto de 3 linhas, eliminando redundâncias.
+3. **Agendamento Direto (`https://calendar.app.google/qztptMcM3QYkeo539`) & Rastreamento de Origem no WhatsApp (`5541992557600`):**
+   - O botão **"Become a Client" / "Torne-se Cliente"** (desktop e mobile) e todos os botões de agendamento da LP agora levam diretamente para `https://calendar.app.google/qztptMcM3QYkeo539`.
+   - Todos os links de WhatsApp Business possuem mensagens personalizadas identificando exatamente o botão/seção clicado (`[Origem: LP Hub - Hero Principal]`, `[Origem: LP Hub - Banner Agente IA]`, `[Origem: LP Hub - Simulador CRM]`, `[Origem: LP Hub - Formato 01/02/03]`, `[Origem: LP Hub - Plano Base/Avançado/Empresarial Kommo]`, `[Origem: LP Hub - Selo Parceiro Kommo]`, etc.).
+
+---
+
 ## 2026-10-25 — V10.3: CORREÇÃO DE LAYOUT DA EQUIPE, CREDENCIAIS ESTRATÉGICAS DE LÍDI MOURA & ROTEAMENTO AMAZÔ G10 + AGENDA 🎯
 
 **Contexto:** Correção do overflow/sobreposição que ocorria ao expandir os detalhes técnicos (`IcebergDetails`) no card da equipe, atualização completa das credenciais estratégicas de Lídi Moura (para leads, clientes, recrutadores e hunters), e padronização de todos os CTAs para WhatsApp Business (`5541992557600`), Agendamento de Consultoria (`encontrodaguahub@gmail.com`) e Amazô.guia G10 (`https://amazo-guia-g10.streamlit.app/`).

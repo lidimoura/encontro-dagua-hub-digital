@@ -6,8 +6,11 @@ interface CRMSimulatorProps {
     onCTAClick?: () => void;
 }
 
+const CALENDAR_BOOKING_URL = 'https://calendar.app.google/qztptMcM3QYkeo539';
+
 export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
     const { t, language } = useTranslation();
+    const isEn = language === 'en';
     const [showAIInsight, setShowAIInsight] = useState(true);
     const [cardMoved, setCardMoved] = useState(false);
 
@@ -16,23 +19,24 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
         setTimeout(() => setCardMoved(true), 300);
     };
 
-    const WA_KOMMO_TRIAL = "https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%2C%20vi%20o%20simulador%20na%20LP%20do%20Hub%20e%20quero%20solicitar%20o%20Teste%20Gr%C3%A1tis%20do%20Kommo%20CRM%20%28Prova%20d%27%C3%81gua%29.";
-    const WA_AGENDA_DIAGNOSTICO = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Consultoria%20%26%20Diagn%C3%B3stico%20%E2%80%94%20Encontro%20d%27%C3%81gua%20Hub&add=encontrodaguahub%40gmail.com&details=Ol%C3%A1%20L%C3%ADdi%20Moura%20%28encontrodaguahub%40gmail.com%29%2C%20gostaria%20de%20agendar%20um%20diagn%C3%B3stico%20de%20Dados%2C%20IA%20e%20Kommo%20CRM.";
+    const waKommoTrial = isEn
+        ? "https://wa.me/5541992557600?text=Hello%20Lidi%21%20%5BOrigin%3A%20Hub%20LP%20-%20CRM%20Simulator%5D%20I%20tested%20the%20pipeline%20simulator%20and%20want%20to%20request%20my%20Guided%20Kommo%20CRM%20Free%20Trial%20%28Prova%20d%27%C3%81gua%29."
+        : "https://wa.me/5541992557600?text=Ol%C3%A1%20Lidi%21%20%5BOrigem%3A%20LP%20Hub%20-%20Simulador%20CRM%5D%20Testei%20o%20simulador%20de%20funil%20e%20quero%20solicitar%20o%20Teste%20Gr%C3%A1tis%20Guiado%20do%20Kommo%20CRM%20%28Prova%20d%27%C3%81gua%29.";
 
     return (
         <section className="py-20 px-6 bg-[#05020a]">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
-                        <TrendingUp className="w-3 h-3" /> {language === 'en' ? 'Kommo CRM + GPTMaker AI in Action' : 'Kommo CRM + Agente IA na Prática'}
+                        <TrendingUp className="w-3 h-3" /> {isEn ? 'Kommo CRM + GPTMaker AI in Action' : 'Kommo CRM + Agente IA na Prática'}
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        {language === 'en'
+                        {isEn
                             ? 'See how your sales funnel works with organized data & AI'
                             : 'Veja como seu funil funciona com Dados Organizados + Kommo & IA'}
                     </h2>
                     <p className="text-slate-400 mb-2 max-w-2xl mx-auto">
-                        {language === 'en'
+                        {isEn
                             ? 'We organize your business rules, catalog, and documents so your AI Agent (GPTMaker) qualifies leads and moves opportunities automatically inside Kommo CRM.'
                             : 'Estruturamos suas regras de negócio, catálogo e documentos para que o seu Agente de IA (GPTMaker) qualifique leads no WhatsApp e movimente oportunidades automaticamente dentro do Kommo CRM.'}
                     </p>
@@ -50,7 +54,6 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
                                 <Users size={16} /> {t('leadColumn')}
                             </h3>
                             <div className="space-y-2">
-                                {/* Maria Silva - Interactive Card */}
                                 {!cardMoved && (
                                     <div className="bg-slate-800/50 border border-white/5 rounded-lg p-3 text-xs relative transition-all duration-500">
                                         <p className="text-white font-semibold">Maria Silva</p>
@@ -108,7 +111,6 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
                                     <p className="text-slate-400">{t('activeSince')}</p>
                                 </div>
 
-                                {/* Maria Silva - Moved Card with Animation */}
                                 {cardMoved && (
                                     <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-3 text-xs animate-slide-in">
                                         <p className="text-white font-semibold">✨ Maria Silva</p>
@@ -122,27 +124,31 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
                     {/* Info Footer */}
                     <div className="mt-6 pt-4 border-t border-white/10 text-center">
                         <p className="text-xs text-slate-400 leading-relaxed">
-                             Demonstração interativa de pipeline comercial estruturado pela <strong className="text-white">Lídi Moura (Parceira Certificada Kommo & Analista de Dados)</strong> integrando atendimento inteligente via <strong className="text-white">GPTMaker</strong>.
+                            {isEn ? (
+                                <>Interactive sales pipeline demo architected by <strong className="text-white">Lídi Moura (Certified Kommo Partner & Data Analyst)</strong> integrating intelligent <strong className="text-white">GPTMaker</strong> automation.</>
+                            ) : (
+                                <>Demonstração interativa de pipeline comercial estruturado pela <strong className="text-white">Lídi Moura (Parceira Certificada Kommo & Analista de Dados)</strong> integrando atendimento inteligente via <strong className="text-white">GPTMaker</strong>.</>
+                            )}
                         </p>
                     </div>
 
                     {/* CTA Buttons */}
                     <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a
-                            href={WA_KOMMO_TRIAL}
+                            href={waKommoTrial}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
                         >
-                            <MessageCircle size={18} /> Solicitar Teste Grátis Kommo (Prova d'Água)
+                            <MessageCircle size={18} /> {isEn ? "Request Kommo Free Trial (Prova d'Água)" : "Solicitar Teste Grátis Kommo (Prova d'Água)"}
                         </a>
                         <a
-                            href={WA_AGENDA_DIAGNOSTICO}
+                            href={CALENDAR_BOOKING_URL}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-purple-500/40 text-purple-300 rounded-xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm"
                         >
-                            <CalendarCheck size={18} /> Agendar Consultoria (encontrodaguahub@gmail.com)
+                            <CalendarCheck size={18} /> {isEn ? 'Book Consultation on Calendar' : 'Agendar Consultoria na Agenda'}
                         </a>
                     </div>
                 </div>
@@ -150,31 +156,15 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
                 {/* Animation Styles */}
                 <style>{`
           @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
           }
           @keyframes slide-in {
-            from {
-              opacity: 0;
-              transform: translateX(-20px) scale(0.9);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0) scale(1);
-            }
+            from { opacity: 0; transform: translateX(-20px) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
           }
-          .animate-fade-in {
-            animation: fade-in 0.3s ease-out;
-          }
-          .animate-slide-in {
-            animation: slide-in 0.5s ease-out;
-          }
+          .animate-fade-in { animation: fade-in 0.3s ease-out; }
+          .animate-slide-in { animation: slide-in 0.5s ease-out; }
         `}</style>
             </div>
         </section>
