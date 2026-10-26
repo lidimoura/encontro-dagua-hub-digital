@@ -17,6 +17,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useTranslation } from '@/hooks/useTranslation';
 import { handleStripeCheckout } from '@/lib/stripe';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
+import { GoogleCalendarButton, GOOGLE_CALENDAR_SCHEDULE_URL } from '@/components/GoogleCalendarButton';
 import { translations } from '@/lib/translations';
 
 
@@ -24,7 +25,7 @@ import { translations } from '@/lib/translations';
 const AMAZO_G10_URL = 'https://amazo-guia-g10.streamlit.app/';
 const WA_BUSINESS_PHONE = '5541992557600';
 const HUB_EMAIL = 'encontrodaguahub@gmail.com';
-const HUB_CALENDAR_URL = 'https://calendar.app.google/qztptMcM3QYkeo539';
+const HUB_CALENDAR_URL = GOOGLE_CALENDAR_SCHEDULE_URL;
 
 // ── IcebergDetails: detalhes técnicos e credenciais (Responsivo & Bilíngue) ─
 function IcebergDetails({ isEn }: { isEn?: boolean }) {
@@ -357,7 +358,7 @@ Agora, gere o prompt perfeito:`;
       </div>
 
       {/* HEADER */}
-      <header className="fixed w-full z-[9999] top-0 py-4 px-6 bg-black/60 backdrop-blur-md border-b border-white/5">
+      <header className="fixed w-full z-50 top-0 py-4 px-6 bg-black/60 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <img
@@ -686,14 +687,10 @@ Agora, gere o prompt perfeito:`;
                       {isEn ? 'from R$ 80/mo + setup' : 'a partir de R$ 80/mês + implementação'}
                     </span>
                   </button>
-                  <a
-                    href={HUB_CALENDAR_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-300 font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-                  >
-                    <MessageCircle size={18} /> {isEn ? 'Book Diagnostic on Hub Calendar' : 'Agendar Diagnóstico na Agenda do Hub'}
-                  </a>
+                  <GoogleCalendarButton
+                    label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                    color="#8E24AA"
+                  />
                 </div>
               </div>
 
@@ -1122,15 +1119,11 @@ Agora, gere o prompt perfeito:`;
                     ? 'Request Kommo Free Trial on WhatsApp →'
                     : 'Solicitar Teste Grátis do Kommo no WhatsApp →'}
                 </a>
-                <div className="mt-4">
-                  <a
-                    href={HUB_CALENDAR_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors"
-                  >
-                    {isEn ? '📅 Prefer to book directly? Schedule a Diagnosis on Google Calendar →' : '📅 Prefere agendar direto? Agendar Diagnóstico na Agenda Oficial →'}
-                  </a>
+                <div className="mt-5 flex justify-center">
+                  <GoogleCalendarButton
+                    label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                    color="#8E24AA"
+                  />
                 </div>
               </div>
             </div>
@@ -1177,9 +1170,16 @@ Agora, gere o prompt perfeito:`;
                       : 'Mapeamento estratégico do seu processo atual, desenho da arquitetura comercial (StartSe AI Canvas), inteligência de dados e direcionamento prático para destravar gargalos de atendimento e vendas.'}
                   </p>
                 </div>
-                <div className="pt-4 border-t border-white/5">
-                  <p className="text-base font-bold text-purple-300">{isEn ? 'Tailored Advisory' : 'Atendimento Personalizado'}</p>
-                  <p className="text-xs text-slate-500 mt-1">{isEn ? 'Strategic sessions scheduled around your needs' : 'Sessões estratégicas agendadas conforme sua necessidade'}</p>
+                <div className="pt-4 border-t border-white/5 space-y-3">
+                  <div>
+                    <p className="text-base font-bold text-purple-300">{isEn ? 'Tailored Advisory (R$ 180/session)' : 'Consultoria Estratégica (R$ 180/sessão)'}</p>
+                    <p className="text-xs text-slate-500 mt-1">{isEn ? 'Book directly via Google Calendar' : 'Agendamento direto pelo Google Calendar'}</p>
+                  </div>
+                  <GoogleCalendarButton
+                    label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                    color="#8E24AA"
+                    className="w-full justify-start"
+                  />
                 </div>
               </div>
 
@@ -1375,14 +1375,10 @@ Agora, gere o prompt perfeito:`;
               >
                 <MessageCircle size={20} /> {isEn ? 'Chat on WhatsApp Business →' : 'Falar no WhatsApp Business →'}
               </a>
-              <a
-                href={HUB_CALENDAR_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 border border-amber-500/40 hover:bg-white/10 text-amber-300 font-extrabold text-sm md:text-base rounded-2xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-              >
-                {isEn ? '📅 Book Consultation on Calendar →' : '📅 Agendar Consultoria na Agenda Oficial →'}
-              </a>
+              <GoogleCalendarButton
+                label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                color="#8E24AA"
+              />
             </div>
           </div>
         </section>
@@ -1563,14 +1559,10 @@ Agora, gere o prompt perfeito:`;
                     >
                       <MessageCircle size={15} /> {isEn ? 'WhatsApp Business' : 'Falar no WhatsApp Business'}
                     </a>
-                    <a
-                      href={HUB_CALENDAR_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all"
-                    >
-                      {isEn ? '📅 Book Consultation on Calendar' : '📅 Agendar Consultoria na Agenda'}
-                    </a>
+                    <GoogleCalendarButton
+                      label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                      color="#8E24AA"
+                    />
                     <a
                       href={AMAZO_G10_URL}
                       target="_blank"
@@ -1591,17 +1583,18 @@ Agora, gere o prompt perfeito:`;
 
         {/* FOOTER ENXUTO & BILÍNGUE (Sem repetição de textos) */}
         <footer className="py-10 text-center text-slate-500 text-xs bg-[#02040a] border-t border-white/5">
-          <div className="max-w-4xl mx-auto px-6 space-y-2.5">
+          <div className="max-w-4xl mx-auto px-6 space-y-3">
             <div className="flex items-center justify-center gap-2">
               <Leaf className="w-4 h-4 text-teal-500" />
               <p className="text-white font-bold text-sm">Encontro d'Água Hub Digital</p>
               <span className="text-slate-700">•</span>
               <span className="text-slate-400">{isEn ? '"Reforesting the Digital"' : '"Reflorestar o Digital"'}</span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs">
-              <a href={HUB_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline font-medium">
-                📅 {isEn ? 'Book a Consultation' : 'Agendar Consultoria'} ({HUB_EMAIL})
-              </a>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
+              <GoogleCalendarButton
+                label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                color="#8E24AA"
+              />
               <span className="text-slate-700">•</span>
               <a
                 href={isEn

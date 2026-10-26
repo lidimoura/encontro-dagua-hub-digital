@@ -98,6 +98,66 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Cinzel:wght@400;700&display=swap"
     rel="stylesheet">
 
+  <!-- Google Calendar Appointment Scheduling begin -->
+  <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
+  <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
+  <style>
+    /* Corrige contraste, fundo branco sólido e sobreposição do modal oficial do Google Calendar */
+    .qJTHM {
+      background-color: rgba(5, 2, 10, 0.92) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      z-index: 100000 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 56px 16px 20px !important;
+    }
+    .qJTHM iframe,
+    iframe.mm8Jec,
+    iframe[src*="calendar.google.com/calendar/appointments"] {
+      background-color: #ffffff !important;
+      color-scheme: light !important;
+      border-radius: 20px !important;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75) !important;
+      border: 1px solid rgba(142, 36, 170, 0.35) !important;
+      width: 100% !important;
+      max-width: 1060px !important;
+      height: 84vh !important;
+      max-height: 820px !important;
+      margin: 0 auto !important;
+      opacity: 1 !important;
+    }
+    .x9Nlic {
+      z-index: 100001 !important;
+      top: 12px !important;
+      right: 16px !important;
+      background-color: #8E24AA !important;
+      color: #ffffff !important;
+      border-radius: 9999px !important;
+      padding: 8px 18px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+    }
+    .qxCTlb {
+      font-family: 'Inter', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 14px !important;
+      line-height: 1.2 !important;
+      padding: 13px 24px !important;
+      border-radius: 14px !important;
+      white-space: nowrap !important;
+      box-shadow: 0 10px 25px rgba(142, 36, 170, 0.35) !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      cursor: pointer !important;
+    }
+    .qxCTlb:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 14px 30px rgba(142, 36, 170, 0.5) !important;
+    }
+  </style>
+  <!-- end Google Calendar Appointment Scheduling -->
+
 </head>
 
 <body

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Shield, Zap, Users, BarChart3, MessageCircle, CalendarCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, Shield, Zap, Users, BarChart3, MessageCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-
-const CALENDAR_BOOKING_URL = 'https://calendar.app.google/qztptMcM3QYkeo539';
+import { GoogleCalendarButton } from '@/components/GoogleCalendarButton';
 
 interface KommoPartnerSectionProps {
   initiallyOpen?: boolean;
@@ -165,15 +164,10 @@ export const KommoPartnerSection: React.FC<KommoPartnerSectionProps> = ({ initia
                 <MessageCircle className="w-4 h-4" />
                 {isEn ? "Request Kommo Free Trial (Prova d'Água)" : "Solicitar Teste Grátis Kommo (Prova d'Água)"}
               </a>
-              <a
-                href={CALENDAR_BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-blue-400/30 hover:bg-white/10 text-blue-200 font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-xs md:text-sm"
-              >
-                <CalendarCheck className="w-4 h-4" />
-                {isEn ? 'Book Consultation on Google Calendar' : 'Agendar Consultoria na Agenda Oficial'}
-              </a>
+              <GoogleCalendarButton
+                label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                color="#8E24AA"
+              />
             </div>
           </div>
         </div>

@@ -1,5 +1,19 @@
 # 🛠️ DEVLOG — Encontro d'água Hub Digital
 
+## 2026-10-26 — V10.5: BOTÃO OFICIAL EMBUTIDO DO GOOGLE CALENDAR APPOINTMENT SCHEDULING (CONSULTORIA R$ 180) 📅
+
+**Contexto:** Incorporação do widget oficial de agendamento do Google Calendar (`scheduling-button-script.css` + `scheduling-button-script.js` com `calendar.schedulingButton.load`, cor `#8E24AA` e rótulo `"Agende sua consultoria"`) apontando para a agenda de consultoria (`R$ 180`) do Encontro d'Água Hub (`https://calendar.google.com/calendar/appointments/schedules/AcZssZ39jIFaE98TdoKnOmL7sOYtM0lQHu7F-hcQm5JU8nYfeCbtzoUAJ7lQXXO9hHxYW-9hvOMejMAm?gv=true`), substituindo todos os links anteriores que mencionavam ou encaminhavam para o agendamento de consultoria com `encontrodaguahub`.
+
+### Alterações Principais (`index.html`, `GoogleCalendarButton.tsx`, `LandingPage.tsx`, `CRMSimulator.tsx`, `KommoPartnerSection.tsx`)
+1. **Inclusão do Script Oficial Google Calendar Appointment Scheduling (`index.html`):**
+   - Adicionados `<link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">` e `<script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>` no `<head>`.
+2. **Componente Reutilizável (`src/components/GoogleCalendarButton.tsx`):**
+   - Invoca `calendar.schedulingButton.load` com a URL oficial `https://calendar.google.com/calendar/appointments/schedules/AcZssZ39jIFaE98TdoKnOmL7sOYtM0lQHu7F-hcQm5JU8nYfeCbtzoUAJ7lQXXO9hHxYW-9hvOMejMAm?gv=true`, cor `#8E24AA` e label `"Agende sua consultoria"` (ou `"Book your consultation"` em inglês), abrindo o modal de agendamento diretamente na página.
+3. **Substituição nos Pontos de Agendamento de Consultoria:**
+   - Substituídos os botões/links de agendamento na seção do Agente de IA, Prova d'Água Kommo, card `1. Diagnóstico, Consultoria & Mentoria (R$ 180/sessão)` e rodapé de `#servicos`, `CRMSimulator.tsx`, card de perfil da Lídi Moura em `#time`, `KommoPartnerSection.tsx` e `<footer>`.
+
+---
+
 ## 2026-10-25 — V10.4: SUPORTE BILÍNGUE INTEGRAL (PT-BR / EN), RODAPÉ ENXUTO & RASTREAMENTO DE ORIGEM NOS CTAS (AGENDA OFICIAL + WHATSAPP BUSINESS) 🌍
 
 **Contexto:** Correção da internacionalização (`PT` / `US`) em todas as seções recém-atualizadas da LP do Hub (`LandingPage.tsx`, `KommoPartnerSection.tsx`, `CRMSimulator.tsx`), eliminação da repetição visual de 3 rodapés empilhados no final da página, atualização de todos os links de agendamento (incluindo o CTA do topo **"Become a Client" / "Torne-se Cliente"**) para a página oficial de agendamento do Google Calendar (`https://calendar.app.google/qztptMcM3QYkeo539`), e inclusão de tags estratégicas de rastreamento de origem (`[Origem: LP Hub - ...]`) em todas as mensagens pré-preenchidas do WhatsApp Business (`5541992557600`).

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Users, MessageCircle, CheckCircle, Sparkles, TrendingUp, CalendarCheck } from 'lucide-react';
+import { Users, MessageCircle, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { GoogleCalendarButton } from '@/components/GoogleCalendarButton';
 
 interface CRMSimulatorProps {
     onCTAClick?: () => void;
 }
-
-const CALENDAR_BOOKING_URL = 'https://calendar.app.google/qztptMcM3QYkeo539';
 
 export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
     const { t, language } = useTranslation();
@@ -142,14 +141,10 @@ export const CRMSimulator: React.FC<CRMSimulatorProps> = () => {
                         >
                             <MessageCircle size={18} /> {isEn ? "Request Kommo Free Trial (Prova d'Água)" : "Solicitar Teste Grátis Kommo (Prova d'Água)"}
                         </a>
-                        <a
-                            href={CALENDAR_BOOKING_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full sm:w-auto px-7 py-3.5 bg-white/5 border border-purple-500/40 text-purple-300 rounded-xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm"
-                        >
-                            <CalendarCheck size={18} /> {isEn ? 'Book Consultation on Calendar' : 'Agendar Consultoria na Agenda'}
-                        </a>
+                        <GoogleCalendarButton
+                            label={isEn ? 'Book your consultation' : 'Agende sua consultoria'}
+                            color="#8E24AA"
+                        />
                     </div>
                 </div>
 
