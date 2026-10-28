@@ -103,18 +103,29 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
     const activeTemplate = templates.find(t => t.id === bridgeTemplate) || templates[0];
     const safeColor = color || '#620939';
 
-    const cardBorderColor = activeTemplate?.button_bg_color
-        ? `${activeTemplate.button_bg_color}40`
-        : (safeColor ? `${safeColor}40` : 'rgba(255,255,255,0.15)');
+    let customStyles: any = {};
+    if (activeTemplate?.custom_css) {
+        try {
+            customStyles = JSON.parse(activeTemplate.custom_css);
+        } catch {
+            customStyles = {};
+        }
+    }
+
+    const cardBorderColor = customStyles.card_border_color || activeTemplate?.button_bg_color || safeColor;
+    const buttonBorderColor = customStyles.button_border_color || activeTemplate?.button_bg_color || safeColor;
+    const buttonStyle = customStyles.button_style || 'glass';
+
     const layoutStyle = projectType !== 'LINK' && activeTemplate ? {
         backgroundColor: activeTemplate.bg_color || undefined,
         color: activeTemplate.text_color || undefined,
         fontFamily: activeTemplate.font_family || undefined
     } : {};
 
-    const cardStyle = projectType !== 'LINK' && activeTemplate ? {
+    const cardStyle = projectType !== 'LINK' ? {
         backgroundColor: activeTemplate?.card_bg_color || 'rgba(255,255,255,0.06)',
-        borderColor: cardBorderColor,
+        border: `2px solid ${cardBorderColor}`,
+        boxShadow: `0 8px 25px ${cardBorderColor}30`,
         color: activeTemplate?.text_color || undefined,
     } : {};
 
@@ -217,7 +228,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                 )}
                             </div>
                         ) : projectType === 'BRIDGE' ? (
-                            <div className="flex flex-col items-center justify-center text-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md border border-solid transition-all my-auto w-full" style={cardStyle}>
+                            <div className="flex flex-col items-center justify-center text-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md transition-all my-auto w-full" style={cardStyle}>
                                 {imageUrl?.trim() && (
                                     <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative">
                                         <img
@@ -238,14 +249,19 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                     {description?.trim() || t('businessDescDefault')}
                                 </p>
                                 <button
-                                    style={{ ...btnStyle, borderColor: activeTemplate?.button_bg_color || safeColor }}
-                                    className="px-6 py-3 rounded-lg font-semibold shadow-lg"
+                                    style={{
+                                        backgroundColor: buttonStyle === 'solid' ? (activeTemplate?.button_bg_color || safeColor) : (activeTemplate?.button_bg_color ? `${activeTemplate.button_bg_color}25` : 'rgba(255,255,255,0.08)'),
+                                        color: buttonStyle === 'solid' ? (activeTemplate?.button_text_color || '#fff') : (activeTemplate?.text_color || '#fff'),
+                                        border: `2px solid ${buttonBorderColor}`,
+                                        boxShadow: `0 4px 15px ${buttonBorderColor}30`
+                                    }}
+                                    className="px-6 py-3 rounded-lg font-semibold shadow-lg backdrop-blur-sm"
                                 >
                                     {buttonText?.trim() || t('clickHere')}
                                 </button>
                             </div>
                         ) : projectType === 'CARD' ? (
-                            <div className="flex flex-col items-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md border border-solid transition-all my-auto w-full" style={cardStyle}>
+                            <div className="flex flex-col items-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md transition-all my-auto w-full" style={cardStyle}>
                                 {imageUrl?.trim() && (
                                     <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative rounded-t-3xl overflow-hidden -mt-6 mb-2">
                                         <img
@@ -272,29 +288,51 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                     {projectType === 'CARD' && formData.linksArray && formData.linksArray.length > 0 ? (
                                         formData.linksArray
                                             .filter(link => link.active)
-                                            .map((link) => (
-                                                <a
-                                                    key={link.id}
-                                                    href={link.url}
-                                                    style={{
-                                                        backgroundColor: link.type === 'whatsapp' ? '#25D366' : (activeTemplate?.button_bg_color || safeColor),
-                                                        color: activeTemplate?.button_text_color || '#ffffff',
-                                                        borderColor: link.type === 'whatsapp' ? '#1da851' : (activeTemplate?.button_bg_color || safeColor)
-                                                    }}
-                                                    className="block w-full px-4 py-3 rounded-lg text-center text-sm font-medium shadow-md hover:shadow-lg transition-all border border-solid"
-                                                >
-                                                    <span className="mr-2">{link.icon}</span>
-                                                    {link.label || 'Link'}
-                                                </a>
-                                            ))
+                                            .map((link) => {
+                                                const isWa = link.type === 'whatsapp';
+                                                const isSolid = buttonStyle === 'solid';
+                                                const linkBg = isWa 
+                                                    ? '#25D366' 
+                                                    : (isSolid 
+                                                        ? (activeTemplate?.button_bg_color || safeColor) 
+                                                        : (activeTemplate?.button_bg_color ? `${activeTemplate.button_bg_color}25` : 'rgba(255,255,255,0.08)'));
+                                                const linkBorder = isWa ? '#1da851' : buttonBorderColor;
+                                                const linkTextColor = isWa 
+                                                    ? '#ffffff' 
+                                                    : (isSolid 
+                                                        ? (activeTemplate?.button_text_color || '#ffffff') 
+                                                        : (activeTemplate?.text_color || '#ffffff'));
+
+                                                return (
+                                                    <a
+                                                        key={link.id}
+                                                        href={link.url}
+                                                        style={{
+                                                            backgroundColor: linkBg,
+                                                            color: linkTextColor,
+                                                            border: `2px solid ${linkBorder}`,
+                                                            boxShadow: `0 4px 15px ${linkBorder}30`
+                                                        }}
+                                                        className="block w-full px-4 py-3 rounded-lg text-center text-sm font-semibold transition-all backdrop-blur-sm"
+                                                    >
+                                                        <span className="mr-2">{link.icon}</span>
+                                                        {link.label || 'Link'}
+                                                    </a>
+                                                );
+                                            })
                                     ) : (
                                         <>
                                             {/* Fallback for BRIDGE type or empty CARD */}
                                             {safeUrl && (
                                                 <a
                                                     href={safeUrl}
-                                                    style={{ borderColor: activeTemplate?.button_bg_color || safeColor, color: activeTemplate?.button_bg_color || safeColor }}
-                                                    className="block w-full px-4 py-2 border-2 rounded-lg text-center text-sm font-medium"
+                                                    style={{
+                                                        backgroundColor: buttonStyle === 'solid' ? (activeTemplate?.button_bg_color || safeColor) : (activeTemplate?.button_bg_color ? `${activeTemplate.button_bg_color}25` : 'rgba(255,255,255,0.08)'),
+                                                        color: buttonStyle === 'solid' ? (activeTemplate?.button_text_color || '#ffffff') : (activeTemplate?.text_color || '#ffffff'),
+                                                        border: `2px solid ${buttonBorderColor}`,
+                                                        boxShadow: `0 4px 15px ${buttonBorderColor}30`
+                                                    }}
+                                                    className="block w-full px-4 py-2 rounded-lg text-center text-sm font-semibold transition-all backdrop-blur-sm"
                                                 >
                                                     {buttonText || `🌐 ${t('website')}`}
                                                 </a>
@@ -302,16 +340,21 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                             {whatsapp?.trim() && (
                                                 <a
                                                     href={`https://wa.me/${whatsapp}`}
-                                                    style={{ ...btnStyle, borderColor: activeTemplate?.button_bg_color || safeColor }}
-                                                    className="block w-full px-4 py-2 border border-solid rounded-lg text-center text-sm font-medium"
+                                                    style={{
+                                                        backgroundColor: '#25D366',
+                                                        color: '#ffffff',
+                                                        border: '2px solid #1da851',
+                                                        boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)'
+                                                    }}
+                                                    className="block w-full px-4 py-2 rounded-lg text-center text-sm font-semibold transition-all"
                                                 >
                                                     💬 {t('whatsapp')}
-                                                </a >
+                                                </a>
                                             )}
                                         </>
                                     )}
-                                </div >
-                            </div >
+                                </div>
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center h-full text-center">
                                 <Smartphone className="w-16 h-16 text-slate-300 dark:text-slate-700 mb-4" />
@@ -362,7 +405,16 @@ export const QRdaguaPage: React.FC = () => {
         const fetchTpls = async () => {
             if (profile?.company_id) {
                 const { data } = await templatesService.getAll(profile.company_id);
-                setBridgeTemplates(data || []);
+                const tpls = data || [];
+                setBridgeTemplates(tpls);
+                if (tpls.length > 0) {
+                    setFormData(prev => {
+                        if (!prev.bridgeTemplate) {
+                            return { ...prev, bridgeTemplate: tpls[0].id };
+                        }
+                        return prev;
+                    });
+                }
             }
         };
         fetchTpls();

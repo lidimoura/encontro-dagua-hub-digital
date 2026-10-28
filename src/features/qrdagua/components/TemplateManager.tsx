@@ -11,17 +11,26 @@ export const TemplateManager: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
 
-    const defaultFormData: Partial<BridgeTemplate> = {
+    interface TemplateFormState extends Partial<BridgeTemplate> {
+        card_border_color?: string;
+        button_border_color?: string;
+        button_style?: 'glass' | 'solid';
+    }
+
+    const defaultFormData: TemplateFormState = {
         name: '',
         description: '',
         bg_color: '#f8fafc',
         card_bg_color: '#ffffff',
+        card_border_color: '#3b82f6',
         text_color: '#0f172a',
         button_bg_color: '#3b82f6',
+        button_border_color: '#3b82f6',
         button_text_color: '#ffffff',
+        button_style: 'glass',
     };
 
-    const [formData, setFormData] = useState<Partial<BridgeTemplate>>(defaultFormData);
+    const [formData, setFormData] = useState<TemplateFormState>(defaultFormData);
 
     useEffect(() => {
         if (profile?.company_id) {
@@ -48,13 +57,27 @@ export const TemplateManager: React.FC = () => {
         }
 
         try {
+            const customStylesObj = {
+                card_border_color: formData.card_border_color || formData.button_bg_color || '#3b82f6',
+                button_border_color: formData.button_border_color || formData.button_bg_color || '#3b82f6',
+                button_style: formData.button_style || 'glass'
+            };
+
+            const payload: any = {
+                ...formData,
+                custom_css: JSON.stringify(customStylesObj)
+            };
+            delete payload.card_border_color;
+            delete payload.button_border_color;
+            delete payload.button_style;
+
             if (formData.id) {
-                const { error } = await templatesService.update(formData.id, formData);
+                const { error } = await templatesService.update(formData.id, payload);
                 if (error) throw error;
                 addToast('Template atualizado com sucesso!', 'success');
             } else {
                 const { error } = await templatesService.create({
-                    ...formData as Required<Omit<BridgeTemplate, 'id' | 'created_at'>>,
+                    ...payload as Required<Omit<BridgeTemplate, 'id' | 'created_at'>>,
                     company_id: profile.company_id,
                 });
                 if (error) throw error;
@@ -82,7 +105,20 @@ export const TemplateManager: React.FC = () => {
     };
 
     const handleEdit = (t: BridgeTemplate) => {
-        setFormData(t);
+        let extra: any = {};
+        if (t.custom_css) {
+            try {
+                extra = JSON.parse(t.custom_css);
+            } catch {
+                extra = {};
+            }
+        }
+        setFormData({
+            ...t,
+            card_border_color: extra.card_border_color || t.button_bg_color || '#3b82f6',
+            button_border_color: extra.button_border_color || t.button_bg_color || '#3b82f6',
+            button_style: extra.button_style || 'glass'
+        });
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -186,6 +222,25 @@ export const TemplateManager: React.FC = () => {
                             </div>
 
                             <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Borda do Cartão (card_border_color)</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={formData.card_border_color || formData.button_bg_color || '#3b82f6'}
+                                        onChange={(e) => setFormData(p => ({ ...p, card_border_color: e.target.value }))}
+                                        className="h-10 w-12 cursor-pointer bg-transparent border-none p-0"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={formData.card_border_color || ''}
+                                        placeholder={formData.button_bg_color || '#3b82f6'}
+                                        onChange={(e) => setFormData(p => ({ ...p, card_border_color: e.target.value }))}
+                                        className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white font-mono"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cor do Texto (text_color)</label>
                                 <div className="flex items-center gap-2">
                                     <input
@@ -238,6 +293,55 @@ export const TemplateManager: React.FC = () => {
                                     />
                                 </div>
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Borda dos Botões (button_border_color)</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={formData.button_border_color || formData.button_bg_color || '#3b82f6'}
+                                        onChange={(e) => setFormData(p => ({ ...p, button_border_color: e.target.value }))}
+                                        className="h-10 w-12 cursor-pointer bg-transparent border-none p-0"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={formData.button_border_color || ''}
+                                        placeholder={formData.button_bg_color || '#3b82f6'}
+                                        onChange={(e) => setFormData(p => ({ ...p, button_border_color: e.target.value }))}
+                                        className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white font-mono"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Estilo Visual dos Botões</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(p => ({ ...p, button_style: 'glass' }))}
+                                        className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                            (formData.button_style || 'glass') === 'glass'
+                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                                : 'border-slate-200 dark:border-slate-700 hover:border-primary-500/50'
+                                        }`}
+                                    >
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">✨ Glass com Borda Destacada</p>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Fundo translúcido moderno onde a borda colorida brilha e se destaca.</p>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(p => ({ ...p, button_style: 'solid' }))}
+                                        className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                            formData.button_style === 'solid'
+                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                                : 'border-slate-200 dark:border-slate-700 hover:border-primary-500/50'
+                                        }`}
+                                    >
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">🎨 Sólido Preenchido</p>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Botão totalmente preenchido com a cor de fundo e borda em destaque.</p>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -273,54 +377,68 @@ export const TemplateManager: React.FC = () => {
                                 {/* Sample Bridge Page Content */}
                                 <div className="p-4 pt-16 h-full flex flex-col items-center">
                                     {/* Glass Card */}
-                                    <div
-                                        className="w-full rounded-2xl p-6 text-center shadow-xl backdrop-blur-md border border-solid transition-all"
-                                        style={{
-                                            backgroundColor: formData.card_bg_color || '#ffffff',
-                                            borderColor: formData.button_bg_color ? `${formData.button_bg_color}40` : 'rgba(0,0,0,0.1)'
-                                        }}
-                                    >
-                                        <div className="w-16 h-16 bg-slate-200 rounded-full mx-auto mb-4 border-2 border-white/20"></div>
-                                        <h2
-                                            className="text-lg font-bold mb-2"
-                                            style={{ color: formData.text_color || '#000000' }}
-                                        >
-                                            Sua Empresa
-                                        </h2>
-                                        <p
-                                            className="text-xs mb-6 opacity-80"
-                                            style={{ color: formData.text_color || '#000000' }}
-                                        >
-                                            A melhor solução do mercado.
-                                        </p>
+                                    {(() => {
+                                        const cardBorder = formData.card_border_color || formData.button_bg_color || '#3b82f6';
+                                        const btnBorder = formData.button_border_color || formData.button_bg_color || '#3b82f6';
+                                        const isSolid = formData.button_style === 'solid';
+                                        const btnBg = isSolid ? (formData.button_bg_color || '#3b82f6') : (formData.button_bg_color ? `${formData.button_bg_color}25` : 'rgba(255,255,255,0.1)');
+                                        const btnTextColor = isSolid ? (formData.button_text_color || '#ffffff') : (formData.text_color || '#000000');
 
-                                        <button
-                                            className="w-full py-3 rounded-xl font-bold text-sm shadow-md"
-                                            style={{
-                                                backgroundColor: formData.button_bg_color || '#3b82f6',
-                                                color: formData.button_text_color || '#ffffff'
-                                            }}
-                                        >
-                                            Acessar Produto
-                                        </button>
+                                        return (
+                                            <div
+                                                className="w-full rounded-2xl p-6 text-center shadow-xl backdrop-blur-md transition-all"
+                                                style={{
+                                                    backgroundColor: formData.card_bg_color || '#ffffff',
+                                                    border: `2px solid ${cardBorder}`,
+                                                    boxShadow: `0 10px 30px ${cardBorder}35`
+                                                }}
+                                            >
+                                                <div className="w-16 h-16 bg-slate-200 rounded-full mx-auto mb-4 border-2 border-white/20"></div>
+                                                <h2
+                                                    className="text-lg font-bold mb-2"
+                                                    style={{ color: formData.text_color || '#000000' }}
+                                                >
+                                                    Sua Empresa
+                                                </h2>
+                                                <p
+                                                    className="text-xs mb-6 opacity-80"
+                                                    style={{ color: formData.text_color || '#000000' }}
+                                                >
+                                                    A melhor solução do mercado.
+                                                </p>
 
-                                        <div className="mt-4 flex flex-col gap-2">
-                                            {[1, 2].map((i) => (
-                                                <div
-                                                    key={i}
-                                                    className="w-full p-3 rounded-lg flex items-center gap-3 border"
+                                                <button
+                                                    className="w-full py-3 rounded-xl font-bold text-sm shadow-md transition-all"
                                                     style={{
-                                                        borderColor: formData.button_bg_color || '#3b82f6',
-                                                        color: formData.text_color || '#000000',
-                                                        backgroundColor: 'transparent'
+                                                        backgroundColor: btnBg,
+                                                        color: btnTextColor,
+                                                        border: `2px solid ${btnBorder}`,
+                                                        boxShadow: `0 4px 15px ${btnBorder}40`
                                                     }}
                                                 >
-                                                    <div className="w-6 h-6 rounded-full opacity-50" style={{ backgroundColor: formData.button_bg_color || '#3b82f6' }}></div>
-                                                    <span className="text-sm font-medium">Link Externo {i}</span>
+                                                    Acessar Produto
+                                                </button>
+
+                                                <div className="mt-4 flex flex-col gap-2">
+                                                    {[1, 2].map((i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="w-full p-3 rounded-lg flex items-center gap-3 transition-all"
+                                                            style={{
+                                                                border: `2px solid ${btnBorder}`,
+                                                                color: btnTextColor,
+                                                                backgroundColor: btnBg,
+                                                                boxShadow: `0 4px 12px ${btnBorder}25`
+                                                            }}
+                                                        >
+                                                            <div className="w-6 h-6 rounded-full opacity-60" style={{ backgroundColor: btnBorder }}></div>
+                                                            <span className="text-sm font-medium">Link Externo {i}</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>
