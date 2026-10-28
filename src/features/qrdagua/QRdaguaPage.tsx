@@ -101,6 +101,11 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
     } = formData;
 
     const activeTemplate = templates.find(t => t.id === bridgeTemplate) || templates[0];
+    const safeColor = color || '#620939';
+
+    const cardBorderColor = activeTemplate?.button_bg_color
+        ? `${activeTemplate.button_bg_color}40`
+        : (safeColor ? `${safeColor}40` : 'rgba(255,255,255,0.15)');
     const layoutStyle = projectType !== 'LINK' && activeTemplate ? {
         backgroundColor: activeTemplate.bg_color || undefined,
         color: activeTemplate.text_color || undefined,
@@ -108,7 +113,9 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
     } : {};
 
     const cardStyle = projectType !== 'LINK' && activeTemplate ? {
-        backgroundColor: activeTemplate.card_bg_color || undefined,
+        backgroundColor: activeTemplate?.card_bg_color || 'rgba(255,255,255,0.06)',
+        borderColor: cardBorderColor,
+        color: activeTemplate?.text_color || undefined,
     } : {};
 
     const btnStyle = projectType !== 'LINK' && activeTemplate ? {
@@ -117,7 +124,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
     } : { backgroundColor: color, color: '#fff' };
 
     // Safe color with fallback
-    const safeColor = color || '#620939';
+
     const safeUrl = destinationUrl?.trim() || '';
 
     return (
@@ -210,7 +217,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                 )}
                             </div>
                         ) : projectType === 'BRIDGE' ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                            <div className="flex flex-col items-center justify-center text-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md border border-solid transition-all my-auto w-full" style={cardStyle}>
                                 {imageUrl?.trim() && (
                                     <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative">
                                         <img
@@ -231,14 +238,14 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                     {description?.trim() || t('businessDescDefault')}
                                 </p>
                                 <button
-                                    style={btnStyle}
+                                    style={{ ...btnStyle, borderColor: activeTemplate?.button_bg_color || safeColor }}
                                     className="px-6 py-3 rounded-lg font-semibold shadow-lg"
                                 >
                                     {buttonText?.trim() || t('clickHere')}
                                 </button>
                             </div>
                         ) : projectType === 'CARD' ? (
-                            <div className="flex flex-col items-center space-y-4 py-6">
+                            <div className="flex flex-col items-center space-y-4 p-4 rounded-2xl shadow-xl backdrop-blur-md border border-solid transition-all my-auto w-full" style={cardStyle}>
                                 {imageUrl?.trim() && (
                                     <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative rounded-t-3xl overflow-hidden -mt-6 mb-2">
                                         <img
@@ -270,10 +277,11 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                                     key={link.id}
                                                     href={link.url}
                                                     style={{
-                                                        backgroundColor: link.type === 'whatsapp' ? '#25D366' : safeColor,
-                                                        borderColor: safeColor
+                                                        backgroundColor: link.type === 'whatsapp' ? '#25D366' : (activeTemplate?.button_bg_color || safeColor),
+                                                        color: activeTemplate?.button_text_color || '#ffffff',
+                                                        borderColor: link.type === 'whatsapp' ? '#1da851' : (activeTemplate?.button_bg_color || safeColor)
                                                     }}
-                                                    className="block w-full px-4 py-3 text-white rounded-lg text-center text-sm font-medium shadow-md hover:shadow-lg transition-all"
+                                                    className="block w-full px-4 py-3 rounded-lg text-center text-sm font-medium shadow-md hover:shadow-lg transition-all border border-solid"
                                                 >
                                                     <span className="mr-2">{link.icon}</span>
                                                     {link.label || 'Link'}
@@ -285,7 +293,7 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                             {safeUrl && (
                                                 <a
                                                     href={safeUrl}
-                                                    style={{ borderColor: safeColor, color: safeColor }}
+                                                    style={{ borderColor: activeTemplate?.button_bg_color || safeColor, color: activeTemplate?.button_bg_color || safeColor }}
                                                     className="block w-full px-4 py-2 border-2 rounded-lg text-center text-sm font-medium"
                                                 >
                                                     {buttonText || `🌐 ${t('website')}`}
@@ -294,8 +302,8 @@ const PhoneMockup: React.FC<{ formData: QRFormData; templates?: BridgeTemplate[]
                                             {whatsapp?.trim() && (
                                                 <a
                                                     href={`https://wa.me/${whatsapp}`}
-                                                    style={btnStyle}
-                                                    className="block w-full px-4 py-2 rounded-lg text-center text-sm font-medium"
+                                                    style={{ ...btnStyle, borderColor: activeTemplate?.button_bg_color || safeColor }}
+                                                    className="block w-full px-4 py-2 border border-solid rounded-lg text-center text-sm font-medium"
                                                 >
                                                     💬 {t('whatsapp')}
                                                 </a >

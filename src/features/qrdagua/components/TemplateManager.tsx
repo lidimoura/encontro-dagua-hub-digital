@@ -274,8 +274,11 @@ export const TemplateManager: React.FC = () => {
                                 <div className="p-4 pt-16 h-full flex flex-col items-center">
                                     {/* Glass Card */}
                                     <div
-                                        className="w-full rounded-2xl p-6 text-center shadow-xl backdrop-blur-md"
-                                        style={{ backgroundColor: formData.card_bg_color || '#ffffff' }}
+                                        className="w-full rounded-2xl p-6 text-center shadow-xl backdrop-blur-md border border-solid transition-all"
+                                        style={{
+                                            backgroundColor: formData.card_bg_color || '#ffffff',
+                                            borderColor: formData.button_bg_color ? `${formData.button_bg_color}40` : 'rgba(0,0,0,0.1)'
+                                        }}
                                     >
                                         <div className="w-16 h-16 bg-slate-200 rounded-full mx-auto mb-4 border-2 border-white/20"></div>
                                         <h2

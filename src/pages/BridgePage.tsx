@@ -320,7 +320,16 @@ export const BridgePage: React.FC = () => {
 
                 <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
                     {/* Glassmorphism Container - Dark Mode */}
-                    <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden" style={template?.card_bg_color ? { backgroundColor: template.card_bg_color } : {}}>
+                    {/* Glassmorphism Container */}
+                    <div
+                        className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-solid overflow-hidden transition-all"
+                        style={{
+                            backgroundColor: template?.card_bg_color || undefined,
+                            borderColor: template?.button_bg_color
+                                ? `${template.button_bg_color}40`
+                                : (data?.color ? `${data.color}40` : 'rgba(255,255,255,0.15)')
+                        }}
+                    >
                         {/* Header Image */}
                         {data.image_url && (
                             <div className="w-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-violet-900/20 relative">
@@ -482,11 +491,12 @@ export const BridgePage: React.FC = () => {
                                             href={link.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                            className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden border border-solid"
                                             style={{
                                                 background: link.type === 'whatsapp' ? '#25D366' : (template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`),
                                                 color: template?.button_text_color || '#ffffff',
-                                                boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`
+                                                boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`,
+                                                borderColor: link.type === 'whatsapp' ? '#1da851' : (template?.button_bg_color || data.color || '#a855f7')
                                             }}
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
@@ -499,10 +509,11 @@ export const BridgePage: React.FC = () => {
                                         {data.destination_url && (
                                             <button
                                                 onClick={() => setIframeOpen(true)}
-                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden w-full"
+                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 rounded-2xl font-bold text-white shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden w-full border border-solid"
                                                 style={{
                                                     background: template?.button_bg_color || `linear-gradient(135deg, ${data.color || '#7c3aed'} 0%, ${data.color || '#a855f7'} 100%)`,
                                                     boxShadow: `0 10px 40px ${data.color || '#7c3aed'}40`,
+                                                borderColor: template?.button_bg_color || data.color || '#a855f7',
                                                     color: template?.button_text_color || '#ffffff'
                                                 }}
                                             >
@@ -519,7 +530,7 @@ export const BridgePage: React.FC = () => {
                                                 href={`https://wa.me/${data.whatsapp.replace(/\D/g, '')}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold text-white shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden"
+                                                className="group relative flex items-center justify-center gap-3 px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold text-white shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden border border-solid border-green-500/40"
                                                 style={{ boxShadow: '0 10px 40px rgba(34, 197, 94, 0.3)' }}
                                             >
                                                 {/* Shine Effect */}
